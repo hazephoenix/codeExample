@@ -26,7 +26,7 @@ class AppConfig {
         val converter = MappingJackson2MessageConverter()
         converter.setTargetType(MessageType.TEXT)
         converter.setTypeIdPropertyName("_type")
-        return converter;
+        return converter
     }
 
     @Bean
@@ -36,7 +36,7 @@ class AppConfig {
 
         module.addSerializer(Reference::class.java, ReferenceSerializer())
         module.addDeserializer(Reference::class.java, ReferenceDeserializer())
-
+        mapper.registerModule(module)
         return mapper
     }
 }

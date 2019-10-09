@@ -15,7 +15,7 @@ class ReferenceDeserializer : JsonDeserializer<Reference>() {
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Reference {
         val node = p.codec.readTree<JsonNode>(p)
-        val value = node["value"].textValue()
+        val value = node["reference"]["value"].textValue()
         val (resourceType, id) = value.split("/")
         return Reference(object : Resource {
             override val identifier: Identifier = Identifier(id)

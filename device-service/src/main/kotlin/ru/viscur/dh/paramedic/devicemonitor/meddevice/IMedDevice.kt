@@ -2,6 +2,7 @@ package ru.viscur.dh.paramedic.devicemonitor.meddevice
 
 import ru.viscur.dh.paramedic.devicemonitor.dto.Device
 import ru.viscur.dh.paramedic.devicemonitor.dto.DeviceStatus
+import ru.viscur.dh.paramedic.devicemonitor.dto.Identifier
 import ru.viscur.dh.paramedic.devicemonitor.dto.Observation
 
 /**
@@ -20,5 +21,5 @@ interface IMedDevice {
     /**
      * Информация об устройстве
      */
-    fun info(): Device = Device(status = DeviceStatus.Unknown)
+    fun info(): Device = Device(status = DeviceStatus.Unknown, identifier = Identifier())
 }

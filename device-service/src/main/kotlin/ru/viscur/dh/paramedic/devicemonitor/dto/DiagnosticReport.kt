@@ -10,6 +10,6 @@ data class DiagnosticReport(
         override val identifier: Identifier,
         val status: DiagnosticReportStatus = DiagnosticReportStatus.Registered,
         val code: String,
-        val encounter: Reference<Encounter>,
+        val encounter: Reference,
         val result: List<Observation>
 ) : Resource

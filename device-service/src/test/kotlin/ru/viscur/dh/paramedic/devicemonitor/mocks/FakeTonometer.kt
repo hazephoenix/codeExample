@@ -8,8 +8,7 @@ import java.util.*
  * Created at 30.09.2019 15:52 by TimochkinEA
  */
 class FakeTonometer(
-        override val delayToResult: Long = 20000L,
-        override val id: String = "fake-tonometer"
+        override val delayToResult: Long = 20000L
 ) : FakeMedDevice {
     override fun take(): Observation {
         sleep(delayToResult)
