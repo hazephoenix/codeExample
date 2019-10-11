@@ -29,6 +29,7 @@ class DeviceQueueListener {
     @Autowired
     private lateinit var publisher: ApplicationEventPublisher
 
+/*
     @JmsListener(destination = "\${uid}-paramedic-requests")
     fun incoming(request: ObjectNode) {
         val r = mapper.treeToValue(request, ServiceRequest::class.java)
@@ -36,4 +37,5 @@ class DeviceQueueListener {
         if (log.isDebugEnabled) log.debug(r.toString())
         publisher.publishEvent(MedMetricRequestEvent(r))
     }
+*/
 }

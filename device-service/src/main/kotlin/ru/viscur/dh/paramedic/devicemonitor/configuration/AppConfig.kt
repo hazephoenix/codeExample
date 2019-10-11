@@ -8,6 +8,7 @@ import org.springframework.jms.annotation.EnableJms
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter
 import org.springframework.jms.support.converter.MessageType
+import org.springframework.web.client.RestTemplate
 import ru.viscur.dh.paramedic.devicemonitor.dto.Reference
 import ru.viscur.dh.paramedic.devicemonitor.jackson.ReferenceDeserializer
 import ru.viscur.dh.paramedic.devicemonitor.jackson.ReferenceSerializer
@@ -39,4 +40,8 @@ class AppConfig {
         mapper.registerModule(module)
         return mapper
     }
+
+    @Bean
+    fun restTemplate() = RestTemplate()
+
 }
