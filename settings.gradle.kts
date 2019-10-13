@@ -1,11 +1,23 @@
 rootProject.name = "DigitalHospital"
 
 include(
-        "data-storage",
-        "device-service",
-        "fhir-model"//,
-//        "queue-manager",
-//        "service-app"
+        "common:spring-boot:flyway-module-configuration",
+        "common:fhir-model",
+        "service:data-storage-service",
+        "service:data-storage-service:data-storage-service-api",
+        "service:data-storage-service:data-storage-service-impl",
+        "service:queue-manager-service:queue-manager-service-api",
+        "service:queue-manager-service:queue-manager-service-impl",
+        "service:queue-manager-service:queue-manager-service-rest",
+        "service:queue-manager-service:queue-manager-service-rest-cli",
+        "service:mis-integration-service",
+        "service:mis-integration-service:mis-integration-service-api",
+        "service:mis-integration-service:mis-integration-service-impl",
+        "service:location-service:location-service-api",
+        "service:location-service:location-service-impl",
+        "applications:dh-central-server-app",
+        "applications:dh-paramedic-device-app"
+        /*TODO "applications:dh-rfid-location-device-app"*/
 )
 
 pluginManagement {

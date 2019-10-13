@@ -17,7 +17,17 @@ import ru.digitalhospital.queueManager.service.QueueManager
 import java.text.SimpleDateFormat
 
 @RunWith(SpringRunner::class)
-@SpringBootTest(classes = [QueueManagerApplication::class])
+@SpringBootTest(
+        classes = [QueueManagerAutoconf::class],
+        properties = [
+            "ru.viscur.dh.queue-manager.enabled=true",
+            "ru.viscur.dh.queue-manager.datasource.url=jdbc:hsqldb:mem:test;sql.syntax_ora=true",
+            "ru.viscur.dh.queue-manager.datasource.username=queue",
+            "ru.viscur.dh.queue-manager.datasource.password=queuepass",
+            "ru.viscur.dh.queue-manager.datasource.driver-class-name=org.hsqldb.jdbc.JDBCDriver",
+            "ru.viscur.dh.queue-manager.datasource.hibernate.dialect=org.hibernate.dialect.Oracle10gDialect"
+        ]
+)
 class RegisterUserTest {
 
     @Autowired

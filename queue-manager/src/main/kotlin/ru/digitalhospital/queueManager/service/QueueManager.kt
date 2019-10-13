@@ -39,13 +39,9 @@ class QueueManager(
 ) {
 
     var surveyTypes = listOf<SurveyType>()
-
     var offices = listOf<Office>()
-
     private var users = mutableListOf<User>()
-
     var routeSheets = mutableListOf<RouteSheet>()
-
     private var finished = mutableListOf<RouteSheet>()
 
     /**

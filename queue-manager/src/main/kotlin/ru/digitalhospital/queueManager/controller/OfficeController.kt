@@ -1,9 +1,9 @@
 package ru.digitalhospital.queueManager.controller
 
-import org.springframework.web.bind.annotation.GetMapping
+/*import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RestController*/
 import ru.digitalhospital.queueManager.service.QueueManager
 
 /**
@@ -11,15 +11,18 @@ import ru.digitalhospital.queueManager.service.QueueManager
  *
  * Контроллер для кабинетов
  */
+/*
 @RestController
 @RequestMapping("offices")
 class OfficeController(private val queueManager: QueueManager) {
 
-    /**
+    */
+/**
      * Информация о кабинете, его очереди, последнем принятом пациенте
-     */
+     *//*
+
     @GetMapping
     fun info(
             @RequestParam officeId: Long
     ) = queueManager.officeById(officeId)
-}
+}*/
