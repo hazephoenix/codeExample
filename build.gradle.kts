@@ -77,8 +77,8 @@ subprojects {
 
         dependencyManagement {
             dependencies {
-                //dependency("org.springframework:spring-core:5.2.0.RELEASE")
                 dependency("com.vladmihalcea:hibernate-types-52:2.7.0")
+                dependency("org.postgresql:postgresql:42.2.8")
             }
         }
 
