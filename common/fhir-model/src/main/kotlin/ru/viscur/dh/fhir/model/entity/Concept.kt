@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Concept @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Concept,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Concept.id,
         @JsonProperty("code") val code: String,
         @JsonProperty("parentCode") val parentCode: String? = null,
         @JsonProperty("display") val display: String,

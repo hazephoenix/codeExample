@@ -27,7 +27,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class ServiceRequest @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.ServiceRequest,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ServiceRequest.id,
         @JsonProperty("status") val status: ServiceRequestStatus = ServiceRequestStatus.active,
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("performer") val performer: List<Reference>? = null,

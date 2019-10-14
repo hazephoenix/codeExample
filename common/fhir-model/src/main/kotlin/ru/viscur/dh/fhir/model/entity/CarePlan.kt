@@ -31,7 +31,7 @@ import java.sql.Timestamp
 class CarePlan @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.CarePlan,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.CarePlan.id,
         @JsonProperty("status") val status: CarePlanStatus = CarePlanStatus.active,
         @JsonProperty("intent") val intent: CarePlanIntent = CarePlanIntent.plan,
         @JsonProperty("created") val created: Timestamp,

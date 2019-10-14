@@ -23,7 +23,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Location @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Location,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Location.id,
         @JsonProperty("name") val name: String,
         @JsonProperty("status") val status: LocationStatus,
         @JsonProperty("address") val address: Address? = null,

@@ -19,7 +19,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class ChargeItem @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.ChargeItem,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ChargeItem.id,
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("service") val service: List<Reference>
 ) : BaseResource(id, identifier, resourceType)

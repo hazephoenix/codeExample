@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Encounter @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Encounter,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Encounter.id,
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("diagnosis") val diagnosis: List<EncounterDiagnosis>? = null,
         @JsonProperty("hospitalization") val hospitalization: EncounterHospitalization? = null,

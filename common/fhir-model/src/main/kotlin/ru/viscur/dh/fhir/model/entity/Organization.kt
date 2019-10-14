@@ -19,7 +19,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Organization @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Organization,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Organization.id,
         @JsonProperty("name") val name: String,
         @JsonProperty("address") val address: List<Address>? = null
 ) : BaseResource(id, identifier, resourceType)

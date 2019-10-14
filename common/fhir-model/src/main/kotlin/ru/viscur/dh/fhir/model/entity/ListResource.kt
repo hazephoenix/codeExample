@@ -23,7 +23,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class ListResource @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.ListResource,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ListResource.id,
         @JsonProperty("status") val status: ListResourceStatus = ListResourceStatus.current,
         @JsonProperty("mode") val mode: ListResourceMode = ListResourceMode.working,
         @JsonProperty("entry") val entry: List<ListResourceEntry>,

@@ -22,7 +22,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Practitioner @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Practitioner,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Practitioner.id,
         @JsonProperty("name") val name: List<HumanName>,
         @JsonProperty("gender") val gender: Gender = Gender.unknown,
         @JsonProperty("qualification") val qualification: PractitionerQualification

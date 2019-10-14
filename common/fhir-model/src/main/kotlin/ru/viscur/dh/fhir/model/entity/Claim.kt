@@ -25,7 +25,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Claim @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Claim,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Claim.id,
         @JsonProperty("patient") val patient: Reference,
         @JsonProperty("status") val status: ClaimStatus =  ClaimStatus.active,
         @JsonProperty("supportingInfo") val supportingInfo: List<ClaimSupportingInfo>? = null,

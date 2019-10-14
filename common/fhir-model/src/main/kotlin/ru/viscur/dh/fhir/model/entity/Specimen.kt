@@ -23,7 +23,7 @@ import java.sql.Timestamp
 class Specimen @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>?,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Specimen,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Specimen.id,
         @JsonProperty("status") val status: SpecimenStatus,
         @JsonProperty("type") val type: CodeableConcept,
         @JsonProperty("subject") val subject: Reference,

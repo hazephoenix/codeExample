@@ -22,7 +22,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class ValueSet @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.ValueSet,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ValueSet.id,
         @JsonProperty("url") val url: String,
         @JsonProperty("name") val name: String,
         @JsonProperty("title") val title: String,

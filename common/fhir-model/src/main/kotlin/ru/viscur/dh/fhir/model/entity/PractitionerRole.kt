@@ -24,7 +24,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class PractitionerRole @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.PractitionerRole,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.PractitionerRole.id,
         @JsonProperty("practitioner") val practitioner: Reference,
         @JsonProperty("code") val code: List<CodeableConcept>,
         @JsonProperty("speciality") val speciality: List<CodeableConcept>,

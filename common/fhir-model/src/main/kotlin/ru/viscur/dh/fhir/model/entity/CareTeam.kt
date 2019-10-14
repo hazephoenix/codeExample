@@ -24,7 +24,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class CareTeam @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.CareTeam,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.CareTeam.id,
         @JsonProperty("category") val category: List<CodeableConcept>,
         @JsonProperty("name") val name: String,
         @JsonProperty("participant") val participant: List<CareTeamParticipant>,

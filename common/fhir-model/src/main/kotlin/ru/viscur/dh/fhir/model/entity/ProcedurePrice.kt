@@ -18,7 +18,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class ProcedurePrice @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>?,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Patient,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Patient.id,
         @JsonProperty("code") val code: Coding,
         @JsonProperty("price") val price: Double
 ) : BaseResource(id, identifier, resourceType)

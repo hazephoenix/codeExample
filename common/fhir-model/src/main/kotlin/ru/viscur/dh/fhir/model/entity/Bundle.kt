@@ -19,7 +19,7 @@ import ru.viscur.dh.fhir.model.valueSets.BundleType
 class Bundle @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Bundle,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Bundle.id,
         @JsonProperty("type") var type: String = BundleType.BATCH.value,
         @JsonProperty("entry") val entry: List<BundleEntry>
 ) : BaseResource(id, identifier, resourceType)

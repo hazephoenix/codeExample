@@ -25,7 +25,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class DiagnosticReport @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.DiagnosticReport,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.DiagnosticReport.id,
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("performer") val performer: List<Reference>,
         @JsonProperty("conclusion") val conclusion: String? = null,

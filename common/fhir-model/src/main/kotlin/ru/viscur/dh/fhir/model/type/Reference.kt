@@ -17,7 +17,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
  */
 class Reference @JsonCreator constructor(
         @JsonProperty("reference") val reference: String? = null,
-        @JsonProperty("type") val type: ResourceType? = null,
+        @JsonProperty("type") val type: ResourceType.ResourceTypeId? = null,
         @JsonProperty("identifier") val identifier: Identifier? = null,
         @JsonProperty("display") val display: String? = null
 ) {

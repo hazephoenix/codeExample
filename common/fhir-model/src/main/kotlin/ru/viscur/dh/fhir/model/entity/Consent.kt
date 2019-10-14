@@ -26,7 +26,7 @@ import java.sql.Timestamp
 class Consent @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Consent,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Consent.id,
         @JsonProperty("category") val category: List<CodeableConcept>,
         @JsonProperty("status") val status: ConsentStatus = ConsentStatus.active,
         @JsonProperty("dateTime") val dateTime: Timestamp,

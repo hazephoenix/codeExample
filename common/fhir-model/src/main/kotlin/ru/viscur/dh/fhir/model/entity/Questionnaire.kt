@@ -20,7 +20,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Questionnaire @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Questionnaire,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Questionnaire.id,
         @JsonProperty("name") val name: String,
         @JsonProperty("title") val title: String,
         @JsonProperty("item") val item: List<QuestionnaireItem>

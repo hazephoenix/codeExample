@@ -26,7 +26,7 @@ import java.util.*
 class ClinicalImpression @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.ClinicalImpression,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ClinicalImpression.id,
         @JsonProperty("status") val status: ClinicalImpressionStatus,
         @JsonProperty("date") val date: Date,
         @JsonProperty("subject") val subject: Reference,

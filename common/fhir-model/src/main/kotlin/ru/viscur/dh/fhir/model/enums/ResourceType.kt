@@ -1,36 +1,89 @@
 package ru.viscur.dh.fhir.model.enums
 
-import ru.viscur.dh.fhir.model.entity.BaseResource
-import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.*
+import java.lang.IllegalStateException
 
 /**
  * Created at 03.10.2019 10:30 by SherbakovaMA
  *
  * Используемые типы ресурсов
  */
-enum class ResourceType(val clazz: Class<out BaseResource>) {
-    Bundle(ru.viscur.dh.fhir.model.entity.Bundle::class.java),
-    CarePlan(ru.viscur.dh.fhir.model.entity.CarePlan::class.java),
-    CareTeam(ru.viscur.dh.fhir.model.entity.CareTeam::class.java),
-    ChargeItem(ru.viscur.dh.fhir.model.entity.ChargeItem::class.java),
-    Claim(ru.viscur.dh.fhir.model.entity.Claim::class.java),
-    ClinicalImpression(ru.viscur.dh.fhir.model.entity.ClinicalImpression::class.java),
-    Concept(ru.viscur.dh.fhir.model.entity.Concept::class.java),
-    Consent(ru.viscur.dh.fhir.model.entity.Consent::class.java),
-    DiagnosticReport(ru.viscur.dh.fhir.model.entity.DiagnosticReport::class.java),
-    Encounter(ru.viscur.dh.fhir.model.entity.Encounter::class.java),
-    HealthcareService(ru.viscur.dh.fhir.model.entity.HealthcareService::class.java),
-    ListResource(ru.viscur.dh.fhir.model.entity.ListResource::class.java),
-    Location(ru.viscur.dh.fhir.model.entity.Location::class.java),
-    Observation(ru.viscur.dh.fhir.model.entity.Observation::class.java),
-    Organization(ru.viscur.dh.fhir.model.entity.Organization::class.java),
-    Patient(ru.viscur.dh.fhir.model.entity.Patient::class.java),
-    Practitioner(ru.viscur.dh.fhir.model.entity.Practitioner::class.java),
-    PractitionerRole(ru.viscur.dh.fhir.model.entity.PractitionerRole::class.java),
-    Procedure(ru.viscur.dh.fhir.model.entity.Procedure::class.java),
-    Questionnaire(ru.viscur.dh.fhir.model.entity.Questionnaire::class.java),
-    QuestionnaireResponse(ru.viscur.dh.fhir.model.entity.QuestionnaireResponse::class.java),
-    ServiceRequest(ru.viscur.dh.fhir.model.entity.ServiceRequest::class.java),
-    Specimen(ru.viscur.dh.fhir.model.entity.Specimen::class.java),
-    ValueSet(ru.viscur.dh.fhir.model.entity.ValueSet::class.java)
+
+class ResourceType<TEntityClass>
+private constructor(
+        val id: ResourceTypeId,
+        val entityClass: Class<TEntityClass>
+) {
+    companion object {
+        val Bundle = createType<Bundle>(ResourceTypeId.Bundle)
+        val CarePlan = createType<CarePlan>(ResourceTypeId.CarePlan)
+        val CareTeam = createType<CareTeam>(ResourceTypeId.CareTeam)
+        val ChargeItem = createType<ChargeItem>(ResourceTypeId.ChargeItem)
+        val Claim = createType<Claim>(ResourceTypeId.Claim)
+        val ClinicalImpression = createType<ClinicalImpression>(ResourceTypeId.ClinicalImpression)
+        val Concept = createType<Concept>(ResourceTypeId.Concept)
+        val Consent = createType<Consent>(ResourceTypeId.Consent)
+        val DiagnosticReport = createType<DiagnosticReport>(ResourceTypeId.DiagnosticReport)
+        val Encounter = createType<Encounter>(ResourceTypeId.Encounter)
+        val HealthcareService = createType<HealthcareService>(ResourceTypeId.HealthcareService)
+        val ListResource = createType<ListResource>(ResourceTypeId.ListResource)
+        val Location = createType<Location>(ResourceTypeId.Location)
+        val Observation = createType<Observation>(ResourceTypeId.Observation)
+        val Organization = createType<Organization>(ResourceTypeId.Organization)
+        val Patient = createType<Patient>(ResourceTypeId.Patient)
+        val Practitioner = createType<Practitioner>(ResourceTypeId.Practitioner)
+        val PractitionerRole = createType<PractitionerRole>(ResourceTypeId.PractitionerRole)
+        val Procedure = createType<Procedure>(ResourceTypeId.Procedure)
+        val Questionnaire = createType<Questionnaire>(ResourceTypeId.Questionnaire)
+        val QuestionnaireResponse = createType<QuestionnaireResponse>(ResourceTypeId.QuestionnaireResponse)
+        val ServiceRequest = createType<ServiceRequest>(ResourceTypeId.ServiceRequest)
+        val Specimen = createType<Specimen>(ResourceTypeId.Specimen)
+        val ValueSet = createType<ValueSet>(ResourceTypeId.ValueSet)
+
+
+        private val typesByIdString = mutableMapOf<String, ResourceType<out BaseResource>>()
+        private inline fun <reified TEntityClass : BaseResource> createType(id: ResourceTypeId): ResourceType<TEntityClass> {
+            val instance = ResourceType(id, TEntityClass::class.java);
+            val key = id.toString()
+            if (typesByIdString.containsKey(key)) {
+                throw IllegalStateException("Duplicate id '$key' for a resource type")
+            }
+            typesByIdString[key] = instance
+            return instance
+        }
+
+        fun byId(id: String): ResourceType<out BaseResource> = typesByIdString[id]
+                ?: throw Exception("Unknown resource type '$id'")
+
+        fun byId(id: ResourceTypeId) = byId(id.toString())
+
+    }
+
+    enum class ResourceTypeId {
+        Bundle,
+        CarePlan,
+        CareTeam,
+        ChargeItem,
+        Claim,
+        ClinicalImpression,
+        Concept,
+        Consent,
+        DiagnosticReport,
+        Encounter,
+        HealthcareService,
+        ListResource,
+        Location,
+        Observation,
+        Organization,
+        Patient,
+        Practitioner,
+        PractitionerRole,
+        Procedure,
+        Questionnaire,
+        QuestionnaireResponse,
+        ServiceRequest,
+        Specimen,
+        ValueSet
+    }
+
 }

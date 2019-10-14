@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class Procedure @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Procedure,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Procedure.id,
         @JsonProperty("code") val code: CodeableConcept,
         @JsonProperty("location") val location: Reference
 ) : BaseResource(id, identifier, resourceType)

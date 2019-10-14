@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.utils.genId
 class HealthcareService @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.HealthcareService,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.HealthcareService.id,
         @JsonProperty("name") val name: String,
         @JsonProperty("type") val type: List<CodeableConcept>,
         @JsonProperty("location") val location: List<Reference>

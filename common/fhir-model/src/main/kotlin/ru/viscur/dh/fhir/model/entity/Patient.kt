@@ -25,7 +25,7 @@ import java.util.*
 class Patient @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>?,
-        @JsonProperty("resourceType") resourceType: ResourceType = ResourceType.Patient,
+        @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Patient.id,
         @JsonProperty("name") val name: List<HumanName>,
         @JsonProperty("birthDate") val birthDate: Date,
         @JsonProperty("gender") val gender: Gender,
