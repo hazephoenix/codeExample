@@ -7,11 +7,25 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 fun isBuildableProject(project: Project) = project.childProjects.isEmpty()
 
 /**
- * Проверка, является ли проект исполняемым. По умолчанию, все проекты, которые находится в applications,
+ * Проверка, является ли проект исполняемым. По умолчанию, все проекты, которые находится в applications
  * считаются исполняемыми
  */
 fun isExecutableProject(project: Project) = project.path.startsWith(":applications:")
 
+/**
+ * Подключать ли автоматически SpringBoot
+ */
+fun isApplySpringBoot(project: Project): Boolean {
+    if (project.path.startsWith(":common:")) {
+        // Если какому-то модулю в common нужен boot, подключаем в самом модуле
+        return false;
+    }
+    if (project.path.endsWith("-api")) {
+        // В api не нужен boot (бесполезная или даже вредная зависимость)
+        return false;
+    }
+    return true
+}
 
 plugins {
     kotlin("jvm") version "1.3.50"
@@ -24,7 +38,6 @@ plugins {
 
 
 allprojects {
-    //if (isBuildableProject(this)) {
     repositories {
         mavenCentral()
         // TODO убрать milestone и snapshot как релизнится spring boot 2.2.0
@@ -47,16 +60,18 @@ allprojects {
             }
         }
     }
-    //}
 }
 
 subprojects {
     if (isBuildableProject(this)) {
+        val applyBoot = isApplySpringBoot(this)
         // Плагины для всех подпроектов
         apply(plugin = "java")
         apply(plugin = "org.jetbrains.kotlin.jvm")
-        apply(plugin = "org.springframework.boot")
         apply(plugin = "io.spring.dependency-management")
+        if (applyBoot) {
+            apply(plugin = "org.springframework.boot")
+        }
         apply(plugin = "org.jetbrains.kotlin.plugin.spring") // Todo может быть не надо во все проекты добавлять?
         apply(plugin = "org.jetbrains.kotlin.plugin.jpa")    // Todo может быть не надо во все проекты добавлять?
 
@@ -71,13 +86,15 @@ subprojects {
         dependencies {
             implementation(kotlin("stdlib-jdk8"))
             implementation(kotlin("reflect"))
-            implementation("org.springframework.boot:spring-boot-starter")
             implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
 
-            testImplementation("org.springframework.boot:spring-boot-starter-test") {
-                //            exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+            if (applyBoot) {
+                implementation("org.springframework.boot:spring-boot-starter")
+                testImplementation("org.springframework.boot:spring-boot-starter-test") {
+                    //            exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+                }
+                annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
             }
-            annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
         }
         if (isExecutableProject(this)) {
             println("Configure executable project: ${this.path}")
