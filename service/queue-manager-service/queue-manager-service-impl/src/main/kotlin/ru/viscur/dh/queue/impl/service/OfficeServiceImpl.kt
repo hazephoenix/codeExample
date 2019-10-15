@@ -1,6 +1,7 @@
 package ru.viscur.dh.queue.impl.service
 
 import ru.viscur.dh.datastorage.api.LocationService
+import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.entity.QueueHistoryOfOffice
@@ -19,7 +20,8 @@ import ru.viscur.dh.queue.impl.msToSeconds
 import ru.viscur.dh.queue.impl.now
 
 class OfficeServiceImpl(
-        private val locationService: LocationService
+        private val locationService: LocationService,
+        private val patientService: PatientService
 ) : OfficeService {
     override fun changeStatus(office: Location, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
         val now = now()
@@ -33,7 +35,8 @@ class OfficeServiceImpl(
         patientIdOfPrevProcess?.run {
             val patient = patient(this)
             queueHistoryOfOffice.apply {
-                //                severity = type//todo severity по пациенту
+                severity = patientService.severity(patientIdOfPrevProcess)
+
 //                diagnosticConclusion = diagnostic//todo диагностик из diagnostic report (предварительный) по пациенту
                 ageGroup = ageGroup(patient!!.birthDate!!)
             }
