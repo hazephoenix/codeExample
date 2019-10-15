@@ -38,7 +38,7 @@ private const val ENTITY_PACKAGE = "$PERSISTENCE_PACKAGE.model"
         basePackages = [REPOSITORY_PACKAGE],
         entityManagerFactoryRef = "qmEntityManagerFactory"
 )
-class BootAutoconf {
+class QueueManagerConfig {
 
     @Bean
     @Qualifier("qmDataSourceProperties")

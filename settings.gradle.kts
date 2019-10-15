@@ -13,6 +13,7 @@ include(
         "service:mis-integration-service",
         "service:mis-integration-service:mis-integration-service-api",
         "service:mis-integration-service:mis-integration-service-impl",
+        "service:mis-integration-service:mis-integration-service-rest",
         "service:location-service:location-service-api",
         "service:location-service:location-service-impl",
         "applications:dh-central-server-app",

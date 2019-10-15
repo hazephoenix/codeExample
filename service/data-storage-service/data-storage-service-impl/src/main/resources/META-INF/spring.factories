@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.viscur.dh.datastorage.impl.config.BootAutoconf
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.viscur.dh.datastorage.impl.config.DataStorageConfig
