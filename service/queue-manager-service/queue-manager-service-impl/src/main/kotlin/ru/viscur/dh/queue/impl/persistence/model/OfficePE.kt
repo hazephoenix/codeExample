@@ -4,7 +4,7 @@ package ru.viscur.dh.queue.impl.persistence.model
 import ru.viscur.dh.queue.api.model.OfficeStatus
 import ru.viscur.dh.queue.api.model.UserInQueueStatus
 import ru.viscur.dh.queue.api.model.UserType
-import ru.viscur.dh.queue.impl.USER_TYPES_WITH_PRIORITY
+import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.queue.impl.now
 import ru.viscur.dh.queue.impl.repository.QueueItemRepository
 import java.util.*
@@ -56,7 +56,7 @@ open class OfficePE(
         val inQueue = queue.filter { it.user.status != UserInQueueStatus.ON_SURVEY }
         val inQueueByType = when (type) {
             UserType.RED -> inQueue.filter { it.user.type == type }
-            UserType.YELLOW -> inQueue.filter { it.user.type in USER_TYPES_WITH_PRIORITY }
+            UserType.YELLOW -> inQueue.filter { it.user.type in SEVERITY_WITH_PRIORITY }
             else -> inQueue
         }
         return inQueueByType.sumBy { it.estDuration }
@@ -77,7 +77,7 @@ open class OfficePE(
         when (userType) {
             UserType.GREEN -> queue.add(queueItem)
             else -> {
-                val userTypes = if (userType == UserType.RED) listOf(UserType.RED) else USER_TYPES_WITH_PRIORITY
+                val userTypes = if (userType == UserType.RED) listOf(UserType.RED) else SEVERITY_WITH_PRIORITY
                 if (queue.any { it.user.type in userTypes }) {
                     queue.add(queue.indexOfLast { it.user.type in userTypes } + 1, queueItem)
                 } else {

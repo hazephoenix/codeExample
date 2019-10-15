@@ -1,12 +1,113 @@
 package ru.viscur.dh.queue.impl.service
 
+import ru.viscur.dh.datastorage.api.LocationService
+import ru.viscur.dh.fhir.model.entity.Location
+import ru.viscur.dh.fhir.model.entity.Patient
+import ru.viscur.dh.fhir.model.entity.QueueHistoryOfOffice
+import ru.viscur.dh.fhir.model.entity.QueueItem
+import ru.viscur.dh.fhir.model.enums.LocationStatus
+import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
+import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.type.LocationExtension
+import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.fhir.model.utils.referenceToLocation
+import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.queue.api.OfficeService
-import ru.viscur.dh.queue.api.model.Office
-import ru.viscur.dh.queue.api.model.OfficeStatus
-import ru.viscur.dh.queue.api.model.User
+import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
+import ru.viscur.dh.queue.impl.ageGroup
+import ru.viscur.dh.queue.impl.msToSeconds
+import ru.viscur.dh.queue.impl.now
 
-class OfficeServiceImpl: OfficeService {
-    override fun changeStatus(office: Office, newStatus: OfficeStatus, userOfPrevProcess: User?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+class OfficeServiceImpl(
+        private val locationService: LocationService
+) : OfficeService {
+    override fun changeStatus(office: Location, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
+        val now = now()
+        val queueHistoryOfOffice = QueueHistoryOfOffice(
+                location = Reference(office),
+                status = office.status,
+                fireDate = office.extension?.statusUpdatedAt,
+                duration = office.extension?.statusUpdatedAt?.let { msToSeconds(now.time - it.time )}
+        )
+
+        patientIdOfPrevProcess?.run {
+            val patient = patient(this)
+            queueHistoryOfOffice.apply {
+                //                severity = type//todo severity по пациенту
+//                diagnosticConclusion = diagnostic//todo диагностик из diagnostic report (предварительный) по пациенту
+                ageGroup = ageGroup(patient!!.birthDate!!)
+            }
+        }
+        //todo save resource queueHistoryOfOffice
+        office.status = newStatus
+        office.extension = LocationExtension(statusUpdatedAt = now)
+        //todo save resource office
+    }
+
+    private fun patient(id: String): Patient? {
+
+        //todo patient po id
+        return null
+    }
+
+    override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int) {
+        val queueItem = QueueItem(
+                subject = referenceToPatient(id = patientId),
+                location = referenceToLocation(id = officeId),
+                estDuration = estDuration
+        )
+        val queue = queueItems(officeId)
+        when (val userSeverity = userSeverity(patientId)) {
+            Severity.GREEN -> queue.add(queueItem)
+            else -> {
+                val severities = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
+                if (queue.any { it.severity in severities }) {
+                    queue.add(queue.indexOfLast { it.severity in severities } + 1, queueItem)
+                } else {
+                    if (queue.any { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }) {
+                        queue.add(queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }, queueItem)
+                    } else {
+                        queue.add(queueItem)
+                    }
+                }
+            }
+        }
+        saveQueue(officeId, queue)
+    }
+
+    private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
+        //todo удаление всех записей QueueItem по этому кабинету,
+        //ghj
+        // добавление указанных - queue
+    }
+
+    private fun userSeverity(patientId: String): Severity {
+        // todo active clinical impression -> questionnairresponse (severityCriteria) -> ответ по типу сортировки (severity)
+        return Severity.RED
+    }
+
+    private fun queueItems(officeId: String): MutableList<QueueItem> {
+        //todo все QueueItem с фильтром по location == officeId сортировкой по onum
+        //+ severity = patient по reference и его severity
+        //+ patientQueueStatus = patient по reference и его queueStatus
+        return mutableListOf()
+    }
+
+    override fun firstPatientInQueue(officeId: String): String? {
+//        todo выборка в QueueItem по кабинету с сортировкой по Onum. взять первое значение, у него reference на пациента
+        return "123"
+    }
+
+    override fun deleteFirstPatientFromQueue(office: Location) {
+        val queue = queueItems(office.id!!)
+        if (queue.isEmpty()) return
+        queue.removeAt(0)
+        saveQueue(office.id!!, queue)
+    }
+
+    override fun deletePatientFromQueue(office: Location, patient: Patient) {
+        val queue = queueItems(office.id!!)
+        queue.removeAt(queue.indexOfFirst { it.subject.id == patient.id!! })
+        saveQueue(office.id!!, queue)
     }
 }

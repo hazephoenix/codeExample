@@ -2,7 +2,7 @@ delete from location;
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/129",
+  "id": "Office:129",
   "name": "Cмотровая",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -11,7 +11,7 @@ select fhirbase_create('{
 }'::jsonb);
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/139",
+  "id": "Office:139",
   "name": "Cмотровая",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -20,7 +20,7 @@ select fhirbase_create('{
 }'::jsonb);
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/140",
+  "id": "Office:140",
   "name": "Cмотровая",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -30,7 +30,7 @@ select fhirbase_create('{
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/101",
+  "id": "Office:101",
   "name": "Процедурный кабинет",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -39,7 +39,7 @@ select fhirbase_create('{
 }'::jsonb);
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/104",
+  "id": "Office:104",
   "name": "Процедурный кабинет",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -52,7 +52,7 @@ select fhirbase_create('{
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/130",
+  "id": "Office:130",
   "name": "Функционально-диагностический кабинет",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -62,7 +62,7 @@ select fhirbase_create('{
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/117",
+  "id": "Office:117",
   "name": "УЗИ",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -72,7 +72,7 @@ select fhirbase_create('{
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/149",
+  "id": "Office:149",
   "name": "Эндоскопия (Бронхоскопия)",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -82,7 +82,7 @@ select fhirbase_create('{
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/150",
+  "id": "Office:150",
   "name": "Эндоскопия (Колоноскопия)",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -92,7 +92,7 @@ select fhirbase_create('{
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/151",
+  "id": "Office:151",
   "name": "Эндоскопия (ЭГДС)",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
@@ -102,7 +102,7 @@ select fhirbase_create('{
 
 select fhirbase_create('{
   "resourceType": "Location",
-  "id": "Location/202",
+  "id": "Office:202",
   "name": "Рентген",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "2 этаж"},

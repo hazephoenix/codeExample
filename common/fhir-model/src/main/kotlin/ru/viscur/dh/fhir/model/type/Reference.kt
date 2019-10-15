@@ -21,5 +21,15 @@ class Reference @JsonCreator constructor(
         @JsonProperty("identifier") val identifier: Identifier? = null,
         @JsonProperty("display") val display: String? = null
 ) {
-    constructor(res: BaseResource) : this(reference = "${res.resourceType}/${res.id}", type = res.resourceType)
+    constructor(res: BaseResource) : this(
+            reference = "${res.resourceType}/${res.id}",
+            type = res.resourceType
+    )
+
+    constructor(resourceType: ResourceType.ResourceTypeId, id: String) : this(
+            reference = "${resourceType}/$id",
+            type = resourceType
+    )
+
+    val id : String? = reference?.substringBefore("/")
 }

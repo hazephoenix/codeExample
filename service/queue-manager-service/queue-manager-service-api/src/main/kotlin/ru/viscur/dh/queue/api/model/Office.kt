@@ -28,7 +28,7 @@ open class Office(
         var status: OfficeStatus = OfficeStatus.CLOSED,
         var updatedAt: Date = Date.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant()),
         @Transient
-        var queue: MutableList<QueueItem> = mutableListOf(),
+        var queue: MutableList<QueueItemDto> = mutableListOf(),
         @Transient
         var lastUserInfo: Pair<User, Office?>? = null
 ) {

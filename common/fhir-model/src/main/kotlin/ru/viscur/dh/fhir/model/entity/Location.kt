@@ -7,6 +7,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.Address
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Identifier
+import ru.viscur.dh.fhir.model.type.LocationExtension
 import ru.viscur.dh.fhir.model.utils.genId
 
 /**
@@ -25,7 +26,8 @@ class Location @JsonCreator constructor(
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Location.id,
         @JsonProperty("name") val name: String,
-        @JsonProperty("status") val status: LocationStatus,
+        @JsonProperty("status") var status: LocationStatus = LocationStatus.BUSY,
         @JsonProperty("address") val address: Address? = null,
-        @JsonProperty("type") val type: List<CodeableConcept>? = null
+        @JsonProperty("type") val type: List<CodeableConcept>? = null,
+        @JsonProperty("extension") var extension: LocationExtension? = null
 ) : BaseResource(id, identifier, resourceType)

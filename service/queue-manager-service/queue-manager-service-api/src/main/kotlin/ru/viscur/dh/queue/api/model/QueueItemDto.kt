@@ -12,7 +12,7 @@ package ru.viscur.dh.queue.api.model
  * @param estDuration предположительная продолжительность осмотра
  * @param onum порядковый номер в очередь (в определенный кабинет)
  */
-data class QueueItem(
+data class QueueItemDto(
         var id: Long = 0L,
         var user: User = User(),
         var office: Office = Office(),

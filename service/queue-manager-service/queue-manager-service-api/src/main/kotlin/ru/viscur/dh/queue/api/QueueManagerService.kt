@@ -1,5 +1,6 @@
 package ru.viscur.dh.queue.api
 
+import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.queue.api.cmd.RegisterUserCMD
 import ru.viscur.dh.queue.api.model.Office
 import ru.viscur.dh.queue.api.model.RouteSheet
@@ -29,25 +30,28 @@ interface QueueManagerService {
 
     /**
      * Пациент получил маршрутный лист: вносим в систему
+     * Возвращаем список обследований с заполненными №пп [ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
-    fun registerUser(cmd: RegisterUserCMD): RouteSheet
+    fun registerUser(patientId: String): List<ServiceRequest>
 
     /**
      * Поставить пациента в очередь
      *
      * TODO moveUserToNextQueue?
-     * TODO pass only userId?
      */
-    fun addToOfficeQueue(user: User, validate: Boolean = true)
+    fun addToOfficeQueue(patientId: String)
 
     /**
      * Убрать пациента из очереди
-     * Перевод пациента в статус [ru.viscur.dh.queue.api.model.UserInQueueStatus.READY]
+     * Перевод пациента в статус [ru.viscur.dh.queue.api.model.UserInQueueStatus.READY] - поставить пациента "вне очередей"
      *
-     * TODO поговорить с Машей что это за метод и что он делает
-     * TODO pass only userId?
+     * Используется, например, на тот случай если его очередь настала, но он отошел - его не нужно исключать вообще из системы,
+     * но и ждать не имеет смысла.
+     * Или если даже он начал обследование, но выяснялось, что по каким-то причинам сейчас осмотр нельзя проводить.
+     * Продолжительность обследования не сохраняется в историю, т к оно было прервано.
+     * Кабинет переводим в статус READY, запускаем если есть кто-то следующего из очереди.
      */
-    fun deleteFromOfficeQueue(user: User)
+    fun deleteFromOfficeQueue(patientId: String)
 
     /**
      * Обследование началось

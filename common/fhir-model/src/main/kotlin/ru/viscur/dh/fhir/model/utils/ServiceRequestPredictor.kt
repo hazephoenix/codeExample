@@ -16,8 +16,7 @@ class ServiceRequestPredictor {
         // кабинет, в котором проводится предложенная услуга
         val location = Location(
                 identifier = listOf(Identifier(value = "139", type = IdentifierType.OFFICE_NUMBER)),
-                name = "Смотровой кабинет",
-                status = LocationStatus.active
+                name = "Смотровой кабинет"
         )
         TODO("Ошибка компиляции: Unresolved reference: patient. В исходном проекте он в sampleData.kt")
         /*// Предложенная слуга

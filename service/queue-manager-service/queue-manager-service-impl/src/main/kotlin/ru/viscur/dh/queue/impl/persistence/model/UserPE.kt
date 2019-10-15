@@ -23,7 +23,7 @@ import javax.persistence.*
  * @param updatedAt дата изменения статуса
  */
 @Entity
-@Table(name = "users")
+@Table(name = "queue_patients")
 data class UserPE(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
