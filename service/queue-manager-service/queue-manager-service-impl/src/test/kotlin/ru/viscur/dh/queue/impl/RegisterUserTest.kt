@@ -1,15 +1,8 @@
 package ru.digitalhospital.queueManager
 
-import org.junit.Assert
+/*import org.junit.Assert
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit4.SpringRunner
-import ru.viscur.dh.queue.api.QueueManagerService
-import ru.viscur.dh.queue.impl.config.BootAutoconf
-import ru.viscur.dh.queue.impl.repository.UserRepository
-import java.text.SimpleDateFormat
+import org.junit.runner.RunWith*/
 
 /*@RunWith(SpringRunner::class)
 @SpringBootTest(

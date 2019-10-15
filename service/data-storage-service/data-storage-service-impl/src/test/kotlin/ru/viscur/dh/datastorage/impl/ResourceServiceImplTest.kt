@@ -1,6 +1,5 @@
 package ru.viscur.dh.datastorage.impl
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
@@ -8,14 +7,14 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.viscur.dh.datastorage.api.ResourceService
-import ru.viscur.dh.datastorage.impl.config.BootAutoconf
+import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 import ru.viscur.dh.fhir.model.entity.HealthcareService
 
 
 @SpringBootTest(
-        classes = [BootAutoconf::class]
+        classes = [DataStorageConfig::class]
 )
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class ResourceServiceImplTest {
     @Autowired
     lateinit var resourceServiceImpl: ResourceService

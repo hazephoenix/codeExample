@@ -12,4 +12,5 @@ dependencies {
     runtime(project(":service:queue-manager-service:queue-manager-service-rest"))
     runtime(project(":service:location-service:location-service-impl"))
     runtime(project(":service:mis-integration-service:mis-integration-service-impl"))
+    runtime(project(":service:mis-integration-service:mis-integration-service-rest"))
 }

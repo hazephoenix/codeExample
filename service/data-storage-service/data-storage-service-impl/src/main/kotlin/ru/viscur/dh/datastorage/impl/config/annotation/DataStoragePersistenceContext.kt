@@ -1,6 +1,5 @@
 package ru.viscur.dh.datastorage.impl.config.annotation
 
-import ru.viscur.dh.datastorage.impl.config.BootAutoconf
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import javax.persistence.PersistenceContext
 

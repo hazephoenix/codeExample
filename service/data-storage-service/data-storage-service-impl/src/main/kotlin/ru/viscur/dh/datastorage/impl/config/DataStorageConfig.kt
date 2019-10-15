@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.*
+import org.springframework.context.annotation.ComponentScan.Filter
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.persistence.EntityManagerFactory
@@ -23,11 +24,26 @@ private const val REPOSITORY_PACKAGE = "$BASE_PACKAGE.repository"
 private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entities"
 
 
+
 @Configuration
-@ComponentScan(basePackages = ["ru.viscur.dh.datastorage.impl"])
+@ComponentScan(
+        basePackages = ["ru.viscur.dh.datastorage.impl"],
+        excludeFilters = [
+            Filter(
+                    pattern = [
+                        "ru/viscur/dh/datastorage/impl/config/DataStorageConfig"
+                    ],
+                    type = FilterType.REGEX
+            )
+        ]
+)
 @EnableTransactionManagement
 @EnableAutoConfiguration
-class BootAutoconf {
+class DataStorageConfig {
+
+    init {
+        String::class.java.name
+    }
 
     @Bean(name = ["dsDataSourceProperties"])
     @ConfigurationProperties("$PROPERTIES_PREFIX.datasource")

@@ -76,8 +76,8 @@ class ResourceServiceImpl : ResourceService {
     @Tx
     override fun <T> update(resource: T): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_update(?1\\:\\:jsonb, nextval('transaction_id_seq'))")
-                .setParameter(1, resource.toJsonb())
+        return em.createNativeQuery("select fhirbase_update('${resource.toJsonb()}'\\:\\:jsonb)")
+//                .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
     }

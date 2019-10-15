@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.viscur.dh.queue.impl.config.BootAutoconf
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.viscur.dh.queue.impl.config.QueueManagerConfig

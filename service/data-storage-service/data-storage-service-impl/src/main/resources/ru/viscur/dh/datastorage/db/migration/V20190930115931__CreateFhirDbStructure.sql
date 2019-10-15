@@ -4261,7 +4261,7 @@ DECLARE
   result jsonb;
 BEGIN
     rt   := resource->>'resourceType';
-    rid  := resource->>'ident'->>'id';
+    rid  := resource->> 'id';
 
     CASE WHEN (rid IS NULL) THEN
       RAISE EXCEPTION 'Resource does not have and id' USING HINT = 'Resource does not have and id';
