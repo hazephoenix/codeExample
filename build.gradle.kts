@@ -91,7 +91,7 @@ subprojects {
             if (applyBoot) {
                 implementation("org.springframework.boot:spring-boot-starter")
                 testImplementation("org.springframework.boot:spring-boot-starter-test") {
-                    //            exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+                    exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }
                 annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
             }

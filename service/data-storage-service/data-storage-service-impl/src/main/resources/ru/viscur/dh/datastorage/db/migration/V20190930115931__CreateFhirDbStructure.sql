@@ -1,10 +1,7 @@
-drop extension if exists pgcrypto;
-create extension pgcrypto;
-
 create sequence if not exists transaction_id_seq
 	as integer;
 
-alter sequence transaction_id_seq owner to ds;
+alter sequence transaction_id_seq owner to ${owner};
 
 drop table if exists "account";
 drop table if exists "account_history";
@@ -287,7 +284,7 @@ drop table if exists "visionprescription_history";
 drop type if exists resource_status cascade;
 create type resource_status as enum ('created', 'updated', 'deleted', 'recreated');
 
-alter type resource_status owner to ds;
+alter type resource_status owner to ${owner};
 
 drop type if exists _resource cascade;
 create type _resource as
@@ -300,7 +297,7 @@ create type _resource as
 	resource jsonb
 );
 
-alter type _resource owner to ds;
+alter type _resource owner to ${owner};
 
 create table transaction
 (
@@ -311,7 +308,7 @@ create table transaction
 	resource jsonb
 );
 
-alter table transaction owner to ds;
+alter table transaction owner to ${owner};
 
 create table devicerequest
 (
@@ -325,7 +322,7 @@ create table devicerequest
 	resource jsonb not null
 );
 
-alter table devicerequest owner to ds;
+alter table devicerequest owner to ${owner};
 
 create table devicerequest_history
 (
@@ -339,7 +336,7 @@ create table devicerequest_history
 		primary key (id, txid)
 );
 
-alter table devicerequest_history owner to ds;
+alter table devicerequest_history owner to ${owner};
 
 create table servicerequest
 (
@@ -353,7 +350,7 @@ create table servicerequest
 	resource jsonb not null
 );
 
-alter table servicerequest owner to ds;
+alter table servicerequest owner to ${owner};
 
 create table servicerequest_history
 (
@@ -367,7 +364,7 @@ create table servicerequest_history
 		primary key (id, txid)
 );
 
-alter table servicerequest_history owner to ds;
+alter table servicerequest_history owner to ${owner};
 
 create table devicecomponent
 (
@@ -381,7 +378,7 @@ create table devicecomponent
 	resource jsonb not null
 );
 
-alter table devicecomponent owner to ds;
+alter table devicecomponent owner to ${owner};
 
 create table devicecomponent_history
 (
@@ -395,7 +392,7 @@ create table devicecomponent_history
 		primary key (id, txid)
 );
 
-alter table devicecomponent_history owner to ds;
+alter table devicecomponent_history owner to ${owner};
 
 create table devicemetric
 (
@@ -409,7 +406,7 @@ create table devicemetric
 	resource jsonb not null
 );
 
-alter table devicemetric owner to ds;
+alter table devicemetric owner to ${owner};
 
 create table devicemetric_history
 (
@@ -423,7 +420,7 @@ create table devicemetric_history
 		primary key (id, txid)
 );
 
-alter table devicemetric_history owner to ds;
+alter table devicemetric_history owner to ${owner};
 
 create table usersession
 (
@@ -437,7 +434,7 @@ create table usersession
 	resource jsonb not null
 );
 
-alter table usersession owner to ds;
+alter table usersession owner to ${owner};
 
 create table usersession_history
 (
@@ -451,7 +448,7 @@ create table usersession_history
 		primary key (id, txid)
 );
 
-alter table usersession_history owner to ds;
+alter table usersession_history owner to ${owner};
 
 create table careplan
 (
@@ -465,7 +462,7 @@ create table careplan
 	resource jsonb not null
 );
 
-alter table careplan owner to ds;
+alter table careplan owner to ${owner};
 
 create table careplan_history
 (
@@ -479,7 +476,7 @@ create table careplan_history
 		primary key (id, txid)
 );
 
-alter table careplan_history owner to ds;
+alter table careplan_history owner to ${owner};
 
 create table observation
 (
@@ -493,7 +490,7 @@ create table observation
 	resource jsonb not null
 );
 
-alter table observation owner to ds;
+alter table observation owner to ${owner};
 
 create table observation_history
 (
@@ -507,7 +504,7 @@ create table observation_history
 		primary key (id, txid)
 );
 
-alter table observation_history owner to ds;
+alter table observation_history owner to ${owner};
 
 create table enrollmentrequest
 (
@@ -521,7 +518,7 @@ create table enrollmentrequest
 	resource jsonb not null
 );
 
-alter table enrollmentrequest owner to ds;
+alter table enrollmentrequest owner to ${owner};
 
 create table enrollmentrequest_history
 (
@@ -535,7 +532,7 @@ create table enrollmentrequest_history
 		primary key (id, txid)
 );
 
-alter table enrollmentrequest_history owner to ds;
+alter table enrollmentrequest_history owner to ${owner};
 
 create table "group"
 (
@@ -549,7 +546,7 @@ create table "group"
 	resource jsonb not null
 );
 
-alter table "group" owner to ds;
+alter table "group" owner to ${owner};
 
 create table group_history
 (
@@ -563,7 +560,7 @@ create table group_history
 		primary key (id, txid)
 );
 
-alter table group_history owner to ds;
+alter table group_history owner to ${owner};
 
 create table messagedefinition
 (
@@ -577,7 +574,7 @@ create table messagedefinition
 	resource jsonb not null
 );
 
-alter table messagedefinition owner to ds;
+alter table messagedefinition owner to ${owner};
 
 create table messagedefinition_history
 (
@@ -591,7 +588,7 @@ create table messagedefinition_history
 		primary key (id, txid)
 );
 
-alter table messagedefinition_history owner to ds;
+alter table messagedefinition_history owner to ${owner};
 
 create table appointment
 (
@@ -605,7 +602,7 @@ create table appointment
 	resource jsonb not null
 );
 
-alter table appointment owner to ds;
+alter table appointment owner to ${owner};
 
 create table appointment_history
 (
@@ -619,7 +616,7 @@ create table appointment_history
 		primary key (id, txid)
 );
 
-alter table appointment_history owner to ds;
+alter table appointment_history owner to ${owner};
 
 create table biologicallyderivedproduct
 (
@@ -633,7 +630,7 @@ create table biologicallyderivedproduct
 	resource jsonb not null
 );
 
-alter table biologicallyderivedproduct owner to ds;
+alter table biologicallyderivedproduct owner to ${owner};
 
 create table biologicallyderivedproduct_history
 (
@@ -647,7 +644,7 @@ create table biologicallyderivedproduct_history
 		primary key (id, txid)
 );
 
-alter table biologicallyderivedproduct_history owner to ds;
+alter table biologicallyderivedproduct_history owner to ${owner};
 
 create table questionnaireresponse
 (
@@ -661,7 +658,7 @@ create table questionnaireresponse
 	resource jsonb not null
 );
 
-alter table questionnaireresponse owner to ds;
+alter table questionnaireresponse owner to ${owner};
 
 create table questionnaireresponse_history
 (
@@ -675,7 +672,7 @@ create table questionnaireresponse_history
 		primary key (id, txid)
 );
 
-alter table questionnaireresponse_history owner to ds;
+alter table questionnaireresponse_history owner to ${owner};
 
 create table episodeofcare
 (
@@ -689,7 +686,7 @@ create table episodeofcare
 	resource jsonb not null
 );
 
-alter table episodeofcare owner to ds;
+alter table episodeofcare owner to ${owner};
 
 create table episodeofcare_history
 (
@@ -703,7 +700,7 @@ create table episodeofcare_history
 		primary key (id, txid)
 );
 
-alter table episodeofcare_history owner to ds;
+alter table episodeofcare_history owner to ${owner};
 
 create table substancepolymer
 (
@@ -717,7 +714,7 @@ create table substancepolymer
 	resource jsonb not null
 );
 
-alter table substancepolymer owner to ds;
+alter table substancepolymer owner to ${owner};
 
 create table substancepolymer_history
 (
@@ -731,7 +728,7 @@ create table substancepolymer_history
 		primary key (id, txid)
 );
 
-alter table substancepolymer_history owner to ds;
+alter table substancepolymer_history owner to ${owner};
 
 create table processresponse
 (
@@ -745,7 +742,7 @@ create table processresponse
 	resource jsonb not null
 );
 
-alter table processresponse owner to ds;
+alter table processresponse owner to ${owner};
 
 create table processresponse_history
 (
@@ -759,7 +756,7 @@ create table processresponse_history
 		primary key (id, txid)
 );
 
-alter table processresponse_history owner to ds;
+alter table processresponse_history owner to ${owner};
 
 create table supplydelivery
 (
@@ -773,7 +770,7 @@ create table supplydelivery
 	resource jsonb not null
 );
 
-alter table supplydelivery owner to ds;
+alter table supplydelivery owner to ${owner};
 
 create table supplydelivery_history
 (
@@ -787,7 +784,7 @@ create table supplydelivery_history
 		primary key (id, txid)
 );
 
-alter table supplydelivery_history owner to ds;
+alter table supplydelivery_history owner to ${owner};
 
 create table adverseevent
 (
@@ -801,7 +798,7 @@ create table adverseevent
 	resource jsonb not null
 );
 
-alter table adverseevent owner to ds;
+alter table adverseevent owner to ${owner};
 
 create table adverseevent_history
 (
@@ -815,7 +812,7 @@ create table adverseevent_history
 		primary key (id, txid)
 );
 
-alter table adverseevent_history owner to ds;
+alter table adverseevent_history owner to ${owner};
 
 create table iteminstance
 (
@@ -829,7 +826,7 @@ create table iteminstance
 	resource jsonb not null
 );
 
-alter table iteminstance owner to ds;
+alter table iteminstance owner to ${owner};
 
 create table iteminstance_history
 (
@@ -843,7 +840,7 @@ create table iteminstance_history
 		primary key (id, txid)
 );
 
-alter table iteminstance_history owner to ds;
+alter table iteminstance_history owner to ${owner};
 
 create table endpoint
 (
@@ -857,7 +854,7 @@ create table endpoint
 	resource jsonb not null
 );
 
-alter table endpoint owner to ds;
+alter table endpoint owner to ${owner};
 
 create table endpoint_history
 (
@@ -871,7 +868,7 @@ create table endpoint_history
 		primary key (id, txid)
 );
 
-alter table endpoint_history owner to ds;
+alter table endpoint_history owner to ${owner};
 
 create table substancereferenceinformation
 (
@@ -885,7 +882,7 @@ create table substancereferenceinformation
 	resource jsonb not null
 );
 
-alter table substancereferenceinformation owner to ds;
+alter table substancereferenceinformation owner to ${owner};
 
 create table substancereferenceinformation_history
 (
@@ -899,7 +896,7 @@ create table substancereferenceinformation_history
 		primary key (id, txid)
 );
 
-alter table substancereferenceinformation_history owner to ds;
+alter table substancereferenceinformation_history owner to ${owner};
 
 create table compartmentdefinition
 (
@@ -913,7 +910,7 @@ create table compartmentdefinition
 	resource jsonb not null
 );
 
-alter table compartmentdefinition owner to ds;
+alter table compartmentdefinition owner to ${owner};
 
 create table compartmentdefinition_history
 (
@@ -927,7 +924,7 @@ create table compartmentdefinition_history
 		primary key (id, txid)
 );
 
-alter table compartmentdefinition_history owner to ds;
+alter table compartmentdefinition_history owner to ${owner};
 
 create table detectedissue
 (
@@ -941,7 +938,7 @@ create table detectedissue
 	resource jsonb not null
 );
 
-alter table detectedissue owner to ds;
+alter table detectedissue owner to ${owner};
 
 create table detectedissue_history
 (
@@ -955,7 +952,7 @@ create table detectedissue_history
 		primary key (id, txid)
 );
 
-alter table detectedissue_history owner to ds;
+alter table detectedissue_history owner to ${owner};
 
 create table medicationadministration
 (
@@ -969,7 +966,7 @@ create table medicationadministration
 	resource jsonb not null
 );
 
-alter table medicationadministration owner to ds;
+alter table medicationadministration owner to ${owner};
 
 create table medicationadministration_history
 (
@@ -983,7 +980,7 @@ create table medicationadministration_history
 		primary key (id, txid)
 );
 
-alter table medicationadministration_history owner to ds;
+alter table medicationadministration_history owner to ${owner};
 
 create table implementationguide
 (
@@ -997,7 +994,7 @@ create table implementationguide
 	resource jsonb not null
 );
 
-alter table implementationguide owner to ds;
+alter table implementationguide owner to ${owner};
 
 create table implementationguide_history
 (
@@ -1011,7 +1008,7 @@ create table implementationguide_history
 		primary key (id, txid)
 );
 
-alter table implementationguide_history owner to ds;
+alter table implementationguide_history owner to ${owner};
 
 create table goal
 (
@@ -1025,7 +1022,7 @@ create table goal
 	resource jsonb not null
 );
 
-alter table goal owner to ds;
+alter table goal owner to ${owner};
 
 create table goal_history
 (
@@ -1039,7 +1036,7 @@ create table goal_history
 		primary key (id, txid)
 );
 
-alter table goal_history owner to ds;
+alter table goal_history owner to ${owner};
 
 create table communication
 (
@@ -1053,7 +1050,7 @@ create table communication
 	resource jsonb not null
 );
 
-alter table communication owner to ds;
+alter table communication owner to ${owner};
 
 create table communication_history
 (
@@ -1067,7 +1064,7 @@ create table communication_history
 		primary key (id, txid)
 );
 
-alter table communication_history owner to ds;
+alter table communication_history owner to ${owner};
 
 create table schedule
 (
@@ -1081,7 +1078,7 @@ create table schedule
 	resource jsonb not null
 );
 
-alter table schedule owner to ds;
+alter table schedule owner to ${owner};
 
 create table schedule_history
 (
@@ -1095,7 +1092,7 @@ create table schedule_history
 		primary key (id, txid)
 );
 
-alter table schedule_history owner to ds;
+alter table schedule_history owner to ${owner};
 
 create table documentreference
 (
@@ -1109,7 +1106,7 @@ create table documentreference
 	resource jsonb not null
 );
 
-alter table documentreference owner to ds;
+alter table documentreference owner to ${owner};
 
 create table documentreference_history
 (
@@ -1123,7 +1120,7 @@ create table documentreference_history
 		primary key (id, txid)
 );
 
-alter table documentreference_history owner to ds;
+alter table documentreference_history owner to ${owner};
 
 create table coverage
 (
@@ -1137,7 +1134,7 @@ create table coverage
 	resource jsonb not null
 );
 
-alter table coverage owner to ds;
+alter table coverage owner to ${owner};
 
 create table coverage_history
 (
@@ -1151,7 +1148,7 @@ create table coverage_history
 		primary key (id, txid)
 );
 
-alter table coverage_history owner to ds;
+alter table coverage_history owner to ${owner};
 
 create table auditevent
 (
@@ -1165,7 +1162,7 @@ create table auditevent
 	resource jsonb not null
 );
 
-alter table auditevent owner to ds;
+alter table auditevent owner to ${owner};
 
 create table auditevent_history
 (
@@ -1179,7 +1176,7 @@ create table auditevent_history
 		primary key (id, txid)
 );
 
-alter table auditevent_history owner to ds;
+alter table auditevent_history owner to ${owner};
 
 create table messageheader
 (
@@ -1193,7 +1190,7 @@ create table messageheader
 	resource jsonb not null
 );
 
-alter table messageheader owner to ds;
+alter table messageheader owner to ${owner};
 
 create table messageheader_history
 (
@@ -1207,7 +1204,7 @@ create table messageheader_history
 		primary key (id, txid)
 );
 
-alter table messageheader_history owner to ds;
+alter table messageheader_history owner to ${owner};
 
 create table contract
 (
@@ -1221,7 +1218,7 @@ create table contract
 	resource jsonb not null
 );
 
-alter table contract owner to ds;
+alter table contract owner to ${owner};
 
 create table contract_history
 (
@@ -1235,7 +1232,7 @@ create table contract_history
 		primary key (id, txid)
 );
 
-alter table contract_history owner to ds;
+alter table contract_history owner to ${owner};
 
 create table sequence
 (
@@ -1249,7 +1246,7 @@ create table sequence
 	resource jsonb not null
 );
 
-alter table sequence owner to ds;
+alter table sequence owner to ${owner};
 
 create table sequence_history
 (
@@ -1263,7 +1260,7 @@ create table sequence_history
 		primary key (id, txid)
 );
 
-alter table sequence_history owner to ds;
+alter table sequence_history owner to ${owner};
 
 create table testreport
 (
@@ -1277,7 +1274,7 @@ create table testreport
 	resource jsonb not null
 );
 
-alter table testreport owner to ds;
+alter table testreport owner to ${owner};
 
 create table testreport_history
 (
@@ -1291,7 +1288,7 @@ create table testreport_history
 		primary key (id, txid)
 );
 
-alter table testreport_history owner to ds;
+alter table testreport_history owner to ${owner};
 
 create table codesystem
 (
@@ -1305,7 +1302,7 @@ create table codesystem
 	resource jsonb not null
 );
 
-alter table codesystem owner to ds;
+alter table codesystem owner to ${owner};
 
 create table codesystem_history
 (
@@ -1319,7 +1316,7 @@ create table codesystem_history
 		primary key (id, txid)
 );
 
-alter table codesystem_history owner to ds;
+alter table codesystem_history owner to ${owner};
 
 create table plandefinition
 (
@@ -1333,7 +1330,7 @@ create table plandefinition
 	resource jsonb not null
 );
 
-alter table plandefinition owner to ds;
+alter table plandefinition owner to ${owner};
 
 create table plandefinition_history
 (
@@ -1347,7 +1344,7 @@ create table plandefinition_history
 		primary key (id, txid)
 );
 
-alter table plandefinition_history owner to ds;
+alter table plandefinition_history owner to ${owner};
 
 create table invoice
 (
@@ -1361,7 +1358,7 @@ create table invoice
 	resource jsonb not null
 );
 
-alter table invoice owner to ds;
+alter table invoice owner to ${owner};
 
 create table invoice_history
 (
@@ -1375,7 +1372,7 @@ create table invoice_history
 		primary key (id, txid)
 );
 
-alter table invoice_history owner to ds;
+alter table invoice_history owner to ${owner};
 
 create table claimresponse
 (
@@ -1389,7 +1386,7 @@ create table claimresponse
 	resource jsonb not null
 );
 
-alter table claimresponse owner to ds;
+alter table claimresponse owner to ${owner};
 
 create table claimresponse_history
 (
@@ -1403,7 +1400,7 @@ create table claimresponse_history
 		primary key (id, txid)
 );
 
-alter table claimresponse_history owner to ds;
+alter table claimresponse_history owner to ${owner};
 
 create table chargeitem
 (
@@ -1417,7 +1414,7 @@ create table chargeitem
 	resource jsonb not null
 );
 
-alter table chargeitem owner to ds;
+alter table chargeitem owner to ${owner};
 
 create table chargeitem_history
 (
@@ -1431,7 +1428,7 @@ create table chargeitem_history
 		primary key (id, txid)
 );
 
-alter table chargeitem_history owner to ds;
+alter table chargeitem_history owner to ${owner};
 
 create table bodystructure
 (
@@ -1445,7 +1442,7 @@ create table bodystructure
 	resource jsonb not null
 );
 
-alter table bodystructure owner to ds;
+alter table bodystructure owner to ${owner};
 
 create table bodystructure_history
 (
@@ -1459,7 +1456,7 @@ create table bodystructure_history
 		primary key (id, txid)
 );
 
-alter table bodystructure_history owner to ds;
+alter table bodystructure_history owner to ${owner};
 
 create table parameters
 (
@@ -1473,7 +1470,7 @@ create table parameters
 	resource jsonb not null
 );
 
-alter table parameters owner to ds;
+alter table parameters owner to ${owner};
 
 create table parameters_history
 (
@@ -1487,7 +1484,7 @@ create table parameters_history
 		primary key (id, txid)
 );
 
-alter table parameters_history owner to ds;
+alter table parameters_history owner to ${owner};
 
 create table clinicalimpression
 (
@@ -1501,7 +1498,7 @@ create table clinicalimpression
 	resource jsonb not null
 );
 
-alter table clinicalimpression owner to ds;
+alter table clinicalimpression owner to ${owner};
 
 create table clinicalimpression_history
 (
@@ -1515,7 +1512,7 @@ create table clinicalimpression_history
 		primary key (id, txid)
 );
 
-alter table clinicalimpression_history owner to ds;
+alter table clinicalimpression_history owner to ${owner};
 
 create table familymemberhistory
 (
@@ -1529,7 +1526,7 @@ create table familymemberhistory
 	resource jsonb not null
 );
 
-alter table familymemberhistory owner to ds;
+alter table familymemberhistory owner to ${owner};
 
 create table familymemberhistory_history
 (
@@ -1543,7 +1540,7 @@ create table familymemberhistory_history
 		primary key (id, txid)
 );
 
-alter table familymemberhistory_history owner to ds;
+alter table familymemberhistory_history owner to ${owner};
 
 create table medicinalproductauthorization
 (
@@ -1557,7 +1554,7 @@ create table medicinalproductauthorization
 	resource jsonb not null
 );
 
-alter table medicinalproductauthorization owner to ds;
+alter table medicinalproductauthorization owner to ${owner};
 
 create table medicinalproductauthorization_history
 (
@@ -1571,7 +1568,7 @@ create table medicinalproductauthorization_history
 		primary key (id, txid)
 );
 
-alter table medicinalproductauthorization_history owner to ds;
+alter table medicinalproductauthorization_history owner to ${owner};
 
 create table "binary"
 (
@@ -1585,7 +1582,7 @@ create table "binary"
 	resource jsonb not null
 );
 
-alter table "binary" owner to ds;
+alter table "binary" owner to ${owner};
 
 create table binary_history
 (
@@ -1599,7 +1596,7 @@ create table binary_history
 		primary key (id, txid)
 );
 
-alter table binary_history owner to ds;
+alter table binary_history owner to ${owner};
 
 create table composition
 (
@@ -1613,7 +1610,7 @@ create table composition
 	resource jsonb not null
 );
 
-alter table composition owner to ds;
+alter table composition owner to ${owner};
 
 create table composition_history
 (
@@ -1627,7 +1624,7 @@ create table composition_history
 		primary key (id, txid)
 );
 
-alter table composition_history owner to ds;
+alter table composition_history owner to ${owner};
 
 create table practitionerrole
 (
@@ -1641,7 +1638,7 @@ create table practitionerrole
 	resource jsonb not null
 );
 
-alter table practitionerrole owner to ds;
+alter table practitionerrole owner to ${owner};
 
 create table practitionerrole_history
 (
@@ -1655,7 +1652,7 @@ create table practitionerrole_history
 		primary key (id, txid)
 );
 
-alter table practitionerrole_history owner to ds;
+alter table practitionerrole_history owner to ${owner};
 
 create table healthcareservice
 (
@@ -1669,7 +1666,7 @@ create table healthcareservice
 	resource jsonb not null
 );
 
-alter table healthcareservice owner to ds;
+alter table healthcareservice owner to ${owner};
 
 create table healthcareservice_history
 (
@@ -1683,7 +1680,7 @@ create table healthcareservice_history
 		primary key (id, txid)
 );
 
-alter table healthcareservice_history owner to ds;
+alter table healthcareservice_history owner to ${owner};
 
 create table patient
 (
@@ -1697,7 +1694,7 @@ create table patient
 	resource jsonb not null
 );
 
-alter table patient owner to ds;
+alter table patient owner to ${owner};
 
 create table patient_history
 (
@@ -1711,7 +1708,7 @@ create table patient_history
 		primary key (id, txid)
 );
 
-alter table patient_history owner to ds;
+alter table patient_history owner to ${owner};
 
 create table entrydefinition
 (
@@ -1725,7 +1722,7 @@ create table entrydefinition
 	resource jsonb not null
 );
 
-alter table entrydefinition owner to ds;
+alter table entrydefinition owner to ${owner};
 
 create table entrydefinition_history
 (
@@ -1739,7 +1736,7 @@ create table entrydefinition_history
 		primary key (id, txid)
 );
 
-alter table entrydefinition_history owner to ds;
+alter table entrydefinition_history owner to ${owner};
 
 create table medicationdispense
 (
@@ -1753,7 +1750,7 @@ create table medicationdispense
 	resource jsonb not null
 );
 
-alter table medicationdispense owner to ds;
+alter table medicationdispense owner to ${owner};
 
 create table medicationdispense_history
 (
@@ -1767,7 +1764,7 @@ create table medicationdispense_history
 		primary key (id, txid)
 );
 
-alter table medicationdispense_history owner to ds;
+alter table medicationdispense_history owner to ${owner};
 
 create table deviceusestatement
 (
@@ -1781,7 +1778,7 @@ create table deviceusestatement
 	resource jsonb not null
 );
 
-alter table deviceusestatement owner to ds;
+alter table deviceusestatement owner to ${owner};
 
 create table deviceusestatement_history
 (
@@ -1795,7 +1792,7 @@ create table deviceusestatement_history
 		primary key (id, txid)
 );
 
-alter table deviceusestatement_history owner to ds;
+alter table deviceusestatement_history owner to ${owner};
 
 create table structuremap
 (
@@ -1809,7 +1806,7 @@ create table structuremap
 	resource jsonb not null
 );
 
-alter table structuremap owner to ds;
+alter table structuremap owner to ${owner};
 
 create table structuremap_history
 (
@@ -1823,7 +1820,7 @@ create table structuremap_history
 		primary key (id, txid)
 );
 
-alter table structuremap_history owner to ds;
+alter table structuremap_history owner to ${owner};
 
 create table immunizationevaluation
 (
@@ -1837,7 +1834,7 @@ create table immunizationevaluation
 	resource jsonb not null
 );
 
-alter table immunizationevaluation owner to ds;
+alter table immunizationevaluation owner to ${owner};
 
 create table immunizationevaluation_history
 (
@@ -1851,7 +1848,7 @@ create table immunizationevaluation_history
 		primary key (id, txid)
 );
 
-alter table immunizationevaluation_history owner to ds;
+alter table immunizationevaluation_history owner to ${owner};
 
 create table library
 (
@@ -1865,7 +1862,7 @@ create table library
 	resource jsonb not null
 );
 
-alter table library owner to ds;
+alter table library owner to ${owner};
 
 create table library_history
 (
@@ -1879,7 +1876,7 @@ create table library_history
 		primary key (id, txid)
 );
 
-alter table library_history owner to ds;
+alter table library_history owner to ${owner};
 
 create table basic
 (
@@ -1893,7 +1890,7 @@ create table basic
 	resource jsonb not null
 );
 
-alter table basic owner to ds;
+alter table basic owner to ${owner};
 
 create table basic_history
 (
@@ -1907,7 +1904,7 @@ create table basic_history
 		primary key (id, txid)
 );
 
-alter table basic_history owner to ds;
+alter table basic_history owner to ${owner};
 
 create table slot
 (
@@ -1921,7 +1918,7 @@ create table slot
 	resource jsonb not null
 );
 
-alter table slot owner to ds;
+alter table slot owner to ${owner};
 
 create table slot_history
 (
@@ -1935,7 +1932,7 @@ create table slot_history
 		primary key (id, txid)
 );
 
-alter table slot_history owner to ds;
+alter table slot_history owner to ${owner};
 
 create table activitydefinition
 (
@@ -1949,7 +1946,7 @@ create table activitydefinition
 	resource jsonb not null
 );
 
-alter table activitydefinition owner to ds;
+alter table activitydefinition owner to ${owner};
 
 create table activitydefinition_history
 (
@@ -1963,7 +1960,7 @@ create table activitydefinition_history
 		primary key (id, txid)
 );
 
-alter table activitydefinition_history owner to ds;
+alter table activitydefinition_history owner to ${owner};
 
 create table specimen
 (
@@ -1977,7 +1974,7 @@ create table specimen
 	resource jsonb not null
 );
 
-alter table specimen owner to ds;
+alter table specimen owner to ${owner};
 
 create table specimen_history
 (
@@ -1991,7 +1988,7 @@ create table specimen_history
 		primary key (id, txid)
 );
 
-alter table specimen_history owner to ds;
+alter table specimen_history owner to ${owner};
 
 create table diagnosticreport
 (
@@ -2005,7 +2002,7 @@ create table diagnosticreport
 	resource jsonb not null
 );
 
-alter table diagnosticreport owner to ds;
+alter table diagnosticreport owner to ${owner};
 
 create table diagnosticreport_history
 (
@@ -2019,7 +2016,7 @@ create table diagnosticreport_history
 		primary key (id, txid)
 );
 
-alter table diagnosticreport_history owner to ds;
+alter table diagnosticreport_history owner to ${owner};
 
 create table subscription
 (
@@ -2033,7 +2030,7 @@ create table subscription
 	resource jsonb not null
 );
 
-alter table subscription owner to ds;
+alter table subscription owner to ${owner};
 
 create table subscription_history
 (
@@ -2047,7 +2044,7 @@ create table subscription_history
 		primary key (id, txid)
 );
 
-alter table subscription_history owner to ds;
+alter table subscription_history owner to ${owner};
 
 create table requestgroup
 (
@@ -2061,7 +2058,7 @@ create table requestgroup
 	resource jsonb not null
 );
 
-alter table requestgroup owner to ds;
+alter table requestgroup owner to ${owner};
 
 create table requestgroup_history
 (
@@ -2075,7 +2072,7 @@ create table requestgroup_history
 		primary key (id, txid)
 );
 
-alter table requestgroup_history owner to ds;
+alter table requestgroup_history owner to ${owner};
 
 create table provenance
 (
@@ -2089,7 +2086,7 @@ create table provenance
 	resource jsonb not null
 );
 
-alter table provenance owner to ds;
+alter table provenance owner to ${owner};
 
 create table provenance_history
 (
@@ -2103,7 +2100,7 @@ create table provenance_history
 		primary key (id, txid)
 );
 
-alter table provenance_history owner to ds;
+alter table provenance_history owner to ${owner};
 
 create table medicinalproduct
 (
@@ -2117,7 +2114,7 @@ create table medicinalproduct
 	resource jsonb not null
 );
 
-alter table medicinalproduct owner to ds;
+alter table medicinalproduct owner to ${owner};
 
 create table medicinalproduct_history
 (
@@ -2131,7 +2128,7 @@ create table medicinalproduct_history
 		primary key (id, txid)
 );
 
-alter table medicinalproduct_history owner to ds;
+alter table medicinalproduct_history owner to ${owner};
 
 create table organizationrole
 (
@@ -2145,7 +2142,7 @@ create table organizationrole
 	resource jsonb not null
 );
 
-alter table organizationrole owner to ds;
+alter table organizationrole owner to ${owner};
 
 create table organizationrole_history
 (
@@ -2159,7 +2156,7 @@ create table organizationrole_history
 		primary key (id, txid)
 );
 
-alter table organizationrole_history owner to ds;
+alter table organizationrole_history owner to ${owner};
 
 create table practitioner
 (
@@ -2173,7 +2170,7 @@ create table practitioner
 	resource jsonb not null
 );
 
-alter table practitioner owner to ds;
+alter table practitioner owner to ${owner};
 
 create table practitioner_history
 (
@@ -2187,7 +2184,7 @@ create table practitioner_history
 		primary key (id, txid)
 );
 
-alter table practitioner_history owner to ds;
+alter table practitioner_history owner to ${owner};
 
 create table medicinalproductpackaged
 (
@@ -2201,7 +2198,7 @@ create table medicinalproductpackaged
 	resource jsonb not null
 );
 
-alter table medicinalproductpackaged owner to ds;
+alter table medicinalproductpackaged owner to ${owner};
 
 create table medicinalproductpackaged_history
 (
@@ -2215,7 +2212,7 @@ create table medicinalproductpackaged_history
 		primary key (id, txid)
 );
 
-alter table medicinalproductpackaged_history owner to ds;
+alter table medicinalproductpackaged_history owner to ${owner};
 
 create table flag
 (
@@ -2229,7 +2226,7 @@ create table flag
 	resource jsonb not null
 );
 
-alter table flag owner to ds;
+alter table flag owner to ${owner};
 
 create table flag_history
 (
@@ -2243,7 +2240,7 @@ create table flag_history
 		primary key (id, txid)
 );
 
-alter table flag_history owner to ds;
+alter table flag_history owner to ${owner};
 
 create table explanationofbenefit
 (
@@ -2257,7 +2254,7 @@ create table explanationofbenefit
 	resource jsonb not null
 );
 
-alter table explanationofbenefit owner to ds;
+alter table explanationofbenefit owner to ${owner};
 
 create table explanationofbenefit_history
 (
@@ -2271,7 +2268,7 @@ create table explanationofbenefit_history
 		primary key (id, txid)
 );
 
-alter table explanationofbenefit_history owner to ds;
+alter table explanationofbenefit_history owner to ${owner};
 
 create table linkage
 (
@@ -2285,7 +2282,7 @@ create table linkage
 	resource jsonb not null
 );
 
-alter table linkage owner to ds;
+alter table linkage owner to ${owner};
 
 create table linkage_history
 (
@@ -2299,7 +2296,7 @@ create table linkage_history
 		primary key (id, txid)
 );
 
-alter table linkage_history owner to ds;
+alter table linkage_history owner to ${owner};
 
 create table operationoutcome
 (
@@ -2313,7 +2310,7 @@ create table operationoutcome
 	resource jsonb not null
 );
 
-alter table operationoutcome owner to ds;
+alter table operationoutcome owner to ${owner};
 
 create table operationoutcome_history
 (
@@ -2327,7 +2324,7 @@ create table operationoutcome_history
 		primary key (id, txid)
 );
 
-alter table operationoutcome_history owner to ds;
+alter table operationoutcome_history owner to ${owner};
 
 create table medicinalproductpharmaceutical
 (
@@ -2341,7 +2338,7 @@ create table medicinalproductpharmaceutical
 	resource jsonb not null
 );
 
-alter table medicinalproductpharmaceutical owner to ds;
+alter table medicinalproductpharmaceutical owner to ${owner};
 
 create table medicinalproductpharmaceutical_history
 (
@@ -2355,7 +2352,7 @@ create table medicinalproductpharmaceutical_history
 		primary key (id, txid)
 );
 
-alter table medicinalproductpharmaceutical_history owner to ds;
+alter table medicinalproductpharmaceutical_history owner to ${owner};
 
 create table immunization
 (
@@ -2369,7 +2366,7 @@ create table immunization
 	resource jsonb not null
 );
 
-alter table immunization owner to ds;
+alter table immunization owner to ${owner};
 
 create table immunization_history
 (
@@ -2383,7 +2380,7 @@ create table immunization_history
 		primary key (id, txid)
 );
 
-alter table immunization_history owner to ds;
+alter table immunization_history owner to ${owner};
 
 create table researchsubject
 (
@@ -2397,7 +2394,7 @@ create table researchsubject
 	resource jsonb not null
 );
 
-alter table researchsubject owner to ds;
+alter table researchsubject owner to ${owner};
 
 create table researchsubject_history
 (
@@ -2411,7 +2408,7 @@ create table researchsubject_history
 		primary key (id, txid)
 );
 
-alter table researchsubject_history owner to ds;
+alter table researchsubject_history owner to ${owner};
 
 create table expansionprofile
 (
@@ -2425,7 +2422,7 @@ create table expansionprofile
 	resource jsonb not null
 );
 
-alter table expansionprofile owner to ds;
+alter table expansionprofile owner to ${owner};
 
 create table expansionprofile_history
 (
@@ -2439,7 +2436,7 @@ create table expansionprofile_history
 		primary key (id, txid)
 );
 
-alter table expansionprofile_history owner to ds;
+alter table expansionprofile_history owner to ${owner};
 
 create table eligibilityrequest
 (
@@ -2453,7 +2450,7 @@ create table eligibilityrequest
 	resource jsonb not null
 );
 
-alter table eligibilityrequest owner to ds;
+alter table eligibilityrequest owner to ${owner};
 
 create table eligibilityrequest_history
 (
@@ -2467,7 +2464,7 @@ create table eligibilityrequest_history
 		primary key (id, txid)
 );
 
-alter table eligibilityrequest_history owner to ds;
+alter table eligibilityrequest_history owner to ${owner};
 
 create table medicinalproductclinicals
 (
@@ -2481,7 +2478,7 @@ create table medicinalproductclinicals
 	resource jsonb not null
 );
 
-alter table medicinalproductclinicals owner to ds;
+alter table medicinalproductclinicals owner to ${owner};
 
 create table medicinalproductclinicals_history
 (
@@ -2495,7 +2492,7 @@ create table medicinalproductclinicals_history
 		primary key (id, txid)
 );
 
-alter table medicinalproductclinicals_history owner to ds;
+alter table medicinalproductclinicals_history owner to ${owner};
 
 create table occupationaldata
 (
@@ -2509,7 +2506,7 @@ create table occupationaldata
 	resource jsonb not null
 );
 
-alter table occupationaldata owner to ds;
+alter table occupationaldata owner to ${owner};
 
 create table occupationaldata_history
 (
@@ -2523,7 +2520,7 @@ create table occupationaldata_history
 		primary key (id, txid)
 );
 
-alter table occupationaldata_history owner to ds;
+alter table occupationaldata_history owner to ${owner};
 
 create table paymentnotice
 (
@@ -2537,7 +2534,7 @@ create table paymentnotice
 	resource jsonb not null
 );
 
-alter table paymentnotice owner to ds;
+alter table paymentnotice owner to ${owner};
 
 create table paymentnotice_history
 (
@@ -2551,7 +2548,7 @@ create table paymentnotice_history
 		primary key (id, txid)
 );
 
-alter table paymentnotice_history owner to ds;
+alter table paymentnotice_history owner to ${owner};
 
 create table namingsystem
 (
@@ -2565,7 +2562,7 @@ create table namingsystem
 	resource jsonb not null
 );
 
-alter table namingsystem owner to ds;
+alter table namingsystem owner to ${owner};
 
 create table namingsystem_history
 (
@@ -2579,7 +2576,7 @@ create table namingsystem_history
 		primary key (id, txid)
 );
 
-alter table namingsystem_history owner to ds;
+alter table namingsystem_history owner to ${owner};
 
 create table medicationstatement
 (
@@ -2593,7 +2590,7 @@ create table medicationstatement
 	resource jsonb not null
 );
 
-alter table medicationstatement owner to ds;
+alter table medicationstatement owner to ${owner};
 
 create table medicationstatement_history
 (
@@ -2607,7 +2604,7 @@ create table medicationstatement_history
 		primary key (id, txid)
 );
 
-alter table medicationstatement_history owner to ds;
+alter table medicationstatement_history owner to ${owner};
 
 create table enrollmentresponse
 (
@@ -2621,7 +2618,7 @@ create table enrollmentresponse
 	resource jsonb not null
 );
 
-alter table enrollmentresponse owner to ds;
+alter table enrollmentresponse owner to ${owner};
 
 create table enrollmentresponse_history
 (
@@ -2635,7 +2632,7 @@ create table enrollmentresponse_history
 		primary key (id, txid)
 );
 
-alter table enrollmentresponse_history owner to ds;
+alter table enrollmentresponse_history owner to ${owner};
 
 create table nutritionorder
 (
@@ -2649,7 +2646,7 @@ create table nutritionorder
 	resource jsonb not null
 );
 
-alter table nutritionorder owner to ds;
+alter table nutritionorder owner to ${owner};
 
 create table nutritionorder_history
 (
@@ -2663,7 +2660,7 @@ create table nutritionorder_history
 		primary key (id, txid)
 );
 
-alter table nutritionorder_history owner to ds;
+alter table nutritionorder_history owner to ${owner};
 
 create table questionnaire
 (
@@ -2677,7 +2674,7 @@ create table questionnaire
 	resource jsonb not null
 );
 
-alter table questionnaire owner to ds;
+alter table questionnaire owner to ${owner};
 
 create table questionnaire_history
 (
@@ -2691,7 +2688,7 @@ create table questionnaire_history
 		primary key (id, txid)
 );
 
-alter table questionnaire_history owner to ds;
+alter table questionnaire_history owner to ${owner};
 
 create table account
 (
@@ -2705,7 +2702,7 @@ create table account
 	resource jsonb not null
 );
 
-alter table account owner to ds;
+alter table account owner to ${owner};
 
 create table account_history
 (
@@ -2719,7 +2716,7 @@ create table account_history
 		primary key (id, txid)
 );
 
-alter table account_history owner to ds;
+alter table account_history owner to ${owner};
 
 create table eventdefinition
 (
@@ -2733,7 +2730,7 @@ create table eventdefinition
 	resource jsonb not null
 );
 
-alter table eventdefinition owner to ds;
+alter table eventdefinition owner to ${owner};
 
 create table eventdefinition_history
 (
@@ -2747,7 +2744,7 @@ create table eventdefinition_history
 		primary key (id, txid)
 );
 
-alter table eventdefinition_history owner to ds;
+alter table eventdefinition_history owner to ${owner};
 
 create table medicinalproductdevicespec
 (
@@ -2761,7 +2758,7 @@ create table medicinalproductdevicespec
 	resource jsonb not null
 );
 
-alter table medicinalproductdevicespec owner to ds;
+alter table medicinalproductdevicespec owner to ${owner};
 
 create table medicinalproductdevicespec_history
 (
@@ -2775,7 +2772,7 @@ create table medicinalproductdevicespec_history
 		primary key (id, txid)
 );
 
-alter table medicinalproductdevicespec_history owner to ds;
+alter table medicinalproductdevicespec_history owner to ${owner};
 
 create table substancespecification
 (
@@ -2789,7 +2786,7 @@ create table substancespecification
 	resource jsonb not null
 );
 
-alter table substancespecification owner to ds;
+alter table substancespecification owner to ${owner};
 
 create table substancespecification_history
 (
@@ -2803,7 +2800,7 @@ create table substancespecification_history
 		primary key (id, txid)
 );
 
-alter table substancespecification_history owner to ds;
+alter table substancespecification_history owner to ${owner};
 
 create table communicationrequest
 (
@@ -2817,7 +2814,7 @@ create table communicationrequest
 	resource jsonb not null
 );
 
-alter table communicationrequest owner to ds;
+alter table communicationrequest owner to ${owner};
 
 create table communicationrequest_history
 (
@@ -2831,7 +2828,7 @@ create table communicationrequest_history
 		primary key (id, txid)
 );
 
-alter table communicationrequest_history owner to ds;
+alter table communicationrequest_history owner to ${owner};
 
 create table specimendefinition
 (
@@ -2845,7 +2842,7 @@ create table specimendefinition
 	resource jsonb not null
 );
 
-alter table specimendefinition owner to ds;
+alter table specimendefinition owner to ${owner};
 
 create table specimendefinition_history
 (
@@ -2859,7 +2856,7 @@ create table specimendefinition_history
 		primary key (id, txid)
 );
 
-alter table specimendefinition_history owner to ds;
+alter table specimendefinition_history owner to ${owner};
 
 create table verificationresult
 (
@@ -2873,7 +2870,7 @@ create table verificationresult
 	resource jsonb not null
 );
 
-alter table verificationresult owner to ds;
+alter table verificationresult owner to ${owner};
 
 create table verificationresult_history
 (
@@ -2887,7 +2884,7 @@ create table verificationresult_history
 		primary key (id, txid)
 );
 
-alter table verificationresult_history owner to ds;
+alter table verificationresult_history owner to ${owner};
 
 create table documentmanifest
 (
@@ -2901,7 +2898,7 @@ create table documentmanifest
 	resource jsonb not null
 );
 
-alter table documentmanifest owner to ds;
+alter table documentmanifest owner to ${owner};
 
 create table documentmanifest_history
 (
@@ -2915,7 +2912,7 @@ create table documentmanifest_history
 		primary key (id, txid)
 );
 
-alter table documentmanifest_history owner to ds;
+alter table documentmanifest_history owner to ${owner};
 
 create table eligibilityresponse
 (
@@ -2929,7 +2926,7 @@ create table eligibilityresponse
 	resource jsonb not null
 );
 
-alter table eligibilityresponse owner to ds;
+alter table eligibilityresponse owner to ${owner};
 
 create table eligibilityresponse_history
 (
@@ -2943,7 +2940,7 @@ create table eligibilityresponse_history
 		primary key (id, txid)
 );
 
-alter table eligibilityresponse_history owner to ds;
+alter table eligibilityresponse_history owner to ${owner};
 
 create table task
 (
@@ -2957,7 +2954,7 @@ create table task
 	resource jsonb not null
 );
 
-alter table task owner to ds;
+alter table task owner to ${owner};
 
 create table task_history
 (
@@ -2971,7 +2968,7 @@ create table task_history
 		primary key (id, txid)
 );
 
-alter table task_history owner to ds;
+alter table task_history owner to ${owner};
 
 create table valueset
 (
@@ -2985,7 +2982,7 @@ create table valueset
 	resource jsonb not null
 );
 
-alter table valueset owner to ds;
+alter table valueset owner to ${owner};
 
 create table valueset_history
 (
@@ -2999,7 +2996,7 @@ create table valueset_history
 		primary key (id, txid)
 );
 
-alter table valueset_history owner to ds;
+alter table valueset_history owner to ${owner};
 
 create table claim
 (
@@ -3013,7 +3010,7 @@ create table claim
 	resource jsonb not null
 );
 
-alter table claim owner to ds;
+alter table claim owner to ${owner};
 
 create table claim_history
 (
@@ -3027,7 +3024,7 @@ create table claim_history
 		primary key (id, txid)
 );
 
-alter table claim_history owner to ds;
+alter table claim_history owner to ${owner};
 
 create table examplescenario
 (
@@ -3041,7 +3038,7 @@ create table examplescenario
 	resource jsonb not null
 );
 
-alter table examplescenario owner to ds;
+alter table examplescenario owner to ${owner};
 
 create table examplescenario_history
 (
@@ -3055,7 +3052,7 @@ create table examplescenario_history
 		primary key (id, txid)
 );
 
-alter table examplescenario_history owner to ds;
+alter table examplescenario_history owner to ${owner};
 
 create table researchstudy
 (
@@ -3069,7 +3066,7 @@ create table researchstudy
 	resource jsonb not null
 );
 
-alter table researchstudy owner to ds;
+alter table researchstudy owner to ${owner};
 
 create table researchstudy_history
 (
@@ -3083,7 +3080,7 @@ create table researchstudy_history
 		primary key (id, txid)
 );
 
-alter table researchstudy_history owner to ds;
+alter table researchstudy_history owner to ${owner};
 
 create table medicationrequest
 (
@@ -3097,7 +3094,7 @@ create table medicationrequest
 	resource jsonb not null
 );
 
-alter table medicationrequest owner to ds;
+alter table medicationrequest owner to ${owner};
 
 create table medicationrequest_history
 (
@@ -3111,7 +3108,7 @@ create table medicationrequest_history
 		primary key (id, txid)
 );
 
-alter table medicationrequest_history owner to ds;
+alter table medicationrequest_history owner to ${owner};
 
 create table measure
 (
@@ -3125,7 +3122,7 @@ create table measure
 	resource jsonb not null
 );
 
-alter table measure owner to ds;
+alter table measure owner to ${owner};
 
 create table measure_history
 (
@@ -3139,7 +3136,7 @@ create table measure_history
 		primary key (id, txid)
 );
 
-alter table measure_history owner to ds;
+alter table measure_history owner to ${owner};
 
 create table list
 (
@@ -3153,7 +3150,7 @@ create table list
 	resource jsonb not null
 );
 
-alter table list owner to ds;
+alter table list owner to ${owner};
 
 create table list_history
 (
@@ -3167,7 +3164,7 @@ create table list_history
 		primary key (id, txid)
 );
 
-alter table list_history owner to ds;
+alter table list_history owner to ${owner};
 
 create table encounter
 (
@@ -3181,7 +3178,7 @@ create table encounter
 	resource jsonb not null
 );
 
-alter table encounter owner to ds;
+alter table encounter owner to ${owner};
 
 create table encounter_history
 (
@@ -3195,7 +3192,7 @@ create table encounter_history
 		primary key (id, txid)
 );
 
-alter table encounter_history owner to ds;
+alter table encounter_history owner to ${owner};
 
 create table capabilitystatement
 (
@@ -3209,7 +3206,7 @@ create table capabilitystatement
 	resource jsonb not null
 );
 
-alter table capabilitystatement owner to ds;
+alter table capabilitystatement owner to ${owner};
 
 create table capabilitystatement_history
 (
@@ -3223,7 +3220,7 @@ create table capabilitystatement_history
 		primary key (id, txid)
 );
 
-alter table capabilitystatement_history owner to ds;
+alter table capabilitystatement_history owner to ${owner};
 
 create table visionprescription
 (
@@ -3237,7 +3234,7 @@ create table visionprescription
 	resource jsonb not null
 );
 
-alter table visionprescription owner to ds;
+alter table visionprescription owner to ${owner};
 
 create table visionprescription_history
 (
@@ -3251,7 +3248,7 @@ create table visionprescription_history
 		primary key (id, txid)
 );
 
-alter table visionprescription_history owner to ds;
+alter table visionprescription_history owner to ${owner};
 
 create table riskassessment
 (
@@ -3265,7 +3262,7 @@ create table riskassessment
 	resource jsonb not null
 );
 
-alter table riskassessment owner to ds;
+alter table riskassessment owner to ${owner};
 
 create table riskassessment_history
 (
@@ -3279,7 +3276,7 @@ create table riskassessment_history
 		primary key (id, txid)
 );
 
-alter table riskassessment_history owner to ds;
+alter table riskassessment_history owner to ${owner};
 
 create table immunizationrecommendation
 (
@@ -3293,7 +3290,7 @@ create table immunizationrecommendation
 	resource jsonb not null
 );
 
-alter table immunizationrecommendation owner to ds;
+alter table immunizationrecommendation owner to ${owner};
 
 create table immunizationrecommendation_history
 (
@@ -3307,7 +3304,7 @@ create table immunizationrecommendation_history
 		primary key (id, txid)
 );
 
-alter table immunizationrecommendation_history owner to ds;
+alter table immunizationrecommendation_history owner to ${owner};
 
 create table processrequest
 (
@@ -3321,7 +3318,7 @@ create table processrequest
 	resource jsonb not null
 );
 
-alter table processrequest owner to ds;
+alter table processrequest owner to ${owner};
 
 create table processrequest_history
 (
@@ -3335,7 +3332,7 @@ create table processrequest_history
 		primary key (id, txid)
 );
 
-alter table processrequest_history owner to ds;
+alter table processrequest_history owner to ${owner};
 
 create table relatedperson
 (
@@ -3349,7 +3346,7 @@ create table relatedperson
 	resource jsonb not null
 );
 
-alter table relatedperson owner to ds;
+alter table relatedperson owner to ${owner};
 
 create table relatedperson_history
 (
@@ -3363,7 +3360,7 @@ create table relatedperson_history
 		primary key (id, txid)
 );
 
-alter table relatedperson_history owner to ds;
+alter table relatedperson_history owner to ${owner};
 
 create table medication
 (
@@ -3377,7 +3374,7 @@ create table medication
 	resource jsonb not null
 );
 
-alter table medication owner to ds;
+alter table medication owner to ${owner};
 
 create table medication_history
 (
@@ -3391,7 +3388,7 @@ create table medication_history
 		primary key (id, txid)
 );
 
-alter table medication_history owner to ds;
+alter table medication_history owner to ${owner};
 
 create table appointmentresponse
 (
@@ -3405,7 +3402,7 @@ create table appointmentresponse
 	resource jsonb not null
 );
 
-alter table appointmentresponse owner to ds;
+alter table appointmentresponse owner to ${owner};
 
 create table appointmentresponse_history
 (
@@ -3419,7 +3416,7 @@ create table appointmentresponse_history
 		primary key (id, txid)
 );
 
-alter table appointmentresponse_history owner to ds;
+alter table appointmentresponse_history owner to ${owner};
 
 create table substance
 (
@@ -3433,7 +3430,7 @@ create table substance
 	resource jsonb not null
 );
 
-alter table substance owner to ds;
+alter table substance owner to ${owner};
 
 create table substance_history
 (
@@ -3447,7 +3444,7 @@ create table substance_history
 		primary key (id, txid)
 );
 
-alter table substance_history owner to ds;
+alter table substance_history owner to ${owner};
 
 create table paymentreconciliation
 (
@@ -3461,7 +3458,7 @@ create table paymentreconciliation
 	resource jsonb not null
 );
 
-alter table paymentreconciliation owner to ds;
+alter table paymentreconciliation owner to ${owner};
 
 create table paymentreconciliation_history
 (
@@ -3475,7 +3472,7 @@ create table paymentreconciliation_history
 		primary key (id, txid)
 );
 
-alter table paymentreconciliation_history owner to ds;
+alter table paymentreconciliation_history owner to ${owner};
 
 create table testscript
 (
@@ -3489,7 +3486,7 @@ create table testscript
 	resource jsonb not null
 );
 
-alter table testscript owner to ds;
+alter table testscript owner to ${owner};
 
 create table testscript_history
 (
@@ -3503,7 +3500,7 @@ create table testscript_history
 		primary key (id, txid)
 );
 
-alter table testscript_history owner to ds;
+alter table testscript_history owner to ${owner};
 
 create table conceptmap
 (
@@ -3517,7 +3514,7 @@ create table conceptmap
 	resource jsonb not null
 );
 
-alter table conceptmap owner to ds;
+alter table conceptmap owner to ${owner};
 
 create table conceptmap_history
 (
@@ -3531,7 +3528,7 @@ create table conceptmap_history
 		primary key (id, txid)
 );
 
-alter table conceptmap_history owner to ds;
+alter table conceptmap_history owner to ${owner};
 
 create table person
 (
@@ -3545,7 +3542,7 @@ create table person
 	resource jsonb not null
 );
 
-alter table person owner to ds;
+alter table person owner to ${owner};
 
 create table person_history
 (
@@ -3559,7 +3556,7 @@ create table person_history
 		primary key (id, txid)
 );
 
-alter table person_history owner to ds;
+alter table person_history owner to ${owner};
 
 create table condition
 (
@@ -3573,7 +3570,7 @@ create table condition
 	resource jsonb not null
 );
 
-alter table condition owner to ds;
+alter table condition owner to ${owner};
 
 create table condition_history
 (
@@ -3587,7 +3584,7 @@ create table condition_history
 		primary key (id, txid)
 );
 
-alter table condition_history owner to ds;
+alter table condition_history owner to ${owner};
 
 create table careteam
 (
@@ -3601,7 +3598,7 @@ create table careteam
 	resource jsonb not null
 );
 
-alter table careteam owner to ds;
+alter table careteam owner to ${owner};
 
 create table careteam_history
 (
@@ -3615,7 +3612,7 @@ create table careteam_history
 		primary key (id, txid)
 );
 
-alter table careteam_history owner to ds;
+alter table careteam_history owner to ${owner};
 
 create table structuredefinition
 (
@@ -3629,7 +3626,7 @@ create table structuredefinition
 	resource jsonb not null
 );
 
-alter table structuredefinition owner to ds;
+alter table structuredefinition owner to ${owner};
 
 create table structuredefinition_history
 (
@@ -3643,7 +3640,7 @@ create table structuredefinition_history
 		primary key (id, txid)
 );
 
-alter table structuredefinition_history owner to ds;
+alter table structuredefinition_history owner to ${owner};
 
 create table procedure
 (
@@ -3657,7 +3654,7 @@ create table procedure
 	resource jsonb not null
 );
 
-alter table procedure owner to ds;
+alter table procedure owner to ${owner};
 
 create table procedure_history
 (
@@ -3671,7 +3668,7 @@ create table procedure_history
 		primary key (id, txid)
 );
 
-alter table procedure_history owner to ds;
+alter table procedure_history owner to ${owner};
 
 create table consent
 (
@@ -3685,7 +3682,7 @@ create table consent
 	resource jsonb not null
 );
 
-alter table consent owner to ds;
+alter table consent owner to ${owner};
 
 create table consent_history
 (
@@ -3699,7 +3696,7 @@ create table consent_history
 		primary key (id, txid)
 );
 
-alter table consent_history owner to ds;
+alter table consent_history owner to ${owner};
 
 create table observationdefinition
 (
@@ -3713,7 +3710,7 @@ create table observationdefinition
 	resource jsonb not null
 );
 
-alter table observationdefinition owner to ds;
+alter table observationdefinition owner to ${owner};
 
 create table observationdefinition_history
 (
@@ -3727,7 +3724,7 @@ create table observationdefinition_history
 		primary key (id, txid)
 );
 
-alter table observationdefinition_history owner to ds;
+alter table observationdefinition_history owner to ${owner};
 
 create table productplan
 (
@@ -3741,7 +3738,7 @@ create table productplan
 	resource jsonb not null
 );
 
-alter table productplan owner to ds;
+alter table productplan owner to ${owner};
 
 create table productplan_history
 (
@@ -3755,7 +3752,7 @@ create table productplan_history
 		primary key (id, txid)
 );
 
-alter table productplan_history owner to ds;
+alter table productplan_history owner to ${owner};
 
 create table location
 (
@@ -3769,7 +3766,7 @@ create table location
 	resource jsonb not null
 );
 
-alter table location owner to ds;
+alter table location owner to ${owner};
 
 create table location_history
 (
@@ -3783,7 +3780,7 @@ create table location_history
 		primary key (id, txid)
 );
 
-alter table location_history owner to ds;
+alter table location_history owner to ${owner};
 
 create table organization
 (
@@ -3797,7 +3794,7 @@ create table organization
 	resource jsonb not null
 );
 
-alter table organization owner to ds;
+alter table organization owner to ${owner};
 
 create table organization_history
 (
@@ -3811,7 +3808,7 @@ create table organization_history
 		primary key (id, txid)
 );
 
-alter table organization_history owner to ds;
+alter table organization_history owner to ${owner};
 
 create table device
 (
@@ -3825,7 +3822,7 @@ create table device
 	resource jsonb not null
 );
 
-alter table device owner to ds;
+alter table device owner to ${owner};
 
 create table device_history
 (
@@ -3839,7 +3836,7 @@ create table device_history
 		primary key (id, txid)
 );
 
-alter table device_history owner to ds;
+alter table device_history owner to ${owner};
 
 create table supplyrequest
 (
@@ -3853,7 +3850,7 @@ create table supplyrequest
 	resource jsonb not null
 );
 
-alter table supplyrequest owner to ds;
+alter table supplyrequest owner to ${owner};
 
 create table supplyrequest_history
 (
@@ -3867,7 +3864,7 @@ create table supplyrequest_history
 		primary key (id, txid)
 );
 
-alter table supplyrequest_history owner to ds;
+alter table supplyrequest_history owner to ${owner};
 
 create table allergyintolerance
 (
@@ -3881,7 +3878,7 @@ create table allergyintolerance
 	resource jsonb not null
 );
 
-alter table allergyintolerance owner to ds;
+alter table allergyintolerance owner to ${owner};
 
 create table allergyintolerance_history
 (
@@ -3895,7 +3892,7 @@ create table allergyintolerance_history
 		primary key (id, txid)
 );
 
-alter table allergyintolerance_history owner to ds;
+alter table allergyintolerance_history owner to ${owner};
 
 create table operationdefinition
 (
@@ -3909,7 +3906,7 @@ create table operationdefinition
 	resource jsonb not null
 );
 
-alter table operationdefinition owner to ds;
+alter table operationdefinition owner to ${owner};
 
 create table operationdefinition_history
 (
@@ -3923,7 +3920,7 @@ create table operationdefinition_history
 		primary key (id, txid)
 );
 
-alter table operationdefinition_history owner to ds;
+alter table operationdefinition_history owner to ${owner};
 
 create table imagingstudy
 (
@@ -3937,7 +3934,7 @@ create table imagingstudy
 	resource jsonb not null
 );
 
-alter table imagingstudy owner to ds;
+alter table imagingstudy owner to ${owner};
 
 create table imagingstudy_history
 (
@@ -3951,7 +3948,7 @@ create table imagingstudy_history
 		primary key (id, txid)
 );
 
-alter table imagingstudy_history owner to ds;
+alter table imagingstudy_history owner to ${owner};
 
 create table medicinalproductingredient
 (
@@ -3965,7 +3962,7 @@ create table medicinalproductingredient
 	resource jsonb not null
 );
 
-alter table medicinalproductingredient owner to ds;
+alter table medicinalproductingredient owner to ${owner};
 
 create table medicinalproductingredient_history
 (
@@ -3979,7 +3976,7 @@ create table medicinalproductingredient_history
 		primary key (id, txid)
 );
 
-alter table medicinalproductingredient_history owner to ds;
+alter table medicinalproductingredient_history owner to ${owner};
 
 create table guidanceresponse
 (
@@ -3993,7 +3990,7 @@ create table guidanceresponse
 	resource jsonb not null
 );
 
-alter table guidanceresponse owner to ds;
+alter table guidanceresponse owner to ${owner};
 
 create table guidanceresponse_history
 (
@@ -4007,7 +4004,7 @@ create table guidanceresponse_history
 		primary key (id, txid)
 );
 
-alter table guidanceresponse_history owner to ds;
+alter table guidanceresponse_history owner to ${owner};
 
 create table media
 (
@@ -4021,7 +4018,7 @@ create table media
 	resource jsonb not null
 );
 
-alter table media owner to ds;
+alter table media owner to ${owner};
 
 create table media_history
 (
@@ -4035,7 +4032,7 @@ create table media_history
 		primary key (id, txid)
 );
 
-alter table media_history owner to ds;
+alter table media_history owner to ${owner};
 
 create table measurereport
 (
@@ -4049,7 +4046,7 @@ create table measurereport
 	resource jsonb not null
 );
 
-alter table measurereport owner to ds;
+alter table measurereport owner to ${owner};
 
 create table measurereport_history
 (
@@ -4063,7 +4060,7 @@ create table measurereport_history
 		primary key (id, txid)
 );
 
-alter table measurereport_history owner to ds;
+alter table measurereport_history owner to ${owner};
 
 create table graphdefinition
 (
@@ -4077,7 +4074,7 @@ create table graphdefinition
 	resource jsonb not null
 );
 
-alter table graphdefinition owner to ds;
+alter table graphdefinition owner to ${owner};
 
 create table graphdefinition_history
 (
@@ -4091,7 +4088,7 @@ create table graphdefinition_history
 		primary key (id, txid)
 );
 
-alter table graphdefinition_history owner to ds;
+alter table graphdefinition_history owner to ${owner};
 
 create table terminologycapabilities
 (
@@ -4105,7 +4102,7 @@ create table terminologycapabilities
 	resource jsonb not null
 );
 
-alter table terminologycapabilities owner to ds;
+alter table terminologycapabilities owner to ${owner};
 
 create table terminologycapabilities_history
 (
@@ -4119,7 +4116,7 @@ create table terminologycapabilities_history
 		primary key (id, txid)
 );
 
-alter table terminologycapabilities_history owner to ds;
+alter table terminologycapabilities_history owner to ${owner};
 
 create table metadataresource
 (
@@ -4133,7 +4130,7 @@ create table metadataresource
 	resource jsonb not null
 );
 
-alter table metadataresource owner to ds;
+alter table metadataresource owner to ${owner};
 
 create table metadataresource_history
 (
@@ -4147,7 +4144,7 @@ create table metadataresource_history
 		primary key (id, txid)
 );
 
-alter table metadataresource_history owner to ds;
+alter table metadataresource_history owner to ${owner};
 
 create table concept
 (
@@ -4161,7 +4158,7 @@ create table concept
 	resource jsonb not null
 );
 
-alter table concept owner to ds;
+alter table concept owner to ${owner};
 
 create table concept_history
 (
@@ -4175,7 +4172,7 @@ create table concept_history
 		primary key (id, txid)
 );
 
-alter table concept_history owner to ds;
+alter table concept_history owner to ${owner};
 
 create or replace function fhirbase_genid() returns text
 	language sql
@@ -4183,7 +4180,7 @@ as $$
 select gen_random_uuid()::text
 $$;
 
-alter function fhirbase_genid() owner to ds;
+alter function fhirbase_genid() owner to ${owner};
 
 create or replace function _fhirbase_to_resource(x _resource) returns jsonb
 	language sql
@@ -4198,7 +4195,7 @@ select x.resource || jsonb_build_object(
  );
 $$;
 
-alter function _fhirbase_to_resource(_resource) owner to ds;
+alter function _fhirbase_to_resource(_resource) owner to ${owner};
 
 create or replace function fhirbase_create(resource jsonb, txid bigint) returns jsonb
 	language plpgsql
@@ -4244,7 +4241,7 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_create(jsonb, bigint) owner to ds;
+alter function fhirbase_create(jsonb, bigint) owner to ${owner};
 
 create or replace function fhirbase_create(resource jsonb) returns jsonb
 	language sql
@@ -4252,7 +4249,7 @@ as $$
 SELECT fhirbase_create(resource, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_create(jsonb) owner to ds;
+alter function fhirbase_create(jsonb) owner to ${owner};
 
 create or replace function fhirbase_update(resource jsonb, txid bigint) returns jsonb
 	language plpgsql
@@ -4304,7 +4301,7 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_update(jsonb, bigint) owner to ds;
+alter function fhirbase_update(jsonb, bigint) owner to ${owner};
 
 create or replace function fhirbase_update(resource jsonb) returns jsonb
 	language sql
@@ -4312,7 +4309,7 @@ as $$
 SELECT fhirbase_update(resource, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_update(jsonb) owner to ds;
+alter function fhirbase_update(jsonb) owner to ${owner};
 
 create or replace function fhirbase_read(resource_type text, id text) returns jsonb
 	language plpgsql
@@ -4333,7 +4330,7 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_read(text, text) owner to ds;
+alter function fhirbase_read(text, text) owner to ${owner};
 
 create or replace function fhirbase_delete(resource_type text, id text, txid bigint) returns jsonb
 	language plpgsql
@@ -4374,7 +4371,7 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_delete(text, text, bigint) owner to ds;
+alter function fhirbase_delete(text, text, bigint) owner to ${owner};
 
 create or replace function fhirbase_delete(resource_type text, id text) returns jsonb
 	language sql
@@ -4382,5 +4379,5 @@ as $$
 SELECT fhirbase_delete(resource_type, id, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_delete(text, text) owner to ds;
+alter function fhirbase_delete(text, text) owner to ${owner};
 

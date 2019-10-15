@@ -1,36 +1,50 @@
 package ru.viscur.dh.datastorage.impl
 
-import org.junit.Ignore
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit4.SpringRunner
+import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.BootAutoconf
+import ru.viscur.dh.fhir.model.entity.HealthcareService
 
 
-@RunWith(SpringRunner::class)
 @SpringBootTest(
-        classes = [BootAutoconf::class],
-        properties = [
-            "ru.viscur.dh.data-storage.enabled=true",
-            "ru.viscur.dh.data-storage.datasource.url=jdbc:postgresql://localhost:5432/dh_datastorage",
-            "ru.viscur.dh.data-storage.datasource.username=dh_datastorage",
-            "ru.viscur.dh.data-storage.datasource.password=dh_datastorage",
-            "ru.viscur.dh.data-storage.datasource.driver-class-name=org.postgresql.Driver",
-            "ru.viscur.dh.data-storage.datasource.hibernate.dialect=ru.viscur.dh.datastorage.impl.config.PostgreSQL95JsonDialect"
-        ]
+        classes = [BootAutoconf::class]
 )
-@Ignore
+//@Disabled("Debug purposes only")
 class ResourceServiceImplTest {
+    @Autowired
+    lateinit var resourceServiceImpl: ResourceService
+
 
     @Test
-    fun `should create resource`() {
-        TODO("Implement me")
-    }
+    @Order(1)
+    fun `should create & update resource`() {
+        val source = HealthcareService(
+                name = "creating resource",
+                type = listOf(),
+                location = listOf()
+        )
+        val created = resourceServiceImpl.create(source)
+        assertNotNull(created)
+        assertNotSame(source, created)
+        assertEquals("creating resource", created!!.name)
 
-    @Test
-    fun `should update resource`() {
-        TODO("Implement me")
+        val updateSource = HealthcareService(
+                id = created.id!!,
+                name = "updating resource",
+                type = listOf(),
+                location = listOf()
+        )
+        val updated = resourceServiceImpl.update(updateSource)
+        /*assertNotNull(updated)
+        assertEquals(created.id, updated?.id)
+        assertNotSame(updateSource, updated)
+        assertEquals("updating resource", updated?.name)*/
     }
 
     @Test
