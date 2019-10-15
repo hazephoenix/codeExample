@@ -5,15 +5,16 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 import ru.viscur.dh.fhir.model.entity.HealthcareService
 
-
 @SpringBootTest(
         classes = [DataStorageConfig::class]
 )
+@EnableAutoConfiguration
 @Disabled("Debug purposes only")
 class ResourceServiceImplTest {
     @Autowired
@@ -40,10 +41,10 @@ class ResourceServiceImplTest {
                 location = listOf()
         )
         val updated = resourceServiceImpl.update(updateSource)
-        /*assertNotNull(updated)
+        assertNotNull(updated)
         assertEquals(created.id, updated?.id)
         assertNotSame(updateSource, updated)
-        assertEquals("updating resource", updated?.name)*/
+        assertEquals("updating resource", updated?.name)
     }
 
     @Test

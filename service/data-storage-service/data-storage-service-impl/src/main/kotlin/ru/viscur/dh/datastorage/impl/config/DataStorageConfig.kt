@@ -5,9 +5,13 @@ import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.AutoConfigureAfter
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.*
 import org.springframework.context.annotation.ComponentScan.Filter
@@ -24,25 +28,29 @@ private const val REPOSITORY_PACKAGE = "$BASE_PACKAGE.repository"
 private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entities"
 
 
-
 @Configuration
 @ComponentScan(
         basePackages = ["ru.viscur.dh.datastorage.impl"],
         excludeFilters = [
             Filter(
-                    pattern = [
-                        "ru/viscur/dh/datastorage/impl/config/DataStorageConfig"
-                    ],
+                    /*pattern = [
+                        "ru\\.viscur\\.dh\\.datastorage\\.impl\\.config\\.."
+                    ],*/
                     type = FilterType.REGEX
             )
         ]
 )
 @EnableTransactionManagement
-@EnableAutoConfiguration
+@EnableConfigurationProperties
+@AutoConfigureAfter(HibernateJpaAutoConfiguration::class)
 class DataStorageConfig {
 
-    init {
-        String::class.java.name
+    @Bean
+    @Primary
+    fun flywayMigrationStrategy(): FlywayMigrationStrategy {
+        return FlywayMigrationStrategy {
+            /* nothing to do */
+        }
     }
 
     @Bean(name = ["dsDataSourceProperties"])
@@ -53,9 +61,16 @@ class DataStorageConfig {
     @Bean(name = ["dsDataSource"])
     fun dataSource() = dataSourceProperties()
             .initializeDataSourceBuilder()
+            .driverClassName("org.postgresql.Driver")
             .type(HikariDataSource::class.java)
             .build()!!
 
+ /*   @ConditionalOnProperty(
+            prefix = "$PROPERTIES_PREFIX.flyway",
+            name = ["enabled"],
+            havingValue = "true",
+            matchIfMissing = false
+    )*/
     @Bean(name = ["dsFlyway"], initMethod = "migrate")
     fun flyway() = Flyway(
             FluentConfiguration()
@@ -71,7 +86,6 @@ class DataStorageConfig {
     )
 
     @Bean(name = ["dsEntityManagerFactory"])
-    @DependsOn("dsFlyway")
     fun entityManagerFactory(builder: EntityManagerFactoryBuilder) =
             builder
                     .dataSource(dataSource())

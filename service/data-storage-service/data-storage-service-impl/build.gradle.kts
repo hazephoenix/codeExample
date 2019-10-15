@@ -5,5 +5,5 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.flywaydb:flyway-core")
 
-    runtime ("org.postgresql:postgresql")
+    implementation ("org.postgresql:postgresql")
 }
