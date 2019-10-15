@@ -2,6 +2,7 @@ package ru.viscur.dh.queue.impl.service
 
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
+import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.entity.QueueHistoryOfOffice
@@ -21,7 +22,8 @@ import ru.viscur.dh.queue.impl.now
 
 class OfficeServiceImpl(
         private val locationService: LocationService,
-        private val patientService: PatientService
+        private val patientService: PatientService,
+        private val resourceService: ResourceService
 ) : OfficeService {
     override fun changeStatus(office: Location, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
         val now = now()
@@ -29,28 +31,23 @@ class OfficeServiceImpl(
                 location = Reference(office),
                 status = office.status,
                 fireDate = office.extension?.statusUpdatedAt,
-                duration = office.extension?.statusUpdatedAt?.let { msToSeconds(now.time - it.time )}
+                duration = office.extension?.statusUpdatedAt?.let { msToSeconds(now.time - it.time) }
         )
 
         patientIdOfPrevProcess?.run {
-            val patient = patient(this)
+            val patient = patientService.byId(this)!!
             queueHistoryOfOffice.apply {
                 severity = patientService.severity(patientIdOfPrevProcess)
-
-//                diagnosticConclusion = diagnostic//todo диагностик из diagnostic report (предварительный) по пациенту
-                ageGroup = ageGroup(patient!!.birthDate!!)
+                diagnosticConclusion = patientService.preliminaryDiagnosticConclusion(patientIdOfPrevProcess)
+                ageGroup = ageGroup(patient.birthDate)
             }
         }
-        //todo save resource queueHistoryOfOffice
-        office.status = newStatus
-        office.extension = LocationExtension(statusUpdatedAt = now)
-        //todo save resource office
-    }
-
-    private fun patient(id: String): Patient? {
-
-        //todo patient po id
-        return null
+        resourceService.create(queueHistoryOfOffice)
+        resourceService.update(office.apply {
+            status = newStatus
+            extension = extension?.let { it.apply { statusUpdatedAt = now } }
+                    ?: LocationExtension(statusUpdatedAt = now)
+        })
     }
 
     override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int) {

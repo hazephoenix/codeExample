@@ -24,7 +24,7 @@ interface PatientService {
     /**
      * Код предварительного диагноза
      */
-    fun preliminaryDiagnosticReport(patientId: String): String?
+    fun preliminaryDiagnosticConclusion(patientId: String): String?
 
     /**
      * Метод сохраняет конечную (заполненную полностью) информацию о пациенте

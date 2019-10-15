@@ -11,5 +11,5 @@ import java.util.*
  * Доп поля местоположения [ru.viscur.dh.fhir.model.entity.Location]
  */
 class LocationExtension @JsonCreator constructor(
-        @JsonProperty("statusUpdatedAt") val statusUpdatedAt: Date? = null
+        @JsonProperty("statusUpdatedAt") var statusUpdatedAt: Date? = null
 )

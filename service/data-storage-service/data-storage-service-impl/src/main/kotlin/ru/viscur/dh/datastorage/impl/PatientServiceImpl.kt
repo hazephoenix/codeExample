@@ -54,11 +54,20 @@ class PatientServiceImpl(
         return enumValueOf(severityStr)
     }
 
-    override fun preliminaryDiagnosticReport(patientId: String): String? {
-//        val diagnosticReport =
-////                single<DiagnosticReport>("select r.resource from DiagnosticReport where id in ()")
-//        return diagnosticReport?.conclusionCode?.first()?.coding?.first()?.code
-        return ""
+    override fun preliminaryDiagnosticConclusion(patientId: String): String? {
+        val query = em.createNativeQuery("""
+            select r.resource
+            from diagnosticReport r
+            where r.resource ->> 'status' = 'preliminary'
+              and 'DiagnosticReport/' || r.id in (
+                select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference' as qrRef
+                from clinicalImpression ci
+                where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                  and ci.resource ->> 'status' = 'active'
+            )""")
+        query.setParameter("patientRef", "Patient/$patientId")
+        val diagnosticReport = query.fetchResource<DiagnosticReport>()
+        return diagnosticReport?.conclusionCode?.first()?.coding?.first()?.code
     }
 
     override fun saveFinalPatientData(bundle: Bundle): String {
