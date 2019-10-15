@@ -77,8 +77,8 @@ subprojects {
 
         dependencyManagement {
             dependencies {
-                //dependency("org.springframework:spring-core:5.2.0.RELEASE")
                 dependency("com.vladmihalcea:hibernate-types-52:2.7.0")
+                dependency("org.postgresql:postgresql:42.2.8")
             }
         }
 
@@ -91,7 +91,7 @@ subprojects {
             if (applyBoot) {
                 implementation("org.springframework.boot:spring-boot-starter")
                 testImplementation("org.springframework.boot:spring-boot-starter-test") {
-                    //            exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+                    exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }
                 annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
             }

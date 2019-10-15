@@ -1,11 +1,11 @@
 package ru.viscur.dh.datastorage.impl
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.digitalhospital.dhdatastorage.dto.Resource
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
+import ru.viscur.dh.datastorage.impl.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import java.math.BigInteger
@@ -15,10 +15,11 @@ import javax.persistence.PersistenceContext
 
 @Service
 class ResourceServiceImpl : ResourceService {
-    @PersistenceContext
+
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    @Transactional(readOnly = true)
+    @Tx(readOnly = true)
     override fun <T> byId(resourceType: ResourceType<T>, id: String): T?
             where T : BaseResource {
         return em.createNativeQuery("select fhirbase_read(?1, ?2)")
@@ -27,7 +28,7 @@ class ResourceServiceImpl : ResourceService {
                 .singleResult.toResourceEntity()
     }
 
-    @Transactional(readOnly = true)
+    @Tx(readOnly = true)
     override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<Resource<T>>
             where T : BaseResource {
         // TODO parameter queries
@@ -62,25 +63,26 @@ class ResourceServiceImpl : ResourceService {
         }
     }
 
-    @Transactional
+    @Tx
     override fun <T> create(resource: T): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_create(?1\\:\\:jsonb)")
-                .setParameter(1, ObjectMapper().writeValueAsString(resource)) // TODO use shared ObjectMapper?
+        return em
+                .createNativeQuery("select fhirbase_create(${jsonbParam(1)})")
+                .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
     }
 
-    @Transactional
+    @Tx
     override fun <T> update(resource: T): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_update(?1\\:\\:jsonb)")
-                .setParameter(1, ObjectMapper().writeValueAsString(resource)) // TODO use shared ObjectMapper?,
+        return em.createNativeQuery("select fhirbase_update(?1\\:\\:jsonb, nextval('transaction_id_seq'))")
+                .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
     }
 
-    @Transactional
+    @Tx
     override fun <T> deleteById(resourceType: ResourceType<T>, id: String): T?
             where T : BaseResource {
         return em.createNativeQuery("select fhirbase_delete(?1, ?2)")
@@ -91,7 +93,7 @@ class ResourceServiceImpl : ResourceService {
 
     }
 
-    @Transactional
+    @Tx
     override fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): Int
             where T : BaseResource {
         val wherePart = makeWherePart(requestBody.filter)
@@ -108,8 +110,9 @@ class ResourceServiceImpl : ResourceService {
                         }.joinToString(" and ")
             } else ""
 
-    private fun <T> Any?.toResourceEntity(): T?
-            where T : BaseResource {
-        return this?.let { it as T }
-    }
+
+
+
+
+
 }

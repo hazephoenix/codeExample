@@ -15,6 +15,8 @@ private constructor(
         val entityClass: Class<TEntityClass>
 ) {
     companion object {
+        @JvmStatic private  val typesByIdString = mutableMapOf<String, ResourceType<out BaseResource>>()
+
         val Bundle = createType<Bundle>(ResourceTypeId.Bundle)
         val CarePlan = createType<CarePlan>(ResourceTypeId.CarePlan)
         val CareTeam = createType<CareTeam>(ResourceTypeId.CareTeam)
@@ -25,7 +27,7 @@ private constructor(
         val Consent = createType<Consent>(ResourceTypeId.Consent)
         val DiagnosticReport = createType<DiagnosticReport>(ResourceTypeId.DiagnosticReport)
         val Encounter = createType<Encounter>(ResourceTypeId.Encounter)
-        val HealthcareService = createType<HealthcareService>(ResourceTypeId.HealthcareService)
+        @JvmStatic val HealthcareService = createType<HealthcareService>(ResourceTypeId.HealthcareService)
         val ListResource = createType<ListResource>(ResourceTypeId.ListResource)
         val Location = createType<Location>(ResourceTypeId.Location)
         val Observation = createType<Observation>(ResourceTypeId.Observation)
@@ -44,7 +46,6 @@ private constructor(
         val ValueSet = createType<ValueSet>(ResourceTypeId.ValueSet)
 
 
-        private val typesByIdString = mutableMapOf<String, ResourceType<out BaseResource>>()
         private inline fun <reified TEntityClass : BaseResource> createType(id: ResourceTypeId): ResourceType<TEntityClass> {
             val instance = ResourceType(id, TEntityClass::class.java);
             val key = id.toString()
