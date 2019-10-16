@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 import ru.viscur.dh.fhir.model.entity.HealthcareService
+import ru.viscur.dh.fhir.model.enums.ResourceType
 
 @SpringBootTest(
         classes = [DataStorageConfig::class]
@@ -49,18 +51,54 @@ class ResourceServiceImplTest {
 
     @Test
     fun `should return resource by id when exists`() {
-        TODO("Implement me")
+        val location = resourceServiceImpl.byId(ResourceType.Location, "Location/139");
+        assertNotNull(location)
+        assertEquals("Location/139", location!!.id)
     }
 
     @Test
     fun `should return null when resource with id doesn't exists`() {
-        TODO("Implement me")
+        val location = resourceServiceImpl.byId(ResourceType.Location, "Location/Unknown");
+        assertNull(location)
     }
 
     @Test
-    fun `should return all resources by resource type`() {
-        TODO("Implement me")
+    @Order(2)
+    fun `should delete rows by name`() {
+        val deletedCount = resourceServiceImpl.deleteAll(ResourceType.HealthcareService, RequestBodyForResources(
+                mapOf("name" to "updating resource")
+        ))
+        assertTrue(deletedCount > 0)
+    }
+
+    @Test
+    fun `should return all resources by resource type and name`() {
+        val found = resourceServiceImpl.all(
+                ResourceType.Location,
+                RequestBodyForResources(
+                        mapOf(
+                                "name" to "мотров"
+                        ),
+                        listOf("id desc")
+                )
+        )
+        assertNotNull(found)
+        assertEquals(3, found.size)
     }
 
 
+    @Test
+    fun `should delete resource by id`() {
+        val source = HealthcareService(
+                name = "deleting resource",
+                type = listOf(),
+                location = listOf()
+        )
+        val created = resourceServiceImpl.create(source)
+        assertNotNull(created)
+        val deleted = resourceServiceImpl.deleteById(ResourceType.HealthcareService, created?.id!!)
+        assertNotNull(deleted)
+        assertEquals(created.id, deleted!!.id)
+        assertNull(resourceServiceImpl.byId(ResourceType.HealthcareService, created?.id!!))
+    }
 }

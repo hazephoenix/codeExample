@@ -24,7 +24,8 @@
   ```
   GRANT ALL ON DATABASE dh_datastorage TO dh_datastorage;
   ```
-* Создать расширение 
+* Создать расширение (необходимо подключиться к созданной БД под пользователем postgres, 
+  например в psql это можно сделать командой ```\c dh_datastorage```) 
   ```
   drop extension if exists pgcrypto;
   create extension pgcrypto;

@@ -12,6 +12,7 @@ import java.math.BigInteger
 import java.sql.Timestamp
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
+import javax.persistence.Query
 
 @Service
 class ResourceServiceImpl : ResourceService {
@@ -31,36 +32,37 @@ class ResourceServiceImpl : ResourceService {
     @Tx(readOnly = true)
     override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<Resource<T>>
             where T : BaseResource {
-        // TODO parameter queries
-        val wherePart = makeWherePart(requestBody.filter)
-        val orderByPart = " order by " + (requestBody.orderBy?.joinToString(", ") {
-            val nameAndOrderType = it.split(" ")
-            "r.resource->>'${nameAndOrderType[0]}' " + (if (nameAndOrderType.size > 1) nameAndOrderType[1] else "")
-        } ?: "txid")
-        val items = em.createNativeQuery(
-                """
+        val parts = GeneratedQueryParts(requestBody.filter, requestBody.orderBy)
+        val items = em
+                .createNativeQuery(
+                        """
                     select r.id, 
                            r.txid, 
                            r.ts, 
                            r.resource_type, 
                            r.status, 
                            r.resource 
-                    from $resourceType r
-                    $wherePart
-                    $orderByPart
+                    from ${resourceType.id} r
+                    ${parts.where()}
+                    ${parts.orderBy()}
                 """.trimIndent()
-        ).resultList
-        return items.map { item ->
-            item as Array<Any>
-            Resource(
-                    item[0] as String,
-                    item[1] as BigInteger,
-                    item[2] as Timestamp,
-                    item[3] as String,
-                    item[4] as String,
-                    item[5].toResourceEntity<T>()!!
-            )
-        }
+                )
+                .apply { parts.setParametersTo(this) }
+                .resultList
+        return items
+                .asSequence()
+                .map { it as Array<Any> }
+                .map {
+                    Resource(
+                            it[0] as String,
+                            it[1] as BigInteger,
+                            it[2] as Timestamp,
+                            it[3] as String,
+                            it[4] as String,
+                            it[5].toResourceEntity<T>()!!
+                    )
+                }
+                .toList()
     }
 
     @Tx
@@ -76,8 +78,8 @@ class ResourceServiceImpl : ResourceService {
     @Tx
     override fun <T> update(resource: T): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_update('${resource.toJsonb()}'\\:\\:jsonb)")
-//                .setParameter(1, resource.toJsonb())
+        return em.createNativeQuery("select fhirbase_update(${jsonbParam(1)})")
+                .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
     }
@@ -96,23 +98,71 @@ class ResourceServiceImpl : ResourceService {
     @Tx
     override fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): Int
             where T : BaseResource {
-        val wherePart = makeWherePart(requestBody.filter)
-        return em.createNativeQuery("delete from $resourceType r$wherePart").executeUpdate()
+        val parts = GeneratedQueryParts(requestBody.filter)
+        return em
+                .createNativeQuery("delete from ${resourceType.id} r ${parts.where()}")
+                .apply { parts.setParametersTo(this) }
+                .executeUpdate()
     }
 
 
-    private fun makeWherePart(params: Map<String, String>): String =
-            // TODO use parameters
-            if (params.isNotEmpty()) {
-                " where " +
-                        params.map { (key, value) ->
-                            "r.resource ->> '$key' ilike '%$value%'"
-                        }.joinToString(" and ")
-            } else ""
+    private class GeneratedQueryParts(
+            filter: Map<String, String>? = null,
+            orderBy: List<String>? = null
+    ) {
+        val params = mutableListOf<Any>()
+        val whereStatements = mutableListOf<String>()
+        val orderStatements = mutableListOf<String>()
 
+        init {
+            addWherePart(filter)
+            addOrderPart(orderBy)
+        }
 
+        fun where(): String {
+            if (whereStatements.isEmpty()) {
+                return ""
+            }
+            return "where ${whereStatements.joinToString(" and ")}"
+        }
 
+        fun orderBy(): String {
+            if (orderStatements.isEmpty()) {
+                return ""
+            }
+            val stmt = orderStatements.joinToString(", ") {
+                "r.resource->> $it"
+            }
+            return "order by $stmt"
+        }
 
+        fun setParametersTo(query: Query) {
+            params.forEachIndexed { idx, value ->
+                query.setParameter(idx + 1, value)
+            }
+        }
 
+        private fun addWherePart(filter: Map<String, String>?) {
+            filter?.forEach { (field, value) ->
+                whereStatements.add("r.resource ->> ?${params.size + 1} ilike ?${params.size + 2}")
+                params.add(field)
+                params.add("%$value%")
+            }
+        }
 
+        private fun addOrderPart(orderBy: List<String>?) {
+            orderBy?.forEach {
+                val parts = it.split(" ")
+                if (parts.isNotEmpty()) {
+                    var statement = "?${params.size + 1}"
+                    if (parts.size > 1) {
+                        val order = if ("desc" == parts[1]) "desc" else "asc"
+                        statement += " $order"
+                    }
+                    orderStatements.add(statement)
+                    params.add(parts[0])
+                }
+            }
+        }
+    }
 }
