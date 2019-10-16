@@ -22,7 +22,7 @@ before_script:
   ##
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
-  - echo "SSH_KNOWN_HOSTS_DH_STAGE" > ~/.ssh/known_hosts
+  - echo "$SSH_KNOWN_HOSTS_DH_STAGE" > ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
 stages:
 #  - build
@@ -39,6 +39,7 @@ stages:
 dh-stage-master:
   stage: deploy
   script:
+    - ls -la ~/.ssh
     - cat ~/.ssh/known_hosts
     - cat ~/.ssh/id_rsa
     - ssh 84.201.154.121 "whoami"
