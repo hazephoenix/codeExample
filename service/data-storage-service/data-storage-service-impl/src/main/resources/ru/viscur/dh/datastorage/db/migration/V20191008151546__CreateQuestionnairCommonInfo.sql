@@ -1,6 +1,6 @@
 delete from Questionnaire r where r.id = 'Common_info';
 
-select fhirbase_create('{"resourceType": "Questionnaire", "id": "Common_info", "name": "Common info", "title": "Общая информация об обращении", "status": "active", "item": [
+select resource_create('{"resourceType": "Questionnaire", "id": "Common_info", "name": "Common info", "title": "Общая информация об обращении", "status": "active", "item": [
     {"linkId": "WWII_participant", "text": "Участник ВОВ", "type": "boolean"},
     {"linkId": "Chernobyl_resident", "text": "Чернобылец", "type": "boolean"},
     {"linkId": "Complaints", "text": "Жалобы", "type": "string"},

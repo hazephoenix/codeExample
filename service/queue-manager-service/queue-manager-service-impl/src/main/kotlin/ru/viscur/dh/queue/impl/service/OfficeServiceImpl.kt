@@ -2,6 +2,7 @@ package ru.viscur.dh.queue.impl.service
 
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
+import ru.viscur.dh.datastorage.api.QueueService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
@@ -23,7 +24,8 @@ import ru.viscur.dh.queue.impl.now
 class OfficeServiceImpl(
         private val locationService: LocationService,
         private val patientService: PatientService,
-        private val resourceService: ResourceService
+        private val resourceService: ResourceService,
+        private val queueService: QueueService
 ) : OfficeService {
     override fun changeStatus(office: Location, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
         val now = now()
@@ -57,7 +59,7 @@ class OfficeServiceImpl(
                 estDuration = estDuration
         )
         val queue = queueItems(officeId)
-        when (val userSeverity = userSeverity(patientId)) {
+        when (val userSeverity = patientService.severity(patientId)) {
             Severity.GREEN -> queue.add(queueItem)
             else -> {
                 val severities = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
@@ -76,14 +78,8 @@ class OfficeServiceImpl(
     }
 
     private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
-        //todo удаление всех записей QueueItem по этому кабинету,
-        //ghj
-        // добавление указанных - queue
-    }
-
-    private fun userSeverity(patientId: String): Severity {
-        // todo active clinical impression -> questionnairresponse (severityCriteria) -> ответ по типу сортировки (severity)
-        return Severity.RED
+        queueService.deleteQueueItemsOfOffice(officeId)
+        queue.forEach { resourceService.create(it) }
     }
 
     private fun queueItems(officeId: String): MutableList<QueueItem> {

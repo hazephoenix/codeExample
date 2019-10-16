@@ -69,7 +69,7 @@ class ResourceServiceImpl : ResourceService {
     override fun <T> create(resource: T): T?
             where T : BaseResource {
         return em
-                .createNativeQuery("select fhirbase_create(${jsonbParam(1)})")
+                .createNativeQuery("select resource_create(${jsonbParam(1)})")
                 .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
@@ -78,7 +78,7 @@ class ResourceServiceImpl : ResourceService {
     @Tx
     override fun <T> update(resource: T): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_update(${jsonbParam(1)})")
+        return em.createNativeQuery("select resource_update(${jsonbParam(1)})")
                 .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
@@ -87,7 +87,7 @@ class ResourceServiceImpl : ResourceService {
     @Tx
     override fun <T> deleteById(resourceType: ResourceType<T>, id: String): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_delete(?1, ?2)")
+        return em.createNativeQuery("select resource_delete(?1, ?2)")
                 .setParameter(1, resourceType.id.toString())
                 .setParameter(2, id)
                 .singleResult

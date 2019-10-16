@@ -1,7 +1,7 @@
 package ru.viscur.dh.queue.impl.persistence.model
 
+import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.queue.api.model.UserInQueueStatus
-import ru.viscur.dh.queue.api.model.UserType
 import ru.viscur.dh.queue.impl.now
 import java.util.*
 import javax.persistence.*
@@ -18,7 +18,7 @@ import javax.persistence.*
  * @param lastName фамилия
  * @param birthDate дата рождения
  * @param diagnostic код МКБ диагноза
- * @param type тип [UserType]
+ * @param type тип [Severity]
  * @param status статус [UserInQueueStatus]
  * @param updatedAt дата изменения статуса
  */
@@ -39,7 +39,7 @@ data class UserPE(
         var diagnostic: String? = null,
         @Column
         @Enumerated(EnumType.STRING)
-        var type: UserType = UserType.GREEN,
+        var type: Severity = Severity.GREEN,
         @Column
         @Enumerated(EnumType.STRING)
         var status: UserInQueueStatus? = null,

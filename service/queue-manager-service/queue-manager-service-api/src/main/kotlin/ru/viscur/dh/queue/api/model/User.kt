@@ -1,5 +1,6 @@
 package ru.viscur.dh.queue.api.model
 
+import ru.viscur.dh.fhir.model.enums.Severity
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -16,7 +17,7 @@ import java.util.*
  * @param lastName фамилия
  * @param birthDate дата рождения
  * @param diagnostic код МКБ диагноза
- * @param type тип [UserType]
+ * @param type тип [Severity]
  * @param status статус [UserInQueueStatus]
  * @param updatedAt дата изменения статуса
  */
@@ -26,7 +27,7 @@ data class User(
         var lastName: String? = null,
         var birthDate: Date? = null,
         var diagnostic: String? = null,
-        var type: UserType = UserType.GREEN,
+        var type: Severity = Severity.GREEN,
         var status: UserInQueueStatus? = null,
         var updatedAt: Date = Date.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant())
 ) {

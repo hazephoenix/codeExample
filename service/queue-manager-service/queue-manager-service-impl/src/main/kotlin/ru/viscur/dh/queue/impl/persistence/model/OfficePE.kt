@@ -1,9 +1,9 @@
 package ru.viscur.dh.queue.impl.persistence.model
 
 
+import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.queue.api.model.OfficeStatus
 import ru.viscur.dh.queue.api.model.UserInQueueStatus
-import ru.viscur.dh.queue.api.model.UserType
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.queue.impl.now
 import ru.viscur.dh.queue.impl.repository.QueueItemRepository
@@ -52,11 +52,11 @@ open class OfficePE(
      * Предположительное время ожидания в очереди пациента с типом [type] =
      * Сумма приблизительных продолжительностей осмотра всех пациентов перед позицией в очереди, куда бы встал пациент с типом [type]
      */
-    fun estWaitingInQueueWithType(type: UserType): Int {
+    fun estWaitingInQueueWithType(type: Severity): Int {
         val inQueue = queue.filter { it.user.status != UserInQueueStatus.ON_SURVEY }
         val inQueueByType = when (type) {
-            UserType.RED -> inQueue.filter { it.user.type == type }
-            UserType.YELLOW -> inQueue.filter { it.user.type in SEVERITY_WITH_PRIORITY }
+            Severity.RED -> inQueue.filter { it.user.type == type }
+            Severity.YELLOW -> inQueue.filter { it.user.type in SEVERITY_WITH_PRIORITY }
             else -> inQueue
         }
         return inQueueByType.sumBy { it.estDuration }
@@ -75,9 +75,9 @@ open class OfficePE(
         val userType = user.type
         val queueItem = QueueItemPE(user = user, estDuration = estDuration)
         when (userType) {
-            UserType.GREEN -> queue.add(queueItem)
+            Severity.GREEN -> queue.add(queueItem)
             else -> {
-                val userTypes = if (userType == UserType.RED) listOf(UserType.RED) else SEVERITY_WITH_PRIORITY
+                val userTypes = if (userType == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
                 if (queue.any { it.user.type in userTypes }) {
                     queue.add(queue.indexOfLast { it.user.type in userTypes } + 1, queueItem)
                 } else {

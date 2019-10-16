@@ -1,7 +1,6 @@
 package ru.viscur.dh.queue.impl
 
 import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.queue.api.model.UserType
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.Period

@@ -1,6 +1,6 @@
 delete from Questionnaire r where r.id = 'Severity_criteria';
 
-select fhirbase_create('{"resourceType": "Questionnaire", "id": "Severity_criteria", "name": "Sorting criteria", "title": "Критерии сортировки", "status": "active", "item": [
+select resource_create('{"resourceType": "Questionnaire", "id": "Severity_criteria", "name": "Sorting criteria", "title": "Критерии сортировки", "status": "active", "item": [
     {"linkId": "Upper_respiratory_airway", "text": "Результат осмотра верхних дыхательных путей", "type": "choice", "answerOption": [
         {"valueCoding": {"code": "Airways_not_passable_(asphyxia)_or_not_breathing", "display": "Дыхательные пути не проходимы (асфиксия) или не дышит", "system": "ValueSet/Upper_respiratory_airway"}},
         {"valueCoding": {"code": "Airways_passable", "display": "Дыхательные пути проходимы", "system": "ValueSet/Upper_respiratory_airway"}}
