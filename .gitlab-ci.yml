@@ -25,20 +25,22 @@ before_script:
   - echo "SSH_KNOWN_HOSTS_DH_STAGE" > ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
 stages:
-  - build
+#  - build
   - deploy
 
-build:
-  stage: build
-  script: ./gradlew build -Penvironment=$ENVIRONMENT
-  artifacts:
-    paths:
-      - applications/dh-central-server-app/build/libs/dh-central-server-app.jar
-      - applications/dh-paramedic-device-app/build/libs/dh-paramedic-device-app.jar
+#build:
+#  stage: build
+#  script: ./gradlew build -Penvironment=$ENVIRONMENT
+#  artifacts:
+#    paths:
+#      - applications/dh-central-server-app/build/libs/dh-central-server-app.jar
+#      - applications/dh-paramedic-device-app/build/libs/dh-paramedic-device-app.jar
 
 dh-stage-master:
   stage: deploy
   script:
+    - cat ~/.ssh/known_hosts
+    - cat ~/.ssh/id_rsa
     - ssh 84.201.154.121 "whoami"
   only:
     - master
