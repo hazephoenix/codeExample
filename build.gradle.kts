@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 /**
  * Проверка, является ли проект собираемым. По умолчанию, собираем только проекты,
@@ -98,6 +99,17 @@ subprojects {
         }
         if (isExecutableProject(this)) {
             println("Configure executable project: ${this.path}")
+            // Возможность переписать application.properties в исполняемой jar'ке
+            tasks.withType<BootJar> {
+                if (project.hasProperty("environment")) {
+                    println("Build for environment ${project.properties["environment"]}")
+                    val before = rootSpec.addFirst()
+                    rootSpec.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                    before.into("BOOT-INF/classes") {
+                        from("$projectDir/environment/${project.properties["environment"]}")
+                    }
+                }
+            }
         } else {
             println("Configure library project: ${this.path}")
             this.tasks.findByName("bootJar")?.enabled = false

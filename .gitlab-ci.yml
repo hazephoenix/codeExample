@@ -1,0 +1,20 @@
+image: openjdk:11.0.4-jdk
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script: ./gradlew build -Penvironment=$ENVIRONMENT
+  artifacts:
+    paths:
+      - applications/dh-central-server-app/build/libs/dh-central-server-app.jar
+      - applications/dh-paramedic-device-app/build/libs/dh-paramedic-device-app.jar
+
+dh-stage-master:
+  stage: deploy
+  script:
+    - echo TODO_Deploy
+  only:
+    - master
