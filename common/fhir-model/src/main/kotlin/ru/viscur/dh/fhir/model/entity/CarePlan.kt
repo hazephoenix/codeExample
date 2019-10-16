@@ -26,7 +26,7 @@ import java.sql.Timestamp
  * @param author ответственный, ссылка на [Practitioner]
  * @param contributor кто составил план, ссылка на [Practitioner]
  * @param encounter обслуживание, в рамках которого сделан план, ссылка на [Encounter]
- * @param actitity список назначений
+ * @param activity список назначений
  */
 class CarePlan @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
@@ -40,5 +40,5 @@ class CarePlan @JsonCreator constructor(
         @JsonProperty("author") val author: Reference,
         @JsonProperty("contributor") val contributor: Reference,
         @JsonProperty("encounter") val encounter: Reference? = null,
-        @JsonProperty("actitity") val actitity: List<CarePlanActivity>
+        @JsonProperty("activity") val activity: List<CarePlanActivity>
 ) : BaseResource(id, identifier, resourceType)

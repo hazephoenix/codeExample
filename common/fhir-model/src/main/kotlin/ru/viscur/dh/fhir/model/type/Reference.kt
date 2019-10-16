@@ -31,5 +31,5 @@ class Reference @JsonCreator constructor(
             type = resourceType
     )
 
-    val id : String? = reference?.substringBefore("/")
+    val id : String? = reference?.substringAfter("/")
 }

@@ -45,8 +45,13 @@ fun <T> Query.fetchResourceList(): List<T>
         where T : BaseResource {
     return this.resultList
             .asSequence()
-            .map { it as Array<*> }
-            .map { it[0] }
+            .map {
+                if(it is Array<*>) {
+                    it[0]
+                } else {//если запрос идет на одно поле resource, то это не Array
+                    it
+                }
+            }
             .filterNotNull()
             .map {
                 it.toResourceEntity<T>()!!

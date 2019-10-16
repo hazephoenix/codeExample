@@ -79,18 +79,18 @@ class PatientServiceImpl(
         val patient = getResources<Patient>(resources, ResourceType.ResourceTypeId.Patient).first()
         val serviceRequests = getResources<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest)
         val patientReference = Reference(patient)
-        val carePlan = CarePlan(
+        CarePlan(
                 subject = patientReference,
                 author = paramedicReference,
                 contributor = paramedicReference,
                 status = CarePlanStatus.active,
                 created = Timestamp(date.time),
                 title = "Маршрутный лист",
-                actitity = serviceRequests
+                activity = serviceRequests
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it)!! }
         val encounter = Encounter(subject = patientReference).let { resourceService.create(it)!! }
-        val clinicalImpression = ClinicalImpression(
+        ClinicalImpression(
                 status = ClinicalImpressionStatus.completed,
                 date = date,
                 subject = patientReference,

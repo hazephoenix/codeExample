@@ -23,7 +23,7 @@ class ResourceServiceImpl : ResourceService {
     @Tx(readOnly = true)
     override fun <T> byId(resourceType: ResourceType<T>, id: String): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_read(?1, ?2)")
+        return em.createNativeQuery("select resource_read(?1, ?2)")
                 .setParameter(1, resourceType.id.toString())
                 .setParameter(2, id)
                 .singleResult.toResourceEntity()
