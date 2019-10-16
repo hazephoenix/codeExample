@@ -1,11 +1,11 @@
 image: openjdk:11.0.4-jdk
 
 variables:
-  ssh-user: dh-central-server
-  server-addr: 84.201.154.121
-  service-name: dh-central-server-dev
-  install-path: ~/develop
-  port: 8080
+  ssh_user: dh-central-server
+  server_addr: 84.201.154.121
+  service_name: dh-central-server-dev
+  install_path: ~/develop
+  http_port: 8080
 
 
 
@@ -49,11 +49,11 @@ stages:
 dh-stage-master:
   stage: deploy
   script:
-    - ssh $ssh-user@$server-addr "systemctl stop $service-name"
-#    - scp ./applications/dh-central-server-app/build/libs/dh-central-server-app.jar $ssh-user@$server-addr:$install-path/dh-central-server-app.jar
-#    - scp ./applications/dh-central-server-app/environment/dh-stage/application.properties $ssh-user@$server-addr:$install-path/application.properties
-#    - ssh $ssh-user@$server-addr "chmod u+x $install-path/dh-central-server-app.jar"
-    - ssh $ssh-user@$server-addr "systemctl start $service-name"
+    - ssh $ssh_user@$server_addr "systemctl stop $service_name"
+#    - scp ./applications/dh-central-server-app/build/libs/dh-central-server-app.jar $ssh_user@$server_addr:$install_path/dh-central-server-app.jar
+#    - scp ./applications/dh-central-server-app/environment/dh-stage/application.properties $ssh_user@$server_addr:$install_path/application.properties
+#    - ssh $ssh_user@$server_addr "chmod u+x $install_path/dh-central-server-app.jar"
+    - ssh $ssh_user@$server_addr "systemctl start $service_name"
   #    - TODO check
   only:
     - master
