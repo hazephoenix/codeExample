@@ -1,7 +1,6 @@
 rootProject.name = "DigitalHospital"
 
 include(
-        "common:spring-boot:flyway-module-configuration",
         "common:fhir-model",
         "service:data-storage-service",
         "service:data-storage-service:data-storage-service-api",

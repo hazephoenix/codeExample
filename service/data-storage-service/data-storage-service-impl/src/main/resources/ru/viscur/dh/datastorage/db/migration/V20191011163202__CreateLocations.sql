@@ -6,8 +6,8 @@ select fhirbase_create('{
   "name": "Cмотровая",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "129", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}
+  "identifier": [{"value": "129", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}], "text": ""}]
 }'::jsonb);
 select fhirbase_create('{
   "resourceType": "Location",
@@ -15,8 +15,8 @@ select fhirbase_create('{
   "name": "Cмотровая",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "139", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}
+  "identifier": [{"value": "139", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}], "text": ""}]
 }'::jsonb);
 select fhirbase_create('{
   "resourceType": "Location",
@@ -24,8 +24,8 @@ select fhirbase_create('{
   "name": "Cмотровая",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "140", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}
+  "identifier": [{"value": "140", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}], "text": ""}]
 }'::jsonb);
 
 select fhirbase_create('{
@@ -34,8 +34,8 @@ select fhirbase_create('{
   "name": "Процедурный кабинет",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "101", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}
+  "identifier": [{"value": "101", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}], "text": ""}]
 }'::jsonb);
 select fhirbase_create('{
   "resourceType": "Location",
@@ -43,12 +43,9 @@ select fhirbase_create('{
   "name": "Процедурный кабинет",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "104", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}
+  "identifier": [{"value": "104", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}], "text": ""}]
 }'::jsonb);
-
-
-
 
 select fhirbase_create('{
   "resourceType": "Location",
@@ -56,8 +53,8 @@ select fhirbase_create('{
   "name": "Функционально-диагностический кабинет",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "130", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "FunctionalDiagnostics", "system": "ValueSet/Location_types", "display": "Функциональная диагностика"}
+  "identifier": [{"value": "130", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "FunctionalDiagnostics", "system": "ValueSet/Location_types", "display": "Функциональная диагностика"}], "text": ""}]
 }'::jsonb);
 
 select fhirbase_create('{
@@ -66,8 +63,8 @@ select fhirbase_create('{
   "name": "УЗИ",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "117", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "UltrasoundDiagnostics", "system": "ValueSet/Location_types", "display": "Ультразвуковая диагностика"}
+  "identifier": [{"value": "117", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "UltrasoundDiagnostics", "system": "ValueSet/Location_types", "display": "Ультразвуковая диагностика"}], "text": ""}]
 }'::jsonb);
 
 select fhirbase_create('{
@@ -76,8 +73,8 @@ select fhirbase_create('{
   "name": "Эндоскопия (Бронхоскопия)",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "149", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}
+  "identifier": [{"value": "149", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}], "text": ""}]
 }'::jsonb);
 
 select fhirbase_create('{
@@ -86,8 +83,8 @@ select fhirbase_create('{
   "name": "Эндоскопия (Колоноскопия)",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "150", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}
+  "identifier": [{"value": "150", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}], "text": ""}]
 }'::jsonb);
 
 select fhirbase_create('{
@@ -96,8 +93,8 @@ select fhirbase_create('{
   "name": "Эндоскопия (ЭГДС)",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "151", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}
+  "identifier": [{"value": "151", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}], "text": ""}]
 }'::jsonb);
 
 select fhirbase_create('{
@@ -106,6 +103,6 @@ select fhirbase_create('{
   "name": "Рентген",
   "status": "active",
   "address": {"use": "work", "type": "physical", "text": "2 этаж"},
-  "identifier": {"value": "202", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "GeneralRadiology", "system": "ValueSet/Location_types", "display": "Общая рентгенология"}
+  "identifier": [{"value": "202", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}, "text": ""}],
+  "type": [{"coding": [{"code": "GeneralRadiology", "system": "ValueSet/Location_types", "display": "Общая рентгенология"}], "text": ""}]
 }'::jsonb);

@@ -26,10 +26,10 @@ class Address @JsonCreator constructor(
         @JsonProperty("type") val type: AddressType = AddressType.both,
         @JsonProperty("text") val text: String,
         @JsonProperty("line") val line: List<String>? = null,
-        @JsonProperty("city") val city: String,
+        @JsonProperty("city") val city: String?,
         @JsonProperty("district") val district: String? = null,
-        @JsonProperty("state") val state: String,
+        @JsonProperty("state") val state: String?,
         @JsonProperty("postalCode") val postalCode: String? = null,
-        @JsonProperty("country") val country: String,
+        @JsonProperty("country") val country: String?,
         @JsonProperty("period") val period: Period? = null
 )
