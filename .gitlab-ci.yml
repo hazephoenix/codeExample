@@ -41,7 +41,7 @@ dh-stage-master:
   script:
     - ls -la ~/.ssh
     - cat ~/.ssh/known_hosts
-    - cat ~/.ssh/id_rsa
+#    - cat ~/.ssh/id_rsa
     - ssh 84.201.154.121 "whoami"
   only:
     - master
