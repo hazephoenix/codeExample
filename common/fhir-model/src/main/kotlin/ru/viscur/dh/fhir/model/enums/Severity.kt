@@ -5,9 +5,13 @@ package ru.viscur.dh.fhir.model.enums
  *
  * Степень тяжести пациента
  * Коды из system = 'ValueSet/Severity'
+ *
+ * @property RED Красный - тяжелая степень тяжести, реанимационный
+ * @property YELLOW Желтый - средней степени тяжести
+ * @property GREEN Зеленый - удовлетворительное состояние
  */
-enum class Severity {
-    RED,
-    YELLOW,
-    GREEN
+enum class Severity(val translation: String) {
+    RED("Красный"),
+    YELLOW("Желтый"),
+    GREEN("Зеленый")
 }
