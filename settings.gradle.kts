@@ -20,6 +20,7 @@ include(
         /*TODO "applications:dh-rfid-location-device-app"*/
 )
 
+
 pluginManagement {
     repositories {
         // TODO убрать milestone и snapshot как релизнится spring boot 2.2.0

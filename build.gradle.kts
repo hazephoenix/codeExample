@@ -1,5 +1,18 @@
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.HttpClients
+import org.gradle.tooling.BuildException
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.apache.httpcomponents:httpclient:4.5.10")
+    }
+}
 
 /**
  * Проверка, является ли проект собираемым. По умолчанию, собираем только проекты,
@@ -115,5 +128,37 @@ subprojects {
             this.tasks.findByName("bootJar")?.enabled = false
             this.tasks.findByName("jar")?.enabled = true
         }
+    }
+}
+
+
+task("waitForHttpEndpoint") {
+    group = "deploy"
+    doFirst {
+        HttpClients
+                .createDefault()
+                .use { client ->
+                    val request = HttpGet(project.properties["endpoint"] as String)
+                    val waitFor = (project.properties["waitFor"] as String).toLong()
+                    var waited = 0L
+
+                    do {
+                        val start = System.currentTimeMillis()
+                        try {
+                            client
+                                    .execute(request)
+                                    ?.use { response ->
+                                        if (response.statusLine.statusCode == 200) {
+                                            println("OK")
+                                            return@doFirst
+                                        }
+                                    }
+                        } catch (ignore: org.apache.http.conn.HttpHostConnectException) {
+                        }
+                        Thread.sleep(2000)
+                        waited += System.currentTimeMillis() - start
+                    } while (waited < waitFor)
+                    throw Exception("Endpoint isn't available")
+                }
     }
 }

@@ -3,9 +3,11 @@ image: openjdk:11.0.4-jdk
 variables:
   ssh_user: dh-central-server
   server_addr: 84.201.154.121
+  server_port: 8080
   service_name: dh-central-server-dev
   install_path: ~/develop
-  http_port: 8080
+  # 2 min
+  health_check_timeout: 120000
 
 
 
@@ -55,6 +57,7 @@ dh-stage-master:
     - scp ./applications/dh-central-server-app/environment/dh-stage/application.properties $ssh_user@$server_addr:$install_path/application.properties
     - ssh $ssh_user@$server_addr "chmod u+x $install_path/dh-central-server-app.jar"
     - ssh $ssh_user@$server_addr "sudo systemctl start $service_name"
-  #    - TODO check
+    - ./gradlew waitForHttpEndpoint -Pendpoint=http://$server_addr:$server_port/systems-services/health-check -PwaitFor=$health_check_timeout
+
   only:
     - master
