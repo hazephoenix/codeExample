@@ -1,3 +1,5 @@
+import org.apache.commons.codec.binary.Base64
+import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
@@ -104,6 +106,7 @@ subprojects {
 
             if (applyBoot) {
                 implementation("org.springframework.boot:spring-boot-starter")
+                implementation("org.springframework.boot:spring-boot-starter-security")
                 testImplementation("org.springframework.boot:spring-boot-starter-test") {
                     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }
@@ -139,9 +142,15 @@ task("waitForHttpEndpoint") {
                 .createDefault()
                 .use { client ->
                     val request = HttpGet(project.properties["endpoint"] as String)
+
+                    // TODO т.к. решение временное не стал выносить в настройки
+                    val auth = "test:testGGhdJpldczxcnasw8745";
+                    val encodedAuth = Base64.encodeBase64(auth.toByteArray(Charsets.ISO_8859_1));
+                    val authHeader = "Basic " + String(encodedAuth);
+                    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+
                     val waitFor = (project.properties["waitFor"] as String).toLong()
                     var waited = 0L
-
                     do {
                         val start = System.currentTimeMillis()
                         try {
