@@ -21,9 +21,9 @@ enum class LocationStatus {
     /**
      * Пациент из очереди назначен, ожидание прихода пациента
      */
-    WAITING_USER,
+    WAITING_PATIENT,
     /**
      * Осмотр пациента
      */
-    SURVEY
+    OBSERVATION
 }

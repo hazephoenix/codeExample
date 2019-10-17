@@ -19,5 +19,5 @@ interface PatientStatusService {
     /**
      * Сохранение текущего статуса в историю
      */
-    fun saveCurrentStatus(patientId: String, officeIdOfPrevProcess: String? = null, now: Date)
+    fun saveCurrentStatus(patientId: String, officeIdOfPrevProcess: String? = null, now: Date = ru.viscur.dh.fhir.model.utils.now())
 }

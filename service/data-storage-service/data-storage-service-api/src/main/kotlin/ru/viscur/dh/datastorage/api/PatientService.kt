@@ -3,6 +3,7 @@ package ru.viscur.dh.datastorage.api
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
+import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.Severity
 
 /**
@@ -23,9 +24,16 @@ interface PatientService {
     fun severity(patientId: String): Severity
 
     /**
-     * Все назначения в маршрутном листе, упорядочены по [ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
+     * Все назначения в маршрутном листе, упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
     fun serviceRequests(patientId: String): List<ServiceRequest>
+
+    /**
+     * Все непройденные назначения в маршрутном листе, упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
+     */
+    fun activeServiceRequests(patientId: String): List<ServiceRequest>
+
+    fun queueStatusOfPatient(patientId: String): PatientQueueStatus
 
     /**
      * Код предварительного диагноза

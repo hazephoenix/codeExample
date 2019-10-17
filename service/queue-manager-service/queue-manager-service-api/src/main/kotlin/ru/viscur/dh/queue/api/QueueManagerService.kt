@@ -13,26 +13,10 @@ import ru.viscur.dh.queue.api.model.User
 interface QueueManagerService {
 
     /**
-     * Кабинет по id
-     */
-    fun officeById(officeId: Long): Office
-
-    /**
-     * Пациент по id
-     */
-    fun userById(userId: Long): User
-
-    /**
-     * Тип обследования по id
-     */
-    fun surveyTypeById(surveyTypeId: Long): SurveyType
-
-
-    /**
      * Пациент получил маршрутный лист: вносим в систему
      * Возвращаем список обследований с заполненными №пп [ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
-    fun registerUser(patientId: String): List<ServiceRequest>
+    fun registerPatient(patientId: String): List<ServiceRequest>
 
     /**
      * Поставить пациента в очередь
@@ -58,14 +42,14 @@ interface QueueManagerService {
      *
      * TODO pass only userId and officeId? (or create cmd)
      */
-    fun surveyStarted(user: User, office: Office);
+    fun observationStarted(patientId: String, officeId: String)
 
     /**
      * Обследование закончилось
      *
      * TODO pass only officeId?
      */
-    fun surveyFinished(office: Office)
+    fun observationFinished(officeId: String)
 
     /**
      * Кабинет готов принять пациента: смена статуса с [OfficeStatus.CLOSED], [OfficeStatus.BUSY] на [OfficeStatus.READY]
@@ -73,14 +57,14 @@ interface QueueManagerService {
      *
      * TODO pass only officeId?
      */
-    fun officeIsReady(office: Office);
+    fun officeIsReady(officeId: String)
 
     /**
      * Смена статуса кабинета с "готов принять" или с "закрыт" на занят
      *
      * TODO pass only officeId?
      */
-    fun officeIsBusy(office: Office)
+    fun officeIsBusy(officeId: String)
 
     /**
      * Смена статуса кабинета с "занят" или "готов принять" на "закрыт"
@@ -88,14 +72,14 @@ interface QueueManagerService {
      *
      * TODO pass only officeId?
      */
-    fun officeIsClosed(office: Office)
+    fun officeIsClosed(officeId: String)
 
     /**
      * Пациент покинул очередь
      *
      * TODO pass only userId?
      */
-    fun userLeftQueue(user: User)
+    fun patientLeftQueue(patientId: String)
 
     /**
      * Удалить всю очередь: из базы и из системы

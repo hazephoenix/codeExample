@@ -1,7 +1,5 @@
 package ru.viscur.dh.queue.api
 
-import ru.viscur.dh.fhir.model.entity.Location
-import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 
 interface OfficeService {
@@ -10,13 +8,20 @@ interface OfficeService {
      *
      * @param userOfPrevProcess пациент закончившегося процесса TODO???
      */
-    fun changeStatus(office: Location, newStatus: LocationStatus, patientIdOfPrevProcess: String? = null)
+    fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String? = null)
 
     fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int)
 
     fun firstPatientInQueue(officeId: String): String?
 
-    fun deleteFirstPatientFromQueue(office: Location)
+    fun deleteFirstPatientFromQueue(officeId: String)
 
-    fun deletePatientFromQueue(office: Location, patient: Patient)
+    fun deletePatientFromQueue(officeId: String, patientId: String)
+
+    /**
+     * Удаление пациента из информации о последнем пациенте (если он фигурирует в такой информации в каком-либо кабинете)
+     */
+    fun deletePatientFromLastPatientInfo(patientId: String)
+
+    fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?)
 }

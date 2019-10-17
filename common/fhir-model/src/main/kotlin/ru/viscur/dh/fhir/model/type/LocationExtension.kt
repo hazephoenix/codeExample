@@ -8,8 +8,12 @@ import java.util.*
 /**
  * Created at 15.10.2019 10:02 by SherbakovaMA
  *
- * Доп поля местоположения [ru.viscur.dh.fhir.model.entity.Location]
+ * Доп поля [местоположения Location][ru.viscur.dh.fhir.model.entity.Location]
+ *
+ * @param statusUpdatedAt когда поменялся [статус Location.status][ru.viscur.dh.fhir.model.entity.Location.status]
+ * @param lastPatientInfo информация кабинета о последнем принятом пациенте, [LocationExtensionLastPatientInfo]
  */
 class LocationExtension @JsonCreator constructor(
-        @JsonProperty("statusUpdatedAt") var statusUpdatedAt: Date? = null
+        @JsonProperty("statusUpdatedAt") var statusUpdatedAt: Date? = null,
+        @JsonProperty("lastPatientInfo") var lastPatientInfo: LocationExtensionLastPatientInfo? = null
 )

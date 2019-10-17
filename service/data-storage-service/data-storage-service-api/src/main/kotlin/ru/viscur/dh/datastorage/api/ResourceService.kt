@@ -16,7 +16,7 @@ interface ResourceService {
      * @param resourceType тип ресурса
      * @param id идентификатор ресурса
      */
-    fun <T> byId(resourceType: ResourceType<T>, id: String): T?
+    fun <T> byId(resourceType: ResourceType<T>, id: String): T
             where T : BaseResource
 
     /**
@@ -71,8 +71,6 @@ interface ResourceService {
      * Без сохранения истории пред. состояний ресурса
      * @return количество удаленных записей
      */
-    fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): Int
+    fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources? = null): Int
             where T : BaseResource
-
-
 }
