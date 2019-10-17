@@ -58,7 +58,7 @@ class QueueManagerServiceImpl(
      */
     private fun estWaitingInQueueWithType(patientId: String, serviceRequest: ServiceRequest): Int {
         val officeId = serviceRequest.locationReference!!.first().id
-        val queue = queueService.queueItemsOfOffice(officeId)
+        val queue = queueService.queueItemsOfOffice(officeId!!)
         val inQueue = queue.filter { it.patientQueueStatus != PatientQueueStatus.ON_SURVEY }
         val severity = patientService.severity(patientId)
         val inQueueByType = when (severity) {
@@ -191,7 +191,7 @@ class QueueManagerServiceImpl(
             val queue = queueService.queueItemsOfOffice(officeId)
             queue.forEach {
                 val patientId = it.subject.id
-                patientStatusService.changeStatus(patientId, PatientQueueStatus.READY)
+                patientStatusService.changeStatus(patientId!!, PatientQueueStatus.READY)
                 addToOfficeQueue(patientId)
             }
             queueService.deleteQueueItemsOfOffice(officeId)

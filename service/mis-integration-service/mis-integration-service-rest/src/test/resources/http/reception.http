@@ -1,0 +1,749 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+GET http://localhost:8080/mis-integration/hello
+Accept: application/json
+
+###
+
+###
+
+POST http://localhost:8080/reception/severity
+Content-Type: application/json
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Heart_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 110
+      }
+    },
+    {
+      "resource": {
+        "id": "ad501881-e445-4316-821f-f7d09a327afd",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_pressure_upper_level",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 95
+      }
+    },
+    {
+      "resource": {
+        "id": "702dd780-3330-4fe1-88c7-19c46a20a207",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Degree_of_saturation_of_blood_with_oxygen",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 90
+      }
+    },
+    {
+      "resource": {
+        "id": "d80684b9-d4e2-4b10-b40a-020b8938367d",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Breathing_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 27
+      }
+    },
+    {
+      "resource": {
+        "id": "37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    { "resource": {
+      "id": "564aa366-5d41-4757-89a3-2e0b5f8dc509",
+      "resourceType": "QuestionnaireResponse",
+      "status": "completed",
+      "author": {
+        "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+        "type": "Practitioner"
+      },
+      "source": {
+        "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+        "type": "Patient"
+      },
+      "questionnaire": "Questionnaire/Severity_criteria",
+      "item": [
+        {
+          "linkId": "Upper_respiratory_airway",
+          "text": "Результат осмотра верхних дыхательных путей",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Airways_passable",
+                "display": "Дыхательные пути проходимы",
+                "system": "ValueSet/Upper_respiratory_airway"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Consciousness_assessment",
+          "text": "Сознание",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Clear_mind",
+                "display": "Ясное сознание",
+                "system": "ValueSet/Consciousness_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Pain_intensity_assessment",
+          "text": "Оценка интенсивности боли (0-10)",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "From_0_to_3",
+                "display": "0-3",
+                "system": "ValueSet/Pain_intensity_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Patient_can_stand",
+          "text": "Опорная функция",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Can_stand",
+                "display": "Может стоять",
+                "system": "ValueSet/Patient_can_stand"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Questionnaire/paramedic-qa-form/complaints",
+          "text": "Жалобы пациента",
+          "answer": [
+            {
+              "valueString": "Озноб"
+            },
+            {
+              "valueString": "Слабость"
+            },
+            {
+              "valueString": "Недомогание"
+            }
+          ]
+        },
+        {
+          "linkId": "Questionnaire/paramedic-qa-form/base-syndrom",
+          "text": "Ведущий синдром",
+          "answer": [
+            {
+              "valueString": "Высокая температура"
+            }
+          ]
+        }
+      ]
+    }
+    }
+  ],
+  "id": "7dc06391-0761-45de-ad64-2c8a814c09a2"
+}
+
+###
+
+POST http://localhost:8080/reception/serviceRequests
+Content-Type: application/json
+
+{"mode": "working", "status": "current", "resourceType": "ListResource", "id":"12121","entry": [{"item" : {"reference": "Concept/ICD-10/", "type": "Concept"}}]}
+
+###
+
+POST http://localhost:8080/reception/diagnostic
+Content-Type: application/json
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Heart_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 110
+      }
+    },
+    {
+      "resource": {
+        "id": "ad501881-e445-4316-821f-f7d09a327afd",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_pressure_upper_level",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 95
+      }
+    },
+    {
+      "resource": {
+        "id": "702dd780-3330-4fe1-88c7-19c46a20a207",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Degree_of_saturation_of_blood_with_oxygen",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 90
+      }
+    },
+    {
+      "resource": {
+        "id": "d80684b9-d4e2-4b10-b40a-020b8938367d",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Breathing_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 27
+      }
+    },
+    {
+      "resource": {
+        "id": "37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    { "resource": {
+      "id": "564aa366-5d41-4757-89a3-2e0b5f8dc509",
+      "resourceType": "QuestionnaireResponse",
+      "status": "completed",
+      "author": {
+        "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+        "type": "Practitioner"
+      },
+      "source": {
+        "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+        "type": "Patient"
+      },
+      "questionnaire": "Questionnaire/Severity_criteria",
+      "item": [
+        {
+          "linkId": "Upper_respiratory_airway",
+          "text": "Результат осмотра верхних дыхательных путей",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Airways_passable",
+                "display": "Дыхательные пути проходимы",
+                "system": "ValueSet/Upper_respiratory_airway"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Consciousness_assessment",
+          "text": "Сознание",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Clear_mind",
+                "display": "Ясное сознание",
+                "system": "ValueSet/Consciousness_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Pain_intensity_assessment",
+          "text": "Оценка интенсивности боли (0-10)",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "From_0_to_3",
+                "display": "0-3",
+                "system": "ValueSet/Pain_intensity_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Patient_can_stand",
+          "text": "Опорная функция",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Can_stand",
+                "display": "Может стоять",
+                "system": "ValueSet/Patient_can_stand"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Questionnaire/paramedic-qa-form/complaints",
+          "text": "Жалобы пациента",
+          "answer": [
+            {
+              "valueString": "Озноб"
+            },
+            {
+              "valueString": "Слабость"
+            },
+            {
+              "valueString": "Недомогание"
+            }
+          ]
+        },
+        {
+          "linkId": "Questionnaire/paramedic-qa-form/base-syndrom",
+          "text": "Ведущий синдром",
+          "answer": [
+            {
+              "valueString": "Высокая температура"
+            }
+          ]
+        }
+      ]
+    }
+    }
+  ],
+  "id": "7dc06391-0761-45de-ad64-2c8a814c09a2"
+}
+
+###
+
+POST http://localhost:8080/reception/patient
+Content-Type: application/json
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Heart_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 110
+      }
+    },
+    {
+      "resource": {
+        "id": "ad501881-e445-4316-821f-f7d09a327afd",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_pressure_upper_level",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 95
+      }
+    },
+    {
+      "resource": {
+        "id": "702dd780-3330-4fe1-88c7-19c46a20a207",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Degree_of_saturation_of_blood_with_oxygen",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 90
+      }
+    },
+    {
+      "resource": {
+        "id": "d80684b9-d4e2-4b10-b40a-020b8938367d",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Breathing_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueInteger": 27
+      }
+    },
+    {
+      "resource": {
+        "id": "37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    { "resource": {
+      "id": "564aa366-5d41-4757-89a3-2e0b5f8dc509",
+      "resourceType": "QuestionnaireResponse",
+      "status": "completed",
+      "author": {
+        "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+        "type": "Practitioner"
+      },
+      "source": {
+        "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+        "type": "Patient"
+      },
+      "questionnaire": "Questionnaire/Severity_criteria",
+      "item": [
+        {
+          "linkId": "Upper_respiratory_airway",
+          "text": "Результат осмотра верхних дыхательных путей",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Airways_passable",
+                "display": "Дыхательные пути проходимы",
+                "system": "ValueSet/Upper_respiratory_airway"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Consciousness_assessment",
+          "text": "Сознание",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Clear_mind",
+                "display": "Ясное сознание",
+                "system": "ValueSet/Consciousness_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Pain_intensity_assessment",
+          "text": "Оценка интенсивности боли (0-10)",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "From_0_to_3",
+                "display": "0-3",
+                "system": "ValueSet/Pain_intensity_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Patient_can_stand",
+          "text": "Опорная функция",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Can_stand",
+                "display": "Может стоять",
+                "system": "ValueSet/Patient_can_stand"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Questionnaire/paramedic-qa-form/complaints",
+          "text": "Жалобы пациента",
+          "answer": [
+            {
+              "valueString": "Озноб"
+            },
+            {
+              "valueString": "Слабость"
+            },
+            {
+              "valueString": "Недомогание"
+            }
+          ]
+        },
+        {
+          "linkId": "Questionnaire/paramedic-qa-form/base-syndrom",
+          "text": "Ведущий синдром",
+          "answer": [
+            {
+              "valueString": "Высокая температура"
+            }
+          ]
+        }
+      ]
+    }
+    }
+  ],
+  "id": "7dc06391-0761-45de-ad64-2c8a814c09a2"
+}
+
+###

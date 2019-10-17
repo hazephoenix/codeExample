@@ -101,9 +101,12 @@ class ObservationServiceImplTest {
                 ),
                 valueString = "Слизистые носоглотки без изменений",
                 issued = Timestamp(1212)
-        )
-        val serviceRequest = observationService.findServiceRequest(observation)
+        ).let { resourceService.create(it)!! }.also { createdResources.add(it) }
+
+        observation.status = ObservationStatus.final
+        val serviceRequest = observationService.update(observation)
         assertEquals(serviceRequest?.resourceType, ResourceType.ServiceRequest.id)
+
         // TODO: finalize deleting test resources
         createdResources.forEach {
             resourceService.deleteById(ResourceType.byId(it.resourceType), it.id!!)

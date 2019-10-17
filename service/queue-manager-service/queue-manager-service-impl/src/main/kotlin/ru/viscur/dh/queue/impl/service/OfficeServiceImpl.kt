@@ -123,8 +123,8 @@ class OfficeServiceImpl(
             queueService.queueItemsOfOffice(officeId).map { queueItem ->
                 val patientId = queueItem.subject.id
                 queueItem.apply {
-                    severity = patientService.severity(patientId)
-                    patientQueueStatus = patientService.byId(patientId).extension.queueStatus
+                    severity = patientService.severity(patientId!!)
+                    patientQueueStatus = patientService.byId(patientId!!).extension.queueStatus
                 }
             }.toMutableList()
 }
