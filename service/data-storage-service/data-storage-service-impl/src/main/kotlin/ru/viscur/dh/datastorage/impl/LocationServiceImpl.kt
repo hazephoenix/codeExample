@@ -1,5 +1,6 @@
 package ru.viscur.dh.datastorage.impl
 
+import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.Location
@@ -10,6 +11,7 @@ import javax.persistence.PersistenceContext
 /**
  * Created at 15.10.2019 12:10 by SherbakovaMA
  */
+@Service
 class LocationServiceImpl(
         private val resourceService: ResourceService
 ) : LocationService {

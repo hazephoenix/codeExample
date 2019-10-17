@@ -1,5 +1,6 @@
 package ru.viscur.dh.datastorage.impl
 
+import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
@@ -15,6 +16,7 @@ import javax.persistence.PersistenceContext
 /**
  * Created at 16.10.2019 12:16 by SherbakovaMA
  */
+@Service
 class QueueServiceImpl(
         private val locationService: LocationService,
         private val patientService: PatientService

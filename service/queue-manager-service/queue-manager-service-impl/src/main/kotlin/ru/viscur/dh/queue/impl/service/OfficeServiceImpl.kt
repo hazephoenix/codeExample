@@ -1,5 +1,6 @@
 package ru.viscur.dh.queue.impl.service
 
+import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
@@ -21,6 +22,7 @@ import ru.viscur.dh.queue.impl.ageGroup
 import ru.viscur.dh.queue.impl.msToSeconds
 import ru.viscur.dh.queue.impl.now
 
+@Service
 class OfficeServiceImpl(
         private val locationService: LocationService,
         private val patientService: PatientService,

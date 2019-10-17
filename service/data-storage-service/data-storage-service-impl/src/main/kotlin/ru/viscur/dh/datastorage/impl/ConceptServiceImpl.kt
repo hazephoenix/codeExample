@@ -1,5 +1,6 @@
 package ru.viscur.dh.datastorage.impl
 
+import org.springframework.stereotype.*
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.ResourceService
@@ -10,6 +11,7 @@ import ru.viscur.dh.fhir.model.type.CodeableConcept
 /**
  * Created at 16.10.2019 17:53 by SherbakovaMA
  */
+@Service
 class ConceptServiceImpl(private val resourceService: ResourceService) : ConceptService {
 
     override fun byCodeableConcept(codeableConcept: CodeableConcept): Concept {

@@ -28,40 +28,7 @@ private const val ENTITY_PACKAGE = "$PERSISTENCE_PACKAGE.model"
  */
 @Configuration
 @ComponentScan(BASE_PACKAGE)
-@EnableAutoConfiguration
-@ConditionalOnProperty(
-        prefix = PROPERTIES_PREFIX,
-        name = ["enabled"],
-        havingValue = "true"
-)
-@EnableJpaRepositories(
-        basePackages = [REPOSITORY_PACKAGE],
-        entityManagerFactoryRef = "qmEntityManagerFactory"
-)
 class QueueManagerConfig {
 
-    @Bean
-    @Qualifier("qmDataSourceProperties")
-    @ConfigurationProperties("$PROPERTIES_PREFIX.datasource")
-    @Primary
-    fun qmDataSourceProperties(): DataSourceProperties = DataSourceProperties()
 
-    @Bean
-    fun qmDataSource(): HikariDataSource {
-        return qmDataSourceProperties()
-                .initializeDataSourceBuilder()
-                .type(HikariDataSource::class.java)
-                .build();
-    }
-
-
-    @Bean
-    fun qmEntityManagerFactory(builder: EntityManagerFactoryBuilder): LocalContainerEntityManagerFactoryBean {
-        return builder
-                .dataSource(qmDataSource())
-                .packages(ENTITY_PACKAGE)
-                .persistenceUnit("queueManager")
-                .build();
-
-    }
 }
