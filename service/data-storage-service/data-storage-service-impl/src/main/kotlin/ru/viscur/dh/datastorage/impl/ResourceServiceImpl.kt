@@ -78,12 +78,12 @@ class ResourceServiceImpl : ResourceService {
     }
 
     @Tx
-    override fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources? = null): Int
+    override fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources?): Int
             where T : BaseResource {
-        val parts = GeneratedQueryParts(requestBody.filter)
+        val parts = requestBody?.let { GeneratedQueryParts(requestBody.filter) }
         return em
-                .createNativeQuery("delete from ${resourceType.id} r ${parts.where()}")
-                .apply { parts.setParametersTo(this) }
+                .createNativeQuery("delete from ${resourceType.id} r ${parts?.where() ?: ""}")
+                .apply { parts?.setParametersTo(this) }
                 .executeUpdate()
     }
 
