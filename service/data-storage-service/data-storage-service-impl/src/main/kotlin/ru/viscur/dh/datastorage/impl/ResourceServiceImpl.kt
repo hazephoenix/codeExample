@@ -23,53 +23,34 @@ class ResourceServiceImpl : ResourceService {
     @Tx(readOnly = true)
     override fun <T> byId(resourceType: ResourceType<T>, id: String): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_read(?1, ?2)")
+        return em.createNativeQuery("select resource_read(?1, ?2)")
                 .setParameter(1, resourceType.id.toString())
                 .setParameter(2, id)
                 .singleResult.toResourceEntity()
     }
 
     @Tx(readOnly = true)
-    override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<Resource<T>>
+    override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<T>
             where T : BaseResource {
         val parts = GeneratedQueryParts(requestBody.filter, requestBody.orderBy)
-        val items = em
+        val query = em
                 .createNativeQuery(
                         """
-                    select r.id, 
-                           r.txid, 
-                           r.ts, 
-                           r.resource_type, 
-                           r.status, 
-                           r.resource 
+                    select r.resource 
                     from ${resourceType.id} r
                     ${parts.where()}
                     ${parts.orderBy()}
                 """.trimIndent()
                 )
                 .apply { parts.setParametersTo(this) }
-                .resultList
-        return items
-                .asSequence()
-                .map { it as Array<Any> }
-                .map {
-                    Resource(
-                            it[0] as String,
-                            it[1] as BigInteger,
-                            it[2] as Timestamp,
-                            it[3] as String,
-                            it[4] as String,
-                            it[5].toResourceEntity<T>()!!
-                    )
-                }
-                .toList()
+        return query.fetchResourceList()
     }
 
     @Tx
     override fun <T> create(resource: T): T?
             where T : BaseResource {
         return em
-                .createNativeQuery("select fhirbase_create(${jsonbParam(1)})")
+                .createNativeQuery("select resource_create(${jsonbParam(1)})")
                 .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
@@ -78,7 +59,7 @@ class ResourceServiceImpl : ResourceService {
     @Tx
     override fun <T> update(resource: T): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_update(${jsonbParam(1)})")
+        return em.createNativeQuery("select resource_update(${jsonbParam(1)})")
                 .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()
@@ -87,7 +68,7 @@ class ResourceServiceImpl : ResourceService {
     @Tx
     override fun <T> deleteById(resourceType: ResourceType<T>, id: String): T?
             where T : BaseResource {
-        return em.createNativeQuery("select fhirbase_delete(?1, ?2)")
+        return em.createNativeQuery("select resource_delete(?1, ?2)")
                 .setParameter(1, resourceType.id.toString())
                 .setParameter(2, id)
                 .singleResult

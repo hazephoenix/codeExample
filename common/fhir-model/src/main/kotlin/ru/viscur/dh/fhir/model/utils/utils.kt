@@ -1,5 +1,8 @@
 package ru.viscur.dh.fhir.model.utils
 
+import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.CodeableConcept
+import ru.viscur.dh.fhir.model.type.Reference
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.Period
@@ -43,3 +46,18 @@ fun Date.toLocalDate() = this.toInstant().atZone(ZoneId.systemDefault()).toLocal
  * Возраст, если дата определения это дата рождения
  */
 fun Date.toAge() = Period.between(this.toLocalDate(), now().toLocalDate()).years
+
+/**
+ * Ссылка на [ru.viscur.dh.fhir.model.entity.Patient]
+ */
+fun referenceToPatient(id: String) = Reference(resourceType = ResourceType.Patient.id, id = id)
+
+/**
+ * Ссылка на [ru.viscur.dh.fhir.model.entity.Location]
+ */
+fun referenceToLocation(id: String) = Reference(resourceType = ResourceType.Location.id, id = id)
+
+/**
+ * Пользуемся [CodeableConcept] однозначно: всегда в coding одно значение
+ */
+fun CodeableConcept.code(): String = this.coding.first().code

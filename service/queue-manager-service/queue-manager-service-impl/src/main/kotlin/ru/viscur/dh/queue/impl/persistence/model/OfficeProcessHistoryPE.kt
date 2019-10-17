@@ -1,7 +1,7 @@
 package ru.viscur.dh.queue.impl.persistence.model
 
+import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.queue.api.model.OfficeStatus
-import ru.viscur.dh.queue.api.model.UserType
 import java.util.*
 import javax.persistence.*
 
@@ -16,7 +16,7 @@ import javax.persistence.*
  * @param status статус кабинета [OfficeStatus]
  * @param fireDate дата события
  * @param duration продолжительность события (в сек)
- * @param userType тип пациента [UserType]
+ * @param userType тип пациента [Severity]
  * @param userDiagnostic код МКБ диагноза пациента
  * @param userAgeGroup возрастная группа пациента [utils.ageGroup]
  */
@@ -38,7 +38,7 @@ data class OfficeProcessHistoryPE(
         var duration: Int? = null,
         @Column
         @Enumerated(EnumType.STRING)
-        var userType: UserType? = null,
+        var userType: Severity? = null,
         @Column
         var userDiagnostic: String? = null,
         @Column

@@ -1,6 +1,6 @@
 delete from Questionnaire r where r.id = 'Injury_info';
 
-select fhirbase_create('{"resourceType": "Questionnaire", "id": "Injury_info", "name": "Common info", "title": "Информация о травме", "status": "active", "item": [
+select resource_create('{"resourceType": "Questionnaire", "id": "Injury_info", "name": "Common info", "title": "Информация о травме", "status": "active", "item": [
     {"linkId": "Injury_received_at_work", "text": "Травма получена на производстве", "type": "boolean"},
     {"linkId": "Injury_received_in_road_accident", "text": "Травма получена в ДТП", "type": "boolean"},
     {"linkId": "Injury_received_in_a_criminal_act", "text": "Травма получена в следствии криминального деяния", "type": "boolean"},

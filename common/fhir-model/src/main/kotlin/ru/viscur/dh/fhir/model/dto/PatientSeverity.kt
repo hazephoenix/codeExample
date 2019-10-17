@@ -5,10 +5,10 @@ import ru.viscur.dh.fhir.model.enums.*
 /**
  * Степень тяжести пациента
  *
- * @param color Цвет сортировочного потока [PatientSeverityColor]
+ * @param severity Степень тяжести [Severity]
  * @param reason Причина распределения в данный поток
  */
 data class PatientSeverity(
-        var color: PatientSeverityColor,
+        var severity: Severity,
         var reason: String
 )

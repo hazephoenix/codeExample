@@ -17,4 +17,8 @@ package ru.digitalhospital.dhdatastorage.dto
 class RequestBodyForResources(
         val filter: Map<String, String>,
         val orderBy: List<String>? = null
-)
+){
+    override fun toString(): String {
+        return "{ filter=$filter, orderBy=$orderBy }"
+    }
+}

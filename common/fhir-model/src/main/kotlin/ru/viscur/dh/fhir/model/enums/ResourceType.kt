@@ -38,6 +38,9 @@ private constructor(
         val Procedure = createType<Procedure>(ResourceTypeId.Procedure)
         val Questionnaire = createType<Questionnaire>(ResourceTypeId.Questionnaire)
         val QuestionnaireResponse = createType<QuestionnaireResponse>(ResourceTypeId.QuestionnaireResponse)
+        val QueueHistoryOfOffice = createType<QueueHistoryOfOffice>(ResourceTypeId.QueueHistoryOfOffice)
+        val QueueHistoryOfPatient = createType<QueueHistoryOfPatient>(ResourceTypeId.QueueHistoryOfPatient)
+        val QueueItem = createType<QueueItem>(ResourceTypeId.QueueItem)
         val ServiceRequest = createType<ServiceRequest>(ResourceTypeId.ServiceRequest)
         val Specimen = createType<Specimen>(ResourceTypeId.Specimen)
         val ValueSet = createType<ValueSet>(ResourceTypeId.ValueSet)
@@ -82,6 +85,9 @@ private constructor(
         Procedure,
         Questionnaire,
         QuestionnaireResponse,
+        QueueHistoryOfOffice,
+        QueueHistoryOfPatient,
+        QueueItem,
         ServiceRequest,
         Specimen,
         ValueSet

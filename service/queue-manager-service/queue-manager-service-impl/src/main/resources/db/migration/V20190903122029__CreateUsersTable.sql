@@ -1,7 +1,7 @@
-CREATE SEQUENCE users_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE queue_patients_seq START WITH 1 INCREMENT BY 1;
 
-CREATE TABLE users (
-    id          BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
+CREATE TABLE queue_patients (
+    id          BIGINT PRIMARY KEY DEFAULT nextval('queue_patients_seq'),
     first_name  VARCHAR(20),
     last_name   VARCHAR(20),
     type        VARCHAR(20),
@@ -11,9 +11,9 @@ CREATE TABLE users (
     birth_date  DATE
 );
 
-COMMENT ON TABLE users IS 'Пациенты';
+COMMENT ON TABLE queue_patients IS 'Пациенты';
 
-COMMENT ON COLUMN users.id IS 'Id';
-COMMENT ON COLUMN users.first_name IS 'Имя';
-COMMENT ON COLUMN users.last_name IS 'Фамилия';
-COMMENT ON COLUMN users.type IS 'Тип';
+COMMENT ON COLUMN queue_patients.id IS 'Id';
+COMMENT ON COLUMN queue_patients.first_name IS 'Имя';
+COMMENT ON COLUMN queue_patients.last_name IS 'Фамилия';
+COMMENT ON COLUMN queue_patients.type IS 'Тип';

@@ -4174,15 +4174,15 @@ create table concept_history
 
 alter table concept_history owner to ${owner};
 
-create or replace function fhirbase_genid() returns text
+create or replace function resource_genid() returns text
 	language sql
 as $$
 select gen_random_uuid()::text
 $$;
 
-alter function fhirbase_genid() owner to ${owner};
+alter function resource_genid() owner to ${owner};
 
-create or replace function _fhirbase_to_resource(x _resource) returns jsonb
+create or replace function _resource_to_resource(x _resource) returns jsonb
 	language sql
 as $$
 select x.resource || jsonb_build_object(
@@ -4195,9 +4195,9 @@ select x.resource || jsonb_build_object(
  );
 $$;
 
-alter function _fhirbase_to_resource(_resource) owner to ${owner};
+alter function _resource_to_resource(_resource) owner to ${owner};
 
-create or replace function fhirbase_create(resource jsonb, txid bigint) returns jsonb
+create or replace function resource_create(resource jsonb, txid bigint) returns jsonb
 	language plpgsql
 as $$
 DECLARE
@@ -4207,7 +4207,7 @@ DECLARE
   result jsonb;
 BEGIN
     rt   := resource->>'resourceType';
-    rid  := coalesce(resource->>'id', fhirbase_genid());
+    rid  := coalesce(resource->>'id', resource_genid());
     _sql := format($SQL$
       WITH archived AS (
         INSERT INTO %s (id, txid, ts, status, resource)
@@ -4227,7 +4227,7 @@ BEGIN
          RETURNING *
       )
 
-      select _fhirbase_to_resource(i.*) from inserted i
+      select _resource_to_resource(i.*) from inserted i
 
       $SQL$,
       rt || '_history', rt, rt, rt);
@@ -4241,17 +4241,17 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_create(jsonb, bigint) owner to ${owner};
+alter function resource_create(jsonb, bigint) owner to ${owner};
 
-create or replace function fhirbase_create(resource jsonb) returns jsonb
+create or replace function resource_create(resource jsonb) returns jsonb
 	language sql
 as $$
-SELECT fhirbase_create(resource, nextval('transaction_id_seq'));
+SELECT resource_create(resource, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_create(jsonb) owner to ${owner};
+alter function resource_create(jsonb) owner to ${owner};
 
-create or replace function fhirbase_update(resource jsonb, txid bigint) returns jsonb
+create or replace function resource_update(resource jsonb, txid bigint) returns jsonb
 	language plpgsql
 as $$
 DECLARE
@@ -4287,7 +4287,7 @@ BEGIN
          RETURNING *
       )
 
-      select _fhirbase_to_resource(i.*) from inserted i
+      select _resource_to_resource(i.*) from inserted i
 
       $SQL$,
       rt || '_history', rt, rt, rt);
@@ -4301,17 +4301,17 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_update(jsonb, bigint) owner to ${owner};
+alter function resource_update(jsonb, bigint) owner to ${owner};
 
-create or replace function fhirbase_update(resource jsonb) returns jsonb
+create or replace function resource_update(resource jsonb) returns jsonb
 	language sql
 as $$
-SELECT fhirbase_update(resource, nextval('transaction_id_seq'));
+SELECT resource_update(resource, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_update(jsonb) owner to ${owner};
+alter function resource_update(jsonb) owner to ${owner};
 
-create or replace function fhirbase_read(resource_type text, id text) returns jsonb
+create or replace function resource_read(resource_type text, id text) returns jsonb
 	language plpgsql
 as $$
 DECLARE
@@ -4319,7 +4319,7 @@ DECLARE
   result jsonb;
 BEGIN
   _sql := format($SQL$
-    SELECT _fhirbase_to_resource(row(r.*)::_resource) FROM %s r WHERE r.id = $1
+    SELECT _resource_to_resource(row(r.*)::_resource) FROM %s r WHERE r.id = $1
   $SQL$,
   resource_type
   );
@@ -4330,9 +4330,9 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_read(text, text) owner to ${owner};
+alter function resource_read(text, text) owner to ${owner};
 
-create or replace function fhirbase_delete(resource_type text, id text, txid bigint) returns jsonb
+create or replace function resource_delete(resource_type text, id text, txid bigint) returns jsonb
 	language plpgsql
 as $$
 DECLARE
@@ -4357,7 +4357,7 @@ BEGIN
       ), dropped AS (
          DELETE FROM %s WHERE id = $2 RETURNING *
       )
-      select _fhirbase_to_resource(i.*) from archived i
+      select _resource_to_resource(i.*) from archived i
 
       $SQL$,
       rt || '_history', rt, rt || '_history', rt, rt);
@@ -4371,13 +4371,13 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_delete(text, text, bigint) owner to ${owner};
+alter function resource_delete(text, text, bigint) owner to ${owner};
 
-create or replace function fhirbase_delete(resource_type text, id text) returns jsonb
+create or replace function resource_delete(resource_type text, id text) returns jsonb
 	language sql
 as $$
-SELECT fhirbase_delete(resource_type, id, nextval('transaction_id_seq'));
+SELECT resource_delete(resource_type, id, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_delete(text, text) owner to ${owner};
+alter function resource_delete(text, text) owner to ${owner};
 

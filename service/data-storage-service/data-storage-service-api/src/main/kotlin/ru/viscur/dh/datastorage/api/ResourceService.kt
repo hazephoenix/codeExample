@@ -30,8 +30,17 @@ interface ResourceService {
      * @param resourceType тип ресурса
      * @param requestBody запрос на поиск
      */
-    fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<Resource<T>>
+    fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<T>
             where T : BaseResource
+
+    /**
+     * Берет первого от [all]
+     * При пустом полученном списке падает
+     * Использование: выборка единственного значения. При нахождении нескольких берет первого
+     */
+    fun <T> single(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): T
+            where T : BaseResource = all(resourceType, requestBody).firstOrNull()
+            ?: throw Exception("Not found resource ${resourceType.id} by request $requestBody")
 
     /**
      * Создание

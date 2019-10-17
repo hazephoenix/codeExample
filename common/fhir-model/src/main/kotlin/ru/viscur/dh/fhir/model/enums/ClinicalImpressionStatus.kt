@@ -5,6 +5,7 @@ package ru.viscur.dh.fhir.model.enums
  */
 enum class ClinicalImpressionStatus {
     draft,
+    active,
     completed,
     entered_in_error
 }

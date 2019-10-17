@@ -22,7 +22,6 @@ class ResourceServiceImplTest {
     @Autowired
     lateinit var resourceServiceImpl: ResourceService
 
-
     @Test
     @Order(1)
     fun `should create & update resource`() {
