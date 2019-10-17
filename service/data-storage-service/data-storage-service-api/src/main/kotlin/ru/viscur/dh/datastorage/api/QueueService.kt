@@ -23,11 +23,6 @@ interface QueueService {
     fun deleteQueueItemsOfOffice(officeId: String)
 
     /**
-     * Удаление всех записей [QueueItem]
-     */
-    fun deleteQueueItems()
-
-    /**
      * Стоит ли пациент в очереди к какому-нибудь кабинету. Если да, то возвращается найденный кабинет
      */
     fun isPatientInOfficeQueue(patientId: String): String?
