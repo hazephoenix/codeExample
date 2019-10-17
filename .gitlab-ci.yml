@@ -49,7 +49,7 @@ build:
       - applications/dh-paramedic-device-app/build/libs/dh-paramedic-device-app.jar
     expire_in: 3 days
 
-dh-stage-master:
+dh-stage-dev:
   stage: deploy
   script:
     - ssh $ssh_user@$server_addr "sudo systemctl stop $service_name"
@@ -60,4 +60,4 @@ dh-stage-master:
     - ./gradlew waitForHttpEndpoint -Pendpoint=http://$server_addr:$server_port/systems-services/health-check -PwaitFor=$health_check_timeout
 
   only:
-    - master
+    - develop
