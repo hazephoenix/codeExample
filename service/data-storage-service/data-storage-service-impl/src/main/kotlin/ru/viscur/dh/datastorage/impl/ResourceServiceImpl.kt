@@ -21,12 +21,13 @@ class ResourceServiceImpl : ResourceService {
     private lateinit var em: EntityManager
 
     @Tx(readOnly = true)
-    override fun <T> byId(resourceType: ResourceType<T>, id: String): T?
+    override fun <T> byId(resourceType: ResourceType<T>, id: String): T
             where T : BaseResource {
         return em.createNativeQuery("select resource_read(?1, ?2)")
                 .setParameter(1, resourceType.id.toString())
                 .setParameter(2, id)
                 .singleResult.toResourceEntity()
+                ?: throw Exception("Not found ${resourceType.id} with id = '$id'")
     }
 
     @Tx(readOnly = true)
@@ -77,7 +78,7 @@ class ResourceServiceImpl : ResourceService {
     }
 
     @Tx
-    override fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): Int
+    override fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources? = null): Int
             where T : BaseResource {
         val parts = GeneratedQueryParts(requestBody.filter)
         return em

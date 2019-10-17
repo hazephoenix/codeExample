@@ -4,14 +4,14 @@ import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
 import ru.viscur.dh.datastorage.api.ResourceService
-import ru.viscur.dh.fhir.model.entity.Location
-import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.entity.QueueHistoryOfOffice
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
+import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.LocationExtension
+import ru.viscur.dh.fhir.model.type.LocationExtensionLastPatientInfo
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
@@ -28,8 +28,9 @@ class OfficeServiceImpl(
         private val queueService: QueueService
 ) : OfficeService {
 
-    override fun changeStatus(office: Location, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
+    override fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
         val now = now()
+        val office = locationService.byId(officeId)
         val queueHistoryOfOffice = QueueHistoryOfOffice(
                 location = Reference(office),
                 status = office.status,
@@ -81,22 +82,39 @@ class OfficeServiceImpl(
     override fun firstPatientInQueue(officeId: String): String? =
             queueService.queueItemsOfOffice(officeId).firstOrNull()?.subject?.id
 
-    override fun deleteFirstPatientFromQueue(office: Location) {
-        val queue = queueItems(office.id!!)
+    override fun deleteFirstPatientFromQueue(officeId: String) {
+        val queue = queueItems(officeId)
         if (queue.isEmpty()) return
         queue.removeAt(0)
-        saveQueue(office.id!!, queue)
+        saveQueue(officeId, queue)
     }
 
-    override fun deletePatientFromQueue(office: Location, patient: Patient) {
-        val queue = queueItems(office.id!!)
-        queue.removeAt(queue.indexOfFirst { it.subject.id == patient.id!! })
-        saveQueue(office.id!!, queue)
+    override fun deletePatientFromQueue(officeId: String, patientId: String) {
+        val queue = queueItems(officeId)
+        queue.removeAt(queue.indexOfFirst { it.subject.id == patientId })
+        saveQueue(officeId, queue)
+    }
+
+    override fun deletePatientFromLastPatientInfo(patientId: String) {
+        locationService.withPatientInLastPatientInfo(patientId).forEach {
+            it.extension?.lastPatientInfo = null
+            resourceService.update(it)
+        }
+    }
+
+    override fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?) {
+        val office = locationService.byId(officeId)
+        val newLastPatientInfo = LocationExtensionLastPatientInfo(
+                subject = Reference(ResourceType.ResourceTypeId.Patient, patientId),
+                nextOffice = nextOfficeId?.let { Reference(ResourceType.ResourceTypeId.Location, nextOfficeId) }
+        )
+        office.extension = office.extension?.apply { lastPatientInfo = newLastPatientInfo }
+                ?: LocationExtension(lastPatientInfo = newLastPatientInfo)
     }
 
     private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
         queueService.deleteQueueItemsOfOffice(officeId)
-        queue.forEach { resourceService.create(it) }
+        queue.forEachIndexed { index, it -> resourceService.create(it.apply { onum = index }) }
     }
 
     private fun queueItems(officeId: String): MutableList<QueueItem> =

@@ -32,14 +32,8 @@ fun <T> Any?.toResourceEntity(): T?
 }
 
 fun <T> Query.fetchResource(): T?
-        where T : BaseResource {
-    return try {
-        this.fetchResourceList<T>()
-                .single()
-    } catch (ex: NoSuchElementException) {
-        null
-    }
-}
+        where T : BaseResource =
+        this.fetchResourceList<T>().singleOrNull()
 
 fun <T> Query.fetchResourceList(): List<T>
         where T : BaseResource {

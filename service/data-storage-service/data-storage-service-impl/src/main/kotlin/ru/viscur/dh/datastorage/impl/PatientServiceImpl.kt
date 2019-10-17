@@ -29,7 +29,7 @@ class PatientServiceImpl(
     private lateinit var em: EntityManager
 
     override fun byId(id: String): Patient =
-            resourceService.byId(ResourceType.Patient, id) ?: throw Exception("not found patient with id = '$id'")
+            resourceService.byId(ResourceType.Patient, id)
 
     override fun severity(patientId: String): Severity {
         //находим clinicalImpression пациента со статусом active
@@ -74,6 +74,33 @@ class PatientServiceImpl(
             """)
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResourceList()
+    }
+
+    override fun activeServiceRequests(patientId: String): List<ServiceRequest> {
+        //active clinicalImpression -> carePlan -> active serviceRequests
+        val query = em.createNativeQuery("""
+            select sr.resource
+            from serviceRequest sr
+            where 'ServiceRequest/' || sr.id in (
+                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                from carePlan cp
+                where 'CarePlan/' || cp.id in (
+                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                    from clinicalImpression ci
+                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                      and ci.resource ->> 'status' = 'active'
+                )
+            )
+            and sr.resource->>'status' = 'active'
+            order by sr.resource -> 'extension' ->> 'executionOrder'
+            """)
+        query.setParameter("patientRef", "Patient/$patientId")
+        return query.fetchResourceList()
+    }
+
+    override fun queueStatusOfPatient(patientId: String): PatientQueueStatus {
+        val patient = byId(patientId)
+        return patient.extension.queueStatus
     }
 
     override fun preliminaryDiagnosticConclusion(patientId: String): String? {

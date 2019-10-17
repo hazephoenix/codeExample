@@ -2,59 +2,35 @@ package ru.viscur.dh.queue.impl.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import ru.viscur.dh.datastorage.api.ConceptService
-import ru.viscur.dh.datastorage.api.PatientService
-import ru.viscur.dh.datastorage.api.ResourceService
-import ru.viscur.dh.fhir.model.entity.Location
-import ru.viscur.dh.fhir.model.entity.Patient
+import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.queue.api.OfficeService
-import ru.viscur.dh.queue.api.QueueManagerService
 import ru.viscur.dh.queue.api.PatientStatusService
-import ru.viscur.dh.queue.api.model.*
-import ru.viscur.dh.queue.impl.repository.RouteSheetItemRepository
-import ru.viscur.dh.queue.impl.repository.SurveyTypeRepository
-import ru.viscur.dh.queue.impl.repository.UserRepository
+import ru.viscur.dh.queue.api.QueueManagerService
+import ru.viscur.dh.queue.api.model.Office
+import ru.viscur.dh.queue.api.model.RouteSheet
+import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 
 @Service
 class QueueManagerServiceImpl(
-        private val userRepository: UserRepository,
         private val officeService: OfficeService,
         private val patientStatusService: PatientStatusService,
         private val patientService: PatientService,
         private val conceptService: ConceptService,
-        private val surveyTypeRepository: SurveyTypeRepository,
-        private val routeSheetItemRepository: RouteSheetItemRepository,
+        private val locationService: LocationService,
+        private val queueService: QueueService,
         private val resourceService: ResourceService
 ) : QueueManagerService {
+
     companion object {
         private val LOGGER = LoggerFactory.getLogger(QueueManagerServiceImpl::class.java)
-        private val needAutoProcess = false
     }
 
-    var surveyTypes = listOf<SurveyType>()
-    val surveyTypesByIds = mapOf<Long, ru.viscur.dh.queue.impl.persistence.model.SurveyTypePE>()
-    var offices = listOf<Office>()
-    private var users = mutableListOf<User>()
-    var routeSheets = mutableListOf<ru.viscur.dh.queue.impl.persistence.model.RouteSheetPE>()
-    private var finished = mutableListOf<RouteSheet>()
-
-    override fun officeById(officeId: Long): Office {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun userById(userId: Long): User {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun surveyTypeById(surveyTypeId: Long): SurveyType {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun registerUser(patientId: String): List<ServiceRequest> {
+    override fun registerPatient(patientId: String): List<ServiceRequest> {
         val serviceRequests = patientService.serviceRequests(patientId)
                 .sortedWith(
                         compareBy({
@@ -77,16 +53,27 @@ class QueueManagerServiceImpl(
     }
 
     /**
-     * Предположительное время ожидания в очереди пациента с типом [type] =
-     * Сумма приблизительных продолжительностей осмотра всех пациентов перед позицией в очереди, куда бы встал пациент с типом [type]
+     * Предположительное время ожидания в очереди пациента с опр. степенью тяжести
+     * Сумма приблизительных продолжительностей осмотра всех пациентов перед позицией в очереди, куда бы встал пациент с своей степенью тяжести
      */
-    private fun estWaitingInQueueWithType(patientId: String, it: ServiceRequest): Int {
-        //todo estWaitingInQueueWithType
-        return 1000
+    private fun estWaitingInQueueWithType(patientId: String, serviceRequest: ServiceRequest): Int {
+        val officeId = serviceRequest.locationReference!!.first().id
+        val queue = queueService.queueItemsOfOffice(officeId)
+        val inQueue = queue.filter { it.patientQueueStatus != PatientQueueStatus.ON_SURVEY }
+        val severity = patientService.severity(patientId)
+        val inQueueByType = when (severity) {
+            Severity.RED -> inQueue.filter { it.severity == severity }
+            Severity.YELLOW -> inQueue.filter { it.severity in SEVERITY_WITH_PRIORITY }
+            else -> inQueue
+        }
+        return inQueueByType.sumBy { it.estDuration }
     }
 
-    //todo serv req -> code -> parentCode -> priority
+    /**
+     * Приоритет у услуги
+     */
     private fun priority(serviceRequest: ServiceRequest): Double {
+        //осмотр ответсвенного в посл очередь
         if (!serviceRequest.performer.isNullOrEmpty()) {
             return 0.0
         }
@@ -110,172 +97,125 @@ class QueueManagerServiceImpl(
     /**
      * Проверить вход в кабинет: если есть возможность запускаем первого в очереди
      */
-    private fun checkEntryToOffice(officeId: String? = null, office: Location? = null) {
-        val office = office ?: office(officeId!!)
+    private fun checkEntryToOffice(officeId: String) {
+        val office = locationService.byId(officeId)
         if (office.status == LocationStatus.READY) {
-            sendFirstToSurvey(office)
+            sendFirstToSurvey(officeId)
         }
-    }
-
-    private fun office(officeId: String): Location {
-//        todo получение Location по id.
-        val location = resourceService.byId(ResourceType.Location, officeId)
-        return Location(name = "")
     }
 
     /**
      * Отправить первого в очереди в кабинет
      */
-    private fun sendFirstToSurvey(office: Location) {
-        val patientId = officeService.firstPatientInQueue(office.id!!)
+    private fun sendFirstToSurvey(officeId: String) {
+        val patientId = officeService.firstPatientInQueue(officeId)
         patientId?.run {
-            officeService.changeStatus(office, LocationStatus.WAITING_USER)
-            patientStatusService.changeStatus(patientId, PatientQueueStatus.GOING_TO_SURVEY, office.id)
+            officeService.changeStatus(officeId, LocationStatus.WAITING_PATIENT)
+            patientStatusService.changeStatus(patientId, PatientQueueStatus.GOING_TO_SURVEY, officeId)
             //todo уведомить о необходимоси пройти в кабинет
         }
     }
 
-    private fun nextOfficeId(patientId: String): String? {
-        //todo active clinicalImpression -> not completed serviceRequests -> min by executionOrder
-        return "werew"
-    }
+    /**
+     * id следующего кабинета: непройденное обследование в маршрутном листе пациента с минимальным [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
+     */
+    private fun nextOfficeId(patientId: String): String? =
+            patientService.activeServiceRequests(patientId).firstOrNull()?.locationReference?.first()?.id
 
     override fun deleteFromOfficeQueue(patientId: String) {
-        /* val patient = patient(patientId)!!
-         //пациент стоит в очереди
-         if (patient.extension.queueStatus !in listOf(PatientQueueStatus.FINISHED, PatientQueueStatus.READY)) {
-             //пациент в очереди (ожидает, идет на обслед. или на обслед.) - необходимо удалить из очереди, освободить если нужно кабинет
-             val office = isUserInOfficeQueue(patient)!!
-             //его ожидают в кабинете или идет осмотр - освободим кабинет
-             if (patient.extension.queueStatus in listOf(PatientQueueStatus.GOING_TO_SURVEY, PatientQueueStatus.ON_SURVEY)) {
-                 officeService.changeStatus(office, LocationStatus.READY)
-                 officeService.deleteFirstPatientFromQueue(office)
-                 checkEntryToOffice(office = office)
-             } else {
-                 //пациент просто в очереди. его очередь не настала. просто удаляем из очереди
-                 officeService.deletePatientFromQueue(office, patient)
-             }
-             //если прервано обследование, то не записываем в историю продолжительность
-             val saveCurrentStatusToHistory = patient.status != PatientQueueStatus.ON_SURVEY
-             patientService.changeStatus(patient, PatientQueueStatus.READY, office.id, saveCurrentStatusToHistory)
-         }
-         deleteUserFromLastUserInfo(patient)
-         printQueues("$patient was removed from office queues")// todo*/
-    }
-
-    private fun patient(id: String): Patient? {
-//        ResourceType<Patient>.Companion.byId(ResourceType.Patient.id)
-        //todo patient po id
-        return null
-    }
-
-    /**
-     * Стоит ли пациент в очереди к какому-нибудь кабинету. Если да, то возвращается найденный кабинет
-     */
-    private fun isUserInOfficeQueue(user: Patient): Location? {
-        //todo найти QueueItem с userId. взять Ref(location), конвертнуть в Location
-        return null
-    }
-
-    override fun surveyStarted(user: User, office: Office) {
-        TODO("Restore");
-        /*if (office.firstUserInQueue()?.id == user.id && user.status == PatientQueueStatus.GOING_TO_SURVEY) {
-            officeService.changeStatus(office, LocationStatus.SURVEY, user)
-            userService.changeStatus(user, PatientQueueStatus.ON_SURVEY, office.id)
-            deleteUserFromLastUserInfo(user)
-            printQueues("survey started of user " + user + " in office " + office)// todo
-            if (needAutoProcess) {
-//            GlobalScope.async {
-                //todo auto
-                Thread.sleep(3000)
-                surveyFinished(office)
-//            }
+        val patient = patientService.byId(patientId)
+        val patientQueueStatus = patient.extension.queueStatus
+        //пациент стоит в очереди
+        if (patientQueueStatus !in listOf(PatientQueueStatus.FINISHED, PatientQueueStatus.READY)) {
+            //пациент в очереди (ожидает, идет на обслед. или на обслед.) - необходимо удалить из очереди, освободить если нужно кабинет
+            val officeId = queueService.isPatientInOfficeQueue(patientId)
+                    ?: throw Exception("Patient has queue status $patientQueueStatus but he is not in any QueueItem")
+            //его ожидают в кабинете или идет осмотр - освободим кабинет
+            if (patientQueueStatus in listOf(PatientQueueStatus.GOING_TO_SURVEY, PatientQueueStatus.ON_SURVEY)) {
+                officeService.changeStatus(officeId, LocationStatus.BUSY)
+                officeService.deleteFirstPatientFromQueue(officeId)
+                checkEntryToOffice(officeId)
+            } else {
+                //пациент просто в очереди. его очередь не настала. просто удаляем из очереди
+                officeService.deletePatientFromQueue(officeId, patientId)
             }
-        }*/
+            //если прервано обследование, то не записываем в историю продолжительность
+            val saveCurrentStatusToHistory = patientQueueStatus != PatientQueueStatus.ON_SURVEY
+            patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId, saveCurrentStatusToHistory)
+        }
+        officeService.deletePatientFromLastPatientInfo(patientId)
     }
 
-    override fun surveyFinished(office: Office) {
-        TODO("Restore");
-        /* val user = office.firstUserInQueue()
-         if (user?.status == PatientQueueStatus.ON_SURVEY) {
-             officeService.changeStatus(office, LocationStatus.BUSY, user)
-             val visitedRouteSheetItem = routeSheets.find { it.user.id == user.id }!!.surveys.find { it.surveyType.id == office.surveyType.id }!!
-             visitedRouteSheetItem.visited = true
-             routeSheetItemRepository.save(visitedRouteSheetItem)
-             office.deleteFirstUserFromQueue(queueItemRepository)
-             userService.changeStatus(user, PatientQueueStatus.READY, office.id)
-             printQueues("survey finished for user " + user + " in office " + office)// todo
-             addToOfficeQueue(user)
-             if (users.any { it.id == user.id }) {
-                 office.lastUserInfo = Pair(user, isUserInOfficeQueue(user))
-             }
-             printQueues("lastUserInfo updated for " + office)// todo
-             if (needAutoProcess) {
- //            GlobalScope.async {
-                 //todo auto
-                 Thread.sleep(2000)
-                 officeIsReady(office)
- //            }
-             }
-         }*/
+    override fun observationStarted(patientId: String, officeId: String) {
+        if (officeService.firstPatientInQueue(officeId) == patientId) {
+            val patient = patientService.byId(patientId)
+            if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_SURVEY) {
+                officeService.changeStatus(officeId, LocationStatus.OBSERVATION, patientId)
+                patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_SURVEY, officeId)
+//                queueService.deleteQueueItemsOfOffice(patientId)//todo оставлять в очереди или нет?..
+            }
+        }
     }
 
-    override fun officeIsReady(office: Office) {
-        TODO("Restore");
-        /* if (office.status !in listOf(LocationStatus.SURVEY, LocationStatus.WAITING_USER)) {
-             officeService.changeStatus(office, LocationStatus.READY)
-             checkEntryToOffice(office)
-         }*/
+    override fun observationFinished(officeId: String) {
+        val patientId = officeService.firstPatientInQueue(officeId)!!
+        val patient = patientService.byId(patientId)
+        if (patient.extension.queueStatus == PatientQueueStatus.ON_SURVEY) {
+            officeService.changeStatus(officeId, LocationStatus.BUSY, patientId)
+            officeService.deleteFirstPatientFromQueue(officeId)
+            patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId)
+            addToOfficeQueue(patientId)
+            officeService.updateLastPatientInfo(officeId, patientId, queueService.isPatientInOfficeQueue(patientId))
+        }
     }
 
-    override fun officeIsBusy(office: Office) {
-        TODO("Restore");
-/*
-        if (office.status !in listOf(LocationStatus.SURVEY, LocationStatus.WAITING_USER)) {
-            officeService.changeStatus(office, LocationStatus.BUSY)
-        }*/
+    override fun officeIsReady(officeId: String) {
+        val office = locationService.byId(officeId)
+        if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
+            officeService.changeStatus(officeId, LocationStatus.READY)
+            checkEntryToOffice(officeId)
+        }
     }
 
-    override fun officeIsClosed(office: Office) {
-        TODO("Restore");
-        /* if (office.status !in listOf(LocationStatus.SURVEY, LocationStatus.WAITING_USER)) {
-             officeService.changeStatus(office, LocationStatus.CLOSED)
-             office.queue.forEach {
-                 userService.changeStatus(it.user, PatientQueueStatus.READY)
-                 addToOfficeQueue(it.user, false)
-             }
-             office.deleteAllFromQueue(queueItemRepository)
-             printQueues("closed $office")
-         }*/
+    override fun officeIsBusy(officeId: String) {
+        val office = locationService.byId(officeId)
+        if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
+            officeService.changeStatus(officeId, LocationStatus.BUSY)
+        }
     }
 
-    override fun userLeftQueue(user: User) {
-        TODO("Restore");
-        /*deleteFromOfficeQueue(user)
-        userService.saveCurrentStatus(user)
-        routeSheets = routeSheets.filterNot { it.user.id == user.id }.toMutableList()
-        finished = finished.filterNot { it.user.id == user.id }.toMutableList()
-        routeSheetItemRepository.deleteAllByUserIs(user.id)
-        users.remove(user)
-        userRepository.deleteById(user.id)//todo возможно не удалять, или перемещать в отдельную таблицу например archived_users
-        printQueues("$user left the system")// todo*/
+    override fun officeIsClosed(officeId: String) {
+        val office = locationService.byId(officeId)
+        if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
+            officeService.changeStatus(officeId, LocationStatus.CLOSED)
+            val queue = queueService.queueItemsOfOffice(officeId)
+            queue.forEach {
+                val patientId = it.subject.id
+                patientStatusService.changeStatus(patientId, PatientQueueStatus.READY)
+                addToOfficeQueue(patientId)
+            }
+            queueService.deleteQueueItemsOfOffice(officeId)
+        }
+    }
+
+    override fun patientLeftQueue(patientId: String) {
+        deleteFromOfficeQueue(patientId)
+        patientStatusService.saveCurrentStatus(patientId)
     }
 
     override fun deleteQueue() {
-        TODO("Restore");
-        /*println("delete queue")//todo
-        offices.filter { it.status in listOf(LocationStatus.WAITING_USER, LocationStatus.SURVEY) }
-                .forEach { officeRepository.save(it.apply { status = LocationStatus.BUSY }) }
-        deleteQueueFromDb()
-        readQueueFromDb()*/
+        queueService.involvedOffices().forEach {
+            officeService.changeStatus(it.id!!, LocationStatus.BUSY)
+        }
+        queueService.involvedPatients().forEach {
+            patientStatusService.changeStatus(it.id!!, PatientQueueStatus.READY)
+        }
+        resourceService.deleteAll(ResourceType.QueueItem)
     }
 
     override fun deleteHistory() {
-        TODO("Restore");
-        /*  println("delete history")//todo
-          userProcessHistoryRepository.deleteAll()
-          officeProcessHistoryRepository.deleteAll()
-          */
+        resourceService.deleteAll(ResourceType.QueueHistoryOfOffice)
+        resourceService.deleteAll(ResourceType.QueueHistoryOfPatient)
     }
 
     private fun officesForSurveyType(surveyTypeId: Long): List<Office> {
