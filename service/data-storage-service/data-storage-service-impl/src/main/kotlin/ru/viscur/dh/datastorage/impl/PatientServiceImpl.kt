@@ -28,7 +28,8 @@ class PatientServiceImpl(
     @PersistenceContext
     private lateinit var em: EntityManager
 
-    override fun byId(id: String): Patient? = resourceService.byId(ResourceType.Patient, id)
+    override fun byId(id: String): Patient =
+            resourceService.byId(ResourceType.Patient, id) ?: throw Exception("not found patient with id = '$id'")
 
     override fun severity(patientId: String): Severity {
         //находим clinicalImpression пациента со статусом active
@@ -41,7 +42,7 @@ class PatientServiceImpl(
                      from questionnaireResponse r
                      where r.resource ->> 'questionnaire' = 'Questionnaire/Severity_criteria'
                        and 'QuestionnaireResponse/' || r.id in (
-                         select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference' as qrRef
+                         select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
                          from clinicalImpression ci
                          where ci.resource -> 'subject' ->> 'reference' = :patientRef
                             and ci.resource ->> 'status' = 'active'
@@ -54,13 +55,34 @@ class PatientServiceImpl(
         return enumValueOf(severityStr)
     }
 
+    override fun serviceRequests(patientId: String): List<ServiceRequest> {
+        //active clinicalImpression -> carePlan -> all serviceRequests
+        val query = em.createNativeQuery("""
+            select sr.resource
+            from serviceRequest sr
+            where 'ServiceRequest/' || sr.id in (
+                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                from carePlan cp
+                where 'CarePlan/' || cp.id in (
+                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                    from clinicalImpression ci
+                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                      and ci.resource ->> 'status' = 'active'
+                )
+            )
+            order by sr.resource -> 'extension' ->> 'executionOrder'
+            """)
+        query.setParameter("patientRef", "Patient/$patientId")
+        return query.fetchResourceList()
+    }
+
     override fun preliminaryDiagnosticConclusion(patientId: String): String? {
         val query = em.createNativeQuery("""
             select r.resource
             from diagnosticReport r
             where r.resource ->> 'status' = 'preliminary'
               and 'DiagnosticReport/' || r.id in (
-                select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference' as qrRef
+                select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
                 from clinicalImpression ci
                 where ci.resource -> 'subject' ->> 'reference' = :patientRef
                   and ci.resource ->> 'status' = 'active'

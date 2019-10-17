@@ -1,6 +1,7 @@
 package ru.viscur.dh.fhir.model.utils
 
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Reference
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
@@ -55,3 +56,8 @@ fun referenceToPatient(id: String) = Reference(resourceType = ResourceType.Patie
  * Ссылка на [ru.viscur.dh.fhir.model.entity.Location]
  */
 fun referenceToLocation(id: String) = Reference(resourceType = ResourceType.Location.id, id = id)
+
+/**
+ * Пользуемся [CodeableConcept] однозначно: всегда в coding одно значение
+ */
+fun CodeableConcept.code(): String = this.coding.first().code

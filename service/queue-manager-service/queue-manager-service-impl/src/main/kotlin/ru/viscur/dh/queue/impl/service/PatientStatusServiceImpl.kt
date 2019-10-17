@@ -23,7 +23,7 @@ class PatientStatusServiceImpl(
         if (saveCurrentStatusToHistory) {
             saveCurrentStatus(patientId, officeIdOfPrevProcess, now)
         }
-        val patient = patientService.byId(patientId)!!
+        val patient = patientService.byId(patientId)
         patient.extension.apply {
             queueStatus = newStatus
             queueStatusUpdatedAt = now
@@ -32,7 +32,7 @@ class PatientStatusServiceImpl(
     }
 
     override fun saveCurrentStatus(patientId: String, officeIdOfPrevProcess: String?, now: Date) {
-        val patient = patientService.byId(patientId)!!
+        val patient = patientService.byId(patientId)
         val queueStatusUpdatedAt = patient.extension.queueStatusUpdatedAt
         val queueHistoryOfPatient = QueueHistoryOfPatient(
                 subject = referenceToPatient(id = patientId),

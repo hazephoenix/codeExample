@@ -27,6 +27,7 @@ class OfficeServiceImpl(
         private val resourceService: ResourceService,
         private val queueService: QueueService
 ) : OfficeService {
+
     override fun changeStatus(office: Location, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
         val now = now()
         val queueHistoryOfOffice = QueueHistoryOfOffice(
@@ -37,7 +38,7 @@ class OfficeServiceImpl(
         )
 
         patientIdOfPrevProcess?.run {
-            val patient = patientService.byId(this)!!
+            val patient = patientService.byId(this)
             queueHistoryOfOffice.apply {
                 severity = patientService.severity(patientIdOfPrevProcess)
                 diagnosticConclusion = patientService.preliminaryDiagnosticConclusion(patientIdOfPrevProcess)
@@ -77,22 +78,8 @@ class OfficeServiceImpl(
         saveQueue(officeId, queue)
     }
 
-    private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
-        queueService.deleteQueueItemsOfOffice(officeId)
-        queue.forEach { resourceService.create(it) }
-    }
-
-    private fun queueItems(officeId: String): MutableList<QueueItem> {
-        //todo все QueueItem с фильтром по location == officeId сортировкой по onum
-        //+ severity = patient по reference и его severity
-        //+ patientQueueStatus = patient по reference и его queueStatus
-        return mutableListOf()
-    }
-
-    override fun firstPatientInQueue(officeId: String): String? {
-//        todo выборка в QueueItem по кабинету с сортировкой по Onum. взять первое значение, у него reference на пациента
-        return "123"
-    }
+    override fun firstPatientInQueue(officeId: String): String? =
+            queueService.queueItemsOfOffice(officeId).firstOrNull()?.subject?.id
 
     override fun deleteFirstPatientFromQueue(office: Location) {
         val queue = queueItems(office.id!!)
@@ -106,4 +93,18 @@ class OfficeServiceImpl(
         queue.removeAt(queue.indexOfFirst { it.subject.id == patient.id!! })
         saveQueue(office.id!!, queue)
     }
+
+    private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
+        queueService.deleteQueueItemsOfOffice(officeId)
+        queue.forEach { resourceService.create(it) }
+    }
+
+    private fun queueItems(officeId: String): MutableList<QueueItem> =
+            queueService.queueItemsOfOffice(officeId).map { queueItem ->
+                val patientId = queueItem.subject.id
+                queueItem.apply {
+                    severity = patientService.severity(patientId)
+                    patientQueueStatus = patientService.byId(patientId).extension.queueStatus
+                }
+            }.toMutableList()
 }

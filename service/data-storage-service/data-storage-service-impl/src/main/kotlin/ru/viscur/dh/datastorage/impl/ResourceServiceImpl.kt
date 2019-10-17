@@ -30,39 +30,20 @@ class ResourceServiceImpl : ResourceService {
     }
 
     @Tx(readOnly = true)
-    override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<Resource<T>>
+    override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<T>
             where T : BaseResource {
         val parts = GeneratedQueryParts(requestBody.filter, requestBody.orderBy)
-        val items = em
+        val query = em
                 .createNativeQuery(
                         """
-                    select r.id, 
-                           r.txid, 
-                           r.ts, 
-                           r.resource_type, 
-                           r.status, 
-                           r.resource 
+                    select r.resource 
                     from ${resourceType.id} r
                     ${parts.where()}
                     ${parts.orderBy()}
                 """.trimIndent()
                 )
                 .apply { parts.setParametersTo(this) }
-                .resultList
-        return items
-                .asSequence()
-                .map { it as Array<Any> }
-                .map {
-                    Resource(
-                            it[0] as String,
-                            it[1] as BigInteger,
-                            it[2] as Timestamp,
-                            it[3] as String,
-                            it[4] as String,
-                            it[5].toResourceEntity<T>()!!
-                    )
-                }
-                .toList()
+        return query.fetchResourceList()
     }
 
     @Tx

@@ -8,5 +8,5 @@ import com.fasterxml.jackson.annotation.*
  * @param executionOrder порядок выполнения услуги
  */
 class ServiceRequestExtension(
-    @JsonProperty("executionOrder") val executionOrder: Int
+    @JsonProperty("executionOrder") var executionOrder: Int
 )
