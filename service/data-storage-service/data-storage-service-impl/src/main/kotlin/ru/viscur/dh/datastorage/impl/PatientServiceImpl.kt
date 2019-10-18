@@ -13,6 +13,7 @@ import javax.persistence.PersistenceContext
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
+import ru.viscur.dh.fhir.model.utils.genId
 import java.sql.*
 import java.util.Date
 
@@ -122,7 +123,7 @@ class PatientServiceImpl(
 
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
-        val resources = bundle.entry.map { resourceService.create(it.resource) }
+        val resources = bundle.entry.map { resourceService.create(it.resource.apply { id = genId() }) }
         val date = Date()
         val diagnosticReport = getResources<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport).first()
         val paramedicReference = diagnosticReport.performer.first()
@@ -142,7 +143,7 @@ class PatientServiceImpl(
         ).let { resourceService.create(it) }
         val encounter = Encounter(subject = patientReference).let { resourceService.create(it) }
         ClinicalImpression(
-                status = ClinicalImpressionStatus.completed,
+                status = ClinicalImpressionStatus.active,
                 date = date,
                 subject = patientReference,
                 assessor = paramedicReference,

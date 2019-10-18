@@ -9,6 +9,7 @@ import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -41,7 +42,8 @@ class QueueManagerServiceImpl(
                         })
                 )
         serviceRequests.forEachIndexed { index, serviceRequest ->
-            serviceRequest.extension.executionOrder = index
+            serviceRequest.extension = serviceRequest.extension?.apply { executionOrder = index }
+                    ?: ServiceRequestExtension(executionOrder = index)
             resourceService.update(serviceRequest)
         }
         addToOfficeQueue(patientId)

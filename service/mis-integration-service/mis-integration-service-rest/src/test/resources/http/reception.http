@@ -541,6 +541,26 @@ Content-Type: application/json
     },
     {
       "resource": {
+        "id": "11",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/1a77ce5f-8473-4627-84b0-b1ddc5c46364",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "HIRURG",
+              "display": "Осмотр хирурга",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "resource": {
         "id": "ad501881-e445-4316-821f-f7d09a327afd",
         "resourceType": "Observation",
         "status": "registered",
