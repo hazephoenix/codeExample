@@ -3,6 +3,7 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.impl.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.DiagnosticReport
 import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -100,7 +101,7 @@ class PatientServiceImpl(
 
     override fun queueStatusOfPatient(patientId: String): PatientQueueStatus {
         val patient = byId(patientId)
-        return patient.extension.queueStatus
+        return patient.extension.queueStatus!!
     }
 
     override fun preliminaryDiagnosticConclusion(patientId: String): String? {
@@ -119,8 +120,9 @@ class PatientServiceImpl(
         return diagnosticReport?.conclusionCode?.first()?.coding?.first()?.code
     }
 
+    @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
-        val resources = bundle.entry.map { resourceService.create(it.resource)!! }
+        val resources = bundle.entry.map { resourceService.create(it.resource) }
         val date = Date()
         val diagnosticReport = getResources<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport).first()
         val paramedicReference = diagnosticReport.performer.first()
@@ -137,8 +139,8 @@ class PatientServiceImpl(
                 title = "Маршрутный лист",
                 activity = serviceRequests
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
-        ).let { resourceService.create(it)!! }
-        val encounter = Encounter(subject = patientReference).let { resourceService.create(it)!! }
+        ).let { resourceService.create(it) }
+        val encounter = Encounter(subject = patientReference).let { resourceService.create(it) }
         ClinicalImpression(
                 status = ClinicalImpressionStatus.completed,
                 date = date,
@@ -146,8 +148,8 @@ class PatientServiceImpl(
                 assessor = paramedicReference,
                 summary = "Заключение: ${diagnosticReport.conclusion}",
                 encounter = Reference(encounter)
-        ).let { resourceService.create(it)!! }
-        return patient.id!!
+        ).let { resourceService.create(it) }
+        return patient.id
     }
 
     private fun <T> getResources(resources: List<BaseResource>, type: ResourceType.ResourceTypeId): List<T> where T : BaseResource {

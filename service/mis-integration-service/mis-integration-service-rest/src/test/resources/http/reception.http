@@ -649,6 +649,139 @@ Content-Type: application/json
         }
       }
     },
+    {
+      "resource": {
+        "id": "4658bb28-2470-4451-accf-81f2f1430c6f",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "A00.0",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "preliminary"
+      }
+    },
+    {
+      "resource": {
+        "id": "cd84b546-0e36-41c2-b7fd-ca8ff94371a9",
+        "identifier": [
+          {
+            "value": "7878 77521487",
+            "period": {
+              "start": "1970-01-01T00:20:22.222+0000"
+            },
+            "type": {
+              "coding": [
+                {
+                  "code": "PASSPORT",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official",
+            "assigner": {
+              "display": "ОУФМС по ТО..."
+            }
+          },
+          {
+            "value": "7878 77521487",
+            "period": {
+              "start": "1970-01-01T00:20:22.222+0000",
+              "end": "1970-01-01T00:20:22.222+0000"
+            },
+            "type": {
+              "coding": [
+                {
+                  "code": "DIGITAL_ASSURANCE",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official",
+            "assigner": {
+              "display": "ОУФМС по ТО..."
+            }
+          },
+          {
+            "value": "7878 77521487",
+            "type": {
+              "coding": [
+                {
+                  "code": "ENP",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          },
+          {
+            "value": "7878 77521487",
+            "type": {
+              "coding": [
+                {
+                  "code": "SNILS",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          },
+          {
+            "value": "7878 77521487",
+            "type": {
+              "coding": [
+                {
+                  "code": "BRACELET",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          }
+        ],
+        "resourceType": "Patient",
+        "name": [
+          {
+            "use": "official",
+            "text": "Петров И. А.",
+            "family": "Петров",
+            "given": [
+              "Иван",
+              "Алексеевич"
+            ]
+          }
+        ],
+        "birthDate": "2019-10-11T04:07:05.243+0000",
+        "gender": "female",
+        "extension": {
+          "nationality": "Russian",
+          "birthPlace": {
+            "use": "home",
+            "type": "both",
+            "text": "Россия ТО г. Томск",
+            "city": "Tomsk",
+            "state": "TO",
+            "country": "Russia"
+          }
+        },
+        "age": 0
+      }
+    },
     { "resource": {
       "id": "564aa366-5d41-4757-89a3-2e0b5f8dc509",
       "resourceType": "QuestionnaireResponse",

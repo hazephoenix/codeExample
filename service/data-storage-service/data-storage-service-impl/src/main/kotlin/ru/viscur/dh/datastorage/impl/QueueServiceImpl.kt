@@ -62,8 +62,8 @@ class QueueServiceImpl(
             from Location r
             where r.resource ->> 'status' in (:WAITING_PATIENT, :OBSERVATION)
             """)
-        query.setParameter("WAITING_PATIENT", LocationStatus.WAITING_PATIENT)
-        query.setParameter("OBSERVATION", LocationStatus.OBSERVATION)
+        query.setParameter("WAITING_PATIENT", LocationStatus.WAITING_PATIENT.toString())
+        query.setParameter("OBSERVATION", LocationStatus.OBSERVATION.toString())
         return query.fetchResourceList()
     }
 
@@ -73,7 +73,7 @@ class QueueServiceImpl(
             from Patient r
             where r.resource -> 'extension' ->> 'queueStatus' != :READY
             """)
-        query.setParameter("READY", PatientQueueStatus.READY)
+        query.setParameter("READY", PatientQueueStatus.READY.toString())
         return query.fetchResourceList()
     }
 }

@@ -37,8 +37,8 @@ class PatientStatusServiceImpl(
         val queueHistoryOfPatient = QueueHistoryOfPatient(
                 subject = referenceToPatient(id = patientId),
                 location = officeIdOfPrevProcess?.let { referenceToLocation(id = officeIdOfPrevProcess) },
-                status = patient.extension.queueStatus,
-                fireDate = queueStatusUpdatedAt,
+                status = patient.extension.queueStatus!!,
+                fireDate = queueStatusUpdatedAt!!,
                 duration = msToSeconds(now.time - queueStatusUpdatedAt.time)
         )
         resourceService.create(queueHistoryOfPatient)

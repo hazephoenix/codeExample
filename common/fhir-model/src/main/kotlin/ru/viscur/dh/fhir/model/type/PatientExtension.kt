@@ -18,8 +18,8 @@ import java.util.*
 class PatientExtension @JsonCreator constructor(
         @JsonProperty("nationality") val nationality: String,
         @JsonProperty("birthPlace") val birthPlace: Address,
-        @JsonProperty("queueStatusUpdatedAt") var queueStatusUpdatedAt: Date = now(),
-        @JsonProperty("queueStatus") var queueStatus: PatientQueueStatus = PatientQueueStatus.READY
+        @JsonProperty("queueStatusUpdatedAt") var queueStatusUpdatedAt: Date? = now(),
+        @JsonProperty("queueStatus") var queueStatus: PatientQueueStatus? = PatientQueueStatus.READY
 //        ,
 //        @JsonProperty("citizenship") val citizenship: String todo пока не нужно?
 )
