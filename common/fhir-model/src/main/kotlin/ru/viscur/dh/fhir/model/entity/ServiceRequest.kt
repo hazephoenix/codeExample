@@ -34,5 +34,5 @@ class ServiceRequest @JsonCreator constructor(
         @JsonProperty("locationReference") val locationReference: List<Reference>? = null,
         @JsonProperty("requester") val requester: Reference? = null,
         @JsonProperty("code") val code: CodeableConcept,
-        @JsonProperty("extension") val extension: ServiceRequestExtension
+        @JsonProperty("extension") var extension: ServiceRequestExtension? = null
 ) : BaseResource(id, identifier, resourceType)
