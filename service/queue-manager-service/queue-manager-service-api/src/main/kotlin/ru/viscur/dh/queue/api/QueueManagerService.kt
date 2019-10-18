@@ -20,6 +20,9 @@ interface QueueManagerService {
 
     /**
      * Поставить пациента в очередь
+     * У пациента может быть незавершенный маршрутный лист, но его удалили из очереди по какой-либо причине,
+     * этой функцией мы снова добавляем его в очередь
+     * Если пациент уже в очереди, то ничего не происходит
      *
      * TODO moveUserToNextQueue?
      */
@@ -32,60 +35,40 @@ interface QueueManagerService {
      * Используется, например, на тот случай если его очередь настала, но он отошел - его не нужно исключать вообще из системы,
      * но и ждать не имеет смысла.
      * Или если даже он начал обследование, но выяснялось, что по каким-то причинам сейчас осмотр нельзя проводить.
-     * Продолжительность обследования не сохраняется в историю, т к оно было прервано.
-     * Кабинет переводим в статус READY, запускаем если есть кто-то следующего из очереди.
+     * Кабинет переводим в статус BUSY, если очередь пациента настала или шло обследование
      */
     fun deleteFromOfficeQueue(patientId: String)
 
     /**
-     * Обследование началось
-     *
-     * TODO pass only userId and officeId? (or create cmd)
+     * Пациент зашел в кабинет
      */
-    fun observationStarted(patientId: String, officeId: String)
+    fun patientEntered(patientId: String, officeId: String)
 
     /**
-     * Обследование закончилось
-     *
-     * TODO pass only officeId?
+     * Пациент выходит из кабинета (все обследования в этом кабинете, которые есть в маршрутном листе проведены)
      */
-    fun observationFinished(officeId: String)
+    fun patientLeft(officeId: String)
 
     /**
      * Кабинет готов принять пациента: смена статуса с [OfficeStatus.CLOSED], [OfficeStatus.BUSY] на [OfficeStatus.READY]
      * Если кабинет находится в статусе назначенного пациента, ничего не делаем
-     *
-     * TODO pass only officeId?
      */
     fun officeIsReady(officeId: String)
 
     /**
      * Смена статуса кабинета с "готов принять" или с "закрыт" на занят
-     *
-     * TODO pass only officeId?
      */
     fun officeIsBusy(officeId: String)
 
     /**
      * Смена статуса кабинета с "занят" или "готов принять" на "закрыт"
      * Расформировываем очередь
-     *
-     * TODO pass only officeId?
      */
     fun officeIsClosed(officeId: String)
 
     /**
-     * Пациент покинул очередь
-     *
-     * TODO pass only userId?
-     */
-    fun patientLeftQueue(patientId: String)
-
-    /**
      * Удалить всю очередь: из базы и из системы
      * и пациентов, и маршрутные листы
-     *
-     * TODO clearQueue?
      */
     fun deleteQueue()
 
@@ -93,4 +76,10 @@ interface QueueManagerService {
      * Удаление истории работы кабинетов и статусов пациентов
      */
     fun deleteHistory()
+
+    /**
+     * Отобразить в логах очередь и провалидировать
+     * todo только на время отладки
+     */
+    fun loqAndValidate()
 }

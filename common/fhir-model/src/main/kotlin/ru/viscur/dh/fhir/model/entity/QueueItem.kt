@@ -31,4 +31,8 @@ class QueueItem @JsonCreator constructor(
         @JsonProperty("onum") var onum: Int? = null,
         @JsonIgnore var severity: Severity? = null,
         @JsonIgnore var patientQueueStatus: PatientQueueStatus? = null
-) : BaseResource(id, identifier, resourceType)
+) : BaseResource(id, identifier, resourceType) {
+    override fun toString(): String {
+        return """  QueueItem($onum, $estDuration, $patientQueueStatus, $severity, subject=$subject, location=$location)""".trimMargin()
+    }
+}

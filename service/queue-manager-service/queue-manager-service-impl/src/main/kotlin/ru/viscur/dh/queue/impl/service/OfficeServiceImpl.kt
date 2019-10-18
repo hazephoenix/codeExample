@@ -107,8 +107,8 @@ class OfficeServiceImpl(
     override fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?) {
         val office = locationService.byId(officeId)
         val newLastPatientInfo = LocationExtensionLastPatientInfo(
-                subject = Reference(ResourceType.ResourceTypeId.Patient, patientId),
-                nextOffice = nextOfficeId?.let { Reference(ResourceType.ResourceTypeId.Location, nextOfficeId) }
+                subject = referenceToPatient(patientId),
+                nextOffice = nextOfficeId?.let { referenceToLocation(nextOfficeId) }
         )
         office.extension = office.extension?.apply { lastPatientInfo = newLastPatientInfo }
                 ?: LocationExtension(lastPatientInfo = newLastPatientInfo)

@@ -2,6 +2,7 @@ package ru.viscur.dh.queue.impl.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.LocationStatus
@@ -27,7 +28,7 @@ class QueueManagerServiceImpl(
 ) : QueueManagerService {
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(QueueManagerServiceImpl::class.java)
+        private val log = LoggerFactory.getLogger(QueueManagerServiceImpl::class.java)
     }
 
     override fun registerPatient(patientId: String): List<ServiceRequest> {
@@ -84,6 +85,10 @@ class QueueManagerServiceImpl(
     }
 
     override fun addToOfficeQueue(patientId: String) {
+        val patient = patientService.byId(patientId)
+        if (patient.extension.queueStatus !in listOf(PatientQueueStatus.FINISHED, PatientQueueStatus.READY)) {
+            return
+        }
         val nextOfficeId = nextOfficeId(patientId)
         nextOfficeId?.run {
             officeService.addPatientToQueue(patientId, nextOfficeId, estDuration(patientId, nextOfficeId))
@@ -146,7 +151,7 @@ class QueueManagerServiceImpl(
         officeService.deletePatientFromLastPatientInfo(patientId)
     }
 
-    override fun observationStarted(patientId: String, officeId: String) {
+    override fun patientEntered(patientId: String, officeId: String) {
         if (officeService.firstPatientInQueue(officeId) == patientId) {
             val patient = patientService.byId(patientId)
             if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_SURVEY) {
@@ -157,7 +162,7 @@ class QueueManagerServiceImpl(
         }
     }
 
-    override fun observationFinished(officeId: String) {
+    override fun patientLeft(officeId: String) {
         val patientId = officeService.firstPatientInQueue(officeId)!!
         val patient = patientService.byId(patientId)
         if (patient.extension.queueStatus == PatientQueueStatus.ON_SURVEY) {
@@ -198,12 +203,8 @@ class QueueManagerServiceImpl(
         }
     }
 
-    override fun patientLeftQueue(patientId: String) {
-        deleteFromOfficeQueue(patientId)
-        patientStatusService.saveCurrentStatus(patientId)
-    }
-
     override fun deleteQueue() {
+        println("deleteQueue")//todo
         queueService.involvedOffices().forEach {
             officeService.changeStatus(it.id!!, LocationStatus.BUSY)
         }
@@ -234,4 +235,23 @@ class QueueManagerServiceImpl(
          return offices.filter { it.surveyType.id in surveysIdWithMaxPriority }*/
     }
 
+    override fun loqAndValidate() {
+        val offices = resourceService.all(ResourceType.Location, RequestBodyForResources(filter = mapOf(
+                "id" to "Office:"
+        )))
+        println("loqAndValidate , ${offices.size}")//todo
+        offices.forEach { office ->
+            log.info("queue for ${office.id}:")
+
+            val queue = queueService.queueItemsOfOffice(office.id!!)
+            queue.forEach { queueItem ->
+                log.info("$queueItem")
+            }
+            //при пустой очереди кабинет не должен иметь назначенного пациента
+
+            if (queue.isEmpty() && office.status in listOf(LocationStatus.WAITING_PATIENT, LocationStatus.OBSERVATION)) {
+                log.error("\n\nERROR. office has wrong status of queue ($office.status) with empty queue")
+            }
+        }
+    }
 }

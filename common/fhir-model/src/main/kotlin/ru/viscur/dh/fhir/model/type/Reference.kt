@@ -32,4 +32,8 @@ class Reference @JsonCreator constructor(
     )
 
     val id : String? = reference?.substringAfter("/")
+
+    override fun toString(): String {
+        return "Ref(reference='$reference', type=$type, display=$display)"
+    }
 }

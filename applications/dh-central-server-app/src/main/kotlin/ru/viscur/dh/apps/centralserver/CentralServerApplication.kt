@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 
 @SpringBootApplication
-@EnableWebSecurity
+//@EnableWebSecurity
 class CentralServerApplication : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         // TODO временное решение для закрытия стенда
