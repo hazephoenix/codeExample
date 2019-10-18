@@ -4,105 +4,105 @@ select resource_create('{
   "resourceType": "Location",
   "id": "Office:129",
   "name": "Cмотровая",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "129", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}
+  "identifier": [{"value": "129", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
 }'::jsonb);
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:139",
   "name": "Cмотровая",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "139", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}
+  "identifier": [{"value": "139", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
 }'::jsonb);
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:140",
   "name": "Cмотровая",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "140", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}
+  "identifier": [{"value": "140", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
 }'::jsonb);
 
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:101",
   "name": "Процедурный кабинет",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "101", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}
+  "identifier": [{"value": "101", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}]}]
 }'::jsonb);
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:104",
   "name": "Процедурный кабинет",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "104", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}
+  "identifier": [{"value": "104", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}]}]
 }'::jsonb);
 
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:130",
   "name": "Функционально-диагностический кабинет",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "130", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "FunctionalDiagnostics", "system": "ValueSet/Location_types", "display": "Функциональная диагностика"}
+  "identifier": [{"value": "130", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "FunctionalDiagnostics", "system": "ValueSet/Location_types", "display": "Функциональная диагностика"}]}]
 }'::jsonb);
 
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:117",
   "name": "УЗИ",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "117", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "UltrasoundDiagnostics", "system": "ValueSet/Location_types", "display": "Ультразвуковая диагностика"}
+  "identifier": [{"value": "117", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "UltrasoundDiagnostics", "system": "ValueSet/Location_types", "display": "Ультразвуковая диагностика"}]}]
 }'::jsonb);
 
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:149",
   "name": "Эндоскопия (Бронхоскопия)",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "149", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}
+  "identifier": [{"value": "149", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}]}]
 }'::jsonb);
 
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:150",
   "name": "Эндоскопия (Колоноскопия)",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "150", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}
+  "identifier": [{"value": "150", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}]}]
 }'::jsonb);
 
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:151",
   "name": "Эндоскопия (ЭГДС)",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
-  "identifier": {"value": "151", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}
+  "identifier": [{"value": "151", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}]}]
 }'::jsonb);
 
 select resource_create('{
   "resourceType": "Location",
   "id": "Office:202",
   "name": "Рентген",
-  "status": "active",
+  "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "2 этаж"},
-  "identifier": {"value": "202", "type": {"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}},
-  "type": {"code": "GeneralRadiology", "system": "ValueSet/Location_types", "display": "Общая рентгенология"}
+  "identifier": [{"value": "202", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "GeneralRadiology", "system": "ValueSet/Location_types", "display": "Общая рентгенология"}]}]
 }'::jsonb);

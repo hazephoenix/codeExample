@@ -45,23 +45,23 @@ interface ResourceService {
     /**
      * Создание
      * Если указан id у ресурса, то будет создан с таким id. Если не указан, то сгенерится свой
-     *
-     * TODO: точно можно присылать ID при создании???
      */
-    fun <T> create(resource: T): T?
+    fun <T> create(resource: T): T
             where T : BaseResource
 
     /**
      * Обновление, обязательно вложенное поле id
+     * Если не найден ресурс с таким id, то создается
      */
-    fun <T> update(resource: T): T?
+    fun <T> update(resource: T): T
             where T : BaseResource
 
     /**
      * Удаление определенного ресурса по типу [resourceType] и [id]
      * С сохранением истории пред. состояния ресурса
+     * Если не найден ресурс с таким id, то пробрасывается исключение
      */
-    fun <T> deleteById(resourceType: ResourceType<T>, id: String): T?
+    fun <T> deleteById(resourceType: ResourceType<T>, id: String): T
             where T : BaseResource
 
     /**

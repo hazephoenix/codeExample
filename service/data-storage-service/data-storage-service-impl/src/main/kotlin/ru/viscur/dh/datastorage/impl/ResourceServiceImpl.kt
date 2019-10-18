@@ -48,33 +48,33 @@ class ResourceServiceImpl : ResourceService {
     }
 
     @Tx
-    override fun <T> create(resource: T): T?
+    override fun <T> create(resource: T): T
             where T : BaseResource {
         return em
                 .createNativeQuery("select resource_create(${jsonbParam(1)})")
                 .setParameter(1, resource.toJsonb())
                 .singleResult
-                .toResourceEntity()
+                .toResourceEntity()!!
     }
 
     @Tx
-    override fun <T> update(resource: T): T?
+    override fun <T> update(resource: T): T
             where T : BaseResource {
         return em.createNativeQuery("select resource_update(${jsonbParam(1)})")
                 .setParameter(1, resource.toJsonb())
                 .singleResult
-                .toResourceEntity()
+                .toResourceEntity()!!
     }
 
     @Tx
-    override fun <T> deleteById(resourceType: ResourceType<T>, id: String): T?
+    override fun <T> deleteById(resourceType: ResourceType<T>, id: String): T
             where T : BaseResource {
         return em.createNativeQuery("select resource_delete(?1, ?2)")
                 .setParameter(1, resourceType.id.toString())
                 .setParameter(2, id)
                 .singleResult
                 .toResourceEntity()
-
+                ?: throw Exception("Not found ${resourceType.id} with id = '$id' for deleting")
     }
 
     @Tx
