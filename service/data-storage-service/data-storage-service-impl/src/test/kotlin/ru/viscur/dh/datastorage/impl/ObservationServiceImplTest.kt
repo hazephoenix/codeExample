@@ -104,8 +104,8 @@ class ObservationServiceImplTest {
         ).let { resourceService.create(it)!! }.also { createdResources.add(it) }
 
         observation.status = ObservationStatus.final
-        val serviceRequest = observationService.update(observation)
-        assertEquals(serviceRequest?.resourceType, ResourceType.ServiceRequest.id)
+        val updated = observationService.update(observation)
+        assertEquals(updated?.resourceType, ResourceType.Observation.id)
 
         // TODO: finalize deleting test resources
         createdResources.forEach {

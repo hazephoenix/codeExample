@@ -1,7 +1,7 @@
 package ru.viscur.dh.integration.mis.rest
 
 import org.springframework.web.bind.annotation.*
-import ru.viscur.dh.datastorage.impl.*
+import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
@@ -13,7 +13,7 @@ import ru.viscur.dh.fhir.model.utils.*
 @RestController
 @RequestMapping("/reception")
 class ReceptionController(
-        private val patientServiceImpl: PatientServiceImpl
+        private val patientService: PatientService
 ) {
     companion object {
         val patientClassifier = PatientClassifier()
@@ -45,8 +45,8 @@ class ReceptionController(
     @PostMapping("/patient")
     fun savePatientData(@RequestBody bundle: Bundle): Bundle {
         // TODO: fix dialect error
-        val patientId = patientServiceImpl.saveFinalPatientData(bundle)
-        val serviceRequests = patientServiceImpl.serviceRequests(patientId)
+        val patientId = patientService.saveFinalPatientData(bundle)
+        val serviceRequests = patientService.serviceRequests(patientId)
         return Bundle(
                 entry = serviceRequests.map { BundleEntry(it) }
         )
