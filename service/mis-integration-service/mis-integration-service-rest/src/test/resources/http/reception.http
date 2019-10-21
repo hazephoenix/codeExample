@@ -1016,7 +1016,21 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           }
         ]
       }
-    }}
+    }},
+    {
+      "mode": "working",
+      "status": "current",
+      "resourceType": "ListResource",
+      "id": "12121",
+      "entry": [
+        {
+          "item": {
+            "reference": "Practitioner/ignored",
+            "type": "Practitioner"
+          }
+        }
+      ]
+    }
   ],
   "id": "ignored"
 }

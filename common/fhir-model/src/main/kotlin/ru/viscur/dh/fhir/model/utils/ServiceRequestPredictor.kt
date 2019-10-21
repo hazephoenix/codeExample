@@ -11,7 +11,7 @@ import ru.viscur.dh.fhir.model.valueSets.*
  *
  */
 class ServiceRequestPredictor {
-    fun predict(conceptId: String): List<ServiceRequest> {
+    fun predict(concept: Concept): List<ServiceRequest> {
         val location = Location(
                 identifier = listOf(Identifier(value = "139", type = IdentifierType.OFFICE_NUMBER)),
                 name = "Смотровой кабинет"

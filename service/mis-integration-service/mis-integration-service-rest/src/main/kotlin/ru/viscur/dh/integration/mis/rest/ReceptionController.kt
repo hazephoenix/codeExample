@@ -1,8 +1,6 @@
 package ru.viscur.dh.integration.mis.rest
 
-import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.client.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
@@ -42,13 +40,12 @@ class ReceptionController(
     /**
      * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ
      *
-     * @param reference [Reference] Ссылка на код МКБ-10, должна содержать поле id
+     * @param concept [Concept] код МКБ-10
      */
     @PostMapping("/serviceRequests")
-    fun predictServiceRequests(@RequestBody reference: Reference): Bundle {
-        val conceptId = reference.id ?: throw HttpClientErrorException(HttpStatus.BAD_REQUEST)
-        val services = serviceRequestPredictor.predict(conceptId)
-        val specialists = responsibleSpecialistPredictor.predict(conceptId)
+    fun predictServiceRequests(@RequestBody concept: Concept): Bundle {
+        val services = serviceRequestPredictor.predict(concept)
+        val specialists = responsibleSpecialistPredictor.predict(concept)
         return Bundle(type = BundleType.BATCH.value, entry = (services + specialists).map { BundleEntry(it) })
     }
 
