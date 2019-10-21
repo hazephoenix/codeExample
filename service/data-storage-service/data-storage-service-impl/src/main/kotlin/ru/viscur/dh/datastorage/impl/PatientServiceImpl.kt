@@ -211,6 +211,14 @@ class PatientServiceImpl(
     }
 
 
+    /**
+     * Проверить, есть ли в списке назначенных услуг услуга осмотра
+     * ответственного врача, если нет - добавить
+     */
+    fun checkServices(services: List<ServiceRequest>) {
+
+    }
+
     private fun <T> getResources(resources: List<BaseResource>, type: ResourceType.ResourceTypeId): List<T> where T : BaseResource {
         return resources.filter { it.resourceType == type }.map { it as T }
     }

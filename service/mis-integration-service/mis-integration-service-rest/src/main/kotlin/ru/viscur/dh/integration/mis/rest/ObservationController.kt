@@ -3,6 +3,7 @@ package ru.viscur.dh.integration.mis.rest
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
+import ru.viscur.dh.fhir.model.enums.*
 
 /**
  * Контроллер для работы с обследованиями
@@ -12,6 +13,13 @@ import ru.viscur.dh.fhir.model.entity.*
 class ObservationController(
         private val observationService: ObservationService
 ) {
+
+    /**
+     * Получить обследование по статусу и id пациента
+     */
+    @GetMapping
+    fun getByPatientId(@RequestParam patientId: String, @RequestParam status: ObservationStatus) =
+        observationService.findByPatient(patientId, status)
 
     /**
      * Создать обследование

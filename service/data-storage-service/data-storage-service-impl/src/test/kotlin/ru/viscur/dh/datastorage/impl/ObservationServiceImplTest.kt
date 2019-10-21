@@ -65,7 +65,7 @@ class ObservationServiceImplTest {
                         nationality = "Russian",//национальность
                         birthPlace = Address(country = "Russia", text = "Россия ТО г. Томск", state = "TO", city = "Tomsk")//место рождения
                 )
-        ).let { resourceService.create(it)!! }.also { createdResources.add(it) }
+        ).let { resourceService.create(it) }.also { createdResources.add(it) }
         val practitioner = Practitioner(
                 identifier = listOf(
                         //rfid
@@ -80,7 +80,7 @@ class ObservationServiceImplTest {
                         period = Period(Timestamp(1), Timestamp(2))
                 )
 
-        ).let { resourceService.create(it)!! }.also { createdResources.add(it) }
+        ).let { resourceService.create(it) }.also { createdResources.add(it) }
         val servReq = ServiceRequest(
                 subject = Reference(patient),
                 code = CodeableConcept(
@@ -89,27 +89,47 @@ class ObservationServiceImplTest {
                         display = "Осмотр хирурга"
                 ),
                 extension = ServiceRequestExtension(executionOrder = 1)
-        ).let { resourceService.create(it)!! }.also { createdResources.add(it) }
-        val observation = Observation(
-                basedOn = Reference(servReq),
-                subject = Reference(patient),
-                performer = listOf(Reference(practitioner)),//кто по факту сделал
-                code = CodeableConcept(
-                        code = "HIRURG",
-                        systemId = "",
-                        display = "Осмотр хирурга"
-                ),
-                valueString = "Слизистые носоглотки без изменений",
-                issued = Timestamp(1212)
-        ).let { resourceService.create(it)!! }.also { createdResources.add(it) }
+        ).let { resourceService.create(it) }.also { createdResources.add(it) }
 
+
+        val observation = observationService.create(
+            Observation(
+                    basedOn = Reference(servReq),
+                    subject = Reference(patient),
+                    performer = listOf(Reference(practitioner)),//кто по факту сделал
+                    code = CodeableConcept(
+                            code = "HIRURG",
+                            systemId = "",
+                            display = "Осмотр хирурга"
+                    ),
+                    valueString = "Слизистые носоглотки без изменений",
+                    issued = Timestamp(1212)
+            )
+        )
+        createdResources.add(observation as BaseResource)
+
+        // Обследование зарегистрировано
+        val createdObservation = observationService.findByPatient(patient.id, ObservationStatus.registered).firstOrNull()
+        assertNotNull(createdObservation)
+
+        // Ждем результатов обследования
+        assertEquals(
+                resourceService.byId(ResourceType.ServiceRequest, servReq.id).status,
+                ServiceRequestStatus.waiting_result
+        )
+
+        // Завершили обследование
         observation.status = ObservationStatus.final
         val updated = observationService.update(observation)
         assertEquals(updated?.resourceType, ResourceType.Observation.id)
+        assertEquals(resourceService.byId(
+                ResourceType.ServiceRequest, servReq.id).status,
+                ServiceRequestStatus.waiting_result
+        )
 
         // TODO: finalize deleting test resources
         createdResources.forEach {
-            resourceService.deleteById(ResourceType.byId(it.resourceType), it.id!!)
+            resourceService.deleteById(ResourceType.byId(it.resourceType), it.id)
         }
     }
 }
