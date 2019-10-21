@@ -1,9 +1,9 @@
 package ru.viscur.dh.datastorage.api
 
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
-import ru.digitalhospital.dhdatastorage.dto.Resource
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 
 /**
  * Сервис для ресурсов
@@ -17,6 +17,15 @@ interface ResourceService {
      * @param id идентификатор ресурса
      */
     fun <T> byId(resourceType: ResourceType<T>, id: String): T
+            where T : BaseResource
+
+    /**
+     * Поиск ресурса по значению идентификатора [Identifier.value][ru.viscur.dh.fhir.model.type.Identifier.value]
+     * @param resourceType тип ресурса
+     * @param type тип идентификатора, [IdentifierType]
+     * @param value значение идентификатора
+     */
+    fun <T> byIdentifier(resourceType: ResourceType<T>, type: IdentifierType, value: String): T?
             where T : BaseResource
 
     /**

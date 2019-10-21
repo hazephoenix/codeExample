@@ -16,7 +16,8 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "139", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}],
+  "extension": {"observationType": [{"code": "Surgeon", "system": "ValueSet/Observation_types"}, {"code": "Therapist", "system": "ValueSet/Observation_types"}]}
 }'::jsonb);
 select resource_create('{
   "resourceType": "Location",
@@ -25,7 +26,8 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "140", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}],
+  "extension": {"observationType": [{"code": "Urologist", "system": "ValueSet/Observation_types"}]}
 }'::jsonb);
 
 select resource_create('{
@@ -35,7 +37,8 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "101", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}]}]
+  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}]}],
+  "extension": {"observationType": [{"code": "OAK", "system": "ValueSet/Observation_types"}, {"code": "Bio", "system": "ValueSet/Observation_types"}]}
 }'::jsonb);
 select resource_create('{
   "resourceType": "Location",
@@ -44,7 +47,8 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "104", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}]}]
+  "type": [{"coding": [{"code": "TreatmentRoom", "system": "ValueSet/Location_types", "display": "Процедурный кабинет"}]}],
+  "extension": {"observationType": [{"code": "OAM", "system": "ValueSet/Observation_types"}]}
 }'::jsonb);
 
 select resource_create('{
@@ -64,7 +68,8 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "117", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "UltrasoundDiagnostics", "system": "ValueSet/Location_types", "display": "Ультразвуковая диагностика"}]}]
+  "type": [{"coding": [{"code": "UltrasoundDiagnostics", "system": "ValueSet/Location_types", "display": "Ультразвуковая диагностика"}]}],
+  "extension": {"observationType": [{"code": "Ultrasound_of_the_kidneys", "system": "ValueSet/Observation_types"}, {"code": "Ultrasound_of_the_heart", "system": "ValueSet/Observation_types"}]}
 }'::jsonb);
 
 select resource_create('{
@@ -104,5 +109,6 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "2 этаж"},
   "identifier": [{"value": "202", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "GeneralRadiology", "system": "ValueSet/Location_types", "display": "Общая рентгенология"}]}]
+  "type": [{"coding": [{"code": "GeneralRadiology", "system": "ValueSet/Location_types", "display": "Общая рентгенология"}]}],
+  "extension": {"observationType": [{"code": "X_ray_of_the_leg", "system": "ValueSet/Observation_types"}]}
 }'::jsonb);

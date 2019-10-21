@@ -30,7 +30,7 @@ class Consent @JsonCreator constructor(
         @JsonProperty("category") val category: List<CodeableConcept>,
         @JsonProperty("status") val status: ConsentStatus = ConsentStatus.active,
         @JsonProperty("dateTime") val dateTime: Timestamp,
-        @JsonProperty("patient") val patient: Reference,
-        @JsonProperty("performer") val performer: Reference? = null,
+        @JsonProperty("patient") var patient: Reference,
+        @JsonProperty("performer") var performer: Reference? = null,
         @JsonProperty("organization") val organization: List<Reference>
 ) : BaseResource(id, identifier, resourceType)

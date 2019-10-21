@@ -35,12 +35,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 110
@@ -48,7 +48,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "ad501881-e445-4316-821f-f7d09a327afd",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -62,12 +62,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 95
@@ -75,7 +75,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "702dd780-3330-4fe1-88c7-19c46a20a207",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -89,12 +89,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 90
@@ -116,12 +116,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 27
@@ -129,7 +129,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -143,12 +143,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueQuantity": {
@@ -157,15 +157,15 @@ Content-Type: application/json
       }
     },
     { "resource": {
-      "id": "564aa366-5d41-4757-89a3-2e0b5f8dc509",
+      "id": "ignored",
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+        "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
         "type": "Practitioner"
       },
       "source": {
-        "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+        "reference": "Patient/ignored",
         "type": "Patient"
       },
       "questionnaire": "Questionnaire/Severity_criteria",
@@ -250,7 +250,7 @@ Content-Type: application/json
     }
     }
   ],
-  "id": "7dc06391-0761-45de-ad64-2c8a814c09a2"
+  "id": "ignored"
 }
 
 ###
@@ -285,12 +285,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 110
@@ -298,7 +298,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "ad501881-e445-4316-821f-f7d09a327afd",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -312,12 +312,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 95
@@ -325,7 +325,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "702dd780-3330-4fe1-88c7-19c46a20a207",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -339,12 +339,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 90
@@ -366,12 +366,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 27
@@ -379,7 +379,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -393,12 +393,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueQuantity": {
@@ -407,15 +407,15 @@ Content-Type: application/json
       }
     },
     { "resource": {
-      "id": "564aa366-5d41-4757-89a3-2e0b5f8dc509",
+      "id": "ignored",
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+        "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
         "type": "Practitioner"
       },
       "source": {
-        "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+        "reference": "Patient/ignored",
         "type": "Patient"
       },
       "questionnaire": "Questionnaire/Severity_criteria",
@@ -500,13 +500,14 @@ Content-Type: application/json
     }
     }
   ],
-  "id": "7dc06391-0761-45de-ad64-2c8a814c09a2"
+  "id": "ignored"
 }
 
 ###
 
 POST http://localhost:8080/reception/patient
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
   "resourceType": "Bundle",
@@ -514,7 +515,42 @@ Content-Type: application/json
   "entry": [
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+        "id": "ignored",
+        "resourceType": "Claim",
+        "identifier": [
+          {
+            "value": "12382(Номер обращения)",
+            "type": {
+              "coding": [
+                {
+                  "code": "CLAIM_NUMBER",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          }],
+        "status": "active",
+        "accident": {
+          "date": "2019-01-01T00:57:04.242+0000",
+          "type": {
+            "coding": [
+              {
+                "code": "travma(еще нет кодов)",
+                "system": "ValueSet/Claim_accident_types"
+              }
+            ]
+          }
+        },
+        "patient": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -528,12 +564,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 110
@@ -541,18 +577,17 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "11",
+        "id": "ignored",
         "resourceType": "ServiceRequest",
         "status": "active",
         "subject": {
-          "reference": "Patient/1a77ce5f-8473-4627-84b0-b1ddc5c46364",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "code": {
           "coding": [
             {
-              "code": "HIRURG",
-              "display": "Осмотр хирурга",
+              "code": "Surgeon",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -561,7 +596,64 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "ad501881-e445-4316-821f-f7d09a327afd",
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "OAK",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "X_ray_of_the_leg",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "Urologist",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -575,12 +667,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 95
@@ -588,7 +680,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "702dd780-3330-4fe1-88c7-19c46a20a207",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -602,12 +694,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 90
@@ -615,7 +707,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "d80684b9-d4e2-4b10-b40a-020b8938367d",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -629,12 +721,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueInteger": 27
@@ -642,7 +734,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -656,12 +748,12 @@ Content-Type: application/json
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "valueQuantity": {
@@ -671,15 +763,15 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "4658bb28-2470-4451-accf-81f2f1430c6f",
+        "id": "ignored",
         "resourceType": "DiagnosticReport",
         "subject": {
-          "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+          "reference": "Patient/ignored",
           "type": "Patient"
         },
         "performer": [
           {
-            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
             "type": "Practitioner"
           }
         ],
@@ -698,7 +790,7 @@ Content-Type: application/json
     },
     {
       "resource": {
-        "id": "cd84b546-0e36-41c2-b7fd-ca8ff94371a9",
+        "id": "ignored",
         "identifier": [
           {
             "value": "7878 77521487",
@@ -738,7 +830,7 @@ Content-Type: application/json
             }
           },
           {
-            "value": "7878 77521487",
+            "value": "7878 11111",
             "type": {
               "coding": [
                 {
@@ -782,7 +874,7 @@ Content-Type: application/json
             "family": "Петров",
             "given": [
               "Иван",
-              "Алексеевич"
+              "Алекссандрович"
             ]
           }
         ],
@@ -803,15 +895,15 @@ Content-Type: application/json
       }
     },
     { "resource": {
-      "id": "564aa366-5d41-4757-89a3-2e0b5f8dc509",
+      "id": "ignored",
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+        "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
         "type": "Practitioner"
       },
       "source": {
-        "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+        "reference": "Patient/ignored",
         "type": "Patient"
       },
       "questionnaire": "Questionnaire/Severity_criteria",
@@ -869,6 +961,19 @@ Content-Type: application/json
           ]
         },
         {
+          "linkId": "Severity",
+          "text": "Результат сортировки",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "RED",
+                "display": "Красный",
+                "system": "ValueSet/Sorting_result"
+              }
+            }
+          ]
+        },
+        {
           "linkId": "Questionnaire/paramedic-qa-form/complaints",
           "text": "Жалобы пациента",
           "answer": [
@@ -896,7 +1001,7 @@ Content-Type: application/json
     }
     }
   ],
-  "id": "7dc06391-0761-45de-ad64-2c8a814c09a2"
+  "id": "ignored"
 }
 
 ###

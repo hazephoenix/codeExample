@@ -27,12 +27,12 @@ class ClinicalImpression @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ClinicalImpression.id,
-        @JsonProperty("status") val status: ClinicalImpressionStatus,
+        @JsonProperty("status") var status: ClinicalImpressionStatus,
         @JsonProperty("date") val date: Date,
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("assessor") val assessor: Reference,
         @JsonProperty("investigation") val investigation: List<Any>? = null,
         @JsonProperty("supportingInfo") val supportingInfo: List<Reference>? = null,
         @JsonProperty("summary") val summary: String,
-        @JsonProperty("encounter") val encounter: Reference
+        @JsonProperty("encounter") val encounter: Reference? = null
 ) : BaseResource(id, identifier, resourceType)

@@ -1,6 +1,7 @@
 package ru.viscur.dh.datastorage.api
 
 import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.ClinicalImpression
 import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
@@ -17,6 +18,12 @@ interface PatientService {
      * Пациент по [id]
      */
     fun byId(id: String): Patient
+
+    /**
+     * Пациент ЕНП [IdentifierType.ENP][ru.viscur.dh.fhir.model.valueSets.IdentifierType.ENP]
+     * @param value значение ЕНП
+     */
+    fun byEnp(value: String): Patient?
 
     /**
      * Какая степень тяжести у пациента
@@ -48,4 +55,9 @@ interface PatientService {
      * @return id пациента в data-storage
      */
     fun saveFinalPatientData(bundle: Bundle): String
+
+    /**
+     * Активное обращение пациента
+     */
+    fun activeClinicalImpression(patientId: String): ClinicalImpression?
 }

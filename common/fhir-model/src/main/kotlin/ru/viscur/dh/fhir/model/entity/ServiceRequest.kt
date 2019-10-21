@@ -29,9 +29,9 @@ class ServiceRequest @JsonCreator constructor(
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ServiceRequest.id,
         @JsonProperty("status") var status: ServiceRequestStatus = ServiceRequestStatus.active,
-        @JsonProperty("subject") val subject: Reference? = null,
+        @JsonProperty("subject") var subject: Reference? = null,
         @JsonProperty("performer") val performer: List<Reference>? = null,
-        @JsonProperty("locationReference") val locationReference: List<Reference>? = null,
+        @JsonProperty("locationReference") var locationReference: List<Reference>? = null,
         @JsonProperty("requester") val requester: Reference? = null,
         @JsonProperty("code") val code: CodeableConcept,
         @JsonProperty("extension") var extension: ServiceRequestExtension? = null

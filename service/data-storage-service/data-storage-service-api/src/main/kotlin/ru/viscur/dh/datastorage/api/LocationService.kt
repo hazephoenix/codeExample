@@ -18,4 +18,11 @@ interface LocationService {
      * Все кабинеты, у которых в lastPatientInfo указан пациент [patientId]
      */
     fun withPatientInLastPatientInfo(patientId: String): List<Location>
+
+    /**
+     * По типу процедур, обследований: определить однозначно кабинет, в котором проводится определенная процедура
+     * Ищет в [LocationExtension.observationType][ru.viscur.dh.fhir.model.type.LocationExtension.observationType]
+     * @param type код услуги/процедуры, код из "ValueSet/Observation_types"
+     */
+    fun byObservationType(type: String): Location
 }

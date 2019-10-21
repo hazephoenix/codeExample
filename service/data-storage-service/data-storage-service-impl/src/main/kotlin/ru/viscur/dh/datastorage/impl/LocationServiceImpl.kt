@@ -30,4 +30,16 @@ class LocationServiceImpl(
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResourceList()
     }
+
+    override fun byObservationType(type: String): Location {
+        val query = em.createNativeQuery("""
+                select resource
+                from (select jsonb_array_elements(r.resource -> 'extension' -> 'observationType') obsType, r.resource
+                      from location r) obsInfo
+                where obsInfo.obsType ->> 'code' = :observationType
+            """)
+        query.setParameter("observationType", type)
+        return query.fetchResourceList<Location>().firstOrNull()?:
+                throw Exception("There is no office for observation type '$type'")
+    }
 }

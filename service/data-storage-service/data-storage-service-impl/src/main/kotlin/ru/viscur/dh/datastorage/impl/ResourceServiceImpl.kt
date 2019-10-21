@@ -2,14 +2,12 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
-import ru.digitalhospital.dhdatastorage.dto.Resource
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.datastorage.impl.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
-import java.math.BigInteger
-import java.sql.Timestamp
+import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import javax.persistence.Query
@@ -28,6 +26,23 @@ class ResourceServiceImpl : ResourceService {
                 .setParameter(2, id)
                 .singleResult.toResourceEntity()
                 ?: throw Exception("Not found ${resourceType.id} with id = '$id'")
+    }
+
+    override fun <T : BaseResource> byIdentifier(resourceType: ResourceType<T>, type: IdentifierType, value: String): T? {
+        val query = em
+                .createNativeQuery(
+                        """
+            select resource
+            from (
+                select identifiers.i ->> 'value' val, jsonb_array_elements(identifiers.i -> 'type' -> 'coding') ->> 'code' identType, identifiers.resource
+                  from (select jsonb_array_elements(r.resource -> 'identifier') i, r.resource resource from patient r) identifiers
+                ) typeAndValues
+            where identType = :resourceType
+              and val = :value
+                """.trimIndent())
+        query.setParameter("resourceType", type.toString())
+        query.setParameter("value", value)
+        return query.fetchResourceList<T>().firstOrNull()
     }
 
     @Tx(readOnly = true)

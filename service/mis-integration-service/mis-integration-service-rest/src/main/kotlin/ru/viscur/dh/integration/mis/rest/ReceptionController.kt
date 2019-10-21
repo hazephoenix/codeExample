@@ -6,6 +6,7 @@ import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
+import ru.viscur.dh.queue.api.QueueManagerService
 
 /**
  * Контроллер для обработки запросов подсистемы "АРМ Фельдшер"
@@ -13,7 +14,8 @@ import ru.viscur.dh.fhir.model.utils.*
 @RestController
 @RequestMapping("/reception")
 class ReceptionController(
-        private val patientService: PatientService
+        private val patientService: PatientService,
+        private val queueManagerService: QueueManagerService
 ) {
     companion object {
         val patientClassifier = PatientClassifier()
@@ -46,7 +48,7 @@ class ReceptionController(
     fun savePatientData(@RequestBody bundle: Bundle): Bundle {
         // TODO: fix dialect error
         val patientId = patientService.saveFinalPatientData(bundle)
-        val serviceRequests = patientService.serviceRequests(patientId)
+        val serviceRequests = queueManagerService.registerPatient(patientId)
         return Bundle(
                 entry = serviceRequests.map { BundleEntry(it) }
         )

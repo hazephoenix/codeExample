@@ -10,6 +10,7 @@ import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
+import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -81,7 +82,7 @@ class QueueManagerServiceImpl(
             return 0.0
         }
         val observationType = conceptService.byCodeableConcept(serviceRequest.code)
-        observationType.parentCode ?: throw Exception("Observation type ${serviceRequest.code} has no parentCode")
+        observationType.parentCode ?: throw Exception("Observation type ${serviceRequest.code.code()} has no parentCode")
         val observationCategory = conceptService.parent(observationType)!!
         return observationCategory.priority ?: 0.5
     }
