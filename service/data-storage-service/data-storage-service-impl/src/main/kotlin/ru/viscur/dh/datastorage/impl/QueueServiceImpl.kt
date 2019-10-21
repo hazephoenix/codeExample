@@ -25,7 +25,7 @@ class QueueServiceImpl(
     @PersistenceContext
     private lateinit var em: EntityManager
 
-    override fun queueItemsOfOffice(officeId: String): List<QueueItem> {
+    override fun queueItemsOfOffice(officeId: String): MutableList<QueueItem> {
         val query = em.createNativeQuery("""
             select r.resource
             from QueueItem r
@@ -33,7 +33,13 @@ class QueueServiceImpl(
             order by r.resource ->> 'onum'
             """)
         query.setParameter("officeRef", "Location/$officeId")
-        return query.fetchResourceList()
+        return query.fetchResourceList<QueueItem>().map { queueItem ->
+            val patientId = queueItem.subject.id
+            queueItem.apply {
+                severity = patientService.severity(patientId!!)
+                patientQueueStatus = patientService.byId(patientId).extension.queueStatus
+            }
+        }.toMutableList()
     }
 
     @Tx
@@ -43,6 +49,7 @@ class QueueServiceImpl(
             from QueueItem r
             where r.resource -> 'location' ->> 'reference' = :officeRef""")
         query.setParameter("officeRef", "Location/$officeId")
+        query.executeUpdate()
     }
 
     override fun isPatientInOfficeQueue(patientId: String): String? {
@@ -52,7 +59,7 @@ class QueueServiceImpl(
             from QueueItem r
             where r.resource -> 'subject' ->> 'reference' = :patientRef
             """)
-        query.setParameter("patientRef", "Location/$patientId")
+        query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResource<QueueItem>()?.location?.id
     }
 

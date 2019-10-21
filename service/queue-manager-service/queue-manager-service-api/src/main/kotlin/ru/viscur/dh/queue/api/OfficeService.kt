@@ -23,5 +23,8 @@ interface OfficeService {
      */
     fun deletePatientFromLastPatientInfo(patientId: String)
 
+    /**
+     * Обновление информации о последнем пациенте у кабинета todo
+     */
     fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?)
 }

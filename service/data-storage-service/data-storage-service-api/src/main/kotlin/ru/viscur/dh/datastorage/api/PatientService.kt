@@ -40,6 +40,12 @@ interface PatientService {
      */
     fun activeServiceRequests(patientId: String): List<ServiceRequest>
 
+    /**
+     * Все непройденные назначения в маршрутном листе в определенном кабинете,
+     * упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
+     */
+    fun activeServiceRequests(patientId: String,  officeId: String): List<ServiceRequest>
+
     fun queueStatusOfPatient(patientId: String): PatientQueueStatus
 
     /**

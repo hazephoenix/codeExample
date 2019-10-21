@@ -4,13 +4,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -47,6 +50,11 @@ class QueueManagerServiceImpl(
                     ?: ServiceRequestExtension(executionOrder = index)
             resourceService.update(serviceRequest)
         }
+        val patient = patientService.byId(patientId)
+        resourceService.update(patient.apply {
+            extension.queueStatus = PatientQueueStatus.READY
+            extension.queueStatusUpdatedAt = now()
+        })
         addToOfficeQueue(patientId)
         return serviceRequests
     }
@@ -82,7 +90,8 @@ class QueueManagerServiceImpl(
             return 0.0
         }
         val observationType = conceptService.byCodeableConcept(serviceRequest.code)
-        observationType.parentCode ?: throw Exception("Observation type ${serviceRequest.code.code()} has no parentCode")
+        observationType.parentCode
+                ?: throw Exception("Observation type ${serviceRequest.code.code()} has no parentCode")
         val observationCategory = conceptService.parent(observationType)!!
         return observationCategory.priority ?: 0.5
     }
@@ -94,7 +103,7 @@ class QueueManagerServiceImpl(
         }
         val nextOfficeId = nextOfficeId(patientId)
         nextOfficeId?.run {
-            officeService.addPatientToQueue(patientId, nextOfficeId, estDuration(patientId, nextOfficeId))
+            officeService.addPatientToQueue(nextOfficeId, patientId, estDuration(patientId, nextOfficeId))
             patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
             checkEntryToOffice(nextOfficeId)
         } ?: run {
@@ -154,15 +163,17 @@ class QueueManagerServiceImpl(
         officeService.deletePatientFromLastPatientInfo(patientId)
     }
 
-    override fun patientEntered(patientId: String, officeId: String) {
+    override fun patientEntered(patientId: String, officeId: String): List<ServiceRequest> {
         if (officeService.firstPatientInQueue(officeId) == patientId) {
             val patient = patientService.byId(patientId)
             if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_SURVEY) {
                 officeService.changeStatus(officeId, LocationStatus.OBSERVATION, patientId)
                 patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_SURVEY, officeId)
 //                queueService.deleteQueueItemsOfOffice(patientId)//todo оставлять в очереди или нет?..
+                return patientService.activeServiceRequests(patientId, officeId)
             }
         }
+        return listOf()
     }
 
     override fun patientLeft(officeId: String) {
@@ -207,12 +218,11 @@ class QueueManagerServiceImpl(
     }
 
     override fun deleteQueue() {
-        println("deleteQueue")//todo
         queueService.involvedOffices().forEach {
-            officeService.changeStatus(it.id!!, LocationStatus.BUSY)
+            officeService.changeStatus(it.id, LocationStatus.BUSY)
         }
         queueService.involvedPatients().forEach {
-            patientStatusService.changeStatus(it.id!!, PatientQueueStatus.READY)
+            patientStatusService.changeStatus(it.id, PatientQueueStatus.READY)
         }
         resourceService.deleteAll(ResourceType.QueueItem)
     }
@@ -221,6 +231,9 @@ class QueueManagerServiceImpl(
         resourceService.deleteAll(ResourceType.QueueHistoryOfOffice)
         resourceService.deleteAll(ResourceType.QueueHistoryOfPatient)
     }
+
+    override fun queueOfOffice(officeId: String): Bundle =
+            Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
     private fun officesForSurveyType(surveyTypeId: Long): List<Office> {
         TODO("Not implemented");
@@ -238,23 +251,26 @@ class QueueManagerServiceImpl(
          return offices.filter { it.surveyType.id in surveysIdWithMaxPriority }*/
     }
 
-    override fun loqAndValidate() {
+    override fun loqAndValidate(): String {
         val offices = resourceService.all(ResourceType.Location, RequestBodyForResources(filter = mapOf(
                 "id" to "Office:"
         )))
         println("loqAndValidate , ${offices.size}")//todo
+        val str = mutableListOf<String>()
         offices.forEach { office ->
-            log.info("queue for ${office.id}:")
+            str.add("queue for ${office.id} (${office.status}):")
 
-            val queue = queueService.queueItemsOfOffice(office.id!!)
+            val queue = queueService.queueItemsOfOffice(office.id)
             queue.forEach { queueItem ->
-                log.info("$queueItem")
+                str.add("$queueItem")
             }
             //при пустой очереди кабинет не должен иметь назначенного пациента
 
             if (queue.isEmpty() && office.status in listOf(LocationStatus.WAITING_PATIENT, LocationStatus.OBSERVATION)) {
-                log.error("\n\nERROR. office has wrong status of queue ($office.status) with empty queue")
+                str.add("\n\nERROR. office has wrong status of queue ($office.status) with empty queue")
             }
         }
+        log.info(str.joinToString("\n"))
+        return str.joinToString("\n")
     }
 }

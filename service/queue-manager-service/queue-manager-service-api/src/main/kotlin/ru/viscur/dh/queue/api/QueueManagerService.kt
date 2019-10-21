@@ -1,5 +1,6 @@
 package ru.viscur.dh.queue.api
 
+import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.queue.api.cmd.RegisterUserCMD
 import ru.viscur.dh.queue.api.model.Office
@@ -42,7 +43,7 @@ interface QueueManagerService {
     /**
      * Пациент зашел в кабинет
      */
-    fun patientEntered(patientId: String, officeId: String)
+    fun patientEntered(patientId: String, officeId: String): List<ServiceRequest>
 
     /**
      * Пациент выходит из кабинета (все обследования в этом кабинете, которые есть в маршрутном листе проведены)
@@ -78,8 +79,13 @@ interface QueueManagerService {
     fun deleteHistory()
 
     /**
+     * Очередь в опр. кабинет
+     */
+    fun queueOfOffice(officeId: String): Bundle
+
+    /**
      * Отобразить в логах очередь и провалидировать
      * todo только на время отладки
      */
-    fun loqAndValidate()
+    fun loqAndValidate(): String
 }

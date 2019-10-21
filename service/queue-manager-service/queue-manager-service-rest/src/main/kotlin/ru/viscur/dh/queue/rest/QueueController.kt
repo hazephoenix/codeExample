@@ -1,6 +1,10 @@
 package ru.viscur.dh.queue.rest
 
 import org.springframework.web.bind.annotation.*
+import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.ListResource
+import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.queue.api.QueueManagerService
 
@@ -15,56 +19,61 @@ import ru.viscur.dh.queue.api.QueueManagerService
 class QueueController(private val queueManagerService: QueueManagerService) {
 
     @GetMapping("/test")
-    fun test () = "Test"
+    fun test() = "Test"
 
     @PostMapping("/registerPatient")
-    fun registerPatient(@RequestParam patientReference: Reference) =
+    fun registerPatient(@RequestBody patientReference: Reference) =
             logAndValidateAfter { queueManagerService.registerPatient(patientReference.id!!) }
 
     @PostMapping("/office/patientEntered")
-    fun patientEntered(
-
-            @RequestParam patientId: String,
-            @RequestParam officeId: String
-    ) = logAndValidateAfter { queueManagerService.patientEntered(patientId, officeId) }
+    fun patientEntered(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
+        val serviceRequests = queueManagerService.patientEntered(
+                listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id!!,
+                listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id!!
+        )
+        Bundle(entry = serviceRequests.map { BundleEntry(it) })
+    }
 
     @PostMapping("/office/patientLeft")
-    fun patientLeft(@RequestParam officeId: String) =
-            logAndValidateAfter { queueManagerService.patientLeft(officeId) }
+    fun patientLeft(@RequestBody officeReference: Reference) =
+            logAndValidateAfter { queueManagerService.patientLeft(officeReference.id!!) }
 
     @PostMapping("/office/ready")
-    fun officeIsReady(@RequestParam officeId: String) =
-            logAndValidateAfter { queueManagerService.officeIsReady(officeId) }
+    fun officeIsReady(@RequestBody officeReference: Reference) =
+            logAndValidateAfter { queueManagerService.officeIsReady(officeReference.id!!) }
 
     @PostMapping("/office/busy")
-    fun officeIsBusy(@RequestParam officeId: String) =
-            logAndValidateAfter { queueManagerService.officeIsBusy(officeId) }
+    fun officeIsBusy(@RequestBody officeReference: Reference) =
+            logAndValidateAfter { queueManagerService.officeIsBusy(officeReference.id!!) }
 
     @PostMapping("/office/closed")
-    fun officeIsClosed(@RequestParam officeId: String) =
-            logAndValidateAfter { queueManagerService.officeIsClosed(officeId) }
+    fun officeIsClosed(@RequestBody officeReference: Reference) =
+            logAndValidateAfter { queueManagerService.officeIsClosed(officeReference.id!!) }
 
     @PostMapping("/patient/addToQueue")
     fun addToOfficeQueue(
-            @RequestParam patientId: String
-    ) = logAndValidateAfter { queueManagerService.addToOfficeQueue(patientId) }
+            @RequestBody patientReference: Reference
+    ) = logAndValidateAfter { queueManagerService.addToOfficeQueue(patientReference.id!!) }
 
     @DeleteMapping("/patient")
     fun patientLeftQueue(
-            @RequestParam patientId: String
-    ) = logAndValidateAfter { queueManagerService.deleteFromOfficeQueue(patientId) }
-
-
-//    @GetMapping("/surveys")
-//    fun notVisitedSurveys(@RequestParam surveyTypeId: String) =
-//            queueManagerService.routeSheets.flatMap { it.surveys }.filter { it.surveyType.id == surveyTypeId && !it.visited}
+            @RequestBody patientReference: Reference
+    ) = logAndValidateAfter { queueManagerService.deleteFromOfficeQueue(patientReference.id!!) }
 
     @DeleteMapping
-    fun deleteQueue() = logAndValidateAfter { queueManagerService.deleteQueue()
-        "deleted"}
+    fun deleteQueue() = logAndValidateAfter {
+        queueManagerService.deleteQueue()
+        "deleted"
+    }
 
     @DeleteMapping("/history")
     fun deleteHistory() = logAndValidateAfter { queueManagerService.deleteHistory() }
+
+    @GetMapping
+    fun queueOfOffice(@RequestBody officeReference: Reference) = queueManagerService.queueOfOffice(officeReference.id!!)
+
+    @GetMapping("/info")
+    fun queueInfo() = queueManagerService.loqAndValidate()
 
     private fun <T> logAndValidateAfter(body: () -> T): T {
         val result = body()

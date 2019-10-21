@@ -1,12 +1,14 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
+import ru.viscur.dh.datastorage.api.QueueService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 import ru.viscur.dh.fhir.model.entity.HealthcareService
@@ -16,7 +18,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
         classes = [DataStorageConfig::class]
 )
 @EnableAutoConfiguration
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class ResourceServiceImplTest {
     @Autowired
     lateinit var resourceServiceImpl: ResourceService

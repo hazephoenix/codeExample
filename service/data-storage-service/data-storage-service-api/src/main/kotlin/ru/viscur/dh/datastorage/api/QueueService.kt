@@ -15,7 +15,7 @@ interface QueueService {
     /**
      * Все записи [QueueItem] по кабинету [officeId] с сортировкой по [QueueItem.onum]
      */
-    fun queueItemsOfOffice(officeId: String): List<QueueItem>
+    fun queueItemsOfOffice(officeId: String): MutableList<QueueItem>
 
     /**
      * Удаление всех записей [QueueItem] по кабинету [officeId]
@@ -27,7 +27,13 @@ interface QueueService {
      */
     fun isPatientInOfficeQueue(patientId: String): String?
 
+    /**
+     * "Вовлеченные в очередь кабинеты": все кабинеты, указанные в [QueueItem]
+     */
     fun involvedOffices(): List<Location>
 
+    /**
+     * "Вовлеченные в очередь пациенты": все пациенты, указанные в [QueueItem]
+     */
     fun involvedPatients(): List<Patient>
 }

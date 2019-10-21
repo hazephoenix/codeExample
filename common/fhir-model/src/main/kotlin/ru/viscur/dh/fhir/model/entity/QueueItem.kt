@@ -28,10 +28,12 @@ class QueueItem @JsonCreator constructor(
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("location") val location: Reference,
         @JsonProperty("estDuration") val estDuration: Int,
-        @JsonProperty("onum") var onum: Int? = null,
-        @JsonIgnore var severity: Severity? = null,
-        @JsonIgnore var patientQueueStatus: PatientQueueStatus? = null
+        @JsonProperty("onum") var onum: Int? = null
 ) : BaseResource(id, identifier, resourceType) {
+
+    @JsonIgnore var severity: Severity? = null
+    @JsonIgnore var patientQueueStatus: PatientQueueStatus? = null
+
     override fun toString(): String {
         return """  QueueItem($onum, $estDuration, $patientQueueStatus, $severity, subject=$subject, location=$location)""".trimMargin()
     }

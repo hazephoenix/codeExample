@@ -10,7 +10,7 @@ import ru.viscur.dh.fhir.model.valueSets.*
  * TODO навверно не в моделе он должен быть?
  */
 class ServiceRequestPredictor {
-    fun predict(conceptId: String): List<ServiceRequest> {
+    fun predict(listResource: ListResource): List<ServiceRequest> {
         val location = Location(
                 identifier = listOf(Identifier(value = "139", type = IdentifierType.OFFICE_NUMBER)),
                 name = "Смотровой кабинет"

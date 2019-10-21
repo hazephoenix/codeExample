@@ -49,6 +49,7 @@ class ReceptionController(
         // TODO: fix dialect error
         val patientId = patientService.saveFinalPatientData(bundle)
         val serviceRequests = queueManagerService.registerPatient(patientId)
+        queueManagerService.loqAndValidate()//todo del after
         return Bundle(
                 entry = serviceRequests.map { BundleEntry(it) }
         )

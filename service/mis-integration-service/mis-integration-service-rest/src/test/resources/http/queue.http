@@ -1,0 +1,158 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###                                                                                Пациент зашел в кабинет
+###
+POST http://localhost:8080/queue/office/patientEntered
+Content-Type: application/json
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:202",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/f1613d5c-353c-4825-971f-93db5b4f96e4",
+        "type": "Patient"
+      }
+    }
+  ]
+}
+###                                                                                Обследования в кабинете завершено
+###
+POST http://localhost:8080/queue/office/patientLeft
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:202",
+  "type": "Location"
+}
+###                                                                                Кабинет готов принять пациента
+POST http://localhost:8080/queue/office/ready
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:202",
+  "type": "Location"
+}
+###
+POST http://localhost:8080/queue/office/ready
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:202",
+  "type": "Location"
+}
+###
+###                                                                                Кабинет busy
+###
+POST http://localhost:8080/queue/office/busy
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:101",
+  "type": "Location"
+}
+###                                                                                Кабинет closed
+###
+POST http://localhost:8080/queue/office/closed
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:101",
+  "type": "Location"
+}
+###                                                                                Убрать пациента из очереди
+###
+DELETE http://localhost:8080/queue/patient
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/f1613d5c-353c-4825-971f-93db5b4f96e4",
+  "type": "Patient"
+}
+###
+###
+DELETE http://84.201.154.121:8080/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                                Поставить пациента в очередь
+###
+POST http://localhost:8080/queue/patient/addToQueue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/f1613d5c-353c-4825-971f-93db5b4f96e4",
+  "type": "Patient"
+}
+###                                                                              Информация об очереди в кабинет
+###
+GET http://localhost:8080/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:101",
+  "type": "Location"
+}
+###                                                                              Информация об очереди в целом
+###
+GET http://localhost:8080/queue/info
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###                                                                                Непройденные обследования в очереди
+###
+GET http://localhost:8080/queue/surveys?surveyTypeId=3
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+####                                                                                Удалить очередь
+####
+DELETE http://localhost:8080/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+###                                                                                Удалить историю
+###
+DELETE http://localhost:8080/queue/history
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+###
+GET http://localhost:8080/mis-integration/hello
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+Content-Type: application/json
+
+{}
+###
