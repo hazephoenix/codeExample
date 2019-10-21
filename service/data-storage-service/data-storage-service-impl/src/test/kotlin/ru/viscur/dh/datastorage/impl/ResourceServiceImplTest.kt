@@ -1,6 +1,7 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,9 +22,6 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 class ResourceServiceImplTest {
     @Autowired
     lateinit var resourceServiceImpl: ResourceService
-
-    @Autowired
-    lateinit var queueService: QueueService
 
     @Test
     @Order(1)
@@ -80,11 +78,6 @@ class ResourceServiceImplTest {
     @Test
     fun `should throw exception while deleting when resource with id doesn't exists`() {
         assertThrows(Exception::class.java) { resourceServiceImpl.deleteById(ResourceType.Location, "Location/Unknown") }
-    }
-
-    @Test
-    fun `queue  qw`() {
-        val offices = queueService.involvedOffices()
     }
 
     @Test
