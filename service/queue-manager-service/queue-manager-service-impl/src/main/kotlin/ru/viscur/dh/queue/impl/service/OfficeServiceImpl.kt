@@ -62,7 +62,7 @@ class OfficeServiceImpl(
                 location = referenceToLocation(id = officeId),
                 estDuration = estDuration
         )
-        val queue = queueItems(officeId)
+        val queue = queueService.queueItemsOfOffice(officeId)
         when (val userSeverity = patientService.severity(patientId)) {
             Severity.GREEN -> queue.add(queueItem)
             else -> {
@@ -85,14 +85,14 @@ class OfficeServiceImpl(
             queueService.queueItemsOfOffice(officeId).firstOrNull()?.subject?.id
 
     override fun deleteFirstPatientFromQueue(officeId: String) {
-        val queue = queueItems(officeId)
+        val queue = queueService.queueItemsOfOffice(officeId)
         if (queue.isEmpty()) return
         queue.removeAt(0)
         saveQueue(officeId, queue)
     }
 
     override fun deletePatientFromQueue(officeId: String, patientId: String) {
-        val queue = queueItems(officeId)
+        val queue = queueService.queueItemsOfOffice(officeId)
         queue.removeAt(queue.indexOfFirst { it.subject.id == patientId })
         saveQueue(officeId, queue)
     }
@@ -118,13 +118,4 @@ class OfficeServiceImpl(
         queueService.deleteQueueItemsOfOffice(officeId)
         queue.forEachIndexed { index, it -> resourceService.create(it.apply { onum = index }) }
     }
-
-    private fun queueItems(officeId: String): MutableList<QueueItem> =
-            queueService.queueItemsOfOffice(officeId).map { queueItem ->
-                val patientId = queueItem.subject.id
-                queueItem.apply {
-                    severity = patientService.severity(patientId!!)
-                    patientQueueStatus = patientService.byId(patientId!!).extension.queueStatus
-                }
-            }.toMutableList()
 }

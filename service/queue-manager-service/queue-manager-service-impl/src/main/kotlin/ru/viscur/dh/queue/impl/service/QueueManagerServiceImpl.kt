@@ -11,6 +11,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -47,6 +48,11 @@ class QueueManagerServiceImpl(
                     ?: ServiceRequestExtension(executionOrder = index)
             resourceService.update(serviceRequest)
         }
+        val patient = patientService.byId(patientId)
+        resourceService.update(patient.apply {
+            extension.queueStatus = PatientQueueStatus.READY
+            extension.queueStatusUpdatedAt = now()
+        })
         addToOfficeQueue(patientId)
         return serviceRequests
     }
@@ -82,7 +88,8 @@ class QueueManagerServiceImpl(
             return 0.0
         }
         val observationType = conceptService.byCodeableConcept(serviceRequest.code)
-        observationType.parentCode ?: throw Exception("Observation type ${serviceRequest.code.code()} has no parentCode")
+        observationType.parentCode
+                ?: throw Exception("Observation type ${serviceRequest.code.code()} has no parentCode")
         val observationCategory = conceptService.parent(observationType)!!
         return observationCategory.priority ?: 0.5
     }
@@ -94,7 +101,7 @@ class QueueManagerServiceImpl(
         }
         val nextOfficeId = nextOfficeId(patientId)
         nextOfficeId?.run {
-            officeService.addPatientToQueue(patientId, nextOfficeId, estDuration(patientId, nextOfficeId))
+            officeService.addPatientToQueue(nextOfficeId, patientId, estDuration(patientId, nextOfficeId))
             patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
             checkEntryToOffice(nextOfficeId)
         } ?: run {
@@ -207,12 +214,11 @@ class QueueManagerServiceImpl(
     }
 
     override fun deleteQueue() {
-        println("deleteQueue")//todo
         queueService.involvedOffices().forEach {
-            officeService.changeStatus(it.id!!, LocationStatus.BUSY)
+            officeService.changeStatus(it.id, LocationStatus.BUSY)
         }
         queueService.involvedPatients().forEach {
-            patientStatusService.changeStatus(it.id!!, PatientQueueStatus.READY)
+            patientStatusService.changeStatus(it.id, PatientQueueStatus.READY)
         }
         resourceService.deleteAll(ResourceType.QueueItem)
     }
@@ -244,9 +250,9 @@ class QueueManagerServiceImpl(
         )))
         println("loqAndValidate , ${offices.size}")//todo
         offices.forEach { office ->
-            log.info("queue for ${office.id}:")
+            log.info("queue for ${office.id} (${office.status}):")
 
-            val queue = queueService.queueItemsOfOffice(office.id!!)
+            val queue = queueService.queueItemsOfOffice(office.id)
             queue.forEach { queueItem ->
                 log.info("$queueItem")
             }

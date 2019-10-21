@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
+import ru.viscur.dh.datastorage.api.QueueService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 import ru.viscur.dh.fhir.model.entity.HealthcareService
@@ -16,10 +17,13 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
         classes = [DataStorageConfig::class]
 )
 @EnableAutoConfiguration
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class ResourceServiceImplTest {
     @Autowired
     lateinit var resourceServiceImpl: ResourceService
+
+    @Autowired
+    lateinit var queueService: QueueService
 
     @Test
     @Order(1)
@@ -76,6 +80,11 @@ class ResourceServiceImplTest {
     @Test
     fun `should throw exception while deleting when resource with id doesn't exists`() {
         assertThrows(Exception::class.java) { resourceServiceImpl.deleteById(ResourceType.Location, "Location/Unknown") }
+    }
+
+    @Test
+    fun `queue  qw`() {
+        val offices = queueService.involvedOffices()
     }
 
     @Test
