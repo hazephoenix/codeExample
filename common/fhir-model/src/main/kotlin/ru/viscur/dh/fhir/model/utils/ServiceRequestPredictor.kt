@@ -8,9 +8,10 @@ import ru.viscur.dh.fhir.model.valueSets.*
  * Предсказатель списка необходимых услуг в системе МКБ-10 // TODO
  *
  * TODO навверно не в моделе он должен быть?
+ *
  */
 class ServiceRequestPredictor {
-    fun predict(listResource: ListResource): List<ServiceRequest> {
+    fun predict(conceptId: String): List<ServiceRequest> {
         val location = Location(
                 identifier = listOf(Identifier(value = "139", type = IdentifierType.OFFICE_NUMBER)),
                 name = "Смотровой кабинет"
