@@ -35,7 +35,7 @@ class LocationServiceImpl(
         val query = em.createNativeQuery("""
                 select resource
                 from (select jsonb_array_elements(r.resource -> 'extension' -> 'observationType') obsType, r.resource
-                      from location r) obsInfo
+                      from location r where r.resource -> 'extension' -> 'observationType' <> 'null') obsInfo
                 where obsInfo.obsType ->> 'code' = :observationType
             """)
         query.setParameter("observationType", type)

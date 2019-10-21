@@ -49,6 +49,7 @@ class QueueServiceImpl(
             from QueueItem r
             where r.resource -> 'location' ->> 'reference' = :officeRef""")
         query.setParameter("officeRef", "Location/$officeId")
+        query.executeUpdate()
     }
 
     override fun isPatientInOfficeQueue(patientId: String): String? {
@@ -58,7 +59,7 @@ class QueueServiceImpl(
             from QueueItem r
             where r.resource -> 'subject' ->> 'reference' = :patientRef
             """)
-        query.setParameter("patientRef", "Location/$patientId")
+        query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResource<QueueItem>()?.location?.id
     }
 

@@ -1,8 +1,10 @@
 package ru.viscur.dh.queue.rest
 
 import org.springframework.web.bind.annotation.*
+import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ListResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.queue.api.QueueManagerService
 
@@ -25,10 +27,11 @@ class QueueController(private val queueManagerService: QueueManagerService) {
 
     @PostMapping("/office/patientEntered")
     fun patientEntered(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
-        queueManagerService.patientEntered(
+        val serviceRequests = queueManagerService.patientEntered(
                 listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id!!,
                 listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id!!
         )
+        Bundle(entry = serviceRequests.map { BundleEntry(it) })
     }
 
     @PostMapping("/office/patientLeft")
@@ -49,8 +52,8 @@ class QueueController(private val queueManagerService: QueueManagerService) {
 
     @PostMapping("/patient/addToQueue")
     fun addToOfficeQueue(
-            @RequestParam patientId: String
-    ) = logAndValidateAfter { queueManagerService.addToOfficeQueue(patientId) }
+            @RequestBody patientReference: Reference
+    ) = logAndValidateAfter { queueManagerService.addToOfficeQueue(patientReference.id!!) }
 
     @DeleteMapping("/patient")
     fun patientLeftQueue(
@@ -65,6 +68,12 @@ class QueueController(private val queueManagerService: QueueManagerService) {
 
     @DeleteMapping("/history")
     fun deleteHistory() = logAndValidateAfter { queueManagerService.deleteHistory() }
+
+    @GetMapping
+    fun queueOfOffice(@RequestBody officeReference: Reference) = queueManagerService.queueOfOffice(officeReference.id!!)
+
+    @GetMapping("/info")
+    fun queueInfo() = queueManagerService.loqAndValidate()
 
     private fun <T> logAndValidateAfter(body: () -> T): T {
         val result = body()
