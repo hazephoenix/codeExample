@@ -1,0 +1,63 @@
+image: openjdk:11.0.4-jdk
+
+variables:
+  ssh_user: dh-central-server
+  server_addr: 84.201.154.121
+  server_port: 8080
+  service_name: dh-central-server-dev
+  install_path: ~/develop
+  # 2 min
+  health_check_timeout: 120000
+
+
+
+before_script:
+  ##
+  ## Install ssh-agent if not already installed, it is required by Docker.
+  ## (change apt-get to yum if you use an RPM-based image)
+  ##
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  ##
+  ## Run ssh-agent (inside the build environment)
+  ##
+  - eval $(ssh-agent -s)
+  ##
+  ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+  ## We're using tr to fix line endings which makes ed25519 keys work
+  ## without extra base64 encoding.
+  ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+  ##
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  ##
+  ## Create the SSH directory and give it the right permissions
+  ##
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  ##
+  - echo "$SSH_KNOWN_HOSTS_DH_STAGE" > ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script: ./gradlew build
+  artifacts:
+    paths:
+      - applications/dh-central-server-app/build/libs/dh-central-server-app.jar
+      - applications/dh-paramedic-device-app/build/libs/dh-paramedic-device-app.jar
+    expire_in: 3 days
+
+dh-stage-dev:
+  stage: deploy
+  script:
+    - ssh $ssh_user@$server_addr "sudo systemctl stop $service_name"
+    - scp ./applications/dh-central-server-app/build/libs/dh-central-server-app.jar $ssh_user@$server_addr:$install_path/dh-central-server-app.jar
+    - scp ./applications/dh-central-server-app/environment/dh-stage/application.properties $ssh_user@$server_addr:$install_path/application.properties
+    - ssh $ssh_user@$server_addr "chmod u+x $install_path/dh-central-server-app.jar"
+    - ssh $ssh_user@$server_addr "sudo systemctl start $service_name"
+    - ./gradlew waitForHttpEndpoint -Pendpoint=http://$server_addr:$server_port/systems-services/health-check -PwaitFor=$health_check_timeout
+
+  only:
+    - develop
