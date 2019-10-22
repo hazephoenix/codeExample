@@ -19,13 +19,13 @@ Content-Type: application/json
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:202",
+        "reference": "Location/Office:101",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/f1613d5c-353c-4825-971f-93db5b4f96e4",
+        "reference": "Patient/84fc7a54-c888-48b1-a460-176a67f36800",
         "type": "Patient"
       }
     }
@@ -38,7 +38,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:202",
+  "reference": "Location/Office:101",
   "type": "Location"
 }
 ###                                                                                Кабинет готов принять пациента
@@ -47,7 +47,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:202",
+  "reference": "Location/Office:101",
   "type": "Location"
 }
 ###

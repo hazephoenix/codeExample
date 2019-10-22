@@ -184,12 +184,11 @@ class PatientServiceImpl(
                 ?.entry?.find { it.item.type == ResourceType.ResourceTypeId.Practitioner }?.item
                 ?: throw Error("No responsible practitioner provided")
 
-        var resultServices = serviceRequests
-        serviceRequests.find { it.performer?.first() == responsiblePractitionerRef }
-                ?: run {
-                    val service = createPractitionerService(responsiblePractitionerRef)
-                    resultServices = serviceRequests.plusElement(service)
-                }
+        val extraServices =
+                if (serviceRequests.any { it.performer?.first() == responsiblePractitionerRef }) {
+                    listOf(createPractitionerService(responsiblePractitionerRef))
+                } else listOf()
+        val resultServices = serviceRequests + extraServices
 
         val carePlan = CarePlan(
                 subject = patientReference,
@@ -269,7 +268,7 @@ class PatientServiceImpl(
                                 systemId = ValueSetName.OBSERVATION_TYPES.id,
                                 display = "Осмотр хирурга"
                         ),
-                        //locationReference = listOf(Reference(location)),
+                        locationReference = listOf(Reference(locationService.byObservationType("Surgeon"))),
                         extension = ServiceRequestExtension(executionOrder = 1)
                 )
         )

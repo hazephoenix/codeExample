@@ -1017,7 +1017,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         ]
       }
     }},
-    {
+    { "resource":  {
       "mode": "working",
       "status": "current",
       "resourceType": "ListResource",
@@ -1030,7 +1030,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           }
         }
       ]
-    }
+    }}
   ],
   "id": "ignored"
 }

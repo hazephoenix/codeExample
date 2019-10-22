@@ -17,11 +17,11 @@ enum class PatientQueueStatus {
     /**
      * Наступила его очередь в опр кабинет, идет в кабинет на обсл-е
      */
-    GOING_TO_SURVEY,
+    GOING_TO_OBSERVATION,
     /**
      * На осмотре в кабинете
      */
-    ON_SURVEY,
+    ON_OBSERVATION,
     /**
      * Закончил все обследования в маршрутном листе
      */

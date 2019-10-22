@@ -112,6 +112,7 @@ class OfficeServiceImpl(
         )
         office.extension = office.extension?.apply { lastPatientInfo = newLastPatientInfo }
                 ?: LocationExtension(lastPatientInfo = newLastPatientInfo)
+        resourceService.update(office)
     }
 
     private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
