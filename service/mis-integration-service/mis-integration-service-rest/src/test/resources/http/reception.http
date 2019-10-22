@@ -591,7 +591,12 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
               "system": "ValueSet/Observation_types"
             }
           ]
-        }
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
       }
     },
     {
@@ -610,7 +615,12 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
               "system": "ValueSet/Observation_types"
             }
           ]
-        }
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
       }
     },
     {
@@ -629,7 +639,12 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
               "system": "ValueSet/Observation_types"
             }
           ]
-        }
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
       }
     },
     {
@@ -648,7 +663,12 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
               "system": "ValueSet/Observation_types"
             }
           ]
-        }
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
       }
     },
     {
@@ -1015,9 +1035,14 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "system": "ValueSet/Observation_types"
           }
         ]
-      }
+      },
+      "locationReference": [
+        {
+          "reference": "Location/Office:ignored"
+        }
+      ]
     }},
-    { "resource":  {
+    { "resource": {
       "mode": "working",
       "status": "current",
       "resourceType": "ListResource",

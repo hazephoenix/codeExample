@@ -70,8 +70,8 @@ class PatientClassifier {
                     it.linkId == observation.code.coding.first().code
                 }.find { answer ->
                     val value = when {
-                        observation.valueQuantity != null -> observation.valueQuantity.value
-                        observation.valueInteger != null -> observation.valueInteger.toDouble()
+                        observation.valueQuantity != null -> observation.valueQuantity?.value
+                        observation.valueInteger != null -> observation.valueInteger?.toDouble()
                         else -> null
                     }
                     value?.let {

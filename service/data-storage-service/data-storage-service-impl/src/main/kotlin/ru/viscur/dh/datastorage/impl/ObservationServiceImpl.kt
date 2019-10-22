@@ -5,7 +5,6 @@ import ru.digitalhospital.dhdatastorage.dto.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
-import java.lang.Error
 
 @Service
 class ObservationServiceImpl(
@@ -38,9 +37,20 @@ class ObservationServiceImpl(
      * Обновить обследование (добавить результаты) и соответствующее направление
      */
     override fun update(observation: Observation): Observation? {
-        val storedObservation = resourceService.byId(ResourceType.Observation, observation.id)
-        updateServiceRequestStatus(storedObservation)
-        return resourceService.update(observation)
+        return resourceService.byId(ResourceType.Observation, observation.id)
+                .let {
+                    updateServiceRequestStatus(it)
+
+                    it.performer = it.performer.union(observation.performer).toList().distinctBy { item -> item.id }
+                    it.status = observation.status
+                    it.valueBoolean = observation.valueBoolean
+                    it.valueInteger = observation.valueInteger
+                    it.valueQuantity = observation.valueQuantity
+                    it.valueSampledData = observation.valueSampledData
+                    it.valueString = observation.valueString
+
+                    resourceService.update(it)
+                }
     }
 
     /**
