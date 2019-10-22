@@ -6,7 +6,8 @@ import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
-import ru.viscur.dh.queue.api.QueueManagerService
+import ru.viscur.dh.fhir.model.valueSets.*
+import ru.viscur.dh.queue.api.*
 
 /**
  * Контроллер для обработки запросов подсистемы "АРМ Фельдшер"
@@ -21,6 +22,7 @@ class ReceptionController(
         val patientClassifier = PatientClassifier()
         val diagnosisPredictor = DiagnosisPredictor()
         val serviceRequestPredictor = ServiceRequestPredictor()
+        val responsibleSpecialistPredictor = ResponsibleSpecialistPredictor()
     }
 
     /**
@@ -37,16 +39,21 @@ class ReceptionController(
 
     /**
      * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ
+     *
+     * @param concept [Concept] код МКБ-10
      */
     @PostMapping("/serviceRequests")
-    fun predictServiceRequests(@RequestBody listResource: ListResource) = serviceRequestPredictor.predict(listResource)
+    fun predictServiceRequests(@RequestBody concept: Concept): Bundle {
+        val services = serviceRequestPredictor.predict(concept)
+        val specialists = responsibleSpecialistPredictor.predict(concept)
+        return Bundle(type = BundleType.BATCH.value, entry = (services + specialists).map { BundleEntry(it) })
+    }
 
     /**
      * Сохранение всех данных, полученных на АРМ Фельдшер
      */
     @PostMapping("/patient")
     fun savePatientData(@RequestBody bundle: Bundle): Bundle {
-        // TODO: fix dialect error
         val patientId = patientService.saveFinalPatientData(bundle)
         val serviceRequests = queueManagerService.registerPatient(patientId)
         queueManagerService.loqAndValidate()//todo del after

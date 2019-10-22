@@ -23,6 +23,7 @@ private constructor(
         val ChargeItem = createType<ChargeItem>(ResourceTypeId.ChargeItem)
         val Claim = createType<Claim>(ResourceTypeId.Claim)
         val ClinicalImpression = createType<ClinicalImpression>(ResourceTypeId.ClinicalImpression)
+        val CodeMap = createType<CodeMap>(ResourceTypeId.CodeMap)
         val Concept = createType<Concept>(ResourceTypeId.Concept)
         val Consent = createType<Consent>(ResourceTypeId.Consent)
         val DiagnosticReport = createType<DiagnosticReport>(ResourceTypeId.DiagnosticReport)
@@ -70,6 +71,7 @@ private constructor(
         ChargeItem,
         Claim,
         ClinicalImpression,
+        CodeMap,
         Concept,
         Consent,
         DiagnosticReport,

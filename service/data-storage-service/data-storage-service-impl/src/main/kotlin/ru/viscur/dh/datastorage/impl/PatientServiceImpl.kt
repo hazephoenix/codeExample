@@ -12,12 +12,11 @@ import ru.viscur.dh.fhir.model.enums.ClinicalImpressionStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.fhir.model.type.CarePlanActivity
-import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.genId
 import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.valueSets.IdentifierType
+import ru.viscur.dh.fhir.model.valueSets.*
 import java.sql.Timestamp
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -166,9 +165,11 @@ class PatientServiceImpl(
         cancelActiveClinicalImpression(patient.id)//todo может лучше сообщать о том, что есть активное обращение?
 
         val patientReference = Reference(patient)
-        val diagnosticReport = getResources<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport).first().let { resourceService.create(it) }
+        val diagnosticReport = getResources<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
+                .first().let { resourceService.create(it) }
         val paramedicReference = diagnosticReport.performer.first()
         val date = now()
+
         val serviceRequests = getResources<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest).map {
             val observationType = it.code.code()
             resourceService.create(it.apply {
@@ -176,14 +177,28 @@ class PatientServiceImpl(
                 locationReference = listOf(Reference(locationService.byObservationType(observationType)))
             })
         }
+
+        // Проверяем наличие направления к ответственному врачу, если нет - создаем
+        val responsiblePractitionerRef = getResources<ListResource>(resources, ResourceType.ResourceTypeId.ListResource)
+                .firstOrNull()
+                ?.entry?.find { it.item.type == ResourceType.ResourceTypeId.Practitioner }?.item
+                ?: throw Error("No responsible practitioner provided")
+
+        var resultServices = serviceRequests
+        serviceRequests.find { it.performer?.first() == responsiblePractitionerRef }
+                ?: run {
+                    val service = createPractitionerService(responsiblePractitionerRef)
+                    resultServices = serviceRequests.plusElement(service)
+                }
+
         val carePlan = CarePlan(
                 subject = patientReference,
-                author = paramedicReference,
+                author = responsiblePractitionerRef, // ответственный врач
                 contributor = paramedicReference,
                 status = CarePlanStatus.active,
                 created = Timestamp(date.time),
                 title = "Маршрутный лист",
-                activity = serviceRequests
+                activity = resultServices
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
 //        val encounter = Encounter(subject = patientReference).let { resourceService.create(it) }todo encounter это инфа о госпитализации, создадим при заполнении инфы о госпитализации. и в supportingInfo класть?
@@ -214,7 +229,7 @@ class PatientServiceImpl(
                 status = ClinicalImpressionStatus.active,
                 date = date,
                 subject = patientReference,
-                assessor = paramedicReference,
+                assessor = responsiblePractitionerRef, // ответственный врач
                 summary = "Заключение: ${diagnosticReport.conclusion}",
                 supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) }
         ).let { resourceService.create(it) }
@@ -245,6 +260,19 @@ class PatientServiceImpl(
         }
     }
 
+    // TODO: создать услугу по коду специальности и привязать врача к кабинету
+    fun createPractitionerService(practitionerRef: Reference): ServiceRequest =
+        resourceService.create(
+                ServiceRequest(
+                        code = CodeableConcept(
+                                code = "Surgeon",
+                                systemId = ValueSetName.OBSERVATION_TYPES.id,
+                                display = "Осмотр хирурга"
+                        ),
+                        //locationReference = listOf(Reference(location)),
+                        extension = ServiceRequestExtension(executionOrder = 1)
+                )
+        )
 
     private fun <T> getResources(resources: List<BaseResource>, type: ResourceType.ResourceTypeId): List<T> where T : BaseResource {
         return resources.filter { it.resourceType == type }.map { it as T }

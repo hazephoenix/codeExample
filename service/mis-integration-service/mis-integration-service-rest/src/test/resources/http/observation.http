@@ -5,6 +5,11 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
+GET http://localhost:8080/Observation?status=registered&patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
+Accept: application/json
+
+###
+
 POST http://localhost:8080/Observation
 Content-Type: application/json
 
@@ -31,7 +36,10 @@ Content-Type: application/json
     "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
     "type": "Patient"
   },
-  "valueInteger": 110
+  "valueInteger": 110,
+  "basedOn" : {
+    "reference": "ServiceRequest/c22a6a83-7727-4ff8-8863-7aefe83e4736"
+  }
 }
 
 ###
@@ -42,7 +50,7 @@ Content-Type: application/json
 {
   "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
   "resourceType": "Observation",
-  "status": "registered",
+  "status": "final",
   "issued": "1970-01-01T00:57:04.242+0000",
   "code": {
     "coding": [

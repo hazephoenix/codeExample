@@ -2,3 +2,6 @@
 .gradle
 build
 *.log
+
+out
+logs

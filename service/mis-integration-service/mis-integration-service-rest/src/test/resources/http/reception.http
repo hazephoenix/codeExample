@@ -998,7 +998,38 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           ]
         }
       ]
-    }
+    }},
+    { "resource":  {
+      "id": "2fa4a612-dffe-4382-a03b-804fc48263e7",
+      "resourceType": "ServiceRequest",
+      "status": "active",
+      "subject": {
+        "reference": "Patient/1a77ce5f-8473-4627-84b0-b1ddc5c46364",
+        "type": "Patient"
+      },
+      "code": {
+        "coding": [
+          {
+            "code": "Surgeon",
+            "display": "Осмотр хирурга",
+            "system": "ValueSet/Observation_types"
+          }
+        ]
+      }
+    }},
+    {
+      "mode": "working",
+      "status": "current",
+      "resourceType": "ListResource",
+      "id": "12121",
+      "entry": [
+        {
+          "item": {
+            "reference": "Practitioner/ignored",
+            "type": "Practitioner"
+          }
+        }
+      ]
     }
   ],
   "id": "ignored"
