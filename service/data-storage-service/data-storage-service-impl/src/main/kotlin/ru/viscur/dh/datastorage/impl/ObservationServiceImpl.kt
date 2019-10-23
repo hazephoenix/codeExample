@@ -1,7 +1,6 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
-import ru.digitalhospital.dhdatastorage.dto.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -18,13 +17,26 @@ class ObservationServiceImpl(
     /**
      * Найти все обследования по id пациента и статусу обследования
      */
-    override fun findByPatient(patientId: String, status: ObservationStatus): List<Observation?> =
-        resourceService.all(
-            ResourceType.Observation,
-            RequestBodyForResources(
-                filter = mapOf("status" to status.name, "subject" to "Patient/$patientId")
-            )
-        )
+    override fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?> {
+        val query = em.createNativeQuery("""
+            select r.resource
+                from Observation r
+                where r.resource -> 'basedOn' ->> 'reference' in (
+                    select 'ServiceRequest/' || sr.id
+                    from ServiceRequest sr
+                    where 'ServiceRequest/' || sr.id in (
+                        select
+                            jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                        from CarePlan cp
+                        where cp.resource -> 'subject' ->> 'id' = :patientId
+                        )
+                )
+                and r.resource ->> 'status' = :status
+        """)
+        query.setParameter("patientId", patientId)
+        query.setParameter("status", status.toString())
+        return query.fetchResourceList()
+    }
 
     /**
      * Зарегистрировать обследование
@@ -66,9 +78,8 @@ class ObservationServiceImpl(
                     resourceService.byId(ResourceType.ServiceRequest, serviceRequestId)
                             .let {
                                 when (observation.status) {
-                                    ObservationStatus.registered -> it.status = ServiceRequestStatus.waiting_result
                                     ObservationStatus.final -> it.status = ServiceRequestStatus.completed
-                                    else -> it.status
+                                    else -> it.status = ServiceRequestStatus.waiting_result
                                 }
                                 resourceService.update(it)
                                 // Обновить статус маршрутного листа
@@ -118,7 +129,7 @@ class ObservationServiceImpl(
             select sr.resource from ServiceRequest sr
             where sr.resource ->>'status' != 'completed' and 'ServiceRequest/' || sr.id in (
                 select
-                            jsonb_array_elements(rIntr.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                    jsonb_array_elements(rIntr.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
                 from CarePlan rIntr
                 where rIntr.id = :carePlanId
             )

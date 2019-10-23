@@ -125,7 +125,7 @@ class ObservationServiceImplTest {
 
         // TODO: убрать, когда заменим метод поиска обследований
         // Поиск обследования по id пациента и статусу обследования
-        val createdObservation = observationService.findByPatient(patient.id, ObservationStatus.registered).firstOrNull()
+        val createdObservation = observationService.findByPatientAndStatus(patient.id, ObservationStatus.registered).firstOrNull()
         assertNotNull(createdObservation)
 
         // Ждем результатов обследования

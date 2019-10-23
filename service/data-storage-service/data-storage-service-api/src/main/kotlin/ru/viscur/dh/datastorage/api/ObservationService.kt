@@ -7,7 +7,7 @@ import ru.viscur.dh.fhir.model.enums.*
  * Сервис для работы с обследованиями
  */
 interface ObservationService {
-    fun findByPatient(patientId: String, status: ObservationStatus): List<Observation?>
+    fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?>
 
     /**
      * Создать запись об обследовании

@@ -20,8 +20,8 @@ class ObservationController(
      * Получить обследование по статусу и id пациента
      */
     @GetMapping
-    fun getByPatientId(@RequestParam patientId: String, @RequestParam status: ObservationStatus) =
-        observationService.findByPatient(patientId, status)
+    fun getByPatientAndStatus(@RequestParam patientId: String, @RequestParam status: ObservationStatus) =
+        observationService.findByPatientAndStatus(patientId, status)
 
     /**
      * Создать обследование
