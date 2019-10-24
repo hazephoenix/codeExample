@@ -58,6 +58,11 @@ fun referenceToPatient(id: String) = Reference(resourceType = ResourceType.Patie
 fun referenceToLocation(id: String) = Reference(resourceType = ResourceType.Location.id, id = id)
 
 /**
+ * Ссылка на [ru.viscur.dh.fhir.model.entity.Practitioner]
+ */
+fun referenceToPractitioner(id: String) = Reference(resourceType = ResourceType.Practitioner.id, id = id)
+
+/**
  * Пользуемся [CodeableConcept] однозначно: всегда в coding одно значение
  */
 fun CodeableConcept.code(): String = this.coding.first().code

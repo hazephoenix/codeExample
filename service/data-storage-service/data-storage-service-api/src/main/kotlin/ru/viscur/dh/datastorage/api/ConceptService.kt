@@ -19,4 +19,20 @@ interface ConceptService {
      * Получение родителя у [concept]
      */
     fun parent(concept: Concept): Concept?
+
+    /**
+     * Поиск концепта по коду
+     * @param valueSetId id ValueSet-а, где искать, [ru.viscur.dh.fhir.model.valueSets.ValueSetName]
+     * @param code значение кода
+     */
+    fun byCode(valueSetId: String, code: String): Concept
+
+    /**
+     * Поиск концепта по совпадениям в [Concept.alternatives]
+     * Пример:
+     * В [realAlternatives] м б "Выраженная СИЛЬНАЯ боль по утрам"
+     * В коде Violent_pain (острая боль) указаны альтернативы "острая боль", "сильная боль"
+     * В результате будет найден код "Violent_pain"
+     */
+    fun byAlternative(valueSetId: String, realAlternatives: List<String>): List<String>
 }

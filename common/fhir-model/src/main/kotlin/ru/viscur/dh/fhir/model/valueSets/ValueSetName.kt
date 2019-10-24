@@ -67,5 +67,9 @@ enum class ValueSetName(val id: String) {
     /**
      * Результат сортировки (степень тяжести пациента)
      */
-    SEVERITY("Severity")
+    SEVERITY("Severity"),
+    /**
+     * Жалобы пациента
+     */
+    COMPLAINTS("Complaints")
 }

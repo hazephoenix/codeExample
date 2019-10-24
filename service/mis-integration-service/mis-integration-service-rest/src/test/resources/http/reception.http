@@ -257,13 +257,19 @@ Content-Type: application/json
 
 POST http://localhost:8080/reception/serviceRequests
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
-{"mode": "working", "status": "current", "resourceType": "ListResource", "id":"12121","entry": [{"item" : {"reference": "Concept/ICD-10/", "type": "Concept"}}]}
+{
+  "diagnosis": "A01",
+  "complaints": ["Сильная боль в правом подреберье"],
+  "gender": "male"
+}
 
 ###
 
 POST http://localhost:8080/reception/diagnostic
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
   "resourceType": "Bundle",
@@ -587,7 +593,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "Surgeon",
+              "code": "СтХир",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -606,7 +612,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "OAK",
+              "code": "B03.016.002ГМУ_СП",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -625,7 +631,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "X_ray_of_the_leg",
+              "code": "A06.03.023",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -644,7 +650,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "Urologist",
+              "code": "СтУрол",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -1010,7 +1016,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "code": {
         "coding": [
           {
-            "code": "Surgeon",
+            "code": "СтХир",
             "display": "Осмотр хирурга",
             "system": "ValueSet/Observation_types"
           }
@@ -1025,7 +1031,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "entry": [
         {
           "item": {
-            "reference": "Practitioner/ignored",
+            "reference": "Practitioner/хирург_Петров",
             "type": "Practitioner"
           }
         }

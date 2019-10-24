@@ -1,9 +1,6 @@
 package ru.viscur.dh.datastorage.api
 
-import ru.viscur.dh.fhir.model.entity.Bundle
-import ru.viscur.dh.fhir.model.entity.ClinicalImpression
-import ru.viscur.dh.fhir.model.entity.Patient
-import ru.viscur.dh.fhir.model.entity.ServiceRequest
+import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.Severity
 
@@ -44,7 +41,7 @@ interface PatientService {
      * Все непройденные назначения в маршрутном листе в определенном кабинете,
      * упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
-    fun activeServiceRequests(patientId: String,  officeId: String): List<ServiceRequest>
+    fun activeServiceRequests(patientId: String, officeId: String): List<ServiceRequest>
 
     fun queueStatusOfPatient(patientId: String): PatientQueueStatus
 
@@ -52,6 +49,17 @@ interface PatientService {
      * Код предварительного диагноза
      */
     fun preliminaryDiagnosticConclusion(patientId: String): String?
+
+    /**
+     * Определение по диагнозу МКБ, полу пациента и жалобам:
+     * - предположительного списка услуг для маршрутного листа
+     * - отв врача (указан в одной из услуги)
+     * - списка врачей, из которых можно выбрать отв.
+     * @param diagnosis код диагноза МКБ-10
+     * @param gender пол пациента
+     * @param complaints жалобы
+     */
+    fun predictServiceRequests(diagnosis: String, gender: String, complaints: List<String>): Bundle
 
     /**
      * Метод сохраняет конечную (заполненную полностью) информацию о пациенте

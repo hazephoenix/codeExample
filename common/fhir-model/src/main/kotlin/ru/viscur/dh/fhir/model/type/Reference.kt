@@ -1,6 +1,7 @@
 package ru.viscur.dh.fhir.model.type
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -31,6 +32,7 @@ class Reference @JsonCreator constructor(
             type = resourceType
     )
 
+    @JsonIgnore
     val id: String? = reference?.substringAfter("/")
 
     override fun toString(): String {

@@ -55,6 +55,7 @@ class QueueManagerServiceImpl(
             extension.queueStatus = PatientQueueStatus.READY
             extension.queueStatusUpdatedAt = now()
         })
+        deleteFromOfficeQueue(patientId)//на случай пересоздания маршрутного листа
         addToOfficeQueue(patientId)
         return serviceRequests
     }
