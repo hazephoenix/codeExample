@@ -37,19 +37,7 @@ class QueueManagerServiceImpl(
     }
 
     override fun registerPatient(patientId: String): List<ServiceRequest> {
-        val serviceRequests = patientService.serviceRequests(patientId)
-                .sortedWith(
-                        compareBy({
-                            -priority(it)
-                        }, {
-                            -estWaitingInQueueWithType(patientId, it)
-                        })
-                )
-        serviceRequests.forEachIndexed { index, serviceRequest ->
-            serviceRequest.extension = serviceRequest.extension?.apply { executionOrder = index }
-                    ?: ServiceRequestExtension(executionOrder = index)
-            resourceService.update(serviceRequest)
-        }
+        val serviceRequests = calcServiceRequestExecOrders(patientId)
         val patient = patientService.byId(patientId)
         resourceService.update(patient.apply {
             extension.queueStatus = PatientQueueStatus.READY
@@ -95,6 +83,23 @@ class QueueManagerServiceImpl(
                 ?: throw Exception("Observation type ${serviceRequest.code.code()} has no parentCode")
         val observationCategory = conceptService.parent(observationType)!!
         return observationCategory.priority ?: 0.5
+    }
+
+    override fun calcServiceRequestExecOrders(patientId: String): List<ServiceRequest> {
+        val serviceRequests = patientService.activeServiceRequests(patientId)
+                .sortedWith(
+                        compareBy({
+                            -priority(it)
+                        }, {
+                            -estWaitingInQueueWithType(patientId, it)
+                        })
+                )
+        serviceRequests.forEachIndexed { index, serviceRequest ->
+            serviceRequest.extension = serviceRequest.extension?.apply { executionOrder = index }
+                    ?: ServiceRequestExtension(executionOrder = index)
+            resourceService.update(serviceRequest)
+        }
+        return serviceRequests
     }
 
     override fun addToOfficeQueue(patientId: String) {
@@ -271,13 +276,13 @@ class QueueManagerServiceImpl(
             }
 
             //при пустой очереди кабинет не должен иметь назначенного пациента
-            if (queue.isEmpty()){
-                if(office.status in listOf(LocationStatus.WAITING_PATIENT, LocationStatus.OBSERVATION)) {
+            if (queue.isEmpty()) {
+                if (office.status in listOf(LocationStatus.WAITING_PATIENT, LocationStatus.OBSERVATION)) {
                     str.add("ERROR. office has wrong status of queue ($office.status) with empty queue")
                 }
                 return@forEach
             }
-            
+
             val firstPatientId = officeService.firstPatientInQueue(office.id)
             val firstPatient = patientService.byId(firstPatientId!!)
             //статус первого в очереди
