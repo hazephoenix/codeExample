@@ -45,12 +45,12 @@ class Observation @JsonCreator constructor(
         @JsonProperty("specimen") val specimen: Reference? = null,
         @JsonProperty("note") val note: List<Annotation>? = null,
         @JsonProperty("interpretation") val interpretation: List<CodeableConcept>? = null,
-        @JsonProperty("valueQuantity") val valueQuantity: Quantity? = null,
-        @JsonProperty("valueCodeableConcept") val valueCodeableConcept: CodeableConcept? = null,
-        @JsonProperty("valueString") val valueString: String? = null,
-        @JsonProperty("valueBoolean") val valueBoolean: Boolean? = null,
-        @JsonProperty("valueInteger") val valueInteger: Int? = null,
-        @JsonProperty("valueSampledData") val valueSampledData: SampledData? = null
+        @JsonProperty("valueQuantity") var valueQuantity: Quantity? = null,
+        @JsonProperty("valueCodeableConcept") var valueCodeableConcept: CodeableConcept? = null,
+        @JsonProperty("valueString") var valueString: String? = null,
+        @JsonProperty("valueBoolean") var valueBoolean: Boolean? = null,
+        @JsonProperty("valueInteger") var valueInteger: Int? = null,
+        @JsonProperty("valueSampledData") var valueSampledData: SampledData? = null
         //val valueRange:  Range ,//todo подключить если необходимо использование
         //val valueRatio:  Ratio ,
         //val valueTime: <time>,
