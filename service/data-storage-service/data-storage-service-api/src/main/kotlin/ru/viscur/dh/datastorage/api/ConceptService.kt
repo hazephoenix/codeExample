@@ -2,6 +2,7 @@ package ru.viscur.dh.datastorage.api
 
 import ru.viscur.dh.fhir.model.entity.Concept
 import ru.viscur.dh.fhir.model.type.CodeableConcept
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
 /**
  * Created at 16.10.2019 17:52 by SherbakovaMA
@@ -26,6 +27,12 @@ interface ConceptService {
      * @param code значение кода
      */
     fun byCode(valueSetId: String, code: String): Concept
+
+    /**
+     * По коду родителя
+     * при незаданном parentCode ищет корневые элементы
+     */
+    fun byParent(valueSet: ValueSetName, parentCode: String? = null): List<Concept>
 
     /**
      * Поиск концепта по совпадениям в [Concept.alternatives]

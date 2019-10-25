@@ -1,6 +1,7 @@
 package ru.viscur.dh.queue.impl.service
 
 import org.springframework.stereotype.*
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
@@ -29,6 +30,11 @@ class OfficeServiceImpl(
         private val resourceService: ResourceService,
         private val queueService: QueueService
 ) : OfficeService {
+
+    override fun all() = resourceService.all(ResourceType.Location, RequestBodyForResources(
+            filter = mapOf("id" to "Office:"),
+            filterLike = true
+    ))
 
     override fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
         val now = now()
@@ -81,7 +87,7 @@ class OfficeServiceImpl(
         saveQueue(officeId, queue)
     }
 
-    override fun firstPatientInQueue(officeId: String): String? =
+    override fun firstPatientIdInQueue(officeId: String): String? =
             queueService.queueItemsOfOffice(officeId).firstOrNull()?.subject?.id
 
     override fun deleteFirstPatientFromQueue(officeId: String) {

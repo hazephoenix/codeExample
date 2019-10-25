@@ -10,6 +10,11 @@ import ru.viscur.dh.fhir.model.entity.Practitioner
 interface PractitionerService {
 
     /**
+     * Все мед. работники
+     */
+    fun all(): List<Practitioner>
+
+    /**
      * Мед. работник по [id]
      */
     fun byId(id: String): Practitioner
