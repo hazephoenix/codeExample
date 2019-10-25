@@ -3,6 +3,7 @@ package ru.viscur.dh.fhir.model.utils
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.Period
@@ -66,3 +67,9 @@ fun referenceToPractitioner(id: String) = Reference(resourceType = ResourceType.
  * Пользуемся [CodeableConcept] однозначно: всегда в coding одно значение
  */
 fun CodeableConcept.code(): String = this.coding.first().code
+
+/**
+ * Найти [ValueSetName] по его id
+ */
+fun valueSetNameById(id: String) = ValueSetName.values().find { it.id == id }
+        ?: throw Exception("Error. Can't find ValueSet with id '$id'. Available ids: ${ValueSetName.values().map { it.id }.joinToString()}")

@@ -1,6 +1,7 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.Practitioner
@@ -18,6 +19,8 @@ class PractitionerServiceImpl(
 
     @PersistenceContext
     private lateinit var em: EntityManager
+
+    override fun all() = resourceService.all(ResourceType.Practitioner, RequestBodyForResources(filter = mapOf()))
 
     override fun byId(id: String): Practitioner = resourceService.byId(ResourceType.Practitioner, id)
 

@@ -223,8 +223,18 @@ class PatientServiceImpl(
         val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.toString() }?.value
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем
-        patient = patientByEnp?.let { byEnp -> resourceService.update(patient.apply { id = byEnp.id }) }
-                ?: let { resourceService.create(patient) }
+        patient = patientByEnp?.let { byEnp ->
+            resourceService.update(patient.apply {
+                id = byEnp.id
+                extension.queueStatusUpdatedAt = byEnp.extension.queueStatusUpdatedAt
+                extension.queueStatus = byEnp.extension.queueStatus
+            })
+        } ?: let {
+            resourceService.create(patient.apply {
+                extension.queueStatusUpdatedAt = now()
+                extension.queueStatus = PatientQueueStatus.READY
+            })
+        }
 
         cancelActiveClinicalImpression(patient.id)//todo может лучше сообщать о том, что есть активное обращение?
 
@@ -252,7 +262,6 @@ class PatientServiceImpl(
             val observationType = it.code.code()
             resourceService.create(it.apply {
                 subject = patientReference
-                locationReference = listOf(Reference(locationService.byObservationType(observationType)))
             })
         }
         val carePlan = CarePlan(

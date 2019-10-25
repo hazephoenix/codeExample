@@ -48,7 +48,7 @@ class ResourceServiceImpl : ResourceService {
     @Tx(readOnly = true)
     override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<T>
             where T : BaseResource {
-        val parts = GeneratedQueryParts(requestBody.filter, requestBody.orderBy)
+        val parts = GeneratedQueryParts(requestBody.filter, requestBody.filterLike, requestBody.orderBy)
         val query = em
                 .createNativeQuery(
                         """
@@ -104,7 +104,8 @@ class ResourceServiceImpl : ResourceService {
 
 
     private class GeneratedQueryParts(
-            filter: Map<String, String>? = null,
+            filter: Map<String, String?>? = null,
+            filterLike: Boolean = false,
             orderBy: List<String>? = null
     ) {
         val params = mutableListOf<Any>()
@@ -112,7 +113,7 @@ class ResourceServiceImpl : ResourceService {
         val orderStatements = mutableListOf<String>()
 
         init {
-            addWherePart(filter)
+            addWherePart(filter, filterLike)
             addOrderPart(orderBy)
         }
 
@@ -139,11 +140,16 @@ class ResourceServiceImpl : ResourceService {
             }
         }
 
-        private fun addWherePart(filter: Map<String, String>?) {
+        private fun addWherePart(filter: Map<String, String?>?, filterLike: Boolean) {
             filter?.forEach { (field, value) ->
-                whereStatements.add("r.resource ->> ?${params.size + 1} ilike ?${params.size + 2}")
-                params.add(field)
-                params.add("%$value%")
+                value?.run {
+                    whereStatements.add("r.resource ->> ?${params.size + 1} ${if (filterLike) "ilike" else "="} ?${params.size + 2}")
+                    params.add(field)
+                    params.add(if (filterLike) "%$value%" else value)
+                } ?: run {
+                    whereStatements.add("r.resource ->> ?${params.size + 1} is null")
+                    params.add(field)
+                }
             }
         }
 

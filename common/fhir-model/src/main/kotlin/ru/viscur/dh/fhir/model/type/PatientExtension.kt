@@ -9,7 +9,7 @@ import java.util.*
 /**
  * Created at 03.10.2019 8:29 by SherbakovaMA
  *
- * Доп. поля пациента
+ * Доп. поля [пациента Patient][ru.viscur.dh.fhir.model.entity.Patient]
  *
  * @param nationality национальность
  * @param birthPlace место рождения
