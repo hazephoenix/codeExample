@@ -45,8 +45,8 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           {
             "coding": [
               {
-                "code": "ignored",
-                "system": "ValueSet/ignored",
+                "code": "Claim_result_types:Hospitalization",
+                "system": "ValueSet/Claim_result_types",
                 "display": "Госпитализация"
               }
             ]
