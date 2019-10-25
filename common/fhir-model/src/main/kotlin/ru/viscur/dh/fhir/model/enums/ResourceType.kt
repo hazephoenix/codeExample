@@ -64,7 +64,7 @@ private constructor(
 
     }
 
-    enum class ResourceTypeId {
+    enum class  ResourceTypeId {
         Bundle,
         CarePlan,
         CareTeam,
