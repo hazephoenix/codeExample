@@ -5,13 +5,49 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
-GET http://localhost:8080/ClinicalImpression?practitionerId=ignored
+GET http://localhost:8080/examination/patients?practitionerId=ignored
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/ClinicalImpression/finish?patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
+POST http://localhost:8080/examination/serviceRequests?patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "СтХир",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
+      }
+    }
+  ]
+}
+
+###
+
+POST http://localhost:8080/examination?patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

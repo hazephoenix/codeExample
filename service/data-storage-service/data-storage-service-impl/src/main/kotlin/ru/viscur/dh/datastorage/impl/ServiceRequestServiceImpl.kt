@@ -2,16 +2,22 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.impl.config.annotation.*
 import ru.viscur.dh.fhir.model.entity.*
+import ru.viscur.dh.fhir.model.enums.*
+import ru.viscur.dh.fhir.model.type.*
 import javax.persistence.*
 
 @Service
-class ServiceRequestServiceImpl : ServiceRequestService {
+class ServiceRequestServiceImpl(
+        private val resourceService: ResourceService,
+        private val carePlanService: CarePlanService
+) : ServiceRequestService {
 
     @PersistenceContext
     private lateinit var em: EntityManager
 
-    override fun getAll(patientId: String): List<ServiceRequest> {
+    override fun all(patientId: String): List<ServiceRequest> {
         //active clinicalImpression -> carePlan -> all serviceRequests
         val query = em.createNativeQuery("""
             select sr.resource
@@ -32,7 +38,7 @@ class ServiceRequestServiceImpl : ServiceRequestService {
         return query.fetchResourceList()
     }
 
-    override fun getActive(patientId: String, officeId: String): List<ServiceRequest> {
+    override fun active(patientId: String, officeId: String): List<ServiceRequest> {
         //active clinicalImpression -> carePlan -> active serviceRequests in office
         val query = em.createNativeQuery("""
             select sr.resource
@@ -60,7 +66,7 @@ class ServiceRequestServiceImpl : ServiceRequestService {
     }
 
 
-    override fun getActive(patientId: String): List<ServiceRequest> {
+    override fun active(patientId: String): List<ServiceRequest> {
         //active clinicalImpression -> carePlan -> active serviceRequests
         val query = em.createNativeQuery("""
             select sr.resource
@@ -80,5 +86,21 @@ class ServiceRequestServiceImpl : ServiceRequestService {
             """)
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResourceList()
+    }
+
+    // TODO: отладить добавление направлений
+    @Tx
+    override fun add(patientId: String, serviceRequestList: List<ServiceRequest>): List<ServiceRequest> {
+        val serviceRequests = serviceRequestList.map { resourceService.create(it) }
+        val activities = serviceRequests.map { CarePlanActivity(Reference(it)) }
+
+        carePlanService.active(patientId)?.let {
+            resourceService.update(it.apply {
+                it.status = CarePlanStatus.active
+                it.activity = activities.plus(it.activity)
+            })
+        }
+
+        return serviceRequests
     }
 }

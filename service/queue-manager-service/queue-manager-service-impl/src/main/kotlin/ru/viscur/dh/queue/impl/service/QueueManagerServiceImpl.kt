@@ -80,7 +80,7 @@ class QueueManagerServiceImpl(
     }
 
     override fun calcServiceRequestExecOrders(patientId: String): List<ServiceRequest> {
-        var serviceRequests = serviceRequestService.getAll(patientId)
+        var serviceRequests = serviceRequestService.all(patientId)
         val severity = patientService.severity(patientId)
         val serviceRequestsWithEstWaiting = serviceRequests.map { serviceRequest ->
             val officeIdWithEstWaiting = locationService.byObservationType(serviceRequest.code.code()).map { officeId ->
@@ -146,7 +146,7 @@ class QueueManagerServiceImpl(
      * id следующего кабинета: непройденное обследование в маршрутном листе пациента с минимальным [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
     private fun nextOfficeId(patientId: String): String? =
-            serviceRequestService.getActive(patientId).firstOrNull()?.locationReference?.first()?.id
+            serviceRequestService.active(patientId).firstOrNull()?.locationReference?.first()?.id
 
     override fun deleteFromOfficeQueue(patientId: String) {
         val patient = patientService.byId(patientId)
@@ -179,7 +179,7 @@ class QueueManagerServiceImpl(
                 officeService.changeStatus(officeId, LocationStatus.OBSERVATION, patientId)
                 patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_OBSERVATION, officeId)
 //                queueService.deleteQueueItemsOfOffice(patientId)//todo оставлять в очереди или нет?..
-                return serviceRequestService.getActive(patientId, officeId)
+                return serviceRequestService.active(patientId, officeId)
             }
         }
         return listOf()

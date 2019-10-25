@@ -11,7 +11,7 @@ class ClaimServiceImpl : ClaimService {
     @PersistenceContext
     private lateinit var em: EntityManager
 
-    override fun getActive(patientId: String): Claim? {
+    override fun active(patientId: String): Claim? {
         val query = em.createNativeQuery("""
             select c.resource
             from Claim c

@@ -20,7 +20,7 @@ class ClinicalImpressionServiceImpl(
     @PersistenceContext
     private lateinit var em: EntityManager
 
-    override fun getActive(patientId: String): ClinicalImpression? {
+    override fun active(patientId: String): ClinicalImpression? {
         val query = em.createNativeQuery("""
                 select ci.resource
                 from clinicalImpression ci
@@ -32,7 +32,7 @@ class ClinicalImpressionServiceImpl(
     }
 
     override fun cancelActive(patientId: String) {
-        getActive(patientId)?.run {
+        active(patientId)?.run {
             resourceService.update(this.apply {
                 status = ClinicalImpressionStatus.cancelled
             })
@@ -74,7 +74,7 @@ class ClinicalImpressionServiceImpl(
         val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.DiagnosticReport.id).first()
         val patientId = diagnosticReport.subject.id ?: throw Error("No patient id provided in DiagnosticReport.subject")
 
-        getActive(patientId)?.let { clinicalImpression ->
+        active(patientId)?.let { clinicalImpression ->
             resourceService.create(diagnosticReport)
             var refs = listOf(Reference(diagnosticReport))
             getResourcesFromList<Encounter>(resources, ResourceType.Encounter.id)
@@ -84,20 +84,20 @@ class ClinicalImpressionServiceImpl(
                         refs = refs.plus(Reference(encounter))
                     }
 
-            carePlanService.getActive(patientId)?.let {
+            carePlanService.active(patientId)?.let {
                 resourceService.update(it.apply {
                     status = CarePlanStatus.completed
                 })
             }
 
-            claimService.getActive(patientId)?.let {
+            claimService.active(patientId)?.let {
                 resourceService.update(it.apply {
                     status = ClaimStatus.completed
                 })
             }
 
             clinicalImpression.status = ClinicalImpressionStatus.completed
-            clinicalImpression.supportingInfo = refs.plus(clinicalImpression.supportingInfo.orEmpty())
+            clinicalImpression.supportingInfo = refs.plus(clinicalImpression.supportingInfo)
 
             resourceService.update(clinicalImpression)
         } ?: throw Error("No active ClinicalImpression for patient with id $patientId found")

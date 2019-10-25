@@ -9,5 +9,5 @@ interface ClaimService {
     /**
      * Получить активное обращение пациента
      */
-    fun getActive(patientId: String): Claim?
+    fun active(patientId: String): Claim?
 }

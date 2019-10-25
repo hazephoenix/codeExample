@@ -10,6 +10,7 @@
 ###
 POST http://localhost:8080/queue/office/patientEntered
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
   "mode": "working",

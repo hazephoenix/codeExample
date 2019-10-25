@@ -6,17 +6,22 @@ interface ServiceRequestService {
     /**
      * Все назначения в маршрутном листе, упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
-    fun getAll(patientId: String): List<ServiceRequest>
+    fun all(patientId: String): List<ServiceRequest>
 
     /**
      * Все непройденные назначения в маршрутном листе в определенном кабинете,
      * упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
-    fun getActive(patientId: String, officeId: String): List<ServiceRequest>
+    fun active(patientId: String, officeId: String): List<ServiceRequest>
 
     /**
      * Все непройденные назначения в маршрутном листе,
      * упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
-    fun getActive(patientId: String): List<ServiceRequest>
+    fun active(patientId: String): List<ServiceRequest>
+
+    /**
+     * Добавить направления на обследования
+     */
+    fun add(patientId: String, serviceRequestList: List<ServiceRequest>): List<ServiceRequest>
 }

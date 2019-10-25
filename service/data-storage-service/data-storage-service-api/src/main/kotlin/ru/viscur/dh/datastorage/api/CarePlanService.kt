@@ -9,9 +9,9 @@ interface CarePlanService {
     /**
      * Получить активный маршрутный лист пациента
      */
-    fun getActive(patientId: String): CarePlan?
+    fun active(patientId: String): CarePlan?
     /**
      * Получить список активных маршрутных листов по id ответственного врача
      */
-    fun getActiveByPractitioner(practitionerId: String): List<CarePlan>
+    fun activeByPractitioner(practitionerId: String): List<CarePlan>
 }

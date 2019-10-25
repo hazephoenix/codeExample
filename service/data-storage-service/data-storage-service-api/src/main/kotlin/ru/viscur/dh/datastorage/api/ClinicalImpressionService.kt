@@ -9,7 +9,7 @@ interface ClinicalImpressionService {
     /**
      * Активное обращение пациента
      */
-    fun getActive(patientId: String): ClinicalImpression?
+    fun active(patientId: String): ClinicalImpression?
 
     /**
      * Отменить активное обращение, если таковое имеется.

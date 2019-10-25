@@ -40,5 +40,5 @@ class CarePlan @JsonCreator constructor(
         @JsonProperty("author") val author: Reference,
         @JsonProperty("contributor") val contributor: Reference,
         @JsonProperty("encounter") val encounter: Reference? = null,
-        @JsonProperty("activity") val activity: List<CarePlanActivity>
+        @JsonProperty("activity") var activity: List<CarePlanActivity>
 ) : BaseResource(id, identifier, resourceType)

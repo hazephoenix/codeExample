@@ -12,7 +12,7 @@ class CarePlanServiceImpl : CarePlanService {
     @PersistenceContext
     private lateinit var em: EntityManager
 
-    override fun getActiveByPractitioner(practitionerId: String): List<CarePlan> {
+    override fun activeByPractitioner(practitionerId: String): List<CarePlan> {
         val query = em.createNativeQuery("""
             select cp.resource
             from CarePlan cp
@@ -28,7 +28,7 @@ class CarePlanServiceImpl : CarePlanService {
         return query.fetchResourceList()
     }
 
-    override fun getActive(patientId: String): CarePlan? {
+    override fun active(patientId: String): CarePlan? {
         val query = em.createNativeQuery("""
             select cp.resource
             from CarePlan cp
