@@ -10,6 +10,11 @@ interface ObservationService {
     fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?>
 
     /**
+     * По назначению-основанию (basedOn - ServiceRequest)
+     */
+    fun byBaseOnServiceRequestId(id: String): Observation?
+
+    /**
      * Создать запись об обследовании
      */
     fun create(observation: Observation): Observation?

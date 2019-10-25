@@ -38,6 +38,16 @@ class ObservationServiceImpl(
         return query.fetchResourceList()
     }
 
+    override fun byBaseOnServiceRequestId(id: String): Observation? {
+        val query = em.createNativeQuery("""
+            select r.resource
+                from Observation r
+                where r.resource -> 'basedOn' ->> 'reference' = :serviceRequestRef
+        """)
+        query.setParameter("serviceRequestRef", "ServiceRequest/$id")
+        return query.fetchResourceList<Observation>().firstOrNull()
+    }
+
     /**
      * Зарегистрировать обследование
      *
