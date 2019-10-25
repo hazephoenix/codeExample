@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.valueSets.IdentifierType
         classes = [DataStorageConfig::class]
 )
 @EnableAutoConfiguration
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class ResourceServiceImplTest {
     @Autowired
     lateinit var resourceServiceImpl: ResourceService
@@ -118,17 +118,6 @@ class ResourceServiceImplTest {
         assertEquals(3, found.size)
     }
 
-    @Test
-    fun `my test`() {
-
-        val practitioner = Practitioner(id = "111",
-                qualification = PractitionerQualification(code = CodeableConcept(coding = listOf(Coding(code = "Surgeon", system = "ValueSet/Practitioner_qualifications")
-                ))),
-                identifier = listOf(Identifier("11111", IdentifierType.ENP)),
-                name = listOf(HumanName(given = listOf("Петров"), family = "Петров", text = "Петров П.П."))
-        )
-        resourceServiceImpl.create(practitioner)
-    }
 
     @Test
     fun `should delete resource by id`() {
