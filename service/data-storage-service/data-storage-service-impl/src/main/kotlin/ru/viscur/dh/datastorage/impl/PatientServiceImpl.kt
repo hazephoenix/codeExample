@@ -23,8 +23,7 @@ class PatientServiceImpl(
         private val clinicalImpressionService: ClinicalImpressionService,
         private val codeMapService: CodeMapService,
         private val conceptService: ConceptService,
-        private val practitionerService: PractitionerService,
-        private val observationService: ObservationService
+        private val practitionerService: PractitionerService
 ) : PatientService {
 
     @PersistenceContext
@@ -56,76 +55,6 @@ class PatientServiceImpl(
         q.setParameter("patientRef", "Patient/$patientId")
         val severityStr = q.singleResult as String
         return enumValueOf(severityStr)
-    }
-
-    override fun serviceRequests(patientId: String): List<ServiceRequest> {
-        //active clinicalImpression -> carePlan -> all serviceRequests
-        val query = em.createNativeQuery("""
-            select sr.resource
-            from serviceRequest sr
-            where 'ServiceRequest/' || sr.id in (
-                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                from carePlan cp
-                where 'CarePlan/' || cp.id in (
-                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                    from clinicalImpression ci
-                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                      and ci.resource ->> 'status' = 'active'
-                )
-            )
-            order by sr.resource -> 'extension' ->> 'executionOrder'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResourceList()
-    }
-
-    override fun activeServiceRequests(patientId: String): List<ServiceRequest> {
-        //active clinicalImpression -> carePlan -> active serviceRequests
-        val query = em.createNativeQuery("""
-            select sr.resource
-            from serviceRequest sr
-            where 'ServiceRequest/' || sr.id in (
-                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                from carePlan cp
-                where 'CarePlan/' || cp.id in (
-                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                    from clinicalImpression ci
-                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                      and ci.resource ->> 'status' = 'active'
-                )
-            )
-            and sr.resource->>'status' = 'active'
-            order by sr.resource -> 'extension' ->> 'executionOrder'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResourceList()
-    }
-
-    override fun activeServiceRequests(patientId: String, officeId: String): List<ServiceRequest> {
-        //active clinicalImpression -> carePlan -> active serviceRequests in office
-        val query = em.createNativeQuery("""
-            select sr.resource
-            from serviceRequest sr
-            where 'ServiceRequest/' || sr.id in (
-                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                from carePlan cp
-                where 'CarePlan/' || cp.id in (
-                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                    from clinicalImpression ci
-                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                      and ci.resource ->> 'status' = 'active'
-                )
-              )
-              and sr.resource ->> 'status' = 'active'
-              and :officeRef in (
-                select jsonb_array_elements(sIntr.resource -> 'locationReference') ->> 'reference'
-                from serviceRequest sIntr
-                where sIntr.id = sr.id)
-            order by sr.resource -> 'extension' ->> 'executionOrder'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        query.setParameter("officeRef", "Location/$officeId")
-        return query.fetchResourceList()
     }
 
     override fun queueStatusOfPatient(patientId: String): PatientQueueStatus {
@@ -218,7 +147,7 @@ class PatientServiceImpl(
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
         val resources = bundle.entry.map { it.resource.apply { id = genId() } }
-        var patient = getResources<Patient>(resources, ResourceType.ResourceTypeId.Patient).first()
+        var patient = getResourcesFromList<Patient>(resources, ResourceType.ResourceTypeId.Patient).first()
         val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.toString() }?.value
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем

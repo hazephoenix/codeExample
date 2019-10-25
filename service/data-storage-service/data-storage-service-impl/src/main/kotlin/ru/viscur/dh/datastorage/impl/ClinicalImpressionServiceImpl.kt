@@ -13,7 +13,8 @@ import javax.persistence.*
 class ClinicalImpressionServiceImpl(
         private val resourceService: ResourceService,
         private val carePlanService: CarePlanService,
-        private val claimService: ClaimService
+        private val claimService: ClaimService,
+        private val observationService: ObservationService
 ) : ClinicalImpressionService {
 
     @PersistenceContext
@@ -31,10 +32,32 @@ class ClinicalImpressionServiceImpl(
     }
 
     override fun cancelActive(patientId: String) {
-        getActive(patientId)?.let {
-            resourceService.update(it.apply {
+        getActive(patientId)?.run {
+            resourceService.update(this.apply {
                 status = ClinicalImpressionStatus.cancelled
             })
+            val references = this.supportingInfo
+            getResources(references, ResourceType.CarePlan).firstOrNull()?.run {
+                if (this.status in listOf(CarePlanStatus.active, CarePlanStatus.waiting_results, CarePlanStatus.results_are_ready)) {
+                    resourceService.update(this.apply {
+                        status = CarePlanStatus.cancelled
+                    })
+                    getResources(this.activity.map { it.outcomeReference }, ResourceType.ServiceRequest).forEach { serviceRequest ->
+                        if (serviceRequest.status in listOf(ServiceRequestStatus.active, ServiceRequestStatus.waiting_result)) {
+                            resourceService.update(serviceRequest.apply {
+                                status = ServiceRequestStatus.cancelled
+                            })
+                            observationService.byBaseOnServiceRequestId(serviceRequest.id)?.run {
+                                if (this.status == ObservationStatus.registered) {
+                                    resourceService.update(this.apply {
+                                        status = ObservationStatus.cancelled
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -79,4 +102,9 @@ class ClinicalImpressionServiceImpl(
             resourceService.update(clinicalImpression)
         } ?: throw Error("No active ClinicalImpression for patient with id $patientId found")
     }
+
+    private fun <T> getResources(references: List<Reference>, resourceType: ResourceType<T>): List<T>
+            where T : BaseResource =
+            references.filter { it.type == resourceType.id }.map { resourceService.byId(resourceType, it.id!!) }
+
 }
