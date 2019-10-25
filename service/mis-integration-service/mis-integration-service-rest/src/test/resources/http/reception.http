@@ -14,6 +14,7 @@ Accept: application/json
 
 POST http://localhost:8080/reception/severity
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
   "resourceType": "Bundle",
@@ -257,13 +258,15 @@ Content-Type: application/json
 
 POST http://localhost:8080/reception/serviceRequests
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
-{"mode": "working", "status": "current", "resourceType": "ListResource", "id":"12121","entry": [{"item" : {"reference": "Concept/ICD-10/", "type": "Concept"}}]}
+{"mode": "working", "status": "current", "resourceType": "ListResource", "id":"12121","entry": [{"item" : {"reference": "Concept/ICD-10/", "type": "Concept", "code":  "A01"}}]}
 
 ###
 
 POST http://localhost:8080/reception/diagnostic
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
   "resourceType": "Bundle",
@@ -795,6 +798,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "type": "Practitioner"
           }
         ],
+        "issued": "2019-10-24T12:01:00.00",
         "conclusionCode": [
           {
             "coding": [

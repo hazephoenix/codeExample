@@ -8,6 +8,7 @@ import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.genId
+import java.sql.*
 
 /**
  * Created at 01.10.2019 13:33 by SherbakovaMA
@@ -17,9 +18,10 @@ import ru.viscur.dh.fhir.model.utils.genId
  *
  * @param subject пациент, ссылка на [Patient]
  * @param performer кто исполнил (ссылка на [Practitioner], [Organization])
- * @param conclusionCode кодируемый тип заключения фельдшера (коды медицинских заключений полученных результатов)
+ * @param conclusionCode кодируемый тип заключения (коды медицинских заключений полученных результатов)
  * @param conclusion строковая интерпретация заключения
  * @param result измерения (множество полученных результатов измерений). ссылки на [Observation]
+ * @param issued дата и время принятия решения
  * @param status status статус (частичный/предварительный/окончательный)
  */
 class DiagnosticReport @JsonCreator constructor(
@@ -30,6 +32,7 @@ class DiagnosticReport @JsonCreator constructor(
         @JsonProperty("performer") val performer: List<Reference>,
         @JsonProperty("conclusion") val conclusion: String? = null,
         @JsonProperty("conclusionCode") val conclusionCode: List<CodeableConcept>,
+        @JsonProperty("issued") val issued: Timestamp,
 //        @JsonProperty("result") val result: List<Reference>,
         @JsonProperty("status") val status: DiagnosticReportStatus = DiagnosticReportStatus.registered
 ) : BaseResource(id, identifier, resourceType)

@@ -7,9 +7,7 @@ import ru.viscur.dh.fhir.model.enums.*
 import javax.persistence.*
 
 @Service
-class ObservationServiceImpl(
-        private val resourceService: ResourceService
-) : ObservationService {
+class ObservationServiceImpl(private val resourceService: ResourceService) : ObservationService {
 
     @PersistenceContext
     private lateinit var em: EntityManager

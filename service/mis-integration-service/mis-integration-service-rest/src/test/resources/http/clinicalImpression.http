@@ -1,0 +1,74 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+GET http://localhost:8080/ClinicalImpression?practitionerId=ignored
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+###
+
+POST http://localhost:8080/ClinicalImpression/finish?patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "status": "final",
+        "issued": "2019-10-23T10:20:37.979+0000",
+        "subject": {
+          "reference": "Patient/0c51d839-1e8f-4254-a4df-f32f25dbf6af"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/ignored"
+          }
+        ],
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "L93",
+                "system": "ValueSet/ICD-10",
+                "display": "Красная волчанка"
+              }
+            ]
+          },
+          {
+            "coding": [
+              {
+                "code": "ignored",
+                "system": "ValueSet/ignored",
+                "display": "Госпитализация"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Encounter",
+        "subject": {
+          "reference": "Patient/0c51d839-1e8f-4254-a4df-f32f25dbf6af"
+        },
+        "hospitalization": {
+          "destination": {
+            "reference": "Location/unknown"
+          }
+        }
+      }
+    }
+  ]
+}
+
+###

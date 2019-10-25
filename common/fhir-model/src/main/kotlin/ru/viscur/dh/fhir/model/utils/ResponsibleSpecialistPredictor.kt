@@ -5,7 +5,7 @@ import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 
 class ResponsibleSpecialistPredictor {
-    fun predict(concept: Concept): ListResource =
+    fun predict(conceptReference: Reference): ListResource =
         ListResource(
             title = "Предлагаемый список ответсвенных врачей",
             entry = listOf(

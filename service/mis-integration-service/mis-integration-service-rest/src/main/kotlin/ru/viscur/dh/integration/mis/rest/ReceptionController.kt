@@ -38,14 +38,15 @@ class ReceptionController(
     fun predictDiagnosis(@RequestBody bundle: Bundle) = diagnosisPredictor.predict()
 
     /**
-     * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ
+     * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ TODO
      *
      * @param concept [Concept] код МКБ-10
      */
     @PostMapping("/serviceRequests")
-    fun predictServiceRequests(@RequestBody concept: Concept): Bundle {
-        val services = serviceRequestPredictor.predict(concept)
-        val specialists = responsibleSpecialistPredictor.predict(concept)
+    fun predictServiceRequests(@RequestBody listResource: ListResource): Bundle {
+        val conceptReference = listResource.entry.first().item
+        val services = serviceRequestPredictor.predict(conceptReference)
+        val specialists = responsibleSpecialistPredictor.predict(conceptReference)
         return Bundle(type = BundleType.BATCH.value, entry = (services + specialists).map { BundleEntry(it) })
     }
 

@@ -13,9 +13,7 @@ import ru.viscur.dh.integration.mis.rest.config.annotation.*
 @RestController
 @RequestMapping("/Observation")
 @Validated
-class ObservationController(
-        private val observationService: ObservationService
-) {
+class ObservationController(private val observationService: ObservationService) {
     /**
      * Получить обследование по статусу и id пациента
      */
@@ -33,5 +31,5 @@ class ObservationController(
      * Обновить обследование
      */
     @PutMapping
-    fun update(@RequestBody @Exists observation: Observation) = observationService.update(observation)
+    fun update(@RequestBody @ResourceExists observation: Observation) = observationService.update(observation)
 }

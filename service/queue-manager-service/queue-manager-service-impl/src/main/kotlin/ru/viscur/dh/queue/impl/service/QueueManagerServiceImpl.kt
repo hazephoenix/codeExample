@@ -29,7 +29,8 @@ class QueueManagerServiceImpl(
         private val conceptService: ConceptService,
         private val locationService: LocationService,
         private val queueService: QueueService,
-        private val resourceService: ResourceService
+        private val resourceService: ResourceService,
+        private val serviceRequestService: ServiceRequestService
 ) : QueueManagerService {
 
     companion object {
@@ -37,7 +38,7 @@ class QueueManagerServiceImpl(
     }
 
     override fun registerPatient(patientId: String): List<ServiceRequest> {
-        val serviceRequests = patientService.serviceRequests(patientId)
+        val serviceRequests = serviceRequestService.getAll(patientId)
                 .sortedWith(
                         compareBy({
                             -priority(it)
@@ -137,7 +138,7 @@ class QueueManagerServiceImpl(
      * id следующего кабинета: непройденное обследование в маршрутном листе пациента с минимальным [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
     private fun nextOfficeId(patientId: String): String? =
-            patientService.activeServiceRequests(patientId).firstOrNull()?.locationReference?.first()?.id
+            serviceRequestService.getActive(patientId).firstOrNull()?.locationReference?.first()?.id
 
     override fun deleteFromOfficeQueue(patientId: String) {
         val patient = patientService.byId(patientId)
@@ -170,7 +171,7 @@ class QueueManagerServiceImpl(
                 officeService.changeStatus(officeId, LocationStatus.OBSERVATION, patientId)
                 patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_OBSERVATION, officeId)
 //                queueService.deleteQueueItemsOfOffice(patientId)//todo оставлять в очереди или нет?..
-                return patientService.activeServiceRequests(patientId, officeId)
+                return serviceRequestService.getActive(patientId, officeId)
             }
         }
         return listOf()
