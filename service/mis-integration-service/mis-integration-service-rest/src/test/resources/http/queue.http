@@ -124,6 +124,12 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
+###
+GET http://84.201.154.121:8080/queue/info
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
 
 ###                                                                                Непройденные обследования в очереди
 ###

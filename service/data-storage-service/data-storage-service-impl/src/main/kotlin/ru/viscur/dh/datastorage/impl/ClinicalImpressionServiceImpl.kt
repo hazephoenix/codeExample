@@ -33,7 +33,7 @@ class ClinicalImpressionServiceImpl(
     override fun cancelActive(patientId: String) {
         getActive(patientId)?.let {
             resourceService.update(it.apply {
-                status = ClinicalImpressionStatus.canceled
+                status = ClinicalImpressionStatus.cancelled
             })
         }
     }

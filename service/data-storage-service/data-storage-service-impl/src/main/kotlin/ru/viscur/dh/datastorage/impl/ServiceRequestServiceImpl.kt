@@ -3,15 +3,10 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
-import ru.viscur.dh.fhir.model.type.*
-import ru.viscur.dh.fhir.model.valueSets.*
 import javax.persistence.*
 
 @Service
-class ServiceRequestServiceImpl(
-        private val resourceService: ResourceService,
-        private val locationService: LocationService
-) : ServiceRequestService {
+class ServiceRequestServiceImpl : ServiceRequestService {
 
     @PersistenceContext
     private lateinit var em: EntityManager
@@ -86,18 +81,4 @@ class ServiceRequestServiceImpl(
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResourceList()
     }
-
-    // TODO: создать услугу по коду специальности и привязать врача к кабинету
-    override fun createForPractitioner(practitionerRef: Reference): ServiceRequest =
-            resourceService.create(
-                    ServiceRequest(
-                            code = CodeableConcept(
-                                    code = "Surgeon",
-                                    systemId = ValueSetName.OBSERVATION_TYPES.id,
-                                    display = "Осмотр хирурга"
-                            ),
-                            locationReference = listOf(Reference(locationService.byObservationType("Surgeon"))),
-                            extension = ServiceRequestExtension(executionOrder = 1)
-                    )
-            )
 }

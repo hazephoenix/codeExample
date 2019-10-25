@@ -6,7 +6,6 @@ import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
-import ru.viscur.dh.fhir.model.valueSets.*
 import ru.viscur.dh.queue.api.*
 
 /**
@@ -21,8 +20,6 @@ class ReceptionController(
     companion object {
         val patientClassifier = PatientClassifier()
         val diagnosisPredictor = DiagnosisPredictor()
-        val serviceRequestPredictor = ServiceRequestPredictor()
-        val responsibleSpecialistPredictor = ResponsibleSpecialistPredictor()
     }
 
     /**
@@ -43,12 +40,12 @@ class ReceptionController(
      * @param concept [Concept] код МКБ-10
      */
     @PostMapping("/serviceRequests")
-    fun predictServiceRequests(@RequestBody listResource: ListResource): Bundle {
-        val conceptReference = listResource.entry.first().item
-        val services = serviceRequestPredictor.predict(conceptReference)
-        val specialists = responsibleSpecialistPredictor.predict(conceptReference)
-        return Bundle(type = BundleType.BATCH.value, entry = (services + specialists).map { BundleEntry(it) })
-    }
+    fun predictServiceRequests(@RequestBody body: ServiceRequestPredictBody) =
+            patientService.predictServiceRequests(
+                    body.diagnosis,
+                    body.gender,
+                    body.complaints
+            )
 
     /**
      * Сохранение всех данных, полученных на АРМ Фельдшер
@@ -63,3 +60,12 @@ class ReceptionController(
         )
     }
 }
+
+/**
+ * Тело запроса для определения услуг в маршрутном листе и др.
+ */
+class ServiceRequestPredictBody(
+        val diagnosis: String,
+        val complaints: List<String>,
+        val gender: String
+)

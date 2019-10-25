@@ -20,6 +20,11 @@ interface QueueManagerService {
     fun registerPatient(patientId: String): List<ServiceRequest>
 
     /**
+     * Проставление/перепроставление порядка у невыполненных назначений в маршрутном листе пациента
+     */
+    fun calcServiceRequestExecOrders(patientId: String): List<ServiceRequest>
+
+    /**
      * Поставить пациента в очередь
      * У пациента может быть незавершенный маршрутный лист, но его удалили из очереди по какой-либо причине,
      * этой функцией мы снова добавляем его в очередь

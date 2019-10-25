@@ -12,7 +12,10 @@ import ru.viscur.dh.datastorage.api.QueueService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 import ru.viscur.dh.fhir.model.entity.HealthcareService
+import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.*
+import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 
 @SpringBootTest(
         classes = [DataStorageConfig::class]

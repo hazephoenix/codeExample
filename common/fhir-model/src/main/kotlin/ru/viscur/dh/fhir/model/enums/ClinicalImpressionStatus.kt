@@ -17,5 +17,5 @@ enum class ClinicalImpressionStatus {
     /**
      * Отменен
      */
-    canceled
+    cancelled
 }

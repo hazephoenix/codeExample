@@ -7,9 +7,7 @@ import ru.viscur.dh.datastorage.impl.utils.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
-import ru.viscur.dh.fhir.model.utils.code
-import ru.viscur.dh.fhir.model.utils.genId
-import ru.viscur.dh.fhir.model.utils.now
+import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.*
 import java.sql.Timestamp
 import javax.persistence.EntityManager
@@ -23,7 +21,9 @@ class PatientServiceImpl(
         private val resourceService: ResourceService,
         private val locationService: LocationService,
         private val clinicalImpressionService: ClinicalImpressionService,
-        private val serviceRequestService: ServiceRequestService
+        private val codeMapService: CodeMapService,
+        private val conceptService: ConceptService,
+        private val practitionerService: PractitionerService
 ) : PatientService {
 
     @PersistenceContext
@@ -78,6 +78,72 @@ class PatientServiceImpl(
         return diagnosticReport?.conclusionCode?.first()?.coding?.first()?.code
     }
 
+    override fun predictServiceRequests(diagnosis: String, gender: String, complaints: List<String>): Bundle {
+        //определяем отв. специальности -> врачей данной специальностей -> самый "свободный" на рабочем месте будет отв.
+        //услуги в маршрутном листе определяются по диагнозу + осмотр отв.
+        val responsibleQualifications = responsibleQualifications(diagnosis, gender, complaints)
+        val practitionersId = practitionerService.byQualifications(responsibleQualifications)
+        if (practitionersId.isEmpty()) {
+            throw Exception("ERROR. Can't find practitioners by qualifications: ${responsibleQualifications.joinToString()}")
+        }
+        val responsiblePractitionerId = practitionersId.first()//todo смотреть кто в системе + кто менее нагружен пациентами под отв-ю
+        val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
+
+        val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10.id, diagnosis)
+        val observationTypes =
+                (codeMapService.icdToObservationTypes(diagnosisConcept.parentCode!!) +
+                        observationTypeOfResponsible).distinct()
+
+        val serviceRequests = observationTypes.map { observationType ->
+            ServiceRequest(code = observationType)
+        }
+        serviceRequests.find { it.code.code() == observationTypeOfResponsible }!!.apply { performer = listOf(referenceToPractitioner(responsiblePractitionerId)) }
+
+        return Bundle(
+                entry =
+                (serviceRequests +
+                        ListResource(
+                                title = "Предлагаемый список ответсвенных врачей",
+                                entry = practitionersId.map { practitionerId -> ListResourceEntry(referenceToPractitioner(practitionerId)) }
+                        )
+                        )
+                        .map { BundleEntry(it) }
+        )
+    }
+
+    /**
+     * По диагнозу + полу пациента + жалобам определяются специальности, которые м б назначены отв. такому пациенту
+     */
+    private fun responsibleQualifications(diagnosis: String, gender: String, complaints: List<String>): List<String> {
+        val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10.id, diagnosis)
+        var qualifications = codeMapService.icdToPractitionerQualifications(diagnosisConcept.parentCode!!)
+        //фильтруем по связанному полу. Если были уролог или гинеколог, то один ненужный отсеивается по полу пациента
+        qualifications = qualifications.filter {
+            val qualification = conceptService.byCode(ValueSetName.PRACTITIONER_QUALIFICATIONS.id, it.code)
+            val relativeGender = qualification.relativeGender
+            relativeGender.isNullOrEmpty() || relativeGender == gender
+        }
+        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS.id, complaints)
+        //случай, если у пациента есть жалобы, указанные в условиях назначения отв. специалиста (например, с сильной болью направляем к хирургу при I70-I79)
+        val qualificationsFilteredByComplaints = qualifications.filter { qualification ->
+            complaintCodes.any { complaintCode ->
+                !qualification.condition.isNullOrEmpty() && complaintCode in qualification.condition!!.map { it.code }
+            }
+        }
+        if (qualificationsFilteredByComplaints.isNotEmpty()) {
+            return qualificationsFilteredByComplaints.map { it.code }
+        }
+        //случай, если у пациента нет сильной боли при I70-I79 (а хирург при сильной боли), тогда к терапевту, т к у него нет условий
+        //или случай, если у специальности(ей) нет условий приема для этого диагноза
+        val qualificationsWithoutConditions = qualifications.filter { it.condition.isNullOrEmpty() }
+        if (qualificationsWithoutConditions.isNotEmpty()) {
+            return qualificationsWithoutConditions.map { it.code }
+        }
+        //случай, если у всех специальностей для диагноза есть условия, которых нет у пациента
+        // (A00-A09 - хирург при острой боли, терапевт при лихорадке, а у пациента нет таких жалоб - тогда все равнозначны и без фильтрации
+        return qualifications.map { it.code }
+    }
+
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
         val resources = bundle.entry.map { it.resource.apply { id = genId() } }
@@ -96,25 +162,27 @@ class PatientServiceImpl(
         val paramedicReference = diagnosticReport.performer.first()
         val date = now()
 
-        val serviceRequests = getResourcesFromList<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest).map {
-            val observationType = it.code.code()
-            resourceService.create(it.apply {
-                subject = patientReference
-                locationReference = listOf(Reference(locationService.byObservationType(observationType)))
-            })
-        }
+        val serviceRequests = getResourcesFromList<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest)
 
         // Проверяем наличие направления к ответственному врачу, если нет - создаем
         val responsiblePractitionerRef = getResourcesFromList<ListResource>(resources, ResourceType.ResourceTypeId.ListResource)
                 .firstOrNull()
                 ?.entry?.find { it.item.type == ResourceType.ResourceTypeId.Practitioner }?.item
                 ?: throw Error("No responsible practitioner provided")
+        val responsiblePractitionerId = responsiblePractitionerRef.id!!
+        val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
+        val serviceRequestOfResponsiblePr = (serviceRequests.find { it.code.code() == observationTypeOfResponsible }
+                ?: ServiceRequest(code = observationTypeOfResponsible))
+                .apply { performer = listOf(referenceToPractitioner(responsiblePractitionerId)) }
 
-        val extraServices =
-                if (serviceRequests.any { it.performer?.first() == responsiblePractitionerRef }) {
-                    listOf(serviceRequestService.createForPractitioner(responsiblePractitionerRef))
-                } else listOf()
-        val resultServices = serviceRequests + extraServices
+        var resultServices = serviceRequests.filterNot { it.code.code() == observationTypeOfResponsible } + serviceRequestOfResponsiblePr
+        resultServices = resultServices.map {
+            val observationType = it.code.code()
+            resourceService.create(it.apply {
+                subject = patientReference
+                locationReference = listOf(Reference(locationService.byObservationType(observationType)))
+            })
+        }
 
         val carePlan = CarePlan(
                 subject = patientReference,
@@ -159,5 +227,13 @@ class PatientServiceImpl(
                 supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) }
         ).let { resourceService.create(it) }
         return patient.id
+    }
+
+    /**
+     * Тип обследования у отв врача по его id
+     */
+    private fun observationTypeOfResponsiblePractitioner(responsiblePractitionerId: String): String {
+        val responsiblePractitioner = practitionerService.byId(responsiblePractitionerId)
+        return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualification.code.code())
     }
 }
