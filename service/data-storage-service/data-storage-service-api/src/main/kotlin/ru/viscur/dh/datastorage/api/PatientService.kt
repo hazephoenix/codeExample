@@ -4,6 +4,7 @@ import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.Severity
 
+
 /**
  * Created at 15.10.2019 11:51 by SherbakovaMA
  *
@@ -28,21 +29,8 @@ interface PatientService {
     fun severity(patientId: String): Severity
 
     /**
-     * Все назначения в маршрутном листе, упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
+     * Узнать статус пациента в очереди [PatientQueueStatus]
      */
-    fun serviceRequests(patientId: String): List<ServiceRequest>
-
-    /**
-     * Все непройденные назначения в маршрутном листе, упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
-     */
-    fun activeServiceRequests(patientId: String): List<ServiceRequest>
-
-    /**
-     * Все непройденные назначения в маршрутном листе в определенном кабинете,
-     * упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
-     */
-    fun activeServiceRequests(patientId: String, officeId: String): List<ServiceRequest>
-
     fun queueStatusOfPatient(patientId: String): PatientQueueStatus
 
     /**
@@ -69,9 +57,4 @@ interface PatientService {
      * @return id пациента в data-storage
      */
     fun saveFinalPatientData(bundle: Bundle): String
-
-    /**
-     * Активное обращение пациента
-     */
-    fun activeClinicalImpression(patientId: String): ClinicalImpression?
 }

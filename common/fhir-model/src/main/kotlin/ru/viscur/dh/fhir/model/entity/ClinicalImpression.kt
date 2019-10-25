@@ -32,7 +32,7 @@ class ClinicalImpression @JsonCreator constructor(
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("assessor") val assessor: Reference,
         @JsonProperty("investigation") val investigation: List<Any>? = null,
-        @JsonProperty("supportingInfo") val supportingInfo: List<Reference>,
+        @JsonProperty("supportingInfo") var supportingInfo: List<Reference>,
         @JsonProperty("summary") val summary: String,
         @JsonProperty("encounter") val encounter: Reference? = null
 ) : BaseResource(id, identifier, resourceType)

@@ -3,6 +3,7 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.datastorage.impl.utils.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
@@ -19,6 +20,7 @@ import javax.persistence.PersistenceContext
 class PatientServiceImpl(
         private val resourceService: ResourceService,
         private val locationService: LocationService,
+        private val clinicalImpressionService: ClinicalImpressionService,
         private val codeMapService: CodeMapService,
         private val conceptService: ConceptService,
         private val practitionerService: PractitionerService,
@@ -233,18 +235,18 @@ class PatientServiceImpl(
             })
         }
 
-        cancelActiveClinicalImpression(patient.id)//todo может лучше сообщать о том, что есть активное обращение?
+        clinicalImpressionService.cancelActive(patient.id)//todo может лучше сообщать о том, что есть активное обращение?
 
         val patientReference = Reference(patient)
-        val diagnosticReport = getResources<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
+        val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
                 .first().let { resourceService.create(it) }
         val paramedicReference = diagnosticReport.performer.first()
         val date = now()
 
-        val serviceRequests = getResources<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest)
+        val serviceRequests = getResourcesFromList<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest)
 
         // Проверяем наличие направления к ответственному врачу, если нет - создаем
-        val responsiblePractitionerRef = getResources<ListResource>(resources, ResourceType.ResourceTypeId.ListResource)
+        val responsiblePractitionerRef = getResourcesFromList<ListResource>(resources, ResourceType.ResourceTypeId.ListResource)
                 .firstOrNull()
                 ?.entry?.find { it.item.type == ResourceType.ResourceTypeId.Practitioner }?.item
                 ?: throw Error("No responsible practitioner provided")
@@ -261,6 +263,7 @@ class PatientServiceImpl(
                 subject = patientReference
             })
         }
+
         val carePlan = CarePlan(
                 subject = patientReference,
                 author = responsiblePractitionerRef, // ответственный врач
@@ -272,24 +275,24 @@ class PatientServiceImpl(
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
 //        val encounter = Encounter(subject = patientReference).let { resourceService.create(it) }todo encounter это инфа о госпитализации, создадим при заполнении инфы о госпитализации. и в supportingInfo класть?
-        val claim = getResources<Claim>(resources, ResourceType.ResourceTypeId.Claim).first().let {
+        val claim = getResourcesFromList<Claim>(resources, ResourceType.ResourceTypeId.Claim).first().let {
             resourceService.create(it.apply {
                 it.patient = patientReference
             })
         }
-        val consents = getResources<Consent>(resources, ResourceType.ResourceTypeId.Consent).map {
+        val consents = getResourcesFromList<Consent>(resources, ResourceType.ResourceTypeId.Consent).map {
             resourceService.create(it.apply {
                 it.patient = patientReference
                 performer = paramedicReference
             })
         }
-        val observations = getResources<Observation>(resources, ResourceType.ResourceTypeId.Observation).map {
+        val observations = getResourcesFromList<Observation>(resources, ResourceType.ResourceTypeId.Observation).map {
             resourceService.create(it.apply {
                 subject = patientReference
                 performer = listOf(paramedicReference)
             })
         }
-        val questionnaireResponse = getResources<QuestionnaireResponse>(resources, ResourceType.ResourceTypeId.QuestionnaireResponse).map {
+        val questionnaireResponse = getResourcesFromList<QuestionnaireResponse>(resources, ResourceType.ResourceTypeId.QuestionnaireResponse).map {
             resourceService.create(it.apply {
                 source = patientReference
                 author = paramedicReference
@@ -312,60 +315,5 @@ class PatientServiceImpl(
     private fun observationTypeOfResponsiblePractitioner(responsiblePractitionerId: String): String {
         val responsiblePractitioner = practitionerService.byId(responsiblePractitionerId)
         return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualification.code.code())
-    }
-
-    override fun activeClinicalImpression(patientId: String): ClinicalImpression? {
-        val query = em.createNativeQuery("""
-                select ci.resource
-                from clinicalImpression ci
-                where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                  and ci.resource ->> 'status' = 'active'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResource()
-    }
-
-    /**
-     * Отменить активное обращение, если таковое имеется.
-     * Т к при создании нового может быть по ошибке 2 активных.
-     * Поэтому перед созданием нового нужно отменить предыдущее
-     * Отменяются также активный маршрутный лист [CarePlan], его непройденные назначения [ServiceRequest], незавершенные результаты назначений [Observation]
-     */
-    private fun cancelActiveClinicalImpression(patientId: String) {
-        activeClinicalImpression(patientId)?.run {
-            resourceService.update(this.apply {
-                status = ClinicalImpressionStatus.cancelled
-            })
-            val references = this.supportingInfo
-            getResources(references, ResourceType.CarePlan).firstOrNull()?.run {
-                if (this.status in listOf(CarePlanStatus.active, CarePlanStatus.waiting_results, CarePlanStatus.results_are_ready)) {
-                    resourceService.update(this.apply {
-                        status = CarePlanStatus.cancelled
-                    })
-                    getResources(this.activity.map { it.outcomeReference }, ResourceType.ServiceRequest).forEach { serviceRequest ->
-                        if (serviceRequest.status in listOf(ServiceRequestStatus.active, ServiceRequestStatus.waiting_result)) {
-                            resourceService.update(serviceRequest.apply {
-                                status = ServiceRequestStatus.cancelled
-                            })
-                            observationService.byBaseOnServiceRequestId(serviceRequest.id)?.run {
-                                if (this.status == ObservationStatus.registered) {
-                                    resourceService.update(this.apply {
-                                        status = ObservationStatus.cancelled
-                                    })
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun <T> getResources(references: List<Reference>, resourceType: ResourceType<T>): List<T>
-            where T : BaseResource =
-            references.filter { it.type == resourceType.id }.map { resourceService.byId(resourceType, it.id!!) }
-
-    private fun <T> getResources(resources: List<BaseResource>, type: ResourceType.ResourceTypeId): List<T> where T : BaseResource {
-        return resources.filter { it.resourceType == type }.map { it as T }
     }
 }

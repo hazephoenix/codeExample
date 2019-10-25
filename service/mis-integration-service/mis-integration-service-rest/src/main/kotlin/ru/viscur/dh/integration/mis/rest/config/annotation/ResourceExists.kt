@@ -10,7 +10,7 @@ import kotlin.reflect.*
 @Constraint(validatedBy = [ExistsByIdValidator::class])
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Exists(
+annotation class ResourceExists(
         val message: String = "Resource with such id does not exist",
         val groups: Array<KClass<out Any>> = [],
         val payload: Array<KClass<out Payload>> = []

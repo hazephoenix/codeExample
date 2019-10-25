@@ -5,19 +5,13 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
-GET http://localhost:8080/devices/scales/start
+GET http://localhost:8080/Patient/9a0dc45f-c224-4bd7-be07-6c770a5b8096
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-GET http://localhost:8080/devices/pulseOximeter/start
-Accept: application/json
-Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
-
-###
-
-GET http://localhost:8080/devices/electrocardiograph/start
+GET http://localhost:8080/Practitioner/05a45df1-a9fb-4c7a-8ae9-b1b593e84aa2
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
