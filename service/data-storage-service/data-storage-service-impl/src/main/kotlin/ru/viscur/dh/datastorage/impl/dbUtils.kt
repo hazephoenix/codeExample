@@ -33,7 +33,7 @@ fun <T> Any?.toResourceEntity(): T?
 
 fun <T> Query.fetchResource(): T?
         where T : BaseResource =
-        this.fetchResourceList<T>().singleOrNull()
+        this.fetchResourceList<T>().firstOrNull()
 
 fun <T> Query.fetchResourceList(): List<T>
         where T : BaseResource {

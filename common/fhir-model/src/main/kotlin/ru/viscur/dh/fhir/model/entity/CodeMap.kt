@@ -13,7 +13,7 @@ import ru.viscur.dh.fhir.model.utils.*
  * @property sourceUrl ссылка на исходный справочник
  * @property targetUrl ссылка на связываемый справочник
  * @property sourceCode код в исходном справочнике
- * @property targetCode код в связываемом справочнике
+ * @property targetCode код(ы) в связываемом справочнике
  */
 class CodeMap @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
@@ -21,6 +21,6 @@ class CodeMap @JsonCreator constructor(
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.CodeMap.id,
         @JsonProperty("sourceUrl") val sourceUrl: String,
         @JsonProperty("targetUrl") val targetUrl: String,
-        @JsonProperty("parentCode") val sourceCode: String,
-        @JsonProperty("targetCode") val targetCode: String
+        @JsonProperty("sourceCode") val sourceCode: String,
+        @JsonProperty("targetCode") val targetCode: List<CodeMapTargetCode>
 ) : BaseResource(id, identifier, resourceType)

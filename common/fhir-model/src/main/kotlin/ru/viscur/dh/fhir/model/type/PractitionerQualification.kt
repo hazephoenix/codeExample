@@ -15,5 +15,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
 class PractitionerQualification @JsonCreator constructor(
         @JsonProperty("identifier") val identifier: List<Identifier>? = null,
         @JsonProperty("code") val code: CodeableConcept,
-        @JsonProperty("period") val period: Period
+        @JsonProperty("period") val period: Period? = null
 )

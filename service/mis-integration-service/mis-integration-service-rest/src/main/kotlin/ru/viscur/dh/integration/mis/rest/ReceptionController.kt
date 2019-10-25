@@ -21,8 +21,6 @@ class ReceptionController(
     companion object {
         val patientClassifier = PatientClassifier()
         val diagnosisPredictor = DiagnosisPredictor()
-        val serviceRequestPredictor = ServiceRequestPredictor()
-        val responsibleSpecialistPredictor = ResponsibleSpecialistPredictor()
     }
 
     /**
@@ -43,11 +41,12 @@ class ReceptionController(
      * @param concept [Concept] код МКБ-10
      */
     @PostMapping("/serviceRequests")
-    fun predictServiceRequests(@RequestBody concept: Concept): Bundle {
-        val services = serviceRequestPredictor.predict(concept)
-        val specialists = responsibleSpecialistPredictor.predict(concept)
-        return Bundle(type = BundleType.BATCH.value, entry = (services + specialists).map { BundleEntry(it) })
-    }
+    fun predictServiceRequests(@RequestBody body: ServiceRequestPredictBody) =
+            patientService.predictServiceRequests(
+                    body.diagnosis,
+                    body.gender,
+                    body.complaints
+            )
 
     /**
      * Сохранение всех данных, полученных на АРМ Фельдшер
@@ -62,3 +61,12 @@ class ReceptionController(
         )
     }
 }
+
+/**
+ * Тело запроса для определения услуг в маршрутном листе и др.
+ */
+class ServiceRequestPredictBody(
+        val diagnosis: String,
+        val complaints: List<String>,
+        val gender: String
+)

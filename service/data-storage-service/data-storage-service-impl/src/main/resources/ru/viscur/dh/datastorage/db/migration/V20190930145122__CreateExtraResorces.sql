@@ -81,3 +81,31 @@ create table QueueItem_history
 		primary key (id, txid)
 );
 alter table QueueItem_history owner to ${owner};
+
+drop table if exists CodeMap;
+create table CodeMap
+(
+	id text not null
+		constraint CodeMap_pkey
+			primary key,
+	txid bigint not null,
+	ts timestamp with time zone default CURRENT_TIMESTAMP,
+	resource_type text default 'CodeMap'::text,
+	status resource_status not null,
+	resource jsonb not null
+);
+alter table CodeMap owner to ${owner};
+
+drop table if exists CodeMap_history;
+create table CodeMap_history
+(
+	id text not null,
+	txid bigint not null,
+	ts timestamp with time zone default CURRENT_TIMESTAMP,
+	resource_type text default 'CodeMap'::text,
+	status resource_status not null,
+	resource jsonb not null,
+	constraint CodeMap_history_pkey
+		primary key (id, txid)
+);
+alter table CodeMap_history owner to ${owner};

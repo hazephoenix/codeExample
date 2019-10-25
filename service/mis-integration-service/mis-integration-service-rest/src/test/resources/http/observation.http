@@ -7,11 +7,13 @@
 
 GET http://localhost:8080/Observation?status=registered&patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
 Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
 POST http://localhost:8080/Observation
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
   "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
@@ -46,6 +48,7 @@ Content-Type: application/json
 
 PUT http://localhost:8080/Observation
 Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
   "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
@@ -70,7 +73,7 @@ Content-Type: application/json
     "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
     "type": "Patient"
   },
-  "valueInteger": 110
+  "valueInteger": 111
 }
 
 ###

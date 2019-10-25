@@ -12,11 +12,11 @@ package ru.digitalhospital.dhdatastorage.dto
  * @param orderBy набор наименований полей ресурса, по которым нужно сортировать результат. Например, ["name", "system"]
  * Можно указывать desc: ["name desc", "system desc"]
  * Применится сортировка order by r.resource->>'name' desc, r.resource->>'system' desc
- * Без указания (по умолчанию) сортируется по txid
+ * Без указания (по умолчанию) сортируется по id
  */
 class RequestBodyForResources(
         val filter: Map<String, String>,
-        val orderBy: List<String>? = null
+        val orderBy: List<String> = listOf("id")
 ){
     override fun toString(): String {
         return "{ filter=$filter, orderBy=$orderBy }"

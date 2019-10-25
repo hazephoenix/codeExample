@@ -1,10 +1,12 @@
 package ru.viscur.dh.datastorage.impl
 
-import org.springframework.stereotype.*
+import org.springframework.stereotype.Service
+import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -13,7 +15,8 @@ import javax.persistence.PersistenceContext
  */
 @Service
 class LocationServiceImpl(
-        private val resourceService: ResourceService
+        private val resourceService: ResourceService,
+        private val conceptService: ConceptService
 ) : LocationService {
 
     @PersistenceContext
@@ -32,13 +35,16 @@ class LocationServiceImpl(
     }
 
     override fun byObservationType(type: String): Location {
+        val typeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, type)
+        val observationCategory = typeConcept.parentCode
         val query = em.createNativeQuery("""
                 select resource
                 from (select jsonb_array_elements(r.resource -> 'extension' -> 'observationType') obsType, r.resource
                       from location r where r.resource -> 'extension' -> 'observationType' <> 'null') obsInfo
-                where obsInfo.obsType ->> 'code' = :observationType
+                where obsInfo.obsType ->> 'code' in (:observationType, :observationCategory)
             """)
         query.setParameter("observationType", type)
+        query.setParameter("observationCategory", observationCategory)
         return query.fetchResourceList<Location>().firstOrNull()?:
                 throw Exception("There is no office for observation type '$type'")
     }
