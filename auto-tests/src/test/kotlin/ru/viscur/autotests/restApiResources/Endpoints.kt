@@ -11,6 +11,7 @@ class Endpoints {
         val QUE_OFFICE_RDY : String = "$BASE_URI/queue/office/ready"
         val QUE_OFFICE_BUSY : String = "$BASE_URI/queue/office/busy"
         val QUE_DELETE_ALL: String = "$BASE_URI/queue"
+        val OFFICE_INVITE: String = "$BASE_URI/queue/office/forceSendPatientToObservation"
     }
 
 }
