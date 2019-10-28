@@ -1,13 +1,12 @@
 package ru.viscur.dh.queue.api
 
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
-import ru.viscur.dh.queue.api.model.User
 import java.util.*
 
 interface PatientStatusService {
 
     /**
-     * Изменение статуса пациента [user] на [newStatus]
+     * Изменение статуса пациента [patientId] на [newStatus]
      * @param officeIdOfPrevProcess кабинет предыдущей операции.
      *  используется, если пред процесс пациента привязан к какому-либо кабинету (например, осмотр)
      * @param saveCurrentStatusToHistory сохранить текущий статус с продолжительностью нахождения в историю.

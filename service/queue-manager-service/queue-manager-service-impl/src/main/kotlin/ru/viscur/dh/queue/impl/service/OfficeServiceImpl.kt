@@ -62,24 +62,28 @@ class OfficeServiceImpl(
         })
     }
 
-    override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int) {
+    override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, asFirst: Boolean) {
         val queueItem = QueueItem(
                 subject = referenceToPatient(id = patientId),
                 location = referenceToLocation(id = officeId),
                 estDuration = estDuration
         )
         val queue = queueService.queueItemsOfOffice(officeId)
-        when (val userSeverity = patientService.severity(patientId)) {
-            Severity.GREEN -> queue.add(queueItem)
-            else -> {
-                val severities = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
-                if (queue.any { it.severity in severities }) {
-                    queue.add(queue.indexOfLast { it.severity in severities } + 1, queueItem)
-                } else {
-                    if (queue.any { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }) {
-                        queue.add(queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }, queueItem)
+        if (asFirst) {
+            queue.add(0, queueItem)
+        } else {
+            when (val userSeverity = patientService.severity(patientId)) {
+                Severity.GREEN -> queue.add(queueItem)
+                else -> {
+                    val severities = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
+                    if (queue.any { it.severity in severities }) {
+                        queue.add(queue.indexOfLast { it.severity in severities } + 1, queueItem)
                     } else {
-                        queue.add(queueItem)
+                        if (queue.any { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }) {
+                            queue.add(queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }, queueItem)
+                        } else {
+                            queue.add(queueItem)
+                        }
                     }
                 }
             }
