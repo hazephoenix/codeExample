@@ -22,7 +22,7 @@ class QueueSmoke {
     @Order(2)
     fun patientShouldBeDeletedFromQue() {
         QueRequests.deleteQue()
-        QueRequests.addPatienToQue(patientRef)
+        QueRequests.addPatientToQue(patientRef)
         QueRequests.deletePatientFromQue(patientRef)
         Assertions.assertThat(QueRequests.getQueInfo()).doesNotContain(RequestsData.red1)
     }
@@ -31,7 +31,7 @@ class QueueSmoke {
     @Order(1)
     fun patientShouldBeAddedToQue() {
         QueRequests.deleteQue()
-        QueRequests.addPatienToQue(patientRef)
+        QueRequests.addPatientToQue(patientRef)
         Assertions.assertThat(QueRequests.getQueInfo()).contains(RequestsData.red1)
     }
 
