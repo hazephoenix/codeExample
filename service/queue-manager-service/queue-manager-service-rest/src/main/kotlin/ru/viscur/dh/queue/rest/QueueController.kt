@@ -18,9 +18,6 @@ import ru.viscur.dh.queue.api.QueueManagerService
 @RequestMapping("/queue")
 class QueueController(private val queueManagerService: QueueManagerService) {
 
-    @GetMapping("/test")
-    fun test() = "Test"
-
     @PostMapping("/registerPatient")
     fun registerPatient(@RequestBody patientReference: Reference) =
             logAndValidateAfter { queueManagerService.registerPatient(patientReference.id!!) }
@@ -34,9 +31,21 @@ class QueueController(private val queueManagerService: QueueManagerService) {
         Bundle(entry = serviceRequests.map { BundleEntry(it) })
     }
 
+    @PostMapping("/office/forceSendPatientToObservation")
+    fun forceSendPatientToObservation(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
+        queueManagerService.forceSendPatientToObservation(
+                listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id!!,
+                listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id!!
+        )
+    }
+
     @PostMapping("/office/patientLeft")
     fun patientLeft(@RequestBody officeReference: Reference) =
             logAndValidateAfter { queueManagerService.patientLeft(officeReference.id!!) }
+
+    @PostMapping("/office/cancelEntering")
+    fun cancelEntering(@RequestBody officeReference: Reference) =
+            logAndValidateAfter { queueManagerService.cancelEntering(officeReference.id!!) }
 
     @PostMapping("/office/ready")
     fun officeIsReady(@RequestBody officeReference: Reference) =
