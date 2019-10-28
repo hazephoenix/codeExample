@@ -28,16 +28,16 @@ class CarePlanServiceImpl : CarePlanService {
         return query.fetchResourceList()
     }
 
-    override fun active(patientId: String): CarePlan? {
+    override fun current(patientId: String): CarePlan? {
         val query = em.createNativeQuery("""
             select cp.resource
             from CarePlan cp
-            where cp.resource -> 'subject' ->> 'id' = :patientId
+            where cp.resource -> 'subject' ->> 'reference' = :patientRef
                 and (cp.resource ->> 'status' = :active
                         OR cp.resource ->> 'status' = :waiting_results
                         OR cp.resource ->> 'status' = :results_are_ready)
         """)
-        query.setParameter("patientId", patientId)
+        query.setParameter("patientRef", "Patient/$patientId")
         query.setParameter("active", CarePlanStatus.active.toString())
         query.setParameter("waiting_results", CarePlanStatus.waiting_results.toString())
         query.setParameter("results_are_ready", CarePlanStatus.results_are_ready.toString())

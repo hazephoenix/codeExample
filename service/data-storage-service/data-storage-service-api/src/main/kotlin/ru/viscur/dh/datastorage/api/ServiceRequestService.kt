@@ -23,5 +23,5 @@ interface ServiceRequestService {
     /**
      * Добавить направления на обследования
      */
-    fun add(patientId: String, serviceRequestList: List<ServiceRequest>): List<ServiceRequest>
+    fun add(patientId: String, serviceRequestList: List<ServiceRequest>): CarePlan
 }

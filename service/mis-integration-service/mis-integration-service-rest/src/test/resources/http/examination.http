@@ -11,7 +11,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/examination/serviceRequests?patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
+POST http://localhost:8080/examination/serviceRequests
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -47,7 +47,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/examination?patientId=0c51d839-1e8f-4254-a4df-f32f25dbf6af
+POST http://localhost:8080/examination
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

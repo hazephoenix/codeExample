@@ -88,19 +88,16 @@ class ServiceRequestServiceImpl(
         return query.fetchResourceList()
     }
 
-    // TODO: отладить добавление направлений
     @Tx
-    override fun add(patientId: String, serviceRequestList: List<ServiceRequest>): List<ServiceRequest> {
-        val serviceRequests = serviceRequestList.map { resourceService.create(it) }
-        val activities = serviceRequests.map { CarePlanActivity(Reference(it)) }
+    override fun add(patientId: String, serviceRequestList: List<ServiceRequest>): CarePlan {
+        return carePlanService.current(patientId)?.let { carePlan ->
+            val serviceRequests = serviceRequestList.map { resourceService.create(it) }
+            val activities = serviceRequests.map { CarePlanActivity(Reference(it)) }
 
-        carePlanService.active(patientId)?.let {
-            resourceService.update(it.apply {
-                it.status = CarePlanStatus.active
-                it.activity = activities.plus(it.activity)
+            resourceService.update(carePlan.apply {
+                carePlan.status = CarePlanStatus.active // results_are_ready -> active
+                carePlan.activity = activities.plus(carePlan.activity)
             })
-        }
-
-        return serviceRequests
+        } ?: throw Error("No active CarePlan found")
     }
 }
