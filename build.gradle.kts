@@ -7,6 +7,10 @@ import org.gradle.tooling.BuildException
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
+// TODO тут это временно
+val skipSpringSecurity = setOf(":applications:dh-paramedic-device-app")
+
+
 buildscript {
     repositories {
         mavenCentral()
@@ -27,6 +31,7 @@ fun isBuildableProject(project: Project) = project.childProjects.isEmpty()
  * считаются исполняемыми
  */
 fun isExecutableProject(project: Project) = project.path.startsWith(":applications:")
+
 
 /**
  * Подключать ли автоматически SpringBoot
@@ -81,6 +86,7 @@ allprojects {
 subprojects {
     if (isBuildableProject(this)) {
         val applyBoot = isApplySpringBoot(this)
+        val skipSecurity = skipSpringSecurity.contains(this.path);
         // Плагины для всех подпроектов
         apply(plugin = "java")
         apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -106,7 +112,9 @@ subprojects {
 
             if (applyBoot) {
                 implementation("org.springframework.boot:spring-boot-starter")
-                implementation("org.springframework.boot:spring-boot-starter-security")
+                if (!skipSecurity) {
+                    implementation("org.springframework.boot:spring-boot-starter-security")
+                }
                 testImplementation("org.springframework.boot:spring-boot-starter-test") {
                     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }
