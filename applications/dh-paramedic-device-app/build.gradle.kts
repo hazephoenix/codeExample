@@ -9,3 +9,7 @@ dependencies {
 tasks.test {
     useJUnit()
 }
+
+tasks.bootRun {
+    args = listOf("--spring.profiles.active=dev")
+}
