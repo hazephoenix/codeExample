@@ -21,12 +21,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.web.client.RestTemplate
 import ru.viscur.dh.apps.paramedicdevice.api.TaskController
+import ru.viscur.dh.apps.paramedicdevice.device.Height
+import ru.viscur.dh.apps.paramedicdevice.device.Weight
 import ru.viscur.dh.apps.paramedicdevice.dto.Task
 import ru.viscur.dh.apps.paramedicdevice.dto.TaskStatus
 import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
 import ru.viscur.dh.apps.paramedicdevice.dto.TvesResponse
-import ru.viscur.dh.apps.paramedicdevice.device.Height
-import ru.viscur.dh.apps.paramedicdevice.device.Weight
 import ru.viscur.dh.apps.paramedicdevice.service.TaskDispatcher
 import java.util.regex.Pattern
 
