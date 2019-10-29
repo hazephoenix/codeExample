@@ -1,5 +1,6 @@
 package ru.viscur.dh.datastorage.api
 
+import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.Severity
@@ -57,4 +58,9 @@ interface PatientService {
      * @return id пациента в data-storage
      */
     fun saveFinalPatientData(bundle: Bundle): String
+
+    /**
+     * Получить список ожидающих осмотра пациентов по id ответственного врача
+     */
+    fun patientsToExamine(practitionerId: String): List<PatientToExamine>
 }

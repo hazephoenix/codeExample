@@ -7,9 +7,7 @@ import org.springframework.web.server.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
-import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.queue.api.*
-import java.lang.Exception
 
 /**
  * Контроллер для осмотра пациентов ответственным врачом
@@ -19,7 +17,6 @@ import java.lang.Exception
 @Validated
 class ExaminationController(
         private val patientService: PatientService,
-        private val carePlanService: CarePlanService,
         private val clinicalImpressionService: ClinicalImpressionService,
         private val serviceRequestService: ServiceRequestService,
         private val queueManagerService: QueueManagerService
@@ -28,8 +25,8 @@ class ExaminationController(
      * Получить список активных пациентов ответсвенного врача
      */
     @GetMapping("/patients")
-    fun getActiveByPractitioner(@RequestParam practitionerId: String) =
-        Bundle(entry = carePlanService.activeByPractitioner(practitionerId).map { BundleEntry(it) })
+    fun activeByPractitioner(@RequestParam practitionerId: String) =
+        patientService.patientsToExamine(practitionerId)
 
     /**
      * Назначить дообследование пациенту

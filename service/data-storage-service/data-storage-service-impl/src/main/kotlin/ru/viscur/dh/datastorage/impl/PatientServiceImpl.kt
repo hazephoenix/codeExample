@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.impl.config.annotation.Tx
 import ru.viscur.dh.datastorage.impl.utils.*
+import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
@@ -19,7 +20,6 @@ import javax.persistence.PersistenceContext
 @Service
 class PatientServiceImpl(
         private val resourceService: ResourceService,
-        private val locationService: LocationService,
         private val clinicalImpressionService: ClinicalImpressionService,
         private val codeMapService: CodeMapService,
         private val conceptService: ConceptService,
@@ -236,6 +236,13 @@ class PatientServiceImpl(
                 supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) }
         ).let { resourceService.create(it) }
         return patient.id
+    }
+
+    override fun patientsToExamine(practitionerId: String): List<PatientToExamine> {
+        val query = em.createNativeQuery("""
+            select * from patients_to_examine
+        """)
+        return query.patientsToExamine()
     }
 
     /**
