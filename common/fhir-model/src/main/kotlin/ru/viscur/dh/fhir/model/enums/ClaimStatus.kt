@@ -8,6 +8,7 @@ package ru.viscur.dh.fhir.model.enums
 enum class ClaimStatus {
     active,
     cancelled,
+    completed,
     draft,
     entered_in_error
 }

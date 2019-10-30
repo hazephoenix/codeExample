@@ -32,9 +32,45 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     }
   ]
 }
+###                                                                                Пригласить любого пациента в кабинет
+###
+POST http://localhost:8080/queue/office/forceSendPatientToObservation
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:101",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/94b5afcc-8719-4553-9f32-5994b08a4ed8",
+        "type": "Patient"
+      }
+    }
+  ]
+}
 ###                                                                                Обследования в кабинете завершено
 ###
 POST http://84.201.154.121:8080/queue/office/patientLeft
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:101",
+  "type": "Location"
+}
+###                                                                                Отменить "вход" пациента в кабинет
+###
+POST http://localhost:8080/queue/office/cancelEntering
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -88,7 +124,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Patient/4b195cf0-aec2-432e-8978-a3f94acd0b86",
+  "reference": "Patient/94b5afcc-8719-4553-9f32-5994b08a4ed8",
   "type": "Patient"
 }
 ###

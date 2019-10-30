@@ -7,6 +7,7 @@ import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.Concept
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -37,11 +38,17 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
     }
 
     override fun byCode(valueSetId: String, code: String): Concept =
-        resourceService.single(
-                ResourceType.Concept, RequestBodyForResources(filter = mapOf(
-                "code" to code,
-                "system" to "ValueSet/$valueSetId"
-        )))
+            resourceService.single(
+                    ResourceType.Concept, RequestBodyForResources(filter = mapOf(
+                    "code" to code,
+                    "system" to "ValueSet/$valueSetId"
+            )))
+
+    override fun byParent(valueSet: ValueSetName, parentCode: String?): List<Concept> = resourceService.all(
+            ResourceType.Concept, RequestBodyForResources(filter = mapOf(
+            "parentCode" to parentCode,
+            "system" to "ValueSet/${valueSet.id}"
+    )))
 
     override fun byAlternative(valueSetId: String, realAlternatives: List<String>): List<String> {
         if (realAlternatives.isEmpty()) return listOf()

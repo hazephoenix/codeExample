@@ -1,6 +1,7 @@
 package ru.viscur.dh.queue.impl.service
 
 import org.springframework.stereotype.*
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
@@ -30,6 +31,11 @@ class OfficeServiceImpl(
         private val queueService: QueueService
 ) : OfficeService {
 
+    override fun all() = resourceService.all(ResourceType.Location, RequestBodyForResources(
+            filter = mapOf("id" to "Office:"),
+            filterLike = true
+    ))
+
     override fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
         val now = now()
         val office = locationService.byId(officeId)
@@ -56,24 +62,28 @@ class OfficeServiceImpl(
         })
     }
 
-    override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int) {
+    override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, asFirst: Boolean) {
         val queueItem = QueueItem(
                 subject = referenceToPatient(id = patientId),
                 location = referenceToLocation(id = officeId),
                 estDuration = estDuration
         )
         val queue = queueService.queueItemsOfOffice(officeId)
-        when (val userSeverity = patientService.severity(patientId)) {
-            Severity.GREEN -> queue.add(queueItem)
-            else -> {
-                val severities = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
-                if (queue.any { it.severity in severities }) {
-                    queue.add(queue.indexOfLast { it.severity in severities } + 1, queueItem)
-                } else {
-                    if (queue.any { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }) {
-                        queue.add(queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }, queueItem)
+        if (asFirst) {
+            queue.add(0, queueItem)
+        } else {
+            when (val userSeverity = patientService.severity(patientId)) {
+                Severity.GREEN -> queue.add(queueItem)
+                else -> {
+                    val severities = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
+                    if (queue.any { it.severity in severities }) {
+                        queue.add(queue.indexOfLast { it.severity in severities } + 1, queueItem)
                     } else {
-                        queue.add(queueItem)
+                        if (queue.any { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }) {
+                            queue.add(queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }, queueItem)
+                        } else {
+                            queue.add(queueItem)
+                        }
                     }
                 }
             }
@@ -81,7 +91,7 @@ class OfficeServiceImpl(
         saveQueue(officeId, queue)
     }
 
-    override fun firstPatientInQueue(officeId: String): String? =
+    override fun firstPatientIdInQueue(officeId: String): String? =
             queueService.queueItemsOfOffice(officeId).firstOrNull()?.subject?.id
 
     override fun deleteFirstPatientFromQueue(officeId: String) {

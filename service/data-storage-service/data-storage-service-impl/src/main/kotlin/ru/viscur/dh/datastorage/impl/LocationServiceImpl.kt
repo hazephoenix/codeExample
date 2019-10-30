@@ -5,6 +5,7 @@ import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.Location
+import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import javax.persistence.EntityManager
@@ -34,18 +35,20 @@ class LocationServiceImpl(
         return query.fetchResourceList()
     }
 
-    override fun byObservationType(type: String): Location {
+    override fun byObservationType(type: String): List<String> {
         val typeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, type)
         val observationCategory = typeConcept.parentCode
         val query = em.createNativeQuery("""
-                select resource
-                from (select jsonb_array_elements(r.resource -> 'extension' -> 'observationType') obsType, r.resource
-                      from location r where r.resource -> 'extension' -> 'observationType' <> 'null') obsInfo
+                select id
+                from (select jsonb_array_elements(r.resource -> 'extension' -> 'observationType') obsType, r.id
+                      from location r 
+                      where r.resource -> 'extension' -> 'observationType' <> 'null'
+                        and r.resource ->> 'status' <> '${LocationStatus.CLOSED}'
+                      ) obsInfo
                 where obsInfo.obsType ->> 'code' in (:observationType, :observationCategory)
             """)
         query.setParameter("observationType", type)
         query.setParameter("observationCategory", observationCategory)
-        return query.fetchResourceList<Location>().firstOrNull()?:
-                throw Exception("There is no office for observation type '$type'")
+        return query.resultList as List<String>
     }
 }

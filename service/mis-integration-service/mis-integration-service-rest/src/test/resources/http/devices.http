@@ -7,15 +7,18 @@
 
 GET http://localhost:8080/devices/scales/start
 Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
 GET http://localhost:8080/devices/pulseOximeter/start
 Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
 GET http://localhost:8080/devices/electrocardiograph/start
 Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###

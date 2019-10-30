@@ -27,7 +27,7 @@ class Claim @JsonCreator constructor(
         @JsonProperty("identifier") identifier: List<Identifier>,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Claim.id,
         @JsonProperty("patient") var patient: Reference,
-        @JsonProperty("status") val status: ClaimStatus =  ClaimStatus.active,
+        @JsonProperty("status") var status: ClaimStatus =  ClaimStatus.active,
         @JsonProperty("supportingInfo") val supportingInfo: List<ClaimSupportingInfo>? = null,
         @JsonProperty("accident") val accident: ClaimAccident,
         @JsonProperty("diagnosis") val diagnosis: List<ClaimDiagnosis>? = null,

@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidatorContext
  */
 class ExistsByIdValidator(
         private val resourceService: ResourceService
-) : ConstraintValidator<Exists, BaseResource> {
+) : ConstraintValidator<ResourceExists, BaseResource> {
 
     override fun isValid(value: BaseResource, context: ConstraintValidatorContext?): Boolean {
         try {

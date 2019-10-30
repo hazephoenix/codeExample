@@ -6,7 +6,6 @@ import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
-import ru.viscur.dh.fhir.model.valueSets.*
 import ru.viscur.dh.queue.api.*
 
 /**
@@ -36,7 +35,7 @@ class ReceptionController(
     fun predictDiagnosis(@RequestBody bundle: Bundle) = diagnosisPredictor.predict()
 
     /**
-     * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ
+     * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ TODO
      *
      * @param concept [Concept] код МКБ-10
      */

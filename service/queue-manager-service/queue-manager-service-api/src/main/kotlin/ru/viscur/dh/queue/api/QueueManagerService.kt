@@ -2,11 +2,6 @@ package ru.viscur.dh.queue.api
 
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
-import ru.viscur.dh.queue.api.cmd.RegisterUserCMD
-import ru.viscur.dh.queue.api.model.Office
-import ru.viscur.dh.queue.api.model.RouteSheet
-import ru.viscur.dh.queue.api.model.SurveyType
-import ru.viscur.dh.queue.api.model.User
 
 /**
  * Сервис управления очередью пациентов
@@ -29,14 +24,18 @@ interface QueueManagerService {
      * У пациента может быть незавершенный маршрутный лист, но его удалили из очереди по какой-либо причине,
      * этой функцией мы снова добавляем его в очередь
      * Если пациент уже в очереди, то ничего не происходит
-     *
-     * TODO moveUserToNextQueue?
      */
     fun addToOfficeQueue(patientId: String)
 
     /**
+     * Вызов пациента на обследование в кабинет (принудительно, в обход очереди, где бы он не стоял)
+     * Статус кабинета д б занят/свободен/закрыт
+     */
+    fun forceSendPatientToObservation(patientId: String, officeId: String)
+
+    /**
      * Убрать пациента из очереди
-     * Перевод пациента в статус [ru.viscur.dh.queue.api.model.UserInQueueStatus.READY] - поставить пациента "вне очередей"
+     * Перевод пациента в статус [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.READY] - поставить пациента "вне очередей"
      *
      * Используется, например, на тот случай если его очередь настала, но он отошел - его не нужно исключать вообще из системы,
      * но и ждать не имеет смысла.
@@ -56,7 +55,15 @@ interface QueueManagerService {
     fun patientLeft(officeId: String)
 
     /**
-     * Кабинет готов принять пациента: смена статуса с [OfficeStatus.CLOSED], [OfficeStatus.BUSY] на [OfficeStatus.READY]
+     * Отменить "вход" пациента в кабинет
+     * Если статус кабинета [ru.viscur.dh.fhir.model.enums.LocationStatus.WAITING_PATIENT] или [ru.viscur.dh.fhir.model.enums.LocationStatus.OBSERVATION]
+     * Пациент отправляется обратно первым в очередь
+     * Кабинет принимает статус "занят"
+     */
+    fun cancelEntering(officeId: String)
+
+    /**
+     * Кабинет готов принять пациента: смена статуса с CLOSED, BUSY на READY
      * Если кабинет находится в статусе назначенного пациента, ничего не делаем
      */
     fun officeIsReady(officeId: String)

@@ -7,9 +7,7 @@ import ru.viscur.dh.fhir.model.enums.*
 import javax.persistence.*
 
 @Service
-class ObservationServiceImpl(
-        private val resourceService: ResourceService
-) : ObservationService {
+class ObservationServiceImpl(private val resourceService: ResourceService) : ObservationService {
 
     @PersistenceContext
     private lateinit var em: EntityManager
@@ -38,6 +36,16 @@ class ObservationServiceImpl(
         return query.fetchResourceList()
     }
 
+    override fun byBaseOnServiceRequestId(id: String): Observation? {
+        val query = em.createNativeQuery("""
+            select r.resource
+                from Observation r
+                where r.resource -> 'basedOn' ->> 'reference' = :serviceRequestRef
+        """)
+        query.setParameter("serviceRequestRef", "ServiceRequest/$id")
+        return query.fetchResourceList<Observation>().firstOrNull()
+    }
+
     /**
      * Зарегистрировать обследование
      *
@@ -45,7 +53,7 @@ class ObservationServiceImpl(
      * со ссылкой на ServiceRequest
      */
     override fun create(observation: Observation): Observation? {
-        updateServiceRequestStatus(observation)
+        updateRelated(observation)
         return resourceService.create(observation)
     }
 
@@ -63,15 +71,16 @@ class ObservationServiceImpl(
                     it.valueSampledData = observation.valueSampledData
                     it.valueString = observation.valueString
 
-                    updateServiceRequestStatus(it)
+                    updateRelated(it)
                     resourceService.update(it)
                 }
     }
 
     /**
-     * Обновить статус направления на обследование и маршрутного листа
+     * Обновить связанные ресурсы -
+     *  статус направления на обследование и маршрутного листа
      */
-    private fun updateServiceRequestStatus(observation: Observation) =
+    private fun updateRelated(observation: Observation) =
             observation.basedOn?.id?.let { serviceRequestId ->
                 // Обновить статус направления на обследование
                 try {

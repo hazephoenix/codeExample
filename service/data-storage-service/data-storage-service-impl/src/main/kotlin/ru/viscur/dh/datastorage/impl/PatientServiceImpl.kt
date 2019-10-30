@@ -3,12 +3,10 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.datastorage.impl.utils.*
+import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
-import ru.viscur.dh.fhir.model.enums.CarePlanStatus
-import ru.viscur.dh.fhir.model.enums.ClinicalImpressionStatus
-import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
-import ru.viscur.dh.fhir.model.enums.ResourceType
-import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.*
@@ -22,7 +20,7 @@ import javax.persistence.PersistenceContext
 @Service
 class PatientServiceImpl(
         private val resourceService: ResourceService,
-        private val locationService: LocationService,
+        private val clinicalImpressionService: ClinicalImpressionService,
         private val codeMapService: CodeMapService,
         private val conceptService: ConceptService,
         private val practitionerService: PractitionerService
@@ -57,76 +55,6 @@ class PatientServiceImpl(
         q.setParameter("patientRef", "Patient/$patientId")
         val severityStr = q.singleResult as String
         return enumValueOf(severityStr)
-    }
-
-    override fun serviceRequests(patientId: String): List<ServiceRequest> {
-        //active clinicalImpression -> carePlan -> all serviceRequests
-        val query = em.createNativeQuery("""
-            select sr.resource
-            from serviceRequest sr
-            where 'ServiceRequest/' || sr.id in (
-                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                from carePlan cp
-                where 'CarePlan/' || cp.id in (
-                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                    from clinicalImpression ci
-                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                      and ci.resource ->> 'status' = 'active'
-                )
-            )
-            order by sr.resource -> 'extension' ->> 'executionOrder'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResourceList()
-    }
-
-    override fun activeServiceRequests(patientId: String): List<ServiceRequest> {
-        //active clinicalImpression -> carePlan -> active serviceRequests
-        val query = em.createNativeQuery("""
-            select sr.resource
-            from serviceRequest sr
-            where 'ServiceRequest/' || sr.id in (
-                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                from carePlan cp
-                where 'CarePlan/' || cp.id in (
-                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                    from clinicalImpression ci
-                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                      and ci.resource ->> 'status' = 'active'
-                )
-            )
-            and sr.resource->>'status' = 'active'
-            order by sr.resource -> 'extension' ->> 'executionOrder'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResourceList()
-    }
-
-    override fun activeServiceRequests(patientId: String, officeId: String): List<ServiceRequest> {
-        //active clinicalImpression -> carePlan -> active serviceRequests in office
-        val query = em.createNativeQuery("""
-            select sr.resource
-            from serviceRequest sr
-            where 'ServiceRequest/' || sr.id in (
-                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                from carePlan cp
-                where 'CarePlan/' || cp.id in (
-                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                    from clinicalImpression ci
-                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                      and ci.resource ->> 'status' = 'active'
-                )
-              )
-              and sr.resource ->> 'status' = 'active'
-              and :officeRef in (
-                select jsonb_array_elements(sIntr.resource -> 'locationReference') ->> 'reference'
-                from serviceRequest sIntr
-                where sIntr.id = sr.id)
-            order by sr.resource -> 'extension' ->> 'executionOrder'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        query.setParameter("officeRef", "Location/$officeId")
-        return query.fetchResourceList()
     }
 
     override fun queueStatusOfPatient(patientId: String): PatientQueueStatus {
@@ -219,25 +147,35 @@ class PatientServiceImpl(
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
         val resources = bundle.entry.map { it.resource.apply { id = genId() } }
-        var patient = getResources<Patient>(resources, ResourceType.ResourceTypeId.Patient).first()
+        var patient = getResourcesFromList<Patient>(resources, ResourceType.ResourceTypeId.Patient).first()
         val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.toString() }?.value
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем
-        patient = patientByEnp?.let { byEnp -> resourceService.update(patient.apply { id = byEnp.id }) }
-                ?: let { resourceService.create(patient) }
+        patient = patientByEnp?.let { byEnp ->
+            resourceService.update(patient.apply {
+                id = byEnp.id
+                extension.queueStatusUpdatedAt = byEnp.extension.queueStatusUpdatedAt
+                extension.queueStatus = byEnp.extension.queueStatus
+            })
+        } ?: let {
+            resourceService.create(patient.apply {
+                extension.queueStatusUpdatedAt = now()
+                extension.queueStatus = PatientQueueStatus.READY
+            })
+        }
 
-        cancelActiveClinicalImpression(patient.id)//todo может лучше сообщать о том, что есть активное обращение?
+        clinicalImpressionService.cancelActive(patient.id)//todo может лучше сообщать о том, что есть активное обращение?
 
         val patientReference = Reference(patient)
-        val diagnosticReport = getResources<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
+        val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
                 .first().let { resourceService.create(it) }
         val paramedicReference = diagnosticReport.performer.first()
         val date = now()
 
-        val serviceRequests = getResources<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest)
+        val serviceRequests = getResourcesFromList<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest)
 
         // Проверяем наличие направления к ответственному врачу, если нет - создаем
-        val responsiblePractitionerRef = getResources<ListResource>(resources, ResourceType.ResourceTypeId.ListResource)
+        val responsiblePractitionerRef = getResourcesFromList<ListResource>(resources, ResourceType.ResourceTypeId.ListResource)
                 .firstOrNull()
                 ?.entry?.find { it.item.type == ResourceType.ResourceTypeId.Practitioner }?.item
                 ?: throw Error("No responsible practitioner provided")
@@ -252,9 +190,9 @@ class PatientServiceImpl(
             val observationType = it.code.code()
             resourceService.create(it.apply {
                 subject = patientReference
-                locationReference = listOf(Reference(locationService.byObservationType(observationType)))
             })
         }
+
         val carePlan = CarePlan(
                 subject = patientReference,
                 author = responsiblePractitionerRef, // ответственный врач
@@ -266,24 +204,24 @@ class PatientServiceImpl(
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
 //        val encounter = Encounter(subject = patientReference).let { resourceService.create(it) }todo encounter это инфа о госпитализации, создадим при заполнении инфы о госпитализации. и в supportingInfo класть?
-        val claim = getResources<Claim>(resources, ResourceType.ResourceTypeId.Claim).first().let {
+        val claim = getResourcesFromList<Claim>(resources, ResourceType.ResourceTypeId.Claim).first().let {
             resourceService.create(it.apply {
                 it.patient = patientReference
             })
         }
-        val consents = getResources<Consent>(resources, ResourceType.ResourceTypeId.Consent).map {
+        val consents = getResourcesFromList<Consent>(resources, ResourceType.ResourceTypeId.Consent).map {
             resourceService.create(it.apply {
                 it.patient = patientReference
                 performer = paramedicReference
             })
         }
-        val observations = getResources<Observation>(resources, ResourceType.ResourceTypeId.Observation).map {
+        val observations = getResourcesFromList<Observation>(resources, ResourceType.ResourceTypeId.Observation).map {
             resourceService.create(it.apply {
                 subject = patientReference
                 performer = listOf(paramedicReference)
             })
         }
-        val questionnaireResponse = getResources<QuestionnaireResponse>(resources, ResourceType.ResourceTypeId.QuestionnaireResponse).map {
+        val questionnaireResponse = getResourcesFromList<QuestionnaireResponse>(resources, ResourceType.ResourceTypeId.QuestionnaireResponse).map {
             resourceService.create(it.apply {
                 source = patientReference
                 author = paramedicReference
@@ -300,39 +238,18 @@ class PatientServiceImpl(
         return patient.id
     }
 
+    override fun patientsToExamine(practitionerId: String): List<PatientToExamine> {
+        val query = em.createNativeQuery("""
+            select * from patients_to_examine
+        """)
+        return query.patientsToExamine()
+    }
+
     /**
      * Тип обследования у отв врача по его id
      */
     private fun observationTypeOfResponsiblePractitioner(responsiblePractitionerId: String): String {
         val responsiblePractitioner = practitionerService.byId(responsiblePractitionerId)
         return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualification.code.code())
-    }
-
-    override fun activeClinicalImpression(patientId: String): ClinicalImpression? {
-        val query = em.createNativeQuery("""
-                select ci.resource
-                from clinicalImpression ci
-                where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                  and ci.resource ->> 'status' = 'active'
-            """)
-        query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResource()
-    }
-
-    /**
-     * Отменить активное обращение, если таковое имеется.
-     * Т к при создании нового может быть по ошибке 2 активных.
-     * Поэтому перед созданием нового нужно отменить предыдущее
-     */
-    private fun cancelActiveClinicalImpression(patientId: String) {
-        activeClinicalImpression(patientId)?.let {
-            resourceService.update(it.apply {
-                status = ClinicalImpressionStatus.cancelled
-            })
-        }
-    }
-
-    private fun <T> getResources(resources: List<BaseResource>, type: ResourceType.ResourceTypeId): List<T> where T : BaseResource {
-        return resources.filter { it.resourceType == type }.map { it as T }
     }
 }
