@@ -53,7 +53,7 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
      * со ссылкой на ServiceRequest
      */
     override fun create(observation: Observation): Observation? {
-        updateServiceRequestStatus(observation)
+        updateRelated(observation)
         return resourceService.create(observation)
     }
 
@@ -71,15 +71,16 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
                     it.valueSampledData = observation.valueSampledData
                     it.valueString = observation.valueString
 
-                    updateServiceRequestStatus(it)
+                    updateRelated(it)
                     resourceService.update(it)
                 }
     }
 
     /**
-     * Обновить статус направления на обследование и маршрутного листа
+     * Обновить связанные ресурсы -
+     *  статус направления на обследование и маршрутного листа
      */
-    private fun updateServiceRequestStatus(observation: Observation) =
+    private fun updateRelated(observation: Observation) =
             observation.basedOn?.id?.let { serviceRequestId ->
                 // Обновить статус направления на обследование
                 try {

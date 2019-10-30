@@ -69,7 +69,7 @@ class ClinicalImpressionServiceImpl(
      * добавляется
      */
     @Tx
-    override fun finish(bundle: Bundle) {
+    override fun finish(bundle: Bundle): ClinicalImpression {
         val resources = bundle.entry.map { it.resource }
         val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.DiagnosticReport.id).first()
         val patientId = diagnosticReport.subject.id ?: throw Error("No patient id provided in DiagnosticReport.subject")
@@ -84,7 +84,7 @@ class ClinicalImpressionServiceImpl(
                         refs = refs.plus(Reference(encounter))
                     }
 
-            carePlanService.active(patientId)?.let {
+            carePlanService.current(patientId)?.let {
                 resourceService.update(it.apply {
                     status = CarePlanStatus.completed
                 })
@@ -100,6 +100,7 @@ class ClinicalImpressionServiceImpl(
             clinicalImpression.supportingInfo = refs.plus(clinicalImpression.supportingInfo)
 
             resourceService.update(clinicalImpression)
+            return clinicalImpression
         } ?: throw Error("No active ClinicalImpression for patient with id $patientId found")
     }
 

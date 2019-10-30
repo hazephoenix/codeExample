@@ -22,5 +22,5 @@ interface ClinicalImpressionService {
     /**
      * Завершить активное обращение пациента
      */
-    fun finish(bundle: Bundle)
+    fun finish(bundle: Bundle): ClinicalImpression
 }

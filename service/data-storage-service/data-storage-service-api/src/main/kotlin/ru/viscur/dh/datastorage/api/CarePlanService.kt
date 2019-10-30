@@ -7,11 +7,7 @@ import ru.viscur.dh.fhir.model.entity.*
  */
 interface CarePlanService {
     /**
-     * Получить активный маршрутный лист пациента
+     * Получить текущий маршрутный лист пациента
      */
-    fun active(patientId: String): CarePlan?
-    /**
-     * Получить список активных маршрутных листов по id ответственного врача
-     */
-    fun activeByPractitioner(practitionerId: String): List<CarePlan>
+    fun current(patientId: String): CarePlan?
 }

@@ -1,9 +1,7 @@
 import org.apache.commons.codec.binary.Base64
 import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.gradle.tooling.BuildException
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -28,17 +26,18 @@ fun isBuildableProject(project: Project) = project.childProjects.isEmpty()
  */
 fun isExecutableProject(project: Project) = project.path.startsWith(":applications:")
 
+
 /**
  * Подключать ли автоматически SpringBoot
  */
 fun isApplySpringBoot(project: Project): Boolean {
     if (project.path.startsWith(":common:")) {
         // Если какому-то модулю в common нужен boot, подключаем в самом модуле
-        return false;
+        return false
     }
     if (project.path.endsWith("-api")) {
         // В api не нужен boot (бесполезная или даже вредная зависимость)
-        return false;
+        return false
     }
     return true
 }
@@ -67,7 +66,7 @@ allprojects {
             kotlinOptions.freeCompilerArgs = listOf("-Xjsr305=strict")
         }
         tasks.withType<Test> {
-            useJUnitPlatform();
+            useJUnitPlatform()
         }
     } else {
         tasks.forEach {
@@ -144,10 +143,10 @@ task("waitForHttpEndpoint") {
                     val request = HttpGet(project.properties["endpoint"] as String)
 
                     // TODO т.к. решение временное не стал выносить в настройки
-                    val auth = "test:testGGhdJpldczxcnasw8745";
-                    val encodedAuth = Base64.encodeBase64(auth.toByteArray(Charsets.ISO_8859_1));
-                    val authHeader = "Basic " + String(encodedAuth);
-                    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                    val auth = "test:testGGhdJpldczxcnasw8745"
+                    val encodedAuth = Base64.encodeBase64(auth.toByteArray(Charsets.ISO_8859_1))
+                    val authHeader = "Basic " + String(encodedAuth)
+                    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader)
 
                     val waitFor = (project.properties["waitFor"] as String).toLong()
                     var waited = 0L
