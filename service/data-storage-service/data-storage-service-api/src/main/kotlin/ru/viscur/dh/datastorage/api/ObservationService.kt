@@ -22,5 +22,5 @@ interface ObservationService {
     /**
      * Обновить запись об исследовании
      */
-    fun update(observation: Observation): Observation?
+    fun update(observation: Observation): Observation
 }

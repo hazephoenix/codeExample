@@ -59,10 +59,11 @@ interface ResourceService {
             where T : BaseResource
 
     /**
-     * Обновление, обязательно вложенное поле id
-     * Если не найден ресурс с таким id, то создается
+     * Обновление ресурса
+     * @param block действия над ресурсом
+     * @return измененный объект
      */
-    fun <T> update(resource: T): T
+    fun <T> update(resourceType: ResourceType<T>, id: String, block: T.() -> Unit): T
             where T : BaseResource
 
     /**

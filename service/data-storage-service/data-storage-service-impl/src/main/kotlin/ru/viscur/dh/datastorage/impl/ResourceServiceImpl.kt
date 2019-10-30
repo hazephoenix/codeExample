@@ -73,12 +73,40 @@ class ResourceServiceImpl : ResourceService {
     }
 
     @Tx
-    override fun <T> update(resource: T): T
+    override fun <T> update(resourceType: ResourceType<T>, id: String, block: T.() -> Unit): T
             where T : BaseResource {
-        return em.createNativeQuery("select resource_update(${jsonbParam(1)})")
+        for (i in (1..100)) {
+            val resource = byId(resourceType, id)
+            val initResource = resource.toJsonb()
+            resource.block()
+            val updated = updateByVersion(resource)
+            if (updated != null) {
+                em.createNativeQuery("""insert into ${resourceType.id}_history
+                    |(id, txid, status, resource)
+                    |values (:id, :txid, 'updated', :resource\:\:jsonb)
+                """.trimMargin())
+                        .setParameter("id", resource.id)
+                        .setParameter("txid", resource.meta.versionId)
+                        .setParameter("resource", initResource)
+                        .executeUpdate()
+                return updated
+            }
+        }
+        throw Exception("Error. can't update resource: 100 attempts failed")
+    }
+
+    /**
+     * Обновление по версии, обязательно вложенное поле id и [BaseResource.meta]->[ru.viscur.dh.fhir.model.entity.ResourceMeta.versionId]
+     * При успешном обновлении возвращает отредактированный ресурс
+     * Если нет записи с таким id и txid (версией), то не обновит и вернет null
+     */
+    @Tx
+    private fun <T : BaseResource> updateByVersion(resource: T): T? {
+        return em.createNativeQuery("select resource_update_by_txid(${jsonbParam(1)}, ?2)")
                 .setParameter(1, resource.toJsonb())
+                .setParameter(2, resource.meta.versionId)
                 .singleResult
-                .toResourceEntity()!!
+                .toResourceEntity()
     }
 
     @Tx

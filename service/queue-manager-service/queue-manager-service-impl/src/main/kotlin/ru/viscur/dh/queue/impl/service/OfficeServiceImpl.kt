@@ -55,11 +55,11 @@ class OfficeServiceImpl(
             }
         }
         resourceService.create(queueHistoryOfOffice)
-        resourceService.update(office.apply {
+        resourceService.update(ResourceType.Location, officeId) {
             status = newStatus
-            extension = extension?.let { it.apply { statusUpdatedAt = now } }
+            extension = extension?.apply { statusUpdatedAt = now }
                     ?: LocationExtension(statusUpdatedAt = now)
-        })
+        }
     }
 
     override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, asFirst: Boolean) {
@@ -109,20 +109,23 @@ class OfficeServiceImpl(
 
     override fun deletePatientFromLastPatientInfo(patientId: String) {
         locationService.withPatientInLastPatientInfo(patientId).forEach {
-            it.extension?.lastPatientInfo = null
-            resourceService.update(it)
+            resourceService.update(ResourceType.Location, it.id) {
+                if (extension?.lastPatientInfo?.subject?.id == patientId) {
+                    extension?.lastPatientInfo = null
+                }
+            }
         }
     }
 
     override fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?) {
-        val office = locationService.byId(officeId)
-        val newLastPatientInfo = LocationExtensionLastPatientInfo(
-                subject = referenceToPatient(patientId),
-                nextOffice = nextOfficeId?.let { referenceToLocation(nextOfficeId) }
-        )
-        office.extension = office.extension?.apply { lastPatientInfo = newLastPatientInfo }
-                ?: LocationExtension(lastPatientInfo = newLastPatientInfo)
-        resourceService.update(office)
+        resourceService.update(ResourceType.Location, officeId) {
+            val newLastPatientInfo = LocationExtensionLastPatientInfo(
+                    subject = referenceToPatient(patientId),
+                    nextOffice = nextOfficeId?.let { referenceToLocation(nextOfficeId) }
+            )
+            extension = extension?.apply { lastPatientInfo = newLastPatientInfo }
+                    ?: LocationExtension(lastPatientInfo = newLastPatientInfo)
+        }
     }
 
     private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {

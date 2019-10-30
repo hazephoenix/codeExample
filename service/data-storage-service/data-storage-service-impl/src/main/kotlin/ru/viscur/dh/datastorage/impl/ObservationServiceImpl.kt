@@ -60,20 +60,18 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
     /**
      * Обновить обследование (добавить результаты)
      */
-    override fun update(observation: Observation): Observation? {
-        return resourceService.byId(ResourceType.Observation, observation.id)
-                .let {
-                    it.performer = it.performer.union(observation.performer).toList().distinctBy { item -> item.id }
-                    it.status = observation.status
-                    it.valueBoolean = observation.valueBoolean
-                    it.valueInteger = observation.valueInteger
-                    it.valueQuantity = observation.valueQuantity
-                    it.valueSampledData = observation.valueSampledData
-                    it.valueString = observation.valueString
-
-                    updateRelated(it)
-                    resourceService.update(it)
-                }
+    override fun update(observation: Observation): Observation {
+        val updatedObservation = resourceService.update(ResourceType.Observation, observation.id) {
+            performer = (performer + observation.performer).distinctBy { item -> item.id }
+            status = observation.status
+            valueBoolean = observation.valueBoolean
+            valueInteger = observation.valueInteger
+            valueQuantity = observation.valueQuantity
+            valueSampledData = observation.valueSampledData
+            valueString = observation.valueString
+        }
+        updateRelated(updatedObservation)
+        return updatedObservation
     }
 
     /**
@@ -83,20 +81,14 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
     private fun updateRelated(observation: Observation) =
             observation.basedOn?.id?.let { serviceRequestId ->
                 // Обновить статус направления на обследование
-                try {
-                    resourceService.byId(ResourceType.ServiceRequest, serviceRequestId)
-                            .let {
-                                when (observation.status) {
-                                    ObservationStatus.final -> it.status = ServiceRequestStatus.completed
-                                    else -> it.status = ServiceRequestStatus.waiting_result
-                                }
-                                resourceService.update(it)
-                                // Обновить статус маршрутного листа
-                                updateCarePlan(it.id)
-                            }
-                } catch (e: Exception) {
-                    throw Error("ServiceRequest.id (basedOn) does not exist")
+                val updatedServiceRequest = resourceService.update(ResourceType.ServiceRequest, serviceRequestId) {
+                    status = when (observation.status) {
+                        ObservationStatus.final -> ServiceRequestStatus.completed
+                        else -> ServiceRequestStatus.waiting_result
+                    }
                 }
+                // Обновить статус маршрутного листа
+                updateCarePlan(updatedServiceRequest.id)
             } ?: throw Error("No correct ServiceRequest.id provided (basedOn)")
 
     /**
@@ -104,11 +96,9 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
      */
     private fun updateCarePlan(serviceRequestId: String) {
         getCarePlanByServiceRequestId(serviceRequestId)?.let { carePlan ->
-            carePlan.status = when (getUncompletedServiceRequests(carePlan.id).isEmpty()) {
-                false -> CarePlanStatus.waiting_results
-                true -> CarePlanStatus.results_are_ready
+            resourceService.update(ResourceType.CarePlan, carePlan.id) {
+                status = if (getUncompletedServiceRequests(id).isEmpty()) CarePlanStatus.results_are_ready else CarePlanStatus.waiting_results
             }
-            resourceService.update(carePlan)
         }
     }
 

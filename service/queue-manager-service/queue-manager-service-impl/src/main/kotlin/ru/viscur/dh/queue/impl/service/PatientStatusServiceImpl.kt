@@ -5,6 +5,7 @@ import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.QueueHistoryOfPatient
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
+import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.queue.api.PatientStatusService
@@ -23,12 +24,12 @@ class PatientStatusServiceImpl(
         if (saveCurrentStatusToHistory) {
             saveCurrentStatus(patientId, officeIdOfPrevProcess, now)
         }
-        val patient = patientService.byId(patientId)
-        patient.extension.apply {
-            queueStatus = newStatus
-            queueStatusUpdatedAt = now
+        resourceService.update(ResourceType.Patient, patientId) {
+            extension.apply {
+                queueStatus = newStatus
+                queueStatusUpdatedAt = now
+            }
         }
-        resourceService.update(patient)
     }
 
     override fun saveCurrentStatus(patientId: String, officeIdOfPrevProcess: String?, now: Date) {

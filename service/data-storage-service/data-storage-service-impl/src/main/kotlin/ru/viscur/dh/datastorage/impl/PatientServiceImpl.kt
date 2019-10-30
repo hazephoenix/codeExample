@@ -152,11 +152,14 @@ class PatientServiceImpl(
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем
         patient = patientByEnp?.let { byEnp ->
-            resourceService.update(patient.apply {
-                id = byEnp.id
-                extension.queueStatusUpdatedAt = byEnp.extension.queueStatusUpdatedAt
-                extension.queueStatus = byEnp.extension.queueStatus
-            })
+            resourceService.update(ResourceType.Patient, byEnp.id) {
+                identifier = patient.identifier
+                name = patient.name
+                birthDate = patient.birthDate
+                gender = patient.gender
+                extension.nationality = patient.extension.nationality
+                extension.birthPlace = patient.extension.birthPlace
+            }
         } ?: let {
             resourceService.create(patient.apply {
                 extension.queueStatusUpdatedAt = now()

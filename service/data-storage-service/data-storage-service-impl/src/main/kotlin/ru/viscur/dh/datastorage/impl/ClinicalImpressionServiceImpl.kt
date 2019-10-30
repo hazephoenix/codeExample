@@ -33,25 +33,25 @@ class ClinicalImpressionServiceImpl(
 
     override fun cancelActive(patientId: String) {
         active(patientId)?.run {
-            resourceService.update(this.apply {
+            resourceService.update(ResourceType.ClinicalImpression, id) {
                 status = ClinicalImpressionStatus.cancelled
-            })
+            }
             val references = this.supportingInfo
             getResources(references, ResourceType.CarePlan).firstOrNull()?.run {
                 if (this.status in listOf(CarePlanStatus.active, CarePlanStatus.waiting_results, CarePlanStatus.results_are_ready)) {
-                    resourceService.update(this.apply {
+                    resourceService.update(ResourceType.CarePlan, id) {
                         status = CarePlanStatus.cancelled
-                    })
+                    }
                     getResources(this.activity.map { it.outcomeReference }, ResourceType.ServiceRequest).forEach { serviceRequest ->
                         if (serviceRequest.status in listOf(ServiceRequestStatus.active, ServiceRequestStatus.waiting_result)) {
-                            resourceService.update(serviceRequest.apply {
+                            resourceService.update(ResourceType.ServiceRequest, serviceRequest.id) {
                                 status = ServiceRequestStatus.cancelled
-                            })
+                            }
                             observationService.byBaseOnServiceRequestId(serviceRequest.id)?.run {
-                                if (this.status == ObservationStatus.registered) {
-                                    resourceService.update(this.apply {
+                                if (status == ObservationStatus.registered) {
+                                    resourceService.update(ResourceType.Observation, id) {
                                         status = ObservationStatus.cancelled
-                                    })
+                                    }
                                 }
                             }
                         }
@@ -74,33 +74,32 @@ class ClinicalImpressionServiceImpl(
         val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.DiagnosticReport.id).first()
         val patientId = diagnosticReport.subject.id ?: throw Error("No patient id provided in DiagnosticReport.subject")
 
-        active(patientId)?.let { clinicalImpression ->
-            resourceService.create(diagnosticReport)
-            var refs = listOf(Reference(diagnosticReport))
-            getResourcesFromList<Encounter>(resources, ResourceType.Encounter.id)
-                    .firstOrNull()
-                    ?.let { encounter ->
-                        resourceService.create(encounter)
-                        refs = refs.plus(Reference(encounter))
+        return active(patientId)?.let { clinicalImpression ->
+            resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
+                resourceService.create(diagnosticReport)
+                var refs = listOf(Reference(diagnosticReport))
+                getResourcesFromList<Encounter>(resources, ResourceType.Encounter.id)
+                        .firstOrNull()
+                        ?.let { encounter ->
+                            resourceService.create(encounter)
+                            refs = refs.plus(Reference(encounter))
+                        }
+
+                carePlanService.current(patientId)?.let {
+                    resourceService.update(ResourceType.CarePlan, it.id) {
+                        status = CarePlanStatus.completed
                     }
+                }
 
-            carePlanService.current(patientId)?.let {
-                resourceService.update(it.apply {
-                    status = CarePlanStatus.completed
-                })
+                claimService.active(patientId)?.let {
+                    resourceService.update(ResourceType.Claim, it.id) {
+                        status = ClaimStatus.completed
+                    }
+                }
+
+                status = ClinicalImpressionStatus.completed
+                supportingInfo = refs.plus(clinicalImpression.supportingInfo)
             }
-
-            claimService.active(patientId)?.let {
-                resourceService.update(it.apply {
-                    status = ClaimStatus.completed
-                })
-            }
-
-            clinicalImpression.status = ClinicalImpressionStatus.completed
-            clinicalImpression.supportingInfo = refs.plus(clinicalImpression.supportingInfo)
-
-            resourceService.update(clinicalImpression)
-            return clinicalImpression
         } ?: throw Error("No active ClinicalImpression for patient with id $patientId found")
     }
 

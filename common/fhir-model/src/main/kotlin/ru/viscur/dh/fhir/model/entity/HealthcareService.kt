@@ -22,7 +22,7 @@ class HealthcareService @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.HealthcareService.id,
-        @JsonProperty("name") val name: String,
-        @JsonProperty("type") val type: List<CodeableConcept>,
-        @JsonProperty("location") val location: List<Reference>
+        @JsonProperty("name") var name: String,
+        @JsonProperty("type") var type: List<CodeableConcept>,
+        @JsonProperty("location") var location: List<Reference>
 ) : BaseResource(id, identifier, resourceType)
