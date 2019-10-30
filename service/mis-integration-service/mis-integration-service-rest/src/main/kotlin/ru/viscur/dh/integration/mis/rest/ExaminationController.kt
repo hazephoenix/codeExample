@@ -26,7 +26,7 @@ class ExaminationController(
      */
     @GetMapping("/patients")
     fun activeByPractitioner(@RequestParam practitionerId: String) =
-        patientService.patientsToExamine(practitionerId)
+        mapOf("patients" to patientService.patientsToExamine(practitionerId))
 
     /**
      * Назначить дообследование пациенту
