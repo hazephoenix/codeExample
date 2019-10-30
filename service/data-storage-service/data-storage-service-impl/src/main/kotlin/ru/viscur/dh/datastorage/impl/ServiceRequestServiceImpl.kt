@@ -94,10 +94,10 @@ class ServiceRequestServiceImpl(
             val serviceRequests = serviceRequestList.map { resourceService.create(it) }
             val activities = serviceRequests.map { CarePlanActivity(Reference(it)) }
 
-            resourceService.update(carePlan.apply {
-                carePlan.status = CarePlanStatus.active // results_are_ready -> active
-                carePlan.activity = activities.plus(carePlan.activity)
-            })
+            resourceService.update(ResourceType.CarePlan, carePlan.id) {
+                status = CarePlanStatus.active // results_are_ready -> active
+                activity = activities + activity
+            }
         } ?: throw Error("No active CarePlan found")
     }
 }

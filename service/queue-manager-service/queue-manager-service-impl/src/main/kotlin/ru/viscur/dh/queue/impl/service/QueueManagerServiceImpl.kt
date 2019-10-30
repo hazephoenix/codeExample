@@ -45,7 +45,7 @@ class QueueManagerServiceImpl(
     private fun estDuration(officeId: String, patientId: String): Int {
         //todo это диагноз пациента + тип пациента + типы процедур в этом кабинете -> продолжительность обслуживания. зашитое сопоставление
         val serviceRequests = serviceRequestService.active(patientId, officeId)
-        if(serviceRequests.isEmpty()) return 0
+        if (serviceRequests.isEmpty()) return 0
         return 1000
     }
 
@@ -98,9 +98,11 @@ class QueueManagerServiceImpl(
                 })
         ).map { it.first }
         serviceRequests.forEachIndexed { index, serviceRequest ->
-            serviceRequest.extension = serviceRequest.extension?.apply { executionOrder = index }
-                    ?: ServiceRequestExtension(executionOrder = index)
-            resourceService.update(serviceRequest)
+            resourceService.update(ResourceType.ServiceRequest, serviceRequest.id) {
+                locationReference =  serviceRequest.locationReference
+                extension = extension?.apply { executionOrder = index }
+                        ?: ServiceRequestExtension(executionOrder = index)
+            }
         }
         return serviceRequests
     }

@@ -19,7 +19,7 @@ interface PatientService {
     fun byId(id: String): Patient
 
     /**
-     * Пациент ЕНП [IdentifierType.ENP][ru.viscur.dh.fhir.model.valueSets.IdentifierType.ENP]
+     * Пациент по ЕНП [IdentifierType.ENP][ru.viscur.dh.fhir.model.valueSets.IdentifierType.ENP]
      * @param value значение ЕНП
      */
     fun byEnp(value: String): Patient?

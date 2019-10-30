@@ -26,9 +26,9 @@ class Patient @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>?,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Patient.id,
-        @JsonProperty("name") val name: List<HumanName>,
-        @JsonProperty("birthDate") val birthDate: Date,
-        @JsonProperty("gender") val gender: Gender,
+        @JsonProperty("name") var name: List<HumanName>,
+        @JsonProperty("birthDate") var birthDate: Date,
+        @JsonProperty("gender") var gender: Gender,
         @JsonProperty("extension") val extension: PatientExtension,
-        @JsonProperty("age") val age: Int = birthDate.toAge()
+        @JsonProperty("age") var age: Int = birthDate.toAge()
 ) : BaseResource(id, identifier, resourceType)

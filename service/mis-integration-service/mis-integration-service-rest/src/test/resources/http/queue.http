@@ -129,7 +129,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###
 ###
-DELETE http://84.201.154.121:8080/queue
+DELETE http://localhost:8080/queue
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

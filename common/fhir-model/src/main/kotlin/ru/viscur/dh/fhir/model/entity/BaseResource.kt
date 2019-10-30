@@ -17,7 +17,7 @@ import ru.viscur.dh.fhir.model.utils.genId
  */
 abstract class BaseResource(
         var id: String = genId(),
-        val identifier: List<Identifier>? = null,
+        var identifier: List<Identifier>? = null,
         val resourceType: ResourceType.ResourceTypeId,
         var meta: ResourceMeta = ResourceMeta()
 )

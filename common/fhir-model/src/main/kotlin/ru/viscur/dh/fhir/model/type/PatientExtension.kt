@@ -16,8 +16,8 @@ import java.util.*
 // * @param citizenship гражданство
  */
 class PatientExtension @JsonCreator constructor(
-        @JsonProperty("nationality") val nationality: String,
-        @JsonProperty("birthPlace") val birthPlace: Address,
+        @JsonProperty("nationality") var nationality: String,
+        @JsonProperty("birthPlace") var birthPlace: Address,
         @JsonProperty("queueStatusUpdatedAt") var queueStatusUpdatedAt: Date? = now(),
         @JsonProperty("queueStatus") var queueStatus: PatientQueueStatus? = PatientQueueStatus.READY
 //        ,

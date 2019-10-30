@@ -39,16 +39,15 @@ class ResourceServiceImplTest {
         assertNotSame(source, created)
         assertEquals("creating resource", created.name)
 
-        val updateSource = HealthcareService(
-                id = created.id,
-                name = "updating resource",
-                type = listOf(),
-                location = listOf()
-        )
-        val updated = resourceServiceImpl.update(updateSource)
+        val updated = resourceServiceImpl.update(ResourceType.HealthcareService, created.id) {
+            id = created.id
+            name = "updating resource"
+            type = listOf()
+            location = listOf()
+        }
         assertNotNull(updated)
         assertEquals(created.id, updated.id)
-        assertNotSame(updateSource, updated)
+        assertEquals("updating resource", updated.name)
         assertEquals("updating resource", updated.name)
     }
 
@@ -84,17 +83,6 @@ class ResourceServiceImplTest {
     }
 
     @Test
-    fun `should create new resource while updating when resource with id doesn't exists`() {
-        val updated = resourceServiceImpl.update(HealthcareService(
-                id = "Unknown",
-                name = "updating resource",
-                type = listOf(),
-                location = listOf()
-        ))
-        assertEquals("Unknown", resourceServiceImpl.byId(ResourceType.HealthcareService, updated.id).id)
-    }
-
-    @Test
     @Order(2)
     fun `should delete rows by name`() {
         val deletedCount = resourceServiceImpl.deleteAll(ResourceType.HealthcareService, RequestBodyForResources(
@@ -119,7 +107,6 @@ class ResourceServiceImplTest {
         assertEquals(3, found.size)
     }
 
-
     @Test
     fun `should delete resource by id`() {
         val source = HealthcareService(
@@ -138,30 +125,53 @@ class ResourceServiceImplTest {
     @Test
     fun updateResource() {
         val id = "for test"
-        resourceServiceImpl.create(Location(id = id, name = "1"))
-
-        val updated = resourceServiceImpl.update(ResourceType.Location, id) {
-            name = "newName"
+        try {
+            resourceServiceImpl.create(Location(id = id, name = "1"))
+            val updated = resourceServiceImpl.update(ResourceType.Location, id) {
+                name = "newName"
+            }
+            assertEquals("newName", updated.name)
+        } finally {
+            resourceServiceImpl.deleteById(ResourceType.Location, id)
         }
-        assertEquals("newName", updated.name)
     }
 
     @Test
-    fun asyncUpdateResource() {
-        val id = "for test"
+    fun nestingUpdatingResource() {
+        val locationId = "for test. location"
+        val hsId = "for test. hs"
         try {
-            resourceServiceImpl.create(Location(id = id, name = "1"))
-            for (i in (1..100)) {
+            resourceServiceImpl.create(Location(id = locationId, name = "1"))
+            resourceServiceImpl.create(HealthcareService(
+                    id = hsId,
+                    name = "1",
+                    type = listOf(),
+                    location = listOf()
+            ))
 
-                CompletableFuture.runAsync {
-//                    Thread {
-                    updateLocation(id)
-//                    }.start()
+            resourceServiceImpl.update(ResourceType.Location, locationId) {
+                name = "newName location"
+                resourceServiceImpl.update(ResourceType.HealthcareService, hsId) {
+                    name = "newName hs"
                 }
             }
-            Thread.sleep(5000)//чтобы потоки успели завершиться
+            assertEquals("newName location", resourceServiceImpl.byId(ResourceType.Location, locationId).name)
+            assertEquals("newName hs", resourceServiceImpl.byId(ResourceType.HealthcareService, hsId).name)
+        } finally {
+            resourceServiceImpl.deleteById(ResourceType.Location, locationId)
+            resourceServiceImpl.deleteById(ResourceType.HealthcareService, hsId)
+        }
+    }
+
+    @Test
+    fun severalUpdatingResourceInTx() {
+
+        val id = "for test severalUpdatingResourceInTx"
+        try {
+            resourceServiceImpl.create(Location(id = id, name = "20"))
+            updateLocation(id)
             val locationAfterUpdated = resourceServiceImpl.byId(ResourceType.Location, id)
-            assertEquals("101", locationAfterUpdated.name)
+            assertEquals("21", locationAfterUpdated.name)
             assertEquals(LocationStatus.OBSERVATION, locationAfterUpdated.status)
         } finally {
             resourceServiceImpl.deleteById(ResourceType.Location, id)
@@ -175,9 +185,30 @@ class ResourceServiceImplTest {
             name = (prevName + 1).toString()
         }
         resourceServiceImpl.update(ResourceType.Location, id) {
-            if (name.length > 1) {
+            if (name.length > 0) {
                 status = LocationStatus.OBSERVATION
             }
+        }
+    }
+
+    @Test
+    fun asyncUpdateResource() {
+        val id = "for async test"
+        try {
+            resourceServiceImpl.create(Location(id = id, name = "1"))
+            for (i in (1..100)) {
+                CompletableFuture.runAsync {
+                    resourceServiceImpl.update(ResourceType.Location, id) {
+                        val prevName = name.toInt()
+                        name = (prevName + 1).toString()
+                    }
+                }
+            }
+            Thread.sleep(5000)//чтобы потоки успели завершиться
+            val locationAfterUpdated = resourceServiceImpl.byId(ResourceType.Location, id)
+            assertEquals("101", locationAfterUpdated.name)
+        } finally {
+            resourceServiceImpl.deleteById(ResourceType.Location, id)
         }
     }
 }
