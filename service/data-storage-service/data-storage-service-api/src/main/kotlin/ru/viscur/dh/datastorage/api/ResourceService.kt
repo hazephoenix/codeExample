@@ -66,6 +66,14 @@ interface ResourceService {
             where T : BaseResource
 
     /**
+     * Обновление ресурса
+     * @param block действия над ресурсом
+     * @return измененный объект
+     */
+    fun <T> update(resourceType: ResourceType<T>, id: String, block: T.() -> Unit): T
+            where T : BaseResource
+
+    /**
      * Удаление определенного ресурса по типу [resourceType] и [id]
      * С сохранением истории пред. состояния ресурса
      * Если не найден ресурс с таким id, то пробрасывается исключение

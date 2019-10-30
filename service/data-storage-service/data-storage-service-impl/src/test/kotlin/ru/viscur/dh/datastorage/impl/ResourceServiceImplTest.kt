@@ -1,21 +1,20 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
-import ru.viscur.dh.datastorage.api.QueueService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
+import ru.viscur.dh.datastorage.impl.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.HealthcareService
-import ru.viscur.dh.fhir.model.entity.Practitioner
+import ru.viscur.dh.fhir.model.entity.Location
+import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
-import ru.viscur.dh.fhir.model.type.*
-import ru.viscur.dh.fhir.model.valueSets.IdentifierType
+import java.util.concurrent.CompletableFuture
 
 @SpringBootTest(
         classes = [DataStorageConfig::class]
@@ -131,7 +130,53 @@ class ResourceServiceImplTest {
         assertNotNull(created)
         val deleted = resourceServiceImpl.deleteById(ResourceType.HealthcareService, created.id)
         assertNotNull(deleted)
-        assertEquals(created.id, deleted!!.id)
+        assertEquals(created.id, deleted.id)
         assertThrows(Exception::class.java) { resourceServiceImpl.byId(ResourceType.HealthcareService, created.id) }
+    }
+
+    @Test
+    fun updateResource() {
+        val id = "for test"
+        resourceServiceImpl.create(Location(id = id, name = "1"))
+
+        val updated = resourceServiceImpl.update(ResourceType.Location, id) {
+            name = "newName"
+        }
+        assertEquals("newName", updated.name)
+    }
+
+    @Test
+    fun asyncUpdateResource() {
+        val id = "for test"
+        try {
+            resourceServiceImpl.create(Location(id = id, name = "1"))
+            for (i in (1..100)) {
+
+                CompletableFuture.runAsync {
+//                    Thread {
+                    updateLocation(id)
+//                    }.start()
+                }
+            }
+            Thread.sleep(5000)//чтобы потоки успели завершиться
+            val locationAfterUpdated = resourceServiceImpl.byId(ResourceType.Location, id)
+            assertEquals("101", locationAfterUpdated.name)
+            assertEquals(LocationStatus.OBSERVATION, locationAfterUpdated.status)
+        } finally {
+            resourceServiceImpl.deleteById(ResourceType.Location, id)
+        }
+    }
+
+    @Tx
+    private fun updateLocation(id: String) {
+        resourceServiceImpl.update(ResourceType.Location, id) {
+            val prevName = name.toInt()
+            name = (prevName + 1).toString()
+        }
+        resourceServiceImpl.update(ResourceType.Location, id) {
+            if (name.length > 1) {
+                status = LocationStatus.OBSERVATION
+            }
+        }
     }
 }

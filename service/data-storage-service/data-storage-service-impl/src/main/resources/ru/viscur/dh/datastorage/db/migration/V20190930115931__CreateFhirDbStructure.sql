@@ -135,8 +135,8 @@ drop table if exists "library";
 drop table if exists "library_history";
 drop table if exists "linkage";
 drop table if exists "linkage_history";
-drop table if exists "list";
-drop table if exists "list_history";
+drop table if exists "listresource";
+drop table if exists "listresource_history";
 drop table if exists "location";
 drop table if exists "location_history";
 drop table if exists "measure";
@@ -3138,33 +3138,33 @@ create table measure_history
 
 alter table measure_history owner to ${owner};
 
-create table list
+create table listresource
 (
 	id text not null
-		constraint list_pkey
+		constraint listresource_pkey
 			primary key,
 	txid bigint not null,
 	ts timestamp with time zone default CURRENT_TIMESTAMP,
-	resource_type text default 'List'::text,
+	resource_type text default 'ListResource'::text,
 	status resource_status not null,
 	resource jsonb not null
 );
 
-alter table list owner to ${owner};
+alter table listresource owner to ${owner};
 
-create table list_history
+create table listresource_history
 (
 	id text not null,
 	txid bigint not null,
 	ts timestamp with time zone default CURRENT_TIMESTAMP,
-	resource_type text default 'List'::text,
+	resource_type text default 'ListResource'::text,
 	status resource_status not null,
 	resource jsonb not null,
-	constraint list_history_pkey
+	constraint listresource_history_pkey
 		primary key (id, txid)
 );
 
-alter table list_history owner to ${owner};
+alter table listresource_history owner to ${owner};
 
 create table encounter
 (
@@ -4182,7 +4182,7 @@ $$;
 
 alter function resource_genid() owner to ${owner};
 
-create or replace function _resource_to_resource(x _resource) returns jsonb
+create or replace function to_resource(x _resource) returns jsonb
 	language sql
 as $$
 select x.resource || jsonb_build_object(
@@ -4190,12 +4190,12 @@ select x.resource || jsonb_build_object(
   'id', x.id,
   'meta', coalesce(x.resource->'meta', '{}'::jsonb) || jsonb_build_object(
     'lastUpdated', x.ts,
-    'versionId', x.txid::text
+    'versionId', x.txid
   )
  );
 $$;
 
-alter function _resource_to_resource(_resource) owner to ${owner};
+alter function to_resource(_resource) owner to ${owner};
 
 create or replace function resource_create(resource jsonb, txid bigint) returns jsonb
 	language plpgsql
@@ -4227,7 +4227,7 @@ BEGIN
          RETURNING *
       )
 
-      select _resource_to_resource(i.*) from inserted i
+      select to_resource(i.*) from inserted i
 
       $SQL$,
       rt || '_history', rt, rt, rt);
@@ -4287,13 +4287,13 @@ BEGIN
          RETURNING *
       )
 
-      select _resource_to_resource(i.*) from inserted i
+      select to_resource(i.*) from inserted i
 
       $SQL$,
       rt || '_history', rt, rt, rt);
 
   EXECUTE _sql
-  USING txid, rid, resource || ('{"id": "' || rid || '"}')::jsonb
+  USING txid, rid, resource || ('{"id": "' || rid || '", "meta": {"versionId": ' || txid ||'}}')::jsonb
   INTO result;
 
   return result;
@@ -4311,6 +4311,57 @@ $$;
 
 alter function resource_update(jsonb) owner to ${owner};
 
+create or replace function resource_update_by_txid(resource jsonb, txid_to_update bigint, txid bigint) returns jsonb
+    language plpgsql
+as $$
+DECLARE
+    _sql text;
+    rt text;
+    rid text;
+    result jsonb;
+BEGIN
+    rt   := resource->>'resourceType';
+    rid  := resource->> 'id';
+
+    CASE WHEN (rid IS NULL) THEN
+        RAISE EXCEPTION 'Resource does not have and id' USING HINT = 'Resource does not have and id';
+        ELSE
+        END CASE;
+
+    _sql := format($SQL$
+    with updated as(
+        update %s set
+              txid = $1,
+              ts = current_timestamp,
+              status = 'updated',
+              resource = $3
+        where id = $2 and txid = $4
+        RETURNING *
+    )
+
+    select to_resource(u.*) from updated u
+    $SQL$,
+    rt);
+
+    EXECUTE _sql
+        USING txid, rid, resource || ('{"id": "' || rid || '", "meta": {"versionId": ' || txid ||'}}')::jsonb, txid_to_update
+        INTO result;
+
+    return result;
+END
+$$;
+
+
+alter function resource_update_by_txid(jsonb, bigint, bigint) owner to ${owner};
+
+create or replace function resource_update_by_txid(resource jsonb, txid_to_update bigint) returns jsonb
+    language sql
+as $$
+SELECT resource_update_by_txid(resource, txid_to_update, nextval('transaction_id_seq'));
+$$;
+
+alter function resource_update_by_txid(jsonb, bigint) owner to ${owner};
+
 create or replace function resource_read(resource_type text, id text) returns jsonb
 	language plpgsql
 as $$
@@ -4319,7 +4370,7 @@ DECLARE
   result jsonb;
 BEGIN
   _sql := format($SQL$
-    SELECT _resource_to_resource(row(r.*)::_resource) FROM %s r WHERE r.id = $1
+    SELECT to_resource(row(r.*)::_resource) FROM %s r WHERE r.id = $1
   $SQL$,
   resource_type
   );
@@ -4357,7 +4408,7 @@ BEGIN
       ), dropped AS (
          DELETE FROM %s WHERE id = $2 RETURNING *
       )
-      select _resource_to_resource(i.*) from archived i
+      select to_resource(i.*) from archived i
 
       $SQL$,
       rt || '_history', rt, rt || '_history', rt, rt);

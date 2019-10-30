@@ -8,12 +8,18 @@ import ru.viscur.dh.datastorage.impl.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
+import java.util.concurrent.locks.ReentrantLock
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import javax.persistence.Query
 
 @Service
 class ResourceServiceImpl : ResourceService {
+
+    companion object {
+        //            private val sl = StampedLock() todo todom
+        private val lock = ReentrantLock()
+    }
 
     @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
@@ -79,6 +85,63 @@ class ResourceServiceImpl : ResourceService {
                 .setParameter(1, resource.toJsonb())
                 .singleResult
                 .toResourceEntity()!!
+    }
+
+    @Tx
+    override fun <T> update(resourceType: ResourceType<T>, id: String, block: T.() -> Unit): T
+            where T : BaseResource {
+        for (i in (1..100)) {
+            val resource = byId(resourceType, id)
+            resource.block()
+            val updated = updateByVersion(resource)
+            if (updated != null) {
+                em.createNativeQuery("""insert into ${resourceType.id}_history
+                    |(id, txid, status, resource)
+                    |values (:id, :txid, 'updated', :resource\:\:jsonb)
+                """.trimMargin())
+                        .setParameter("id", resource.id)
+                        .setParameter("txid", resource.meta.versionId)
+                        .setParameter("resource", resource.toJsonb())
+                        .executeUpdate()
+                return updated
+            }
+        }
+        throw Exception("Error. can't update resource: 100 attempts failed")
+    }
+
+//    @Tx todo todom
+//    override fun <T> update(resourceType: ResourceType<T>, id: String, block: T.() -> Unit): T
+//            where T : BaseResource {
+//        lock.lock()
+//        try{
+//            val update = updateIntr(resourceType, id, block)
+//            return update
+//        } finally{
+//            lock.unlock()
+//        }
+//    }
+//
+//    @Tx
+//    private fun <T> updateIntr(resourceType: ResourceType<T>, id: String, block: T.() -> Unit): T where T : BaseResource {
+//        val resource = byId(resourceType, id)
+//        println("  selected ${resource.meta.versionId} in ${Thread.currentThread().id}")
+//        resource.block()
+//        val update = update(resource)
+//        return update
+//    }
+
+    /**
+     * Обновление по версии, обязательно вложенное поле id и [BaseResource.meta]->[ru.viscur.dh.fhir.model.entity.ResourceMeta.versionId]
+     * При успешном обновлении возвращает отредактированный ресурс
+     * Если нет записи с таким id и txid (версией), то не обновит и вернет null
+     */
+    @Tx
+    private fun <T : BaseResource> updateByVersion(resource: T): T? {
+        return em.createNativeQuery("select resource_update_by_txid(${jsonbParam(1)}, ?2)")
+                .setParameter(1, resource.toJsonb())
+                .setParameter(2, resource.meta.versionId)
+                .singleResult
+                .toResourceEntity()
     }
 
     @Tx
