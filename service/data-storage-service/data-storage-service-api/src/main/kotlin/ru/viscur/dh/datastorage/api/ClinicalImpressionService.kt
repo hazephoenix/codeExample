@@ -11,6 +11,8 @@ interface ClinicalImpressionService {
      */
     fun active(patientId: String): ClinicalImpression?
 
+
+
     /**
      * Отменить активное обращение, если таковое имеется.
      * Т к при создании нового может быть по ошибке 2 активных.

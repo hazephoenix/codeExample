@@ -7,7 +7,11 @@ import ru.viscur.dh.fhir.model.enums.*
 import javax.persistence.*
 
 @Service
-class ObservationServiceImpl(private val resourceService: ResourceService) : ObservationService {
+class ObservationServiceImpl(
+        private val resourceService: ResourceService,
+        private val clinicalImpressionService: ClinicalImpressionService,
+        private val serviceRequestService: ServiceRequestService
+) : ObservationService {
 
     @PersistenceContext
     private lateinit var em: EntityManager
@@ -97,7 +101,11 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
     private fun updateCarePlan(serviceRequestId: String) {
         getCarePlanByServiceRequestId(serviceRequestId)?.let { carePlan ->
             resourceService.update(ResourceType.CarePlan, carePlan.id) {
-                status = if (getUncompletedServiceRequests(id).isEmpty()) CarePlanStatus.results_are_ready else CarePlanStatus.waiting_results
+                serviceRequestService.active(subject.id!!)
+                val uncompletedServiceRequests = getUncompletedServiceRequests(id)
+                val serviceReqOfRespPract = uncompletedServiceRequests.first().performer?.isNotEmpty() ?: false
+                status =
+                        if (uncompletedServiceRequests.size == 1 && serviceReqOfRespPract) CarePlanStatus.results_are_ready else CarePlanStatus.waiting_results
             }
         }
     }
