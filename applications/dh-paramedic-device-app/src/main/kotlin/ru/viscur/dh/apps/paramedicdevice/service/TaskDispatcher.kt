@@ -68,7 +68,7 @@ class TaskDispatcher(private val publisher: ApplicationEventPublisher) {
     /**
      * Удаление выполненных и выполненных с ошибкой задач
      */
-    @Scheduled(fixedDelay = 60000L)
+    @Scheduled(fixedDelay = 600_000L)
     fun cleanCompletedTasks() {
         val completedAndError = tasks.filterValues { it.status in arrayOf(TaskStatus.Complete, TaskStatus.Error) }
         completedAndError.forEach{ (k, _) -> tasks.remove(k) }
