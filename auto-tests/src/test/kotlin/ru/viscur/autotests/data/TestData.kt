@@ -1,6 +1,6 @@
 package ru.viscur.autotests.data
 
-class RequestsData {
+class TestData {
 
     companion object {
         //101 каб первый

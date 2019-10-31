@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import ru.viscur.autotests.data.RequestsData
+import ru.viscur.autotests.data.TestData
 import ru.viscur.autotests.restApiResources.QueRequests
 import ru.viscur.autotests.restApiResources.QueRequests.Companion.addPatientToQue
 import ru.viscur.autotests.restApiResources.QueRequests.Companion.getCabinetBusy
@@ -15,9 +15,9 @@ import ru.viscur.dh.fhir.model.type.Reference
 @EnableAutoConfiguration
 class QueueLogic {
 
-    val greenPatientRef = Reference(resourceType = ResourceType.ResourceTypeId.Patient, id = RequestsData.green1)
-    val redPatientRef = Reference(resourceType = ResourceType.ResourceTypeId.Patient, id = RequestsData.red1)
-    val yellowPatientRef = Reference(resourceType = ResourceType.ResourceTypeId.Patient, id = RequestsData.yellow1)
+    val greenPatientRef = Reference(resourceType = ResourceType.ResourceTypeId.Patient, id = TestData.green1)
+    val redPatientRef = Reference(resourceType = ResourceType.ResourceTypeId.Patient, id = TestData.red1)
+    val yellowPatientRef = Reference(resourceType = ResourceType.ResourceTypeId.Patient, id = TestData.yellow1)
     val cabinet101Ref = Reference(resourceType = ResourceType.ResourceTypeId.Location, id = "Office:101")
 
     @Test
@@ -55,5 +55,15 @@ class QueueLogic {
         //проверка, что зеленый первый в очереди
         assertThat(QueRequests.getQueInfo()).contains(expectedQueOrder)
     }
+    @Test
+    @Order(1)
+    fun smth() {
+        val patient = Reference(resourceType = ResourceType.ResourceTypeId.Patient, id = "1ce414ad-4c4a-4e0b-9895-7744a7f031f8")
+        /*QueRequests.deletePatientFromQue(patient).log().all()*/
+        addPatientToQue(patient)
+    }
+    @Test
+    fun diagnosis() {
 
+    }
 }
