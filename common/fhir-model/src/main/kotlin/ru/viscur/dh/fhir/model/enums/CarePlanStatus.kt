@@ -6,15 +6,10 @@ package ru.viscur.dh.fhir.model.enums
  * Статус [плана назначений пациенту CarePlan][ru.viscur.dh.fhir.model.entity.CarePlan]
  */
 enum class CarePlanStatus {
-    draft,
     /**
      * Проходит обследования
      */
     active,
-    /**
-     * Преостановлено (вне очереди)
-     */
-    suspended,
     /**
      * Прошел обследования, ждет результаты
      */
@@ -27,7 +22,8 @@ enum class CarePlanStatus {
      * Завершен
      */
     completed,
-    entered_in_error,
-    cancelled,
-    unknown
+    /**
+     * Отменен
+     */
+    cancelled
 }

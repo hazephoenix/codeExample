@@ -101,7 +101,7 @@ class ObservationServiceImplTest {
         ).let { resourceService.create(it) }.also { createdResources.add(it) }
 
         // Добавляем обследование
-        val observation = observationService.create(
+        val observation = observationService.create(patient.id,
             Observation(
                     basedOn = Reference(servReq),
                     subject = Reference(patient),
@@ -134,7 +134,7 @@ class ObservationServiceImplTest {
         // Добавляем результаты в обследование и завершаем его
         observation.valueInteger = 180
         observation.status = ObservationStatus.final
-        observationService.update(observation)
+        observationService.update(patient.id, observation)
 
         // Проверяем, что статусы направления и маршрутного листа обновились
         assertEquals(resourceService.byId(ResourceType.ServiceRequest, servReq.id).status, ServiceRequestStatus.completed)

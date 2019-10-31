@@ -1,20 +1,23 @@
 package ru.viscur.dh.datastorage.impl
 
-import org.springframework.stereotype.*
+import jdk.management.resource.ResourceId
+import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
-import ru.viscur.dh.datastorage.impl.config.annotation.*
-import ru.viscur.dh.datastorage.impl.utils.*
+import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.datastorage.impl.utils.getResourcesFromList
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
-import ru.viscur.dh.fhir.model.type.*
-import javax.persistence.*
+import ru.viscur.dh.fhir.model.type.Reference
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
 
 @Service
 class ClinicalImpressionServiceImpl(
         private val resourceService: ResourceService,
         private val carePlanService: CarePlanService,
         private val claimService: ClaimService,
-        private val observationService: ObservationService
+        private val observationService: ObservationService,
+        private val serviceRequestService: ServiceRequestService
 ) : ClinicalImpressionService {
 
     @PersistenceContext
@@ -29,6 +32,41 @@ class ClinicalImpressionServiceImpl(
             """)
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResource()
+    }
+
+    override fun bySupportingInfoReference(refResourceType: ResourceType.ResourceTypeId, refResourceId: String): ClinicalImpression {
+        val query = em.createNativeQuery("""
+                select r.resource
+                from ClinicalImpression r
+                where :refResourceType || '/' || :refResourceId in (
+                    select
+                        jsonb_array_elements(rIntr.resource -> 'supportingInfo') ->> 'reference'
+                    from ClinicalImpression rIntr
+                    where rIntr.id = r.id
+                )
+        """)
+        query.setParameter("refResourceType", refResourceType.toString())
+        query.setParameter("refResourceId", refResourceId)
+        return query.fetchResource()
+                ?: throw Exception("Not found ClinicalImpression with reference '$refResourceType/refResourceId' in supportingInfo")
+    }
+
+    override fun byServiceRequest(serviceRequestId: String): ClinicalImpression {
+        val query = em.createNativeQuery("""
+                select cir
+                from (select ci.resource cir, jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference' ciSiRef
+                      from clinicalimpression ci
+                      where ci.resource ->> 'status' = 'active'
+                     ) ciInfo
+                         join
+                     (select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference' srRef, cp.id cpId
+                      from CarePlan cp) srInfo
+                     on ciInfo.ciSiRef = 'CarePlan/' || srInfo.cpId
+                where  srInfo.srRef = 'ServiceRequest/' || :servReqId
+        """)
+        query.setParameter("servReqId", serviceRequestId)
+        return query.fetchResource()
+                ?: throw Exception("Not found active ClinicalImpression by serviceRequest with id: '$serviceRequestId'")
     }
 
     override fun cancelActive(patientId: String) {
@@ -69,27 +107,33 @@ class ClinicalImpressionServiceImpl(
      * добавляется
      */
     @Tx
-    override fun finish(bundle: Bundle): ClinicalImpression {
+    override fun completeRelated(bundle: Bundle): ClinicalImpression {
         val resources = bundle.entry.map { it.resource }
         val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.DiagnosticReport.id).first()
         val patientId = diagnosticReport.subject.id ?: throw Error("No patient id provided in DiagnosticReport.subject")
 
         return active(patientId)?.let { clinicalImpression ->
             resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
-                resourceService.create(diagnosticReport)
-                var refs = listOf(Reference(diagnosticReport))
+                val createdDiagnosticReport = resourceService.create(diagnosticReport)
+                val refs = mutableListOf(Reference(createdDiagnosticReport))
                 getResourcesFromList<Encounter>(resources, ResourceType.Encounter.id)
-                        .firstOrNull()
+                        .singleOrNull()
                         ?.let { encounter ->
-                            resourceService.create(encounter)
-                            refs = refs.plus(Reference(encounter))
-                        }
+                            val createdEncounter = resourceService.create(encounter)
+                            refs += Reference(createdEncounter)
+                        } ?: throw Exception("Error. Not found single encounter in bundle: '${bundle.toJsonb()}'")
+                getResourcesFromList<Observation>(resources, ResourceType.Observation.id)
+                        .singleOrNull()
+                        ?.let { observation ->
+                            serviceRequestService.updateStatusByObservation(observation)
+                            observationService.create(patientId, observation)
+                        } ?: throw Exception("Error. Not found single observation in bundle: '${bundle.toJsonb()}'")
 
                 carePlanService.current(patientId)?.let {
                     resourceService.update(ResourceType.CarePlan, it.id) {
                         status = CarePlanStatus.completed
                     }
-                }
+                } ?: throw Exception("Error. Not found current CarePlan for patient with id: '$patientId'")
 
                 claimService.active(patientId)?.let {
                     resourceService.update(ResourceType.Claim, it.id) {
@@ -97,11 +141,16 @@ class ClinicalImpressionServiceImpl(
                     }
                 }
 
-                status = ClinicalImpressionStatus.completed
-                supportingInfo = refs.plus(clinicalImpression.supportingInfo)
+                supportingInfo += refs
             }
-        } ?: throw Error("No active ClinicalImpression for patient with id $patientId found")
+        } ?: throw Error("Error. No active ClinicalImpression for patient with id $patientId found")
     }
+
+    @Tx
+    override fun complete(clinicalImpression: ClinicalImpression): ClinicalImpression =
+            resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
+                status = ClinicalImpressionStatus.completed
+            }
 
     private fun <T> getResources(references: List<Reference>, resourceType: ResourceType<T>): List<T>
             where T : BaseResource =

@@ -16,9 +16,9 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+  "id": "ignored",
   "resourceType": "Observation",
-  "status": "registered",
+  "status": "final",
   "issued": "1970-01-01T00:57:04.242+0000",
   "code": {
     "coding": [
@@ -40,7 +40,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   },
   "valueInteger": 110,
   "basedOn" : {
-    "reference": "ServiceRequest/c22a6a83-7727-4ff8-8863-7aefe83e4736"
+    "reference": "ServiceRequest/47da293a-a67e-492b-90e8-a87de1bc23bb"
   }
 }
 

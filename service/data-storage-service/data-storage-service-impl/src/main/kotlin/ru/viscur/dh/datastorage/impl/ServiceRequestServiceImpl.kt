@@ -100,4 +100,15 @@ class ServiceRequestServiceImpl(
             }
         } ?: throw Error("No active CarePlan found")
     }
+
+    @Tx
+    override fun updateStatusByObservation(observation: Observation): ServiceRequest =
+            observation.basedOn?.id?.let { serviceRequestId ->
+                resourceService.update(ResourceType.ServiceRequest, serviceRequestId) {
+                    status = when (observation.status) {
+                        ObservationStatus.final -> ServiceRequestStatus.completed
+                        else -> ServiceRequestStatus.waiting_result
+                    }
+                }
+            } ?: throw Error("Not found ServiceRequest by Observation.basedOn.id: '${observation.basedOn?.id}'")
 }

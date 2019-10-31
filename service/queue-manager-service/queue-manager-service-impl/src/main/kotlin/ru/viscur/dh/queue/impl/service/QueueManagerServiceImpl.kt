@@ -117,8 +117,6 @@ class QueueManagerServiceImpl(
             officeService.addPatientToQueue(nextOfficeId, patientId, estDuration(nextOfficeId, patientId))
             patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
             checkEntryToOffice(nextOfficeId)
-        } ?: run {
-            //завершил выполнение
         }
     }
 
@@ -172,7 +170,6 @@ class QueueManagerServiceImpl(
             if (patientQueueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION)) {
                 officeService.changeStatus(officeId, LocationStatus.BUSY)
                 officeService.deleteFirstPatientFromQueue(officeId)
-                checkEntryToOffice(officeId)
             } else {
                 //пациент просто в очереди. его очередь не настала. просто удаляем из очереди
                 officeService.deletePatientFromQueue(officeId, patientId)
@@ -205,6 +202,12 @@ class QueueManagerServiceImpl(
             patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId)
             addToOfficeQueue(patientId)
             officeService.updateLastPatientInfo(officeId, patientId, queueService.isPatientInOfficeQueue(patientId))
+        }
+    }
+
+    override fun patientLeftByPatientId(patientId: String) {
+        queueService.isPatientInOfficeQueue(patientId)?.run{
+            patientLeft(this)
         }
     }
 

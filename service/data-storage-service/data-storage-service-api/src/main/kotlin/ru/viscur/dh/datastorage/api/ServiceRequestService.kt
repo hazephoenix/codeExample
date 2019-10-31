@@ -24,4 +24,9 @@ interface ServiceRequestService {
      * Добавить направления на обследования
      */
     fun add(patientId: String, serviceRequestList: List<ServiceRequest>): CarePlan
+
+    /**
+     * Обновить статус направления на обследование [ServiceRequest] по [observation], который на нем основан
+     */
+    fun updateStatusByObservation(observation: Observation): ServiceRequest
 }

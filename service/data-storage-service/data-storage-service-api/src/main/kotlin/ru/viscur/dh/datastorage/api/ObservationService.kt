@@ -17,10 +17,10 @@ interface ObservationService {
     /**
      * Создать запись об обследовании
      */
-    fun create(observation: Observation): Observation?
+    fun create(patientId: String, observation: Observation): Observation
 
     /**
      * Обновить запись об исследовании
      */
-    fun update(observation: Observation): Observation
+    fun update(patientId: String, observation: Observation): Observation
 }

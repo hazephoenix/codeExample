@@ -57,15 +57,45 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     {
       "resource": {
         "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "СтХир",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/6e14d0e3-21e8-4524-99f4-f705832c1bb8",
+          "type": "Patient"
+        },
+        "valueString": "На осмотре хирурга (отв. врача) показаний для дообследований не выявлено. Необходима госпитализация.",
+        "basedOn" : {
+          "reference": "ServiceRequest/64cb66ff-2483-46c7-aed2-314c5bafe0d6"
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
         "resourceType": "DiagnosticReport",
         "status": "final",
         "issued": "2019-10-23T10:20:37.979+0000",
         "subject": {
-          "reference": "Patient/0c51d839-1e8f-4254-a4df-f32f25dbf6af"
+          "reference": "Patient/6e14d0e3-21e8-4524-99f4-f705832c1bb8"
         },
         "performer": [
           {
-            "reference": "Practitioner/ignored"
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962"
           }
         ],
         "conclusionCode": [
@@ -95,7 +125,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "id": "ignored",
         "resourceType": "Encounter",
         "subject": {
-          "reference": "Patient/0c51d839-1e8f-4254-a4df-f32f25dbf6af"
+          "reference": "Patient/6e14d0e3-21e8-4524-99f4-f705832c1bb8"
         },
         "hospitalization": {
           "destination": {

@@ -55,6 +55,11 @@ interface QueueManagerService {
     fun patientLeft(officeId: String)
 
     /**
+     * Аналог [patientLeft]
+     */
+    fun patientLeftByPatientId(patientId: String)
+
+    /**
      * Отменить "вход" пациента в кабинет
      * Если статус кабинета [ru.viscur.dh.fhir.model.enums.LocationStatus.WAITING_PATIENT] или [ru.viscur.dh.fhir.model.enums.LocationStatus.OBSERVATION]
      * Пациент отправляется обратно первым в очередь
