@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
-import ru.viscur.autotests.restApiResources.QueRequests
+import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -14,19 +14,19 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.valueSets.*
 
-class Test2 {
+class End2End {
 
     @Test
     @Order(1)
     fun patientE2e () {
         val patient = Helpers.createPatientResource("7879")
         val bodyWeight = Helpers.createObservation("Weight", 90, Reference(patient))
-        val questionnaireResponseSeverityCriteria = Helpers.createQuestResponse(Reference(patient))
-        val personalDataConsent = Helpers.createConsent(Reference(patient))
-        val diagnosticReport = Helpers.createDiagnosticReport("A00.0", Reference(patient))
+        val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(Reference(patient))
+        val personalDataConsent = Helpers.createConsentResource(Reference(patient))
+        val diagnosticReport = Helpers.createDiagnosticReportResource("A00.0", Reference(patient))
         val list = Helpers.createPractitionerListResource("хирург_Петров")
-        val claim = Helpers.createClaim(Reference(patient))
-        val servReq1 = Helpers.createServiceRequest("СтХир", Reference(patient))
+        val claim = Helpers.createClaimResource(Reference(patient))
+        val servReq1 = Helpers.createServiceRequestResource("СтХир", Reference(patient))
 
         val bundle = Bundle(
                 type = BundleType.BATCH.value,
@@ -47,7 +47,7 @@ class Test2 {
         QueRequests.getCabinetBusy(referenceToLocation(office139Id))
         val responseBundle = QueRequests.createPatient(bundle).extract().response().`as`(Bundle::class.java)
 
-        //проверка количества и наличия Service Request
+        //проверка наличия и количества Service Request
         assertEquals(1, responseBundle.entry.size, "number of servicerequests in response")
         assertEquals(ResourceType.ServiceRequest.id, responseBundle.entry.first().resource.resourceType, "")
 
@@ -73,15 +73,12 @@ class Test2 {
                         )
                 )
         )
-        /*val patientEnteredListResource = Helpers.createPatientAndLocationListResource(Reference(patient), referenceToLocation(office139Id))*/
-        
         QueRequests.getCabinetRdy(referenceToLocation(office139Id))
         val actOfficeServiceList = QueRequests.patientEntered(patientEnteredListResource).extract().response().`as`(Bundle::class.java)
         actPatient = QueRequests.getResource(ResourceType.Patient.id.toString(), patientId).extract().response().`as`(Patient::class.java)
         //проверка что в кабинете необходимые обследования и пациент
         assertEquals(1, actOfficeServiceList.entry.size, "wrong number of office's service requests")
         assertEquals(PatientQueueStatus.ON_OBSERVATION, actPatient.extension.queueStatus, "wrong patient status")
-
 
 //
 //        responseBundle.entry.find { it as Location

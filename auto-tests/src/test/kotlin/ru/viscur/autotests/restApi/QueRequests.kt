@@ -1,11 +1,11 @@
-package ru.viscur.autotests.restApiResources
+package ru.viscur.autotests.restApi
 
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
+import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ListResource
 import ru.viscur.dh.fhir.model.entity.Observation
 import ru.viscur.dh.fhir.model.type.Reference
-import java.io.File
 
 class QueRequests {
 
@@ -55,7 +55,7 @@ class QueRequests {
                 then().statusCode(200)
 
         //patient
-        fun createPatient(json : Any) = Helpers.createRequestSpec(json).
+        fun createPatient(bundle : Bundle) = Helpers.createRequestSpec(bundle).
                 `when`().
                 post(Endpoints.CREATE_PATIENT).
                 then().statusCode(200)
@@ -72,10 +72,9 @@ class QueRequests {
         then().statusCode(200)
 
         //service requests, severity, diagnosis
-        fun getServiceRequests(diagnosis : Any) = Helpers.createRequestSpec(diagnosis).log().all().
+        fun getSupposedServRequests(diagnosis : Any) = Helpers.createRequestSpec(diagnosis).log().all().
                 `when`().
                 post(Endpoints.SERVICE_REQUEST).
                 then().statusCode(200)
-
     }
 }

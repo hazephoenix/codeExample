@@ -1,4 +1,4 @@
-package ru.viscur.autotests.restApiResources
+package ru.viscur.autotests.restApi
 
 class Endpoints {
 

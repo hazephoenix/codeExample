@@ -31,13 +31,6 @@ class Helpers {
             return RestAssured.given().header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
         }
 
-        //преобразовать json из папки resources в строку
-        fun jsonToString(fileName: String): String {
-            val s = "C:\\Autotests\\DH\\digital-hospital\\auto-tests\\src\\test\\kotlin\\ru\\viscur\\autotests\\resources\\"
-            return String(Files.readAllBytes(Paths.get("$s$fileName")))
-        }
-
-
         //создание ресурсов
         fun createPatientResource(enp: String): Patient {
             return Patient(
@@ -80,7 +73,7 @@ class Helpers {
             )
         }
 
-        fun createServiceRequest(servRequestCode: String, patientReference: Reference): ServiceRequest {
+        fun createServiceRequestResource(servRequestCode: String, patientReference: Reference): ServiceRequest {
             return ServiceRequest(
                     subject = patientReference,
                     code = CodeableConcept(
@@ -91,7 +84,7 @@ class Helpers {
             )
         }
 
-        fun createClaim(patientReference: Reference): Claim {
+        fun createClaimResource(patientReference: Reference): Claim {
            return Claim(
                     identifier = listOf(Identifier(value = "123/012345", type = CodeableConcept(systemId = ValueSetName.IDENTIFIER_TYPES.id, code = IdentifierType.CLAIM_NUMBER.toString()))),//номер обращения
                     patient = patientReference,
@@ -103,7 +96,7 @@ class Helpers {
             )
         }
 
-        fun createDiagnosticReport(diagnosisCode: String, patientReference: Reference): DiagnosticReport {
+        fun createDiagnosticReportResource(diagnosisCode: String, patientReference: Reference): DiagnosticReport {
             return DiagnosticReport(
                     subject = patientReference,
                     performer = listOf(referenceToPractitioner("ignored")),
@@ -113,7 +106,7 @@ class Helpers {
             )
         }
 
-        fun createConsent(patientReference: Reference): Consent {
+        fun createConsentResource(patientReference: Reference): Consent {
             return Consent(
                     category = listOf(CodeableConcept(
                             code = "PERSONAL_DATA",
@@ -127,7 +120,7 @@ class Helpers {
             )
         }
 
-        fun createQuestResponse(patientReference: Reference): QuestionnaireResponse {
+        fun createQuestResponseResource(patientReference: Reference): QuestionnaireResponse {
             return QuestionnaireResponse(
                     status = QuestionnaireResponseStatus.completed,
                     author = referenceToPractitioner("ignored"),
@@ -178,9 +171,9 @@ class Helpers {
                             ),
                             QuestionnaireResponseItem(
                                     linkId = "Severity",
-                                    text = "Опорная функция",
+                                    text = "Категория пациента",
                                     answer = listOf(QuestionnaireResponseItemAnswer(
-                                            valueCoding = Coding(code = "RED", display = "Может стоять", system = ValueSetName.SEVERITY.id)
+                                            valueCoding = Coding(code = "RED", display = "Красный", system = ValueSetName.SEVERITY.id)
                                     ))
                             )
                     )
@@ -207,7 +200,7 @@ class Helpers {
             )
         }
 
-        fun createPatientAndLocationListResource (patientReference: Reference, locationReference: Reference): ListResource {
+        /*fun createPatientAndLocationListResource (patientReference: Reference, locationReference: Reference): ListResource {
             return ListResource(
                     entry = listOf(
                             ListResourceEntry(
@@ -217,7 +210,7 @@ class Helpers {
                                     item = locationReference)
                             )
                     )
-        }
-
+        }*/
     }
+
 }
