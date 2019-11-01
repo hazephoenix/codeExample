@@ -31,7 +31,7 @@ class QueueLogic {
 
         /*val observation = Observation(
                 status = ObservationStatus.final,
-                issued = Timestamp.valueOf(LocalDateTime.now()),
+                issued = now(),
                 basedOn = Reference(
                         resourceType = ResourceType.ResourceTypeId.ServiceRequest,
                         id = "dd252a96-a5f1-4206-9e00-f0e9a0ec716a"

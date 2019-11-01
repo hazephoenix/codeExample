@@ -11,7 +11,6 @@ import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.fhir.model.utils.referenceToPractitioner
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
-import java.sql.Timestamp
 import java.util.*
 
 class Helpers {
@@ -49,7 +48,7 @@ class Helpers {
                                 value = "7878 77521487",//серия номер
                                 type = CodeableConcept(systemId = ValueSetName.IDENTIFIER_TYPES.id, code = IdentifierType.PASSPORT.toString()),
                                 assigner = Reference(display = "ОУФМС по ТО..."),//кем выдан
-                                period = Period(start = Timestamp(1222222)),//дата выдачи
+                                period = Period(start = now()),//дата выдачи
                                 use = IdentifierUse.official//статус паспорта
                         ),
                         //полис
@@ -57,7 +56,7 @@ class Helpers {
                                 value = "7878 77521487",//серия номер
                                 type = CodeableConcept(systemId = ValueSetName.IDENTIFIER_TYPES.id, code = IdentifierType.DIGITAL_ASSURANCE.toString()),//|| physicalPolis - полис + вид полиса
                                 assigner = Reference(display = "ОУФМС по ТО..."),//кем выдан
-                                period = Period(start = Timestamp(1222222), end = Timestamp(1222222)),//действует с по
+                                period = Period(start = now(), end = now()),//действует с по
                                 use = IdentifierUse.official//статус полиса ||old
                         ),
                         Identifier(
@@ -122,7 +121,7 @@ class Helpers {
                         systemId = ValueSetName.CONSENT_CATEGORIES.id,
                         display = "Согласие на обарботку ПДн"
                 )),
-                dateTime = Timestamp(3424242),
+                dateTime = now(),
                 patient = referenceToPatient(patientId),
                 performer = referenceToPractitioner("ignored"),
                 organization = listOf(Reference(Organization(name = "СибГМУ")))
@@ -195,7 +194,7 @@ class Helpers {
         ) = Observation(
                 performer = listOf(referenceToPractitioner(practitionerId)),
                 subject = referenceToPatient(patientId),
-                issued = Timestamp(3424242),
+                issued = now(),
                 code = CodeableConcept(
                         code = code,
                         systemId = ValueSetName.OBSERVATION_TYPES.id,

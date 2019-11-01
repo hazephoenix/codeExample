@@ -206,7 +206,7 @@ class PatientServiceImpl(
                 author = responsiblePractitionerRef, // ответственный врач
                 contributor = paramedicReference,
                 status = CarePlanStatus.active,
-                created = Timestamp(date.time),
+                created = date,
                 title = "Маршрутный лист",
                 activity = resultServices
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
