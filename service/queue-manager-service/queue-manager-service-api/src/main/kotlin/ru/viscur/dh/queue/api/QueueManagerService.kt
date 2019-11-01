@@ -104,7 +104,7 @@ interface QueueManagerService {
     /**
      * Все [QueueItem] - все элементы очередей для всех кабинетов
      */
-    fun queueItems(officeId: String): List<QueueItem>
+    fun queueItems(): List<QueueItem>
 
     /**
      * Отобразить в логах очередь и провалидировать

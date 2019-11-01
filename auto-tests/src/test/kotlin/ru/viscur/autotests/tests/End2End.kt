@@ -88,6 +88,7 @@ class End2End {
         assertEquals(servReq1.code.code(), actServiceInOffice.code.code(), "wrong service request code in office")
         assertEquals(patientId, actServiceInOffice.subject?.id, "wrong patientId of service request")
 
+        //завершение обращения
         val obsOfRespPract = Helpers.createObservation(code = actServiceInOffice.code.code(),
                 valueString = "состояние удовлетворительное",
                 practitionerId = actServiceInOffice.performer?.first()?.id!!,

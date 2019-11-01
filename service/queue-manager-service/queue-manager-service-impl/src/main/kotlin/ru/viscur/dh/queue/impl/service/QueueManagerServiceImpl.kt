@@ -282,7 +282,7 @@ class QueueManagerServiceImpl(
     override fun queueOfOffice(officeId: String): Bundle =
             Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
-    override fun queueItems(officeId: String): List<QueueItem> =
+    override fun queueItems(): List<QueueItem> =
             resourceService.all(ResourceType.QueueItem, RequestBodyForResources(filter = mapOf()))
 
     //    private fun officesForSurveyType(surveyTypeId: Long): List<Office> {
