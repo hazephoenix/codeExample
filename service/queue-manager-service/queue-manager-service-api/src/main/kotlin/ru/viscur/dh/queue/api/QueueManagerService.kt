@@ -1,6 +1,7 @@
 package ru.viscur.dh.queue.api
 
 import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 
 /**
@@ -55,6 +56,11 @@ interface QueueManagerService {
     fun patientLeft(officeId: String)
 
     /**
+     * Аналог [patientLeft]
+     */
+    fun patientLeftByPatientId(patientId: String)
+
+    /**
      * Отменить "вход" пациента в кабинет
      * Если статус кабинета [ru.viscur.dh.fhir.model.enums.LocationStatus.WAITING_PATIENT] или [ru.viscur.dh.fhir.model.enums.LocationStatus.OBSERVATION]
      * Пациент отправляется обратно первым в очередь
@@ -94,6 +100,11 @@ interface QueueManagerService {
      * Очередь в опр. кабинет
      */
     fun queueOfOffice(officeId: String): Bundle
+
+    /**
+     * Все [QueueItem] - все элементы очередей для всех кабинетов
+     */
+    fun queueItems(): List<QueueItem>
 
     /**
      * Отобразить в логах очередь и провалидировать

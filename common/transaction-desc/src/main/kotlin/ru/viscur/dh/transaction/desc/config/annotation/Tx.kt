@@ -1,4 +1,4 @@
-package ru.viscur.dh.datastorage.impl.config.annotation
+package ru.viscur.dh.transaction.desc.config.annotation
 
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional

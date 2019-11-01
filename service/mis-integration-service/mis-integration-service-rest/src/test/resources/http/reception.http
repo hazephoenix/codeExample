@@ -594,79 +594,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "СтХир",
-              "system": "ValueSet/Observation_types"
-            }
-          ]
-        },
-        "locationReference": [
-          {
-            "reference": "Location/Office:ignored"
-          }
-        ]
-      }
-    },
-    {
-      "resource": {
-        "id": "ignored",
-        "resourceType": "ServiceRequest",
-        "status": "active",
-        "subject": {
-          "reference": "Patient/ignored",
-          "type": "Patient"
-        },
-        "code": {
-          "coding": [
-            {
-              "code": "B03.016.002ГМУ_СП",
-              "system": "ValueSet/Observation_types"
-            }
-          ]
-        },
-        "locationReference": [
-          {
-            "reference": "Location/Office:ignored"
-          }
-        ]
-      }
-    },
-    {
-      "resource": {
-        "id": "ignored",
-        "resourceType": "ServiceRequest",
-        "status": "active",
-        "subject": {
-          "reference": "Patient/ignored",
-          "type": "Patient"
-        },
-        "code": {
-          "coding": [
-            {
-              "code": "A06.03.023",
-              "system": "ValueSet/Observation_types"
-            }
-          ]
-        },
-        "locationReference": [
-          {
-            "reference": "Location/Office:ignored"
-          }
-        ]
-      }
-    },
-    {
-      "resource": {
-        "id": "ignored",
-        "resourceType": "ServiceRequest",
-        "status": "active",
-        "subject": {
-          "reference": "Patient/ignored",
-          "type": "Patient"
-        },
-        "code": {
-          "coding": [
-            {
-              "code": "СтУрол",
+              "code": "B03.016.006ГМУ_СП",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -858,7 +786,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             }
           },
           {
-            "value": "7878 11111",
+            "value": "7878 11113",
             "type": {
               "coding": [
                 {

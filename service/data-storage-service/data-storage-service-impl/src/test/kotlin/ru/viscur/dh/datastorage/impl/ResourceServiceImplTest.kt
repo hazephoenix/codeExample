@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
-import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.HealthcareService
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.enums.LocationStatus

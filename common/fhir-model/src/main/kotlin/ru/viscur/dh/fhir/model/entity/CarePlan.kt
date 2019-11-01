@@ -9,7 +9,7 @@ import ru.viscur.dh.fhir.model.type.CarePlanActivity
 import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.genId
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 04.10.2019 10:26 by SherbakovaMA
@@ -34,7 +34,7 @@ class CarePlan @JsonCreator constructor(
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.CarePlan.id,
         @JsonProperty("status") var status: CarePlanStatus = CarePlanStatus.active,
         @JsonProperty("intent") val intent: CarePlanIntent = CarePlanIntent.plan,
-        @JsonProperty("created") val created: Timestamp,
+        @JsonProperty("created") val created: Date,
         @JsonProperty("title") val title: String? = null,
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("author") val author: Reference,

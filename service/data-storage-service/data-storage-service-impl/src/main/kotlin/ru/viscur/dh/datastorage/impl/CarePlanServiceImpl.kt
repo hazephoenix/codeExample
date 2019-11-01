@@ -17,9 +17,7 @@ class CarePlanServiceImpl : CarePlanService {
             select cp.resource
             from CarePlan cp
             where cp.resource -> 'subject' ->> 'reference' = :patientRef
-                and (cp.resource ->> 'status' = :active
-                        OR cp.resource ->> 'status' = :waiting_results
-                        OR cp.resource ->> 'status' = :results_are_ready)
+                and cp.resource ->> 'status' in (:active, :waiting_results, :results_are_ready)
         """)
         query.setParameter("patientRef", "Patient/$patientId")
         query.setParameter("active", CarePlanStatus.active.toString())

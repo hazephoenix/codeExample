@@ -8,7 +8,7 @@ import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.genId
-import java.sql.*
+import java.util.*
 
 /**
  * Created at 01.10.2019 13:33 by SherbakovaMA
@@ -28,11 +28,11 @@ class DiagnosticReport @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.DiagnosticReport.id,
-        @JsonProperty("subject") val subject: Reference,
+        @JsonProperty("subject") var subject: Reference,
         @JsonProperty("performer") val performer: List<Reference>,
         @JsonProperty("conclusion") val conclusion: String? = null,
         @JsonProperty("conclusionCode") val conclusionCode: List<CodeableConcept>,
-        @JsonProperty("issued") val issued: Timestamp,
+        @JsonProperty("issued") val issued: Date,
 //        @JsonProperty("result") val result: List<Reference>,
-        @JsonProperty("status") val status: DiagnosticReportStatus = DiagnosticReportStatus.registered
+        @JsonProperty("status") val status: DiagnosticReportStatus = DiagnosticReportStatus.preliminary
 ) : BaseResource(id, identifier, resourceType)

@@ -1,6 +1,8 @@
 delete from Practitioner;
 
 --todo это временно, пока не дали данные
+select resource_create('{"resourceType": "Practitioner", "id": "фельдшер_Колосова", "name": [{"use": "official", "text": "Колосова А.А.", "given": ["Александра"], "family": "Колосова"}], "gender": "female", "qualification": {"code": {"coding": [{"code": "Paramedic", "system": "ValueSet/Practitioner_qualifications"}]}}}'::jsonb);
+select resource_create('{"resourceType": "Practitioner", "id": "мед_работник_диагностики_Сидорова", "name": [{"use": "official", "text": "Сидорова А.А.", "given": ["Александра"], "family": "Заборова"}], "gender": "female", "qualification": {"code": {"coding": [{"code": "Diagnostic_assistant", "system": "ValueSet/Practitioner_qualifications"}]}}}'::jsonb);
 select resource_create('{"resourceType": "Practitioner", "id": "терапевт_Петров", "name": [{"use": "official", "text": "Петров П.П.", "given": ["Петр"], "family": "Петров"}], "gender": "male", "qualification": {"code": {"coding": [{"code": "Therapist", "system": "ValueSet/Practitioner_qualifications"}]}}}'::jsonb);
 select resource_create('{"resourceType": "Practitioner", "id": "терапевт_Иванов", "name": [{"use": "official", "text": "Иванов П.П.", "given": ["Петр"], "family": "Иванов"}], "gender": "male", "qualification": {"code": {"coding": [{"code": "Therapist", "system": "ValueSet/Practitioner_qualifications"}]}}}'::jsonb);
 select resource_create('{"resourceType": "Practitioner", "id": "хирург_Петров", "name": [{"use": "official", "text": "Петров П.П.", "given": ["Петр"], "family": "Петров"}], "gender": "male", "qualification": {"code": {"coding": [{"code": "Surgeon", "system": "ValueSet/Practitioner_qualifications"}]}}}'::jsonb);

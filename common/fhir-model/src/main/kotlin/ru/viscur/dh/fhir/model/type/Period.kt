@@ -2,7 +2,7 @@ package ru.viscur.dh.fhir.model.type
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 01.10.2019 12:55 by SherbakovaMA
@@ -13,6 +13,6 @@ import java.sql.Timestamp
  * @param end дата окончания
  */
 class Period @JsonCreator constructor(
-        @JsonProperty("start") val start: Timestamp?,
-        @JsonProperty("end") val end: Timestamp? = null
+        @JsonProperty("start") val start: Date?,
+        @JsonProperty("end") val end: Date? = null
 )

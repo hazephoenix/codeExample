@@ -10,7 +10,7 @@ import ru.viscur.dh.fhir.model.type.Coding
 import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.genId
-import java.sql.Timestamp
+import java.util.*
 import java.util.*
 
 /**
