@@ -78,7 +78,7 @@ class QueRequests {
                 then().statusCode(200)
 
         //examination
-        fun completeExamination(bundle : Bundle) = Helpers.createRequestSpec(bundle).
+        fun completeExamination(bundle : Bundle) = Helpers.createRequestSpec(bundle).log().all().
                 `when`().
                 post(Endpoints.COMPLETE_EXAMINATION).
                 then().statusCode(200)

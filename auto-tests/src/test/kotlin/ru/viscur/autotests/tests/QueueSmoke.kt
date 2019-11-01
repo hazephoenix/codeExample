@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import ru.viscur.autotests.restApi.QueRequests
 
 @EnableAutoConfiguration
+@Disabled("Debug purposes only")
 class QueueSmoke {
     companion object {
         private val log = LoggerFactory.getLogger(QueueSmoke::class.java)

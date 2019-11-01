@@ -4,6 +4,7 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 
+@Disabled("Debug purposes only")
 class ServiceRequests {
 
 

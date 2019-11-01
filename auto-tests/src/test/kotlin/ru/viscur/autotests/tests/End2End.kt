@@ -13,6 +13,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 
+@Disabled("Debug purposes only")
 class End2End {
 
     companion object {
