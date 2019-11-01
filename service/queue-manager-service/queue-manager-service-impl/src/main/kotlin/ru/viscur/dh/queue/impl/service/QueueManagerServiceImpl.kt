@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
@@ -18,6 +19,7 @@ import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 
 @Service
 class QueueManagerServiceImpl(
@@ -35,6 +37,7 @@ class QueueManagerServiceImpl(
         private val log = LoggerFactory.getLogger(QueueManagerServiceImpl::class.java)
     }
 
+    @Tx
     override fun registerPatient(patientId: String): List<ServiceRequest> {
         val serviceRequests = calcServiceRequestExecOrders(patientId)
         deleteFromOfficeQueue(patientId)//на случай пересоздания маршрутного листа
@@ -79,6 +82,7 @@ class QueueManagerServiceImpl(
         return observationCategory.priority ?: 0.5
     }
 
+    @Tx
     override fun calcServiceRequestExecOrders(patientId: String): List<ServiceRequest> {
         var serviceRequests = serviceRequestService.all(patientId)
         val severity = patientService.severity(patientId)
@@ -107,6 +111,7 @@ class QueueManagerServiceImpl(
         return serviceRequests
     }
 
+    @Tx
     override fun addToOfficeQueue(patientId: String) {
         val patient = patientService.byId(patientId)
         if (patient.extension.queueStatus != PatientQueueStatus.READY) {
@@ -148,6 +153,7 @@ class QueueManagerServiceImpl(
     private fun nextOfficeId(patientId: String): String? =
             serviceRequestService.active(patientId).firstOrNull()?.locationReference?.first()?.id
 
+    @Tx
     override fun forceSendPatientToObservation(patientId: String, officeId: String) {
         val office = locationService.byId(officeId)
         if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
@@ -158,6 +164,7 @@ class QueueManagerServiceImpl(
         }
     }
 
+    @Tx
     override fun deleteFromOfficeQueue(patientId: String) {
         val patient = patientService.byId(patientId)
         val patientQueueStatus = patient.extension.queueStatus
@@ -181,6 +188,7 @@ class QueueManagerServiceImpl(
         officeService.deletePatientFromLastPatientInfo(patientId)
     }
 
+    @Tx
     override fun patientEntered(patientId: String, officeId: String): List<ServiceRequest> {
         if (officeService.firstPatientIdInQueue(officeId) == patientId) {
             val patient = patientService.byId(patientId)
@@ -193,6 +201,7 @@ class QueueManagerServiceImpl(
         return listOf()
     }
 
+    @Tx
     override fun patientLeft(officeId: String) {
         val patientId = officeService.firstPatientIdInQueue(officeId)!!
         val patient = patientService.byId(patientId)
@@ -205,12 +214,14 @@ class QueueManagerServiceImpl(
         }
     }
 
+    @Tx
     override fun patientLeftByPatientId(patientId: String) {
         queueService.isPatientInOfficeQueue(patientId)?.run{
             patientLeft(this)
         }
     }
 
+    @Tx
     override fun cancelEntering(officeId: String) {
         val office = locationService.byId(officeId)
         if (office.status in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
@@ -220,6 +231,7 @@ class QueueManagerServiceImpl(
         }
     }
 
+    @Tx
     override fun officeIsReady(officeId: String) {
         val office = locationService.byId(officeId)
         if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
@@ -228,6 +240,7 @@ class QueueManagerServiceImpl(
         }
     }
 
+    @Tx
     override fun officeIsBusy(officeId: String) {
         val office = locationService.byId(officeId)
         if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
@@ -235,6 +248,7 @@ class QueueManagerServiceImpl(
         }
     }
 
+    @Tx
     override fun officeIsClosed(officeId: String) {
         val office = locationService.byId(officeId)
         if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
@@ -249,6 +263,7 @@ class QueueManagerServiceImpl(
         }
     }
 
+    @Tx
     override fun deleteQueue() {
         queueService.involvedOffices().forEach {
             officeService.changeStatus(it.id, LocationStatus.BUSY)
@@ -267,7 +282,10 @@ class QueueManagerServiceImpl(
     override fun queueOfOffice(officeId: String): Bundle =
             Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
-//    private fun officesForSurveyType(surveyTypeId: Long): List<Office> {
+    override fun queueItems(officeId: String): List<QueueItem> =
+            resourceService.all(ResourceType.QueueItem, RequestBodyForResources(filter = mapOf()))
+
+    //    private fun officesForSurveyType(surveyTypeId: Long): List<Office> {
 //        TODO("Not implemented");
 //    }
 //

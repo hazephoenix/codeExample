@@ -4,6 +4,7 @@ import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
+import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import javax.persistence.*
 
 @Service
@@ -56,6 +57,9 @@ class ObservationServiceImpl(
      * со ссылкой на ServiceRequest
      */
     override fun create(patientId: String, observation: Observation): Observation {
+        observation.apply {
+            subject = referenceToPatient(patientId)
+        }
         updateRelated(patientId, observation)
         return resourceService.create(observation)
     }

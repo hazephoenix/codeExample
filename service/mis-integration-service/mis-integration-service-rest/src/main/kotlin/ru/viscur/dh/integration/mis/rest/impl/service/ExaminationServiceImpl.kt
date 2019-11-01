@@ -41,6 +41,7 @@ class ExaminationServiceImpl(
 
     @Tx
     override fun completeExamination(bundle: Bundle): ClinicalImpression {
+        //todo возможно логичнее: завершить обследование, удалить из очереди, завершить обращение и связанное
         val clinicalImpression = clinicalImpressionService.completeRelated(bundle)
         val patientId = clinicalImpression.subject.id!!
         //завершить обследование в кабинете (если пациент со статусом На обследовании)

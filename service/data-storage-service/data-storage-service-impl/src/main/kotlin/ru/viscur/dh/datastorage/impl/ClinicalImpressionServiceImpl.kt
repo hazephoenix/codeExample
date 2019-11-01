@@ -8,6 +8,7 @@ import ru.viscur.dh.datastorage.impl.utils.getResourcesFromList
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -109,25 +110,27 @@ class ClinicalImpressionServiceImpl(
     @Tx
     override fun completeRelated(bundle: Bundle): ClinicalImpression {
         val resources = bundle.entry.map { it.resource }
-        val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.DiagnosticReport.id).first()
-        val patientId = diagnosticReport.subject.id ?: throw Error("No patient id provided in DiagnosticReport.subject")
+        val observation = getResourcesFromList<Observation>(resources, ResourceType.Observation.id)
+                .singleOrNull()
+                ?: throw Exception("Error. Not found single observation in bundle: '${bundle.toJsonb()}'")
+
+        val updatedServiceRequest = serviceRequestService.updateStatusByObservation(observation)
+        val patientId = updatedServiceRequest.subject?.id
+                ?: throw Error("Not defined patient in subject of ServiceRequest with id: '${updatedServiceRequest.id}'")
+        observationService.create(patientId, observation)
 
         return active(patientId)?.let { clinicalImpression ->
             resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
-                val createdDiagnosticReport = resourceService.create(diagnosticReport)
+                val refToPatient = referenceToPatient(patientId)
+                val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.DiagnosticReport.id).first()
+                val createdDiagnosticReport = resourceService.create(diagnosticReport.apply { subject = refToPatient })
                 val refs = mutableListOf(Reference(createdDiagnosticReport))
                 getResourcesFromList<Encounter>(resources, ResourceType.Encounter.id)
                         .singleOrNull()
                         ?.let { encounter ->
-                            val createdEncounter = resourceService.create(encounter)
+                            val createdEncounter = resourceService.create(encounter.apply { subject = refToPatient })
                             refs += Reference(createdEncounter)
                         } ?: throw Exception("Error. Not found single encounter in bundle: '${bundle.toJsonb()}'")
-                getResourcesFromList<Observation>(resources, ResourceType.Observation.id)
-                        .singleOrNull()
-                        ?.let { observation ->
-                            serviceRequestService.updateStatusByObservation(observation)
-                            observationService.create(patientId, observation)
-                        } ?: throw Exception("Error. Not found single observation in bundle: '${bundle.toJsonb()}'")
 
                 carePlanService.current(patientId)?.let {
                     resourceService.update(ResourceType.CarePlan, it.id) {

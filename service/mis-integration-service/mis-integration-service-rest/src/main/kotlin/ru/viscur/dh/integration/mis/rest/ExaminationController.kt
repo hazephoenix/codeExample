@@ -4,7 +4,7 @@ import org.springframework.validation.annotation.*
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
-import ru.viscur.dh.queue.api.ExaminationService
+import ru.viscur.dh.integration.mis.rest.api.ExaminationService
 
 /**
  * Контроллер для осмотра пациентов ответственным врачом
@@ -21,7 +21,7 @@ class ExaminationController(
      */
     @GetMapping("/patients")
     fun activeByPractitioner(@RequestParam practitionerId: String) =
-        patientService.patientsToExamine(practitionerId)
+            mapOf("patients" to patientService.patientsToExamine(practitionerId))
 
     /**
      * Назначить дообследование пациенту

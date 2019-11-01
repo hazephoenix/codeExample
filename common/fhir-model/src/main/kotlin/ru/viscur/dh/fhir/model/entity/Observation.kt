@@ -7,7 +7,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.type.Annotation
 import ru.viscur.dh.fhir.model.utils.genId
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 01.10.2019 13:56 by SherbakovaMA
@@ -37,9 +37,9 @@ class Observation @JsonCreator constructor(
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Observation.id,
         @JsonProperty("status") var status: ObservationStatus = ObservationStatus.registered,
-        @JsonProperty("issued") val issued: Timestamp,
+        @JsonProperty("issued") val issued: Date,
         @JsonProperty("code") val code: CodeableConcept,
-        @JsonProperty("basedOn") val basedOn: Reference? = null,
+        @JsonProperty("basedOn") var basedOn: Reference? = null,
         @JsonProperty("performer") var performer: List<Reference>,
         @JsonProperty("subject") var subject: Reference,
         @JsonProperty("specimen") val specimen: Reference? = null,

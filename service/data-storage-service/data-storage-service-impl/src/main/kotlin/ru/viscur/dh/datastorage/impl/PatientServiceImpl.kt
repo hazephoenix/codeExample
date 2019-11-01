@@ -171,7 +171,12 @@ class PatientServiceImpl(
 
         val patientReference = Reference(patient)
         val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
-                .first().let { resourceService.create(it) }
+                .firstOrNull()?.let {
+                    resourceService.create(it.apply {
+                        subject = patientReference
+                    })
+                }
+                ?: throw Error("No DiagnosticReport provided")
         val paramedicReference = diagnosticReport.performer.first()
         val date = now()
 
@@ -206,7 +211,6 @@ class PatientServiceImpl(
                 activity = resultServices
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
-//        val encounter = Encounter(subject = patientReference).let { resourceService.create(it) }todo encounter это инфа о госпитализации, создадим при заполнении инфы о госпитализации. и в supportingInfo класть?
         val claim = getResourcesFromList<Claim>(resources, ResourceType.ResourceTypeId.Claim).first().let {
             resourceService.create(it.apply {
                 it.patient = patientReference

@@ -1,6 +1,7 @@
 package ru.viscur.dh.queue.api
 
 import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 
 /**
@@ -99,6 +100,11 @@ interface QueueManagerService {
      * Очередь в опр. кабинет
      */
     fun queueOfOffice(officeId: String): Bundle
+
+    /**
+     * Все [QueueItem] - все элементы очередей для всех кабинетов
+     */
+    fun queueItems(officeId: String): List<QueueItem>
 
     /**
      * Отобразить в логах очередь и провалидировать

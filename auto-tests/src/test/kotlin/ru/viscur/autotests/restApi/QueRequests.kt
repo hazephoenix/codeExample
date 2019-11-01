@@ -28,18 +28,18 @@ class QueRequests {
                 post(Endpoints.QUE_ADD_PATIENT).
                 then().statusCode(200)
 
-        fun deletePatientFromQue(patientRef: Reference) = Helpers.createRequestSpec(patientRef).
+        fun deletePatientFromQueue(patientRef: Reference) = Helpers.createRequestSpec(patientRef).
                 `when`().
                 delete(Endpoints.QUE_DELETE_PATIENT).
                 then()
 
         //cabinet
-        fun getCabinetRdy(cabinetRef: Reference) = Helpers.createRequestSpec(cabinetRef).
+        fun officeIsReady(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
                 `when`().
-                post(Endpoints.QUE_OFFICE_RDY).
+                post(Endpoints.QUE_OFFICE_READY).
                 then().statusCode(200)
 
-        fun getCabinetBusy(cabinetRef: Reference) = Helpers.createRequestSpec(cabinetRef).
+        fun cabinetIsBusy(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
                 `when`().
                 post(Endpoints.QUE_OFFICE_BUSY).
                 then().statusCode(200)
@@ -75,6 +75,12 @@ class QueRequests {
         fun getSupposedServRequests(diagnosis : Any) = Helpers.createRequestSpec(diagnosis).log().all().
                 `when`().
                 post(Endpoints.SERVICE_REQUEST).
+                then().statusCode(200)
+
+        //examination
+        fun completeExamination(bundle : Bundle) = Helpers.createRequestSpec(bundle).
+                `when`().
+                post(Endpoints.COMPLETE_EXAMINATION).
                 then().statusCode(200)
     }
 }

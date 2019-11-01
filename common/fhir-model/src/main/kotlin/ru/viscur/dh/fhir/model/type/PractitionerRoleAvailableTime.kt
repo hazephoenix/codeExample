@@ -3,7 +3,7 @@ package ru.viscur.dh.fhir.model.type
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import ru.viscur.dh.fhir.model.enums.DayOfWeek
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 03.10.2019 16:34 by SherbakovaMA
@@ -18,6 +18,6 @@ import java.sql.Timestamp
 class PractitionerRoleAvailableTime @JsonCreator constructor(
         @JsonProperty("daysOfWeek") val daysOfWeek: List<DayOfWeek>,
         @JsonProperty("allDay") val allDay: Boolean = false,
-        @JsonProperty("availableStartTime") val availableStartTime: Timestamp? = null,
-        @JsonProperty("availableEndTime") val availableEndTime: Timestamp? = null
+        @JsonProperty("availableStartTime") val availableStartTime: Date? = null,
+        @JsonProperty("availableEndTime") val availableEndTime: Date? = null
 )

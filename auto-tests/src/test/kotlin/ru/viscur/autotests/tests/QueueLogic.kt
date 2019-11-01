@@ -10,11 +10,19 @@ import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.type.BundleEntry
-import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.valueSets.BundleType
 
 class QueueLogic {
+
+    companion object {
+        //фельдшер
+        val paramedicId = Helpers.paramedicId
+        //кто делает все observation
+        val diagnosticAssistantId = Helpers.diagnosticAssistantId
+        //ответсвенный
+        val respPractitionerId = Helpers.surgeonId
+    }
 
     @Test
     fun addingObservation() {
@@ -44,19 +52,19 @@ class QueueLogic {
     }
 
     @Test
-    fun patientsUziSorting () {
+    fun patientsUziSorting() {
         val uziPatient1 = createPatientResource("1111")
         val uziPatient2 = createPatientResource("1112")
         val office116 = referenceToLocation("Office:116")
         val office117 = referenceToLocation("Office:117")
         // uziPatient1
-        val bodyWeight1 = createObservation("Weight", 90, Reference(uziPatient1))
-        val questionnaireResponseSeverityCriteria1 = Helpers.createQuestResponseResource(Reference(uziPatient1))
-        val personalDataConsent1 = Helpers.createConsentResource(Reference(uziPatient1))
-        val diagnosticReport1 = Helpers.createDiagnosticReportResource("A00.0", Reference(uziPatient1))
+        val bodyWeight1 = createObservation(code = "Weight", valueInt = 90)
+        val questionnaireResponseSeverityCriteria1 = Helpers.createQuestResponseResource()
+        val personalDataConsent1 = Helpers.createConsentResource()
+        val diagnosticReport1 = Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = diagnosticAssistantId)
         val list1 = Helpers.createPractitionerListResource("хирург_Петров")
-        val claim1 = Helpers.createClaimResource(Reference(uziPatient1))
-        val servReq1 = Helpers.createServiceRequestResource("A04.16.001", Reference(uziPatient1))
+        val claim1 = Helpers.createClaimResource()
+        val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
         val bundle1 = Bundle(
                 type = BundleType.BATCH.value,
                 entry = listOf(
@@ -71,13 +79,13 @@ class QueueLogic {
                 )
         )
         //uziPatient2
-        val bodyWeight2 = createObservation("Weight", 90, Reference(uziPatient2))
-        val questionnaireResponseSeverityCriteria2 = Helpers.createQuestResponseResource(Reference(uziPatient2))
-        val personalDataConsent2 = Helpers.createConsentResource(Reference(uziPatient2))
-        val diagnosticReport2 = Helpers.createDiagnosticReportResource("A00.0", Reference(uziPatient2))
-        val list2 = Helpers.createPractitionerListResource("хирург_Петров")
-        val claim2 = Helpers.createClaimResource(Reference(uziPatient2))
-        val servReq2 = Helpers.createServiceRequestResource("A04.16.001", Reference(uziPatient2))
+        val bodyWeight2 = createObservation(code = "Weight", valueInt = 90)
+        val questionnaireResponseSeverityCriteria2 = Helpers.createQuestResponseResource()
+        val personalDataConsent2 = Helpers.createConsentResource()
+        val diagnosticReport2 = Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
+        val list2 = Helpers.createPractitionerListResource(respPractitionerId)
+        val claim2 = Helpers.createClaimResource()
+        val servReq2 = Helpers.createServiceRequestResource("A04.16.001")
         val bundle2 = Bundle(
                 type = BundleType.BATCH.value,
                 entry = listOf(
@@ -92,8 +100,8 @@ class QueueLogic {
                 )
         )
         QueRequests.deleteQue()
-        QueRequests.getCabinetBusy(office116)
-        QueRequests.getCabinetBusy(office117)
+        QueRequests.cabinetIsBusy(office116)
+        QueRequests.cabinetIsBusy(office117)
         val servReqUzi1 = QueRequests.createPatient(bundle1).extract().response().`as`(Bundle::class.java).entry.first().resource as ServiceRequest
         val servReqUzi2 = QueRequests.createPatient(bundle2).extract().response().`as`(Bundle::class.java).entry.first().resource as ServiceRequest
         val queitem117 = QueRequests.getOfficeQue(office117).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
@@ -108,13 +116,13 @@ class QueueLogic {
         val patient1 = createPatientResource("1113")
         val patient2 = createPatientResource("1112")
         // patient1
-        val bodyWeight1 = createObservation("Weight", 90, Reference(patient1))
-        val questionnaireResponseSeverityCriteria1 = Helpers.createQuestResponseResource(Reference(patient1))
-        val personalDataConsent1 = Helpers.createConsentResource(Reference(patient1))
-        val diagnosticReport1 = Helpers.createDiagnosticReportResource("A00.0", Reference(patient1))
-        val list1 = Helpers.createPractitionerListResource("хирург_Петров")
-        val claim1 = Helpers.createClaimResource(Reference(patient1))
-        val servReq1 = Helpers.createServiceRequestResource("A04.16.001", Reference(patient1))
+        val bodyWeight1 = createObservation(code = "Weight", valueInt = 90)
+        val questionnaireResponseSeverityCriteria1 = Helpers.createQuestResponseResource()
+        val personalDataConsent1 = Helpers.createConsentResource()
+        val diagnosticReport1 = Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
+        val list1 = Helpers.createPractitionerListResource(respPractitionerId)
+        val claim1 = Helpers.createClaimResource()
+        val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
         val bundle1 = Bundle(
                 type = BundleType.BATCH.value,
                 entry = listOf(
@@ -129,7 +137,7 @@ class QueueLogic {
                 )
         )
         QueRequests.deleteQue()
-        QueRequests.getCabinetRdy(referenceToLocation("Office:117"))
+        QueRequests.officeIsReady(referenceToLocation("Office:117"))
         val servReq = QueRequests.createPatient(bundle1).extract().response().`as`(Bundle::class.java).entry
 
     }

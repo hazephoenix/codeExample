@@ -10,7 +10,6 @@ import javax.persistence.*
 
 private val dbResourceObjectMapper = ObjectMapper()
         .apply {
-            // TODO в ответе есть атрибут meta, но в моделе у нас его нет
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
 
