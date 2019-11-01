@@ -20,7 +20,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:139",
+        "reference": "Location/Office:101",
         "type": "Location"
       }
     },
@@ -52,7 +52,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "item": {
-        "reference": "Patient/6e14d0e3-21e8-4524-99f4-f705832c1bb8",
+        "reference": "Patient/94b5afcc-8719-4553-9f32-5994b08a4ed8",
         "type": "Patient"
       }
     }
