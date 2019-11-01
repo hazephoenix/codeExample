@@ -4,6 +4,7 @@ import org.springframework.validation.annotation.*
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
+import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.integration.mis.rest.api.ExaminationService
 
 /**
@@ -14,7 +15,8 @@ import ru.viscur.dh.integration.mis.rest.api.ExaminationService
 @Validated
 class ExaminationController(
         private val patientService: PatientService,
-        private val examinationService: ExaminationService
+        private val examinationService: ExaminationService,
+        private val serviceRequestService: ServiceRequestService
 ) {
     /**
      * Получить список активных пациентов ответсвенного врача
@@ -34,4 +36,10 @@ class ExaminationController(
      */
     @PostMapping
     fun completeExamination(@RequestBody bundle: Bundle) = examinationService.completeExamination(bundle)
+
+    /**
+     * Все назначения пациента
+     */
+    @GetMapping("/serviceRequests")
+    fun serviceRequests(@RequestParam patientId: String) = Bundle(entry = serviceRequestService.all(patientId).map { BundleEntry(it) })
 }

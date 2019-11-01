@@ -7,6 +7,10 @@ import ru.viscur.dh.fhir.model.enums.*
  * Сервис для работы с обследованиями
  */
 interface ObservationService {
+
+    /**
+     * По пациенту и статусу
+     */
     fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?>
 
     /**

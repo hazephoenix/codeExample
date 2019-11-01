@@ -1,14 +1,13 @@
 package ru.viscur.dh.datastorage.impl
 
-import jdk.management.resource.ResourceId
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
-import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.datastorage.impl.utils.getResourcesFromList
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
