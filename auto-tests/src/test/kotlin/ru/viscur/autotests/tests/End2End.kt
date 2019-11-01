@@ -2,6 +2,7 @@ package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests

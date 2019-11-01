@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests
 
 import org.hamcrest.CoreMatchers.equalTo
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 

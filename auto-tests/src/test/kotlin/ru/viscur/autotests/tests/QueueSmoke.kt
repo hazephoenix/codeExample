@@ -1,5 +1,6 @@
 package ru.viscur.autotests.tests
 
+import org.junit.jupiter.api.Disabled
 import org.slf4j.LoggerFactory
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
