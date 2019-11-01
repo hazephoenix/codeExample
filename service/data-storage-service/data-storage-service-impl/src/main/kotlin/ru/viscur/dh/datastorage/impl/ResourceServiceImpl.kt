@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
-import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType

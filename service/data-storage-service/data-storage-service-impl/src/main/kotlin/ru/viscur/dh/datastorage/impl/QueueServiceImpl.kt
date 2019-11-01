@@ -4,7 +4,7 @@ import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
-import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.entity.QueueItem

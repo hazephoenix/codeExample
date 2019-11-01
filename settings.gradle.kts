@@ -17,7 +17,8 @@ include(
         "service:location-service:location-service-impl",
         "applications:dh-central-server-app",
         "applications:dh-paramedic-device-app",
-        "auto-tests"
+        "auto-tests",
+        "common:transaction-desc"
         /*TODO "applications:dh-rfid-location-device-app"*/
 )
 

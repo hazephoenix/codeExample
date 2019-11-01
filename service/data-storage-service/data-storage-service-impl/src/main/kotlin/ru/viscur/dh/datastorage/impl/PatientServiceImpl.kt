@@ -2,7 +2,7 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
-import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.datastorage.impl.utils.*
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*

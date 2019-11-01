@@ -1,4 +1,4 @@
-package ru.viscur.dh.queue.api
+package ru.viscur.dh.integration.mis.rest.api
 
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.CarePlan

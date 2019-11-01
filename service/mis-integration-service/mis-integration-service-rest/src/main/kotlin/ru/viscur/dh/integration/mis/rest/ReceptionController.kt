@@ -6,6 +6,8 @@ import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
+import ru.viscur.dh.integration.mis.rest.api.ReceptionService
+import ru.viscur.dh.integration.mis.rest.dto.ServiceRequestPredictBody
 import ru.viscur.dh.queue.api.*
 
 /**
@@ -15,7 +17,7 @@ import ru.viscur.dh.queue.api.*
 @RequestMapping("/reception")
 class ReceptionController(
         private val patientService: PatientService,
-        private val queueManagerService: QueueManagerService
+        private val receptionService: ReceptionService
 ) {
     companion object {
         val patientClassifier = PatientClassifier()
@@ -48,24 +50,10 @@ class ReceptionController(
             )
 
     /**
-     * Сохранение всех данных, полученных на АРМ Фельдшер
+     * see [ReceptionService.registerPatient]
      */
     @PostMapping("/patient")
-    fun savePatientData(@RequestBody bundle: Bundle): Bundle {
-        val patientId = patientService.saveFinalPatientData(bundle)
-        val serviceRequests = queueManagerService.registerPatient(patientId)
-        queueManagerService.loqAndValidate()//todo del after
-        return Bundle(
-                entry = serviceRequests.map { BundleEntry(it) }
-        )
-    }
+    fun registerPatient(@RequestBody bundle: Bundle) = Bundle(
+            entry = receptionService.registerPatient(bundle).map { BundleEntry(it) }
+    )
 }
-
-/**
- * Тело запроса для определения услуг в маршрутном листе и др.
- */
-class ServiceRequestPredictBody(
-        val diagnosis: String,
-        val complaints: List<String>,
-        val gender: String
-)

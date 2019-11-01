@@ -1,17 +1,17 @@
-package ru.viscur.dh.queue.impl.service
+package ru.viscur.dh.integration.mis.rest.impl.service
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.ClinicalImpressionService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.ServiceRequestService
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Bundle
-import ru.viscur.dh.fhir.model.entity.ClinicalImpression
-import ru.viscur.dh.queue.api.ExaminationService
-import ru.viscur.dh.queue.api.QueueManagerService
-import ru.viscur.dh.datastorage.impl.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.CarePlan
+import ru.viscur.dh.fhir.model.entity.ClinicalImpression
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.integration.mis.rest.api.ExaminationService
+import ru.viscur.dh.queue.api.QueueManagerService
 
 /**
  * Created at 31.10.2019 18:03 by SherbakovaMA
