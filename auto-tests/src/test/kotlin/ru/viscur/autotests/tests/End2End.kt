@@ -53,8 +53,6 @@ class End2End {
         val patientId = actServiceRequest.subject?.id!!
         assertEquals(servRequests.first().code.code(), actServiceRequest.code.code(), "code ... ")
 
-        var actPatient = QueRequests.resource(ResourceType.Patient, patientId)
-
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office139Id, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
@@ -72,12 +70,13 @@ class End2End {
         //пациент вошел в кабинет
         val patientEnteredListResource = Helpers.createListResource(patientId, office139Id)
         val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
+
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office139Id, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
                 ))
         ))
-        actPatient = QueRequests.resource(ResourceType.Patient, patientId)
+        val actPatient = QueRequests.resource(ResourceType.Patient, patientId)
 
         //проверка что в кабинете необходимые обследования и пациент
         assertEquals(1, actServicesInOffice.size, "wrong number of office's service requests")
@@ -85,7 +84,7 @@ class End2End {
 
         //т к единственное обследование - осмотр отв. - завершение обследования:
         val actServiceInOffice = actServicesInOffice.first()
-        assertEquals(servRequests.first().code.code(), actServiceInOffice.code.code(), "wrong service request code in office")
+        assertEquals(servRequests.first().code.code(), actServiceInOffice.code.code(), "wrong service request code at office")
         assertEquals(patientId, actServiceInOffice.subject?.id, "wrong patientId of service request")
 
         //завершение обращения
@@ -107,7 +106,6 @@ class End2End {
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
-        checkQueueItems(listOf())
     }
 
     @Test
@@ -129,6 +127,11 @@ class End2End {
 
         val serviceRequest = responseBundle.entry.first().resource as ServiceRequest
         val patientId = serviceRequest.subject?.id!!
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office139, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
         var actPatient = QueRequests.resource(ResourceType.Patient, patientId)
         assertEquals(PatientQueueStatus.IN_QUEUE, actPatient.extension.queueStatus, "wrong status of patient ... ")
 
@@ -160,6 +163,46 @@ class End2End {
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
+    }
+
+    @Test
+    @Order(1)
+    fun fullPositiveE2ePatient() {
+        QueRequests.deleteQue()
+        val patientServiceRequests = listOf(
+                Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
+                Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
+                Helpers.createServiceRequestResource("A04.16.001")
+        )
+        val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
+        val responseBundle = QueRequests.createPatient(patientBundle)
+        assertEquals(4, responseBundle.entry.size, "wrong number of service request")
+
+    }
+
+    @Test
+    @Order(1)
+    fun fullPositiveE2ePatient2() {
+        QueRequests.deleteQue()
+        val patientServiceRequests = listOf(
+                Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
+                Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
+                Helpers.createServiceRequestResource("A04.16.001")
+        )
+        val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
+        val responseBundle = QueRequests.createPatient(Helpers.bundle("1001", "RED", patientServiceRequests))
+        val responseBundle2 = QueRequests.createPatient(Helpers.bundle("1002", "RED", patientServiceRequests))
+        val responseBundle3 = QueRequests.createPatient(Helpers.bundle("1003", "RED", patientServiceRequests))
+        val responseBundle4 = QueRequests.createPatient(Helpers.bundle("1004", "RED", patientServiceRequests))
+        val responseBundle5 = QueRequests.createPatient(Helpers.bundle("1005", "RED", patientServiceRequests))
+        val responseBundle6 = QueRequests.createPatient(Helpers.bundle("1006", "RED", patientServiceRequests))
+        val responseBundle7 = QueRequests.createPatient(Helpers.bundle("1007", "RED", patientServiceRequests))
+        val responseBundle8 = QueRequests.createPatient(Helpers.bundle("1008", "RED", patientServiceRequests))
+        val responseBundle9 = QueRequests.createPatient(Helpers.bundle("1009", "RED", patientServiceRequests))
+        val responseBundle10 = QueRequests.createPatient(Helpers.bundle("1010", "RED", patientServiceRequests))
+        val responseBundle11 = QueRequests.createPatient(Helpers.bundle("1011", "RED", patientServiceRequests))
+        val responseBundle12 = QueRequests.createPatient(Helpers.bundle("1012", "RED", patientServiceRequests))
+        val responseBundle13 = QueRequests.createPatient(Helpers.bundle("1013", "RED", patientServiceRequests))
     }
 
 }

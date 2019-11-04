@@ -49,6 +49,11 @@ class QueRequests {
                 post(Endpoints.QUE_OFFICE_BUSY).
                 then().statusCode(200)
 
+        fun officeIsClosed(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
+                `when`().
+                post(Endpoints.QUE_OFFICE_CLOSE).
+                then().statusCode(200)
+
         fun invitePatientToOffice(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).
                 `when`().
                 post(Endpoints.OFFICE_INVITE).

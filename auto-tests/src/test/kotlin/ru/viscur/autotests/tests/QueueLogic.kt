@@ -113,4 +113,31 @@ class QueueLogic {
                 ))
         ))
     }
+
+    @Test
+    fun GreenYellowRedSorting() {
+        val office101 = "Office:101"
+        QueRequests.deleteQue()
+        QueRequests.officeIsBusy(referenceToLocation(office101))
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource("B03.016.002ГМУ_СП"),
+                Helpers.createServiceRequestResource("СтХир")
+        )
+        val bundle1 = Helpers.bundle("1120", "GREEN", servRequests)
+        val bundle2 = Helpers.bundle("1121", "YELLOW", servRequests)
+        val bundle3 = Helpers.bundle("1122", "RED", servRequests)
+
+        val responseBundle1 = QueRequests.createPatient(bundle1).entry.get(0).resource as ServiceRequest
+        val responseBundle2 = QueRequests.createPatient(bundle2).entry.get(0).resource as ServiceRequest
+        val responseBundle3 = QueRequests.createPatient(bundle3).entry.get(0).resource as ServiceRequest
+
+        //проверка корректного формарования очереди
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(responseBundle3.subject?.id!!, PatientQueueStatus.IN_QUEUE),
+                        QueueItemInfo(responseBundle2.subject?.id!!, PatientQueueStatus.IN_QUEUE),
+                        QueueItemInfo(responseBundle1.subject?.id!!, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+    }
 }

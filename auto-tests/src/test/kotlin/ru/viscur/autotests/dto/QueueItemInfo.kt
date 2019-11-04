@@ -8,7 +8,7 @@ import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
  *
  * @param officeId id офиса
  */
-data class QueueItemsOfOffice(
+data class QueueItemsOfOffice  (
         val officeId: String,
         val items: List<QueueItemInfo>
 )

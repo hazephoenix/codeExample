@@ -14,6 +14,8 @@ class Endpoints {
         const val QUE_DELETE_PATIENT: String = "$BASE_URI/queue/patient"
         const val QUE_OFFICE_READY: String = "$BASE_URI/queue/office/ready"
         const val QUE_OFFICE_BUSY: String = "$BASE_URI/queue/office/busy"
+        const val QUE_OFFICE_CLOSE: String = "$BASE_URI/queue/office/closed"
+
         const val QUE_DELETE_ALL: String = "$BASE_URI/queue"
         const val QUE_ITEMS: String = "$BASE_URI/queue/queueItems"
         //office
