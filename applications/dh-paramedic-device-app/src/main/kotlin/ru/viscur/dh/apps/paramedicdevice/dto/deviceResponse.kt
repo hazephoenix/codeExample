@@ -20,3 +20,23 @@ data class TvesResponse(
         val code: String,
         val message: String
 )
+
+/**
+ * Ответ от сканера документов
+ */
+data class DocumentResponse(
+        val firstName: String?,
+        val middleName: String?,
+        val lastName: String?,
+        val birthDate: String?,
+        val fullName: String?
+)
+
+
+/**
+ * Ответ от термометра
+ */
+data class TemperatureResponse(
+        val temperature: Double,
+        val unit: String
+);
