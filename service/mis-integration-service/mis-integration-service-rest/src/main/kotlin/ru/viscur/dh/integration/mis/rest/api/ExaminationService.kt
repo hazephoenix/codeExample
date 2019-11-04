@@ -20,4 +20,9 @@ interface ExaminationService {
      * Завершить осмотр пациента
      */
     fun completeExamination(bundle: Bundle): ClinicalImpression
+
+    /**
+     * Отменить обращение пациента
+     */
+    fun cancelClinicalImpression(patientId: String)
 }

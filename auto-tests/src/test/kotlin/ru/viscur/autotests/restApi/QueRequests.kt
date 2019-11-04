@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
+import ru.viscur.dh.fhir.model.dto.PatientToExamine
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.Reference
@@ -77,6 +78,10 @@ class QueRequests {
                 post(Endpoints.CREATE_OBSERVATION).
                 then().statusCode(200)
 
+        fun observations(patientId: String? = null) =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.OBSERVATIONS + "?patientId=$patientId").then().statusCode(200)
+                        .extract().response().`as`(ObservationsResponse::class.java)
+
         fun addServiceRequests(bundle: Bundle) = Helpers.createRequestSpec(bundle).log().all().
                 `when`().
                 post(Endpoints.ADD_SERVICE_REQUEST).
@@ -93,7 +98,20 @@ class QueRequests {
                 `when`().
                 post(Endpoints.COMPLETE_EXAMINATION).
                 then().statusCode(200).extract().response().`as`(ClinicalImpression::class.java)
+
+        fun patientsOfResp(practitionerId: String? = null) =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.PATIENTS_OF_RESP + if (practitionerId == null) "" else "?practitionerId=$practitionerId").then().statusCode(200)
+                        .extract().response().`as`(PatientsOfRespResponse::class.java)["patients"]!!
+
+        fun serviceRequestsOfPatients(patientId: String) =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.SERVICE_REQUEST + "?patientId=$patientId").then().statusCode(200)
+                        .extract().response().`as`(Bundle::class.java)
+                        .let { it.entry.map { it.resource as ServiceRequest } }
     }
 }
 
 class QueueItemsResponse: ArrayList<QueueItem>()
+
+class ObservationsResponse: ArrayList<Observation>()
+
+class PatientsOfRespResponse: HashMap<String, List<PatientToExamine>>()

@@ -16,8 +16,7 @@ import ru.viscur.dh.integration.mis.rest.api.ExaminationService
 class ExaminationController(
         private val patientService: PatientService,
         private val examinationService: ExaminationService,
-        private val serviceRequestService: ServiceRequestService,
-        private val clinicalImpressionService: ClinicalImpressionService
+        private val serviceRequestService: ServiceRequestService
 ) {
     /**
      * Получить список активных пациентов ответсвенного врача
@@ -49,6 +48,6 @@ class ExaminationController(
      */
     @GetMapping("/cancel")
     fun cancel(@RequestParam patientId: String) {
-        clinicalImpressionService.cancelActive(patientId)
+        examinationService.cancelClinicalImpression(patientId)
     }
 }
