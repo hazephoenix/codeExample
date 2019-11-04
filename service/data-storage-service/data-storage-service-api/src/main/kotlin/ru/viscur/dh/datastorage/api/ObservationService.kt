@@ -11,7 +11,7 @@ interface ObservationService {
     /**
      * По пациенту и статусу
      */
-    fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?>
+    fun byPatientAndStatus(patientId: String, status: ObservationStatus? = null): List<Observation?>
 
     /**
      * По назначению-основанию (basedOn - ServiceRequest)

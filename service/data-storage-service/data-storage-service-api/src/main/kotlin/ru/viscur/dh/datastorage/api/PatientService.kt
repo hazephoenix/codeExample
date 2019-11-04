@@ -61,6 +61,7 @@ interface PatientService {
 
     /**
      * Получить список ожидающих осмотра пациентов по id ответственного врача
+     * Если [practitionerId] не задан, возвращаются все
      */
-    fun patientsToExamine(practitionerId: String): List<PatientToExamine>
+    fun patientsToExamine(practitionerId: String? = null): List<PatientToExamine>
 }

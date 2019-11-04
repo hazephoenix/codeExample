@@ -5,7 +5,21 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
-GET http://localhost:8080/examination/patients?practitionerId=ignored
+###        все пациенты в ответственности врача
+###
+GET http://localhost:8080/examination/patients?practitionerId=37030497-7d8b-48ec-a5cf-5f3097c813ac
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+###
+GET http://localhost:8080/examination/patients
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+###        все назначения пациента
+###
+
+GET http://localhost:8080/examination/serviceRequests?patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

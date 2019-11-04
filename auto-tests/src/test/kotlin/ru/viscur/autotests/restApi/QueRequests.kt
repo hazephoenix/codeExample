@@ -1,10 +1,11 @@
 package ru.viscur.autotests.restApi
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
-import ru.viscur.dh.fhir.model.entity.Bundle
-import ru.viscur.dh.fhir.model.entity.ListResource
-import ru.viscur.dh.fhir.model.entity.Observation
+import ru.viscur.dh.fhir.model.entity.*
+import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
 
 class QueRequests {
@@ -33,13 +34,17 @@ class QueRequests {
                 delete(Endpoints.QUE_DELETE_PATIENT).
                 then()
 
+        fun queueItems() = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
+                `when`().get(Endpoints.QUE_ITEMS).
+                then().statusCode(200).extract().response().`as`(QueueItemsResponse::class.java)
+
         //cabinet
         fun officeIsReady(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
                 `when`().
                 post(Endpoints.QUE_OFFICE_READY).
                 then().statusCode(200)
 
-        fun cabinetIsBusy(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
+        fun officeIsBusy(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
                 `when`().
                 post(Endpoints.QUE_OFFICE_BUSY).
                 then().statusCode(200)
@@ -52,18 +57,24 @@ class QueRequests {
         fun patientEntered(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).log().all().
                 `when`().
                 post(Endpoints.PATIENT_ENTERED).
-                then().statusCode(200)
+                then().statusCode(200).extract().response().`as`(Bundle::class.java)
+                .let { it.entry.map { it.resource as ServiceRequest } }
 
         //patient
         fun createPatient(bundle : Bundle) = Helpers.createRequestSpec(bundle).
                 `when`().
                 post(Endpoints.CREATE_PATIENT).
-                then().statusCode(200)
+                then().statusCode(200).extract().response().`as`(Bundle::class.java)
 
         fun getResource(resourceType: String, id: String) = Helpers.createRequestSpecWithoutBody().
                 `when`().
                 get(Endpoints.BASE_URI + "/" + resourceType + "/" + id).
                 then().statusCode(200)
+
+        fun <T> resource(resourceType: ResourceType<T>, id: String): T
+                where T : BaseResource =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.BASE_URI + "/" + resourceType.id.toString() + "/" + id).then().statusCode(200)
+                        .extract().response().`as`(resourceType.entityClass)
 
         //observation
         fun createObservation(observation : Observation) = Helpers.createRequestSpec(observation).log().all().
@@ -81,6 +92,8 @@ class QueRequests {
         fun completeExamination(bundle : Bundle) = Helpers.createRequestSpec(bundle).log().all().
                 `when`().
                 post(Endpoints.COMPLETE_EXAMINATION).
-                then().statusCode(200)
+                then().statusCode(200).extract().response().`as`(ClinicalImpression::class.java)
     }
 }
+
+class QueueItemsResponse: ArrayList<QueueItem>()

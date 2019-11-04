@@ -102,10 +102,10 @@ class QueueLogic {
                 )
         )
         QueRequests.deleteQue()
-        QueRequests.cabinetIsBusy(office116)
-        QueRequests.cabinetIsBusy(office117)
-        val servReqUzi1 = QueRequests.createPatient(bundle1).extract().response().`as`(Bundle::class.java).entry.first().resource as ServiceRequest
-        val servReqUzi2 = QueRequests.createPatient(bundle2).extract().response().`as`(Bundle::class.java).entry.first().resource as ServiceRequest
+        QueRequests.officeIsBusy(office116)
+        QueRequests.officeIsBusy(office117)
+        val servReqUzi1 = QueRequests.createPatient(bundle1).entry.first().resource as ServiceRequest
+        val servReqUzi2 = QueRequests.createPatient(bundle2).entry.first().resource as ServiceRequest
         val queitem117 = QueRequests.getOfficeQue(office117).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
         val queitem116 = QueRequests.getOfficeQue(office116).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
         //проверка, что оба идут на обследование в разных кабинетах
@@ -140,7 +140,7 @@ class QueueLogic {
         )
         QueRequests.deleteQue()
         QueRequests.officeIsReady(referenceToLocation("Office:117"))
-        val servReq = QueRequests.createPatient(bundle1).extract().response().`as`(Bundle::class.java).entry
+        val servReq = QueRequests.createPatient(bundle1).entry
 
     }
 }

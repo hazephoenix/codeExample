@@ -10,9 +10,9 @@ import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.*
-import java.sql.Timestamp
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
+import javax.persistence.Query
 
 /**
  * Created at 15.10.2019 11:52 by SherbakovaMA
@@ -245,10 +245,17 @@ class PatientServiceImpl(
         return patient.id
     }
 
-    override fun patientsToExamine(practitionerId: String): List<PatientToExamine> {
-        val query = em.createNativeQuery("""
-            select * from patients_to_examine
-        """)
+    override fun patientsToExamine(practitionerId: String?): List<PatientToExamine> {
+        var queryStr = """
+            select * from patients_to_examine            
+        """
+        val params = mutableListOf<String>()
+        practitionerId?.run {
+            queryStr += "where resp_practitioner_id = ?1"
+            params += practitionerId
+        }
+        val query = em.createNativeQuery(queryStr)
+        query.setParameters(params)
         return query.patientsToExamine()
     }
 
@@ -258,5 +265,22 @@ class PatientServiceImpl(
     private fun observationTypeOfResponsiblePractitioner(responsiblePractitionerId: String): String {
         val responsiblePractitioner = practitionerService.byId(responsiblePractitionerId)
         return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualification.code.code())
+    }
+
+    private fun Query.patientsToExamine(): List<PatientToExamine> {
+        return this.resultList
+                .asSequence()
+                .map {
+                    it as Array<*>
+                    PatientToExamine(
+                            practitionerId = it[0] as String,
+                            patientId = it[1] as String,
+                            severity = it[2] as String,
+                            carePlanStatus = enumValueOf(it[3] as String),
+                            patient = it[4].toResourceEntity()!!
+                    )
+                }
+                .filterNotNull()
+                .toList()
     }
 }

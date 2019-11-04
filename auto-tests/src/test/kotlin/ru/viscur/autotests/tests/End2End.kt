@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import ru.viscur.autotests.dto.QueueItemInfo
+import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Helpers
+import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
@@ -49,11 +52,11 @@ class End2End {
                 BundleEntry(claim),
                 BundleEntry(questionnaireResponseSeverityCriteria)
         ))
-//        QueRequests.deleteQue()
+        QueRequests.deleteQue()
 
         val office139Id = "Office:139"
-        QueRequests.cabinetIsBusy(referenceToLocation(office139Id))
-        val responseBundle = QueRequests.createPatient(bundle).extract().response().`as`(Bundle::class.java)
+        QueRequests.officeIsBusy(referenceToLocation(office139Id))
+        val responseBundle = QueRequests.createPatient(bundle)
 
         //проверка наличия и количества Service Request
         assertEquals(1, responseBundle.entry.size, "number of servicerequests in response")
@@ -67,20 +70,35 @@ class End2End {
         val patientId = actServiceRequest.subject?.id!!
         assertEquals(servReq1.code.code(), actServiceRequest.code.code(), "code ... ")
 
-        var actPatient = QueRequests.getResource(ResourceType.Patient.id.toString(), patientId).extract().response().`as`(Patient::class.java)
+        var actPatient = QueRequests.resource(ResourceType.Patient, patientId)
         assertEquals(PatientQueueStatus.IN_QUEUE, actPatient.extension.queueStatus, "wrong status of patient ... ")
 
-        //queue items..
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office139Id, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+
+        //кабинет READY
+        QueRequests.officeIsReady(referenceToLocation(office139Id))
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office139Id, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.GOING_TO_OBSERVATION)
+                ))
+        ))
+
+        //пациент вошел в кабинет
         val patientEnteredListResource = ListResource(entry = listOf(
                 ListResourceEntry(item = referenceToPatient(patientId)),
                 ListResourceEntry(item = referenceToLocation(office139Id))
         ))
-        //кабинет READY
-        QueRequests.officeIsReady(referenceToLocation(office139Id))
-        //пациент вошел в кабинет
-        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource).extract().response().`as`(Bundle::class.java)
-                .let { it.entry.map { it.resource as ServiceRequest } }
-        actPatient = QueRequests.getResource(ResourceType.Patient.id.toString(), patientId).extract().response().`as`(Patient::class.java)
+        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office139Id, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                ))
+        ))
+        actPatient = QueRequests.resource(ResourceType.Patient, patientId)
         //проверка что в кабинете необходимые обследования и пациент
         assertEquals(1, actServicesInOffice.size, "wrong number of office's service requests")
         assertEquals(PatientQueueStatus.ON_OBSERVATION, actPatient.extension.queueStatus, "wrong patient status")
@@ -107,7 +125,8 @@ class End2End {
                 BundleEntry(diagnosticReportOfResp),
                 BundleEntry(encounter)
         ))
-        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination).extract().response().`as`(ClinicalImpression::class.java)
+        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
+        checkQueueItems(listOf())
     }
 }
