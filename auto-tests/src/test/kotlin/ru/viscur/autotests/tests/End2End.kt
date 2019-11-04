@@ -15,9 +15,8 @@ import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class End2End {
 
     companion object {
@@ -36,10 +35,9 @@ class End2End {
         val servRequests = listOf(
                 Helpers.createServiceRequestResource("СтХир")
         )
-
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-
         val office139Id = "Office:139"
+
         QueRequests.officeIsBusy(referenceToLocation(office139Id))
         val responseBundle = QueRequests.createPatient(bundle)
 
@@ -56,7 +54,6 @@ class End2End {
         assertEquals(servRequests.first().code.code(), actServiceRequest.code.code(), "code ... ")
 
         var actPatient = QueRequests.resource(ResourceType.Patient, patientId)
-        assertEquals(PatientQueueStatus.IN_QUEUE, actPatient.extension.queueStatus, "wrong status of patient ... ")
 
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office139Id, listOf(
@@ -74,14 +71,13 @@ class End2End {
 
         //пациент вошел в кабинет
         val patientEnteredListResource = Helpers.createListResource(patientId, office139Id)
-        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource).extract().response().`as`(Bundle::class.java)
-                .let { it.entry.map { it.resource as ServiceRequest } }
+        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office139Id, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
                 ))
         ))
-        actPatient = QueRequests.getResource(ResourceType.Patient.id, patientId).extract().response().`as`(Patient::class.java)
+        actPatient = QueRequests.resource(ResourceType.Patient, patientId)
 
         //проверка что в кабинете необходимые обследования и пациент
         assertEquals(1, actServicesInOffice.size, "wrong number of office's service requests")
@@ -122,9 +118,10 @@ class End2End {
                 Helpers.createServiceRequestResource("СтХир")
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-        val office139Id = "Office:139"
-        QueRequests.cabinetIsBusy(referenceToLocation(office139Id))
-        val responseBundle = QueRequests.createPatient(bundle).extract().response().`as`(Bundle::class.java)
+        val office139 = "Office:139"
+        val office104 = "Office:104"
+        QueRequests.officeIsBusy(referenceToLocation(office139))
+        val responseBundle = QueRequests.createPatient(bundle)
 
         //проверка наличия и количества Service Request
         assertEquals(1, responseBundle.entry.size, "number of servicerequests in response")
@@ -132,15 +129,14 @@ class End2End {
 
         val serviceRequest = responseBundle.entry.first().resource as ServiceRequest
         val patientId = serviceRequest.subject?.id!!
-        var actPatient = QueRequests.getResource(ResourceType.Patient.id, patientId).extract().response().`as`(Patient::class.java)
+        var actPatient = QueRequests.resource(ResourceType.Patient, patientId)
         assertEquals(PatientQueueStatus.IN_QUEUE, actPatient.extension.queueStatus, "wrong status of patient ... ")
 
         //пациент вошел в кабинет
-        QueRequests.officeIsReady(referenceToLocation(office139Id))
-        val patientEnteredListResource = Helpers.createListResource(patientId, office139Id)
-        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource).extract().response().`as`(Bundle::class.java)
-                .let { it.entry.map { it.resource as ServiceRequest } }
-        actPatient = QueRequests.getResource(ResourceType.Patient.id, patientId).extract().response().`as`(Patient::class.java)
+        QueRequests.officeIsReady(referenceToLocation(office139))
+        val patientEnteredListResource = Helpers.createListResource(patientId, office139)
+        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
+        actPatient = QueRequests.resource(ResourceType.Patient, patientId)
 
         //проверка что в кабинете необходимые обследования и пациент
         assertEquals(1, actServicesInOffice.size, "wrong number of office's service requests")
@@ -154,16 +150,16 @@ class End2End {
         val bundleForExamin = Bundle(
                 entry = additionalServiceRequests.map { BundleEntry(it) }
         )
-        val office104 = referenceToLocation("Office:104")
-        QueRequests.cabinetIsBusy(office104)
-        val updatedCarePlan = QueRequests.addServiceRequests(bundleForExamin).extract().response().`as`(CarePlan::class.java)
-        actPatient = QueRequests.getResource(ResourceType.Patient.id, patientId).extract().response().`as`(Patient::class.java)
-        val queFirstItem104 = QueRequests.getOfficeQue(office104).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
+        QueRequests.officeIsBusy(referenceToLocation(office104))
+        val updatedCarePlan = QueRequests.addServiceRequests(bundleForExamin)
 
         //в CarePlan должны быть добавленные ServiceRequests и осмотр ответственного, пациент должен встать в очередь в другой кабинет
         assertEquals(3, updatedCarePlan.activity.size, "wrong care plan activities")
-        assertEquals(PatientQueueStatus.IN_QUEUE, actPatient.extension.queueStatus, "wrong patient status")
-        assertEquals(patientId, queFirstItem104.subject?.id, "wrong patient in que")
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office104, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
     }
 
 }

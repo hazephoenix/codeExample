@@ -1,23 +1,18 @@
 package ru.viscur.autotests.tests
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import ru.viscur.autotests.dto.QueueItemInfo
+import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createListResource
-import ru.viscur.autotests.utils.Helpers.Companion.createObservation
-import ru.viscur.autotests.utils.Helpers.Companion.createPatientResource
-import ru.viscur.dh.fhir.model.entity.Bundle
-import ru.viscur.dh.fhir.model.entity.ListResource
-import ru.viscur.dh.fhir.model.entity.QueueItem
+import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
-import ru.viscur.dh.fhir.model.type.BundleEntry
+import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.valueSets.BundleType
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class QueueLogic {
 
     companion object {
@@ -58,51 +53,64 @@ class QueueLogic {
 
     @Test
     fun patientsUziSorting() {
-        val office116 = referenceToLocation("Office:116")
-        val office117 = referenceToLocation("Office:117")
+        val office116 = "Office:116"
+        val office117 = "Office:117"
 
-        // uziPatient1
+        //uziPatient1
         val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
-        val bundle0 = bundle("1111","RED", listOf(servReq1))
+        val bundle1 = bundle("1111","RED", listOf(servReq1))
 
         //uziPatient2
         val servReq2 = Helpers.createServiceRequestResource("A04.16.001")
-        val bundle3 = bundle("1112","RED", listOf(servReq2))
+        val bundle2 = bundle("1112","RED", listOf(servReq2))
 
+        //добавление 2 пациентов на узи
         QueRequests.deleteQue()
-        QueRequests.cabinetIsBusy(office116)
-        QueRequests.cabinetIsBusy(office117)
-        val servReqUzi1 = QueRequests.createPatient(bundle0).extract().response().`as`(Bundle::class.java).entry.first().resource as ServiceRequest
-        val servReqUzi2 = QueRequests.createPatient(bundle3).extract().response().`as`(Bundle::class.java).entry.first().resource as ServiceRequest
-        val queitem117 = QueRequests.getOfficeQue(office117).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
-        val queitem116 = QueRequests.getOfficeQue(office116).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
+        QueRequests.officeIsBusy(referenceToLocation(office116))
+        QueRequests.officeIsBusy(referenceToLocation(office117))
+        val servReqUzi1 = QueRequests.createPatient(bundle1).entry.first().resource as ServiceRequest
+        val patientId1 = servReqUzi1.subject!!.id!!
+        val servReqUzi2 = QueRequests.createPatient(bundle2).entry.first().resource as ServiceRequest
+        val patientId2 = servReqUzi2.subject!!.id!!
 
-        //проверка, что оба идут на обследование в разных кабинетах
-        assertEquals(servReqUzi1.subject?.id, queitem117.subject.id, "patient ${servReqUzi1.subject?.id} in wrong que")
-        assertEquals(servReqUzi2.subject?.id, queitem116.subject.id, "patient ${servReqUzi2.subject?.id} in wrong que")
+        //проверка что оба пациента в очереди в разные кабинеты узи
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office116, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
+                )),
+                QueueItemsOfOffice(office117, listOf(
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
     }
 
     @Test
-    fun forceInvite() {
-        val office117 = referenceToLocation("Office:117")
-        val office139 = referenceToLocation("Office:139")
+    fun patientForceInviteToOffice() {
+        val office116 = "Office:116"
+        val office139 = "Office:139"
         val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
         val bundle = bundle("1113", "RED", listOf(servReq1))
 
         QueRequests.deleteQue()
-        QueRequests.officeIsReady(referenceToLocation("Office:117"))
-        val actServReq = QueRequests.createPatient(bundle).extract().response().`as`(Bundle::class.java).entry.first().resource as ServiceRequest
+        QueRequests.officeIsReady(referenceToLocation(office116))
+        val actServReq = QueRequests.createPatient(bundle).entry.first().resource as ServiceRequest
         val patientId = actServReq.subject?.id!!
-        val queitem117 = QueRequests.getOfficeQue(office117).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
 
-        //проверка, что пациент стоит в очереди в 117
-        assertEquals(patientId, queitem117.subject.id, "patient $patientId in wrong que")
+        //проверка, что пациент стоит в очереди в 116
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office116, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.GOING_TO_OBSERVATION)
+                ))
+        ))
 
-        val forceInviteList = createListResource(patientId,"Office:139")
-        QueRequests.invitePatientToOffice(forceInviteList)
-        val queitem139 = QueRequests.getOfficeQue(office139).extract().response().`as`(Bundle::class.java).entry.first().resource as QueueItem
+        QueRequests.officeIsBusy(referenceToLocation(office139))
+        QueRequests.invitePatientToOffice(createListResource(patientId,office139))
 
         //проверка, что пациента вызвали в 139
-        assertEquals(patientId, queitem139.subject.id, "patient $patientId in wrong que")
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office139, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.GOING_TO_OBSERVATION)
+                ))
+        ))
     }
 }

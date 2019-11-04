@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
-import ru.viscur.dh.fhir.model.entity.BaseResource
-import ru.viscur.dh.fhir.model.entity.Bundle
-import ru.viscur.dh.fhir.model.entity.ListResource
-import ru.viscur.dh.fhir.model.entity.Observation
+import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.Reference
 
@@ -25,7 +22,7 @@ class QueRequests {
 
         fun getOfficeQue(cabinetRef: Reference) = Helpers.createRequestSpec(cabinetRef).
                 `when`().get(Endpoints.OFFICE_QUE).
-                then().statusCode(200)
+                then().statusCode(200).extract().response().`as`(Bundle::class.java)
 
         fun addPatientToQue(patientRef: Reference) = Helpers.createRequestSpec(patientRef).
                 `when`().
@@ -69,11 +66,6 @@ class QueRequests {
                 post(Endpoints.CREATE_PATIENT).
                 then().statusCode(200).extract().response().`as`(Bundle::class.java)
 
-        fun getResource(resourceType: ResourceType.ResourceTypeId, id: String) = Helpers.createRequestSpecWithoutBody().
-                `when`().
-                get(Endpoints.BASE_URI + "/" + resourceType + "/" + id).
-                then().statusCode(200)
-
         fun <T> resource(resourceType: ResourceType<T>, id: String): T
                 where T : BaseResource =
                 Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.BASE_URI + "/" + resourceType.id.toString() + "/" + id).then().statusCode(200)
@@ -88,7 +80,7 @@ class QueRequests {
         fun addServiceRequests(bundle: Bundle) = Helpers.createRequestSpec(bundle).log().all().
                 `when`().
                 post(Endpoints.ADD_SERVICE_REQUEST).
-                then().statusCode(200)
+                then().statusCode(200).extract().response().`as`(CarePlan::class.java)
 
         //service requests, severity, diagnosis
         fun getSupposedServRequests(diagnosis : Any) = Helpers.createRequestSpec(diagnosis).log().all().
