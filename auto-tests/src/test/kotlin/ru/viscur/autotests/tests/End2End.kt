@@ -16,7 +16,7 @@ import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class End2End {
 
     companion object {
@@ -92,7 +92,8 @@ class End2End {
         val obsOfRespPract = Helpers.createObservation(code = actServiceInOffice.code.code(),
                 valueString = "состояние удовлетворительное",
                 practitionerId = actServiceInOffice.performer?.first()?.id!!,
-                basedOnServiceRequestId = actServiceInOffice.id
+                basedOnServiceRequestId = actServiceInOffice.id,
+                status = ObservationStatus.final
         )
         val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
                 diagnosisCode = "A00.0",
