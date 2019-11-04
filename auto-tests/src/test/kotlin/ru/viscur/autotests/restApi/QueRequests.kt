@@ -2,9 +2,11 @@ package ru.viscur.autotests.restApi
 
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
+import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ListResource
 import ru.viscur.dh.fhir.model.entity.Observation
+import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.Reference
 
 class QueRequests {
@@ -60,21 +62,27 @@ class QueRequests {
                 post(Endpoints.CREATE_PATIENT).
                 then().statusCode(200)
 
-        fun getResource(resourceType: String, id: String) = Helpers.createRequestSpecWithoutBody().
+        fun getResource(resourceType: ResourceType.ResourceTypeId, id: String) = Helpers.createRequestSpecWithoutBody().
                 `when`().
                 get(Endpoints.BASE_URI + "/" + resourceType + "/" + id).
                 then().statusCode(200)
 
         //observation
         fun createObservation(observation : Observation) = Helpers.createRequestSpec(observation).log().all().
-        `when`().
-        post(Endpoints.CREATE_OBSERVATION).
-        then().statusCode(200)
+                `when`().
+                post(Endpoints.CREATE_OBSERVATION).
+                then().statusCode(200)
+
+        fun addServiceRequests(bundle: Bundle) = Helpers.createRequestSpec(bundle).log().all().
+                `when`().
+                post(Endpoints.ADD_SERVICE_REQUEST).
+                then().statusCode(200)
+
 
         //service requests, severity, diagnosis
         fun getSupposedServRequests(diagnosis : Any) = Helpers.createRequestSpec(diagnosis).log().all().
                 `when`().
-                post(Endpoints.SERVICE_REQUEST).
+                post(Endpoints.SUPPOSED_SERVICE_REQUEST).
                 then().statusCode(200)
 
         //examination

@@ -3,10 +3,12 @@ package ru.viscur.autotests.utils
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
+import ru.viscur.autotests.tests.End2End
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.now
+import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.fhir.model.utils.referenceToPractitioner
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
@@ -41,6 +43,27 @@ class Helpers {
         fun createRequestSpecWithoutBody(): RequestSpecification =
                 RestAssured.given().header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
 
+        //создание bundle для пациента
+        fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>): Bundle {
+            val patient = createPatientResource(enp = enp)
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = End2End.paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
+            val personalDataConsent = createConsentResource()
+            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = End2End.paramedicId)
+            val list = createPractitionerListResource(surgeonId)
+            val claim = createClaimResource()
+
+            val bundle = Bundle(entry = listOf(
+                    BundleEntry(patient),
+                    BundleEntry(diagnosticReport),
+                    BundleEntry(bodyWeight),
+                    BundleEntry(personalDataConsent),
+                    BundleEntry(list),
+                    BundleEntry(claim),
+                    BundleEntry(questionnaireResponseSeverityCriteria)
+            ) + servRequests.map { BundleEntry(it) })
+            return bundle
+        }
         //создание ресурсов
         fun createPatientResource(enp: String) = Patient(
                 identifier = listOf(
@@ -127,7 +150,7 @@ class Helpers {
                 organization = listOf(Reference(Organization(name = "СибГМУ")))
         )
 
-        fun createQuestResponseResource(patientId: String = "ignore") = QuestionnaireResponse(
+        fun createQuestResponseResource(severity: String, patientId: String = "ignore") = QuestionnaireResponse(
                 status = QuestionnaireResponseStatus.completed,
                 author = referenceToPractitioner("ignored"),
                 source = referenceToPatient(patientId),
@@ -179,7 +202,7 @@ class Helpers {
                                 linkId = "Severity",
                                 text = "Категория пациента",
                                 answer = listOf(QuestionnaireResponseItemAnswer(
-                                        valueCoding = Coding(code = "RED", display = "Красный", system = ValueSetName.SEVERITY.id)
+                                        valueCoding = Coding(code = severity, display = "Красный", system = ValueSetName.SEVERITY.id)
                                 ))
                         )
                 )
@@ -214,17 +237,9 @@ class Helpers {
                 hospitalization = EncounterHospitalization(destination = Reference(display = hospitalizationStr))
         )
 
-        /*fun createPatientAndLocationListResource (patientReference: Reference, locationReference: Reference): ListResource {
-            return ListResource(
-                    entry = listOf(
-                            ListResourceEntry(
-                                    item = patientReference
-                            ),
-                            ListResourceEntry(
-                                    item = locationReference)
-                            )
-                    )
-        }*/
+        fun createListResource(patientId: String, officeId: String) = ListResource(entry = listOf(
+                ListResourceEntry(item = referenceToPatient(patientId)),
+                ListResourceEntry(item = referenceToLocation(officeId))
+        ))
     }
-
 }

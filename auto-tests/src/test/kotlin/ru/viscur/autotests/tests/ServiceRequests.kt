@@ -8,11 +8,10 @@ import ru.viscur.autotests.restApi.QueRequests
 @Disabled("Debug purposes only")
 class ServiceRequests {
 
-
     @Test
     fun responseShouldContainReturnServiceRequests () {
         val diagnosis = " {\"diagnosis\": \"A01\",\"complaints\": [\"Сильная боль в правом подреберье\", \"Тошнит\"],\"gender\": \"male\"}"
-        QueRequests.getSupposedServRequests(diagnosis).log().all().
+        QueRequests.getSupposedServRequests(diagnosis).
                 assertThat().body("entry.size()", equalTo(6))
 
     }

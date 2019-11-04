@@ -20,7 +20,8 @@ class Endpoints {
         const val OFFICE_QUE: String = "$BASE_URI/queue"
         //observation
         const val CREATE_OBSERVATION: String = "$BASE_URI/Observation"
-        const val SERVICE_REQUEST: String = "$BASE_URI/reception/serviceRequests"
+        const val SUPPOSED_SERVICE_REQUEST: String = "$BASE_URI/reception/serviceRequests"
+        const val ADD_SERVICE_REQUEST = "$BASE_URI/examination/serviceRequests  "
         //examination
         const val COMPLETE_EXAMINATION: String = "$BASE_URI/examination"
 
