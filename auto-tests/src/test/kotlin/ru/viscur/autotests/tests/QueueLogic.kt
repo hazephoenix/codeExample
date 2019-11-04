@@ -17,7 +17,7 @@ import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.valueSets.BundleType
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class QueueLogic {
 
     companion object {

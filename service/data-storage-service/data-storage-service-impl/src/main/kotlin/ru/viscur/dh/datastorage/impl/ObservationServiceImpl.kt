@@ -19,24 +19,24 @@ class ObservationServiceImpl(
     /**
      * Найти все обследования по id пациента и статусу обследования
      */
-    override fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?> {
-        val query = em.createNativeQuery("""
+    override fun byPatientAndStatus(patientId: String, status: ObservationStatus?): List<Observation?> {
+        var queryStr = """
             select r.resource
                 from Observation r
                 where r.resource -> 'basedOn' ->> 'reference' in (
-                    select 'ServiceRequest/' || sr.id
-                    from ServiceRequest sr
-                    where 'ServiceRequest/' || sr.id in (
                         select
                             jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
                         from CarePlan cp
-                        where cp.resource -> 'subject' ->> 'id' = :patientId
-                        )
-                )
-                and r.resource ->> 'status' = :status
-        """)
-        query.setParameter("patientId", patientId)
-        query.setParameter("status", status.toString())
+                        where cp.resource -> 'subject' ->> 'reference' = ?1
+                )                
+        """
+        val params = mutableListOf("Patient/$patientId")
+        status?.run {
+            queryStr += "\nand r.resource ->> 'status' = ?2"
+            params += status.toString()
+        }
+        val query = em.createNativeQuery(queryStr)
+        query.setParameters(params)
         return query.fetchResourceList()
     }
 
@@ -85,7 +85,7 @@ class ObservationServiceImpl(
      * Обновить связанные ресурсы -
      *  статус направления на обследование и маршрутного листа
      */
-    private fun updateRelated(patientId: String, observation: Observation){
+    private fun updateRelated(patientId: String, observation: Observation) {
         // Обновить статус направления на обследование
         val updatedServiceRequest = serviceRequestService.updateStatusByObservation(observation)
         // Обновить статус маршрутного листа

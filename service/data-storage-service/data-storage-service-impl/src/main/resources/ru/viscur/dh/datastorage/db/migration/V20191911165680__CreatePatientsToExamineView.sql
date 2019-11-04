@@ -2,13 +2,16 @@ drop view if exists patients_to_examine;
 
 create or replace view patients_to_examine
 as
-select jsonb_array_elements(items.item -> 'answer') -> 'valueCoding' as severity,
+select
+       SPLIT_PART(respPractRef, '/', 2) as resp_practitioner_id,
        SPLIT_PART(patientRef, '/', 2) as patient_id,
-       p.resource as patient,
-       cp.resource -> 'status' as care_plan_status
+       jsonb_array_elements(items.item -> 'answer') -> 'valueCoding'->>'code' as severity,
+       cp.resource ->> 'status' as care_plan_status,
+       p.resource as patient
 from (
          select jsonb_array_elements(r.resource -> 'item') as item,
-                r.resource -> 'source' ->> 'reference' as patientRef
+                r.resource -> 'source' ->> 'reference' as patientRef,
+                r.resource -> 'author' ->> 'reference' as respPractRef
          from questionnaireResponse r
          where r.resource ->> 'questionnaire' = 'Questionnaire/Severity_criteria'
            and 'QuestionnaireResponse/' || r.id in (
@@ -18,10 +21,12 @@ from (
                and ci.resource -> 'subject' ->> 'reference' = r.resource -> 'source' ->> 'reference'
          )
      ) as items
-         left join patient p on p.id = SPLIT_PART(patientRef, '/', 2)
-         left join careplan cp on cp.resource -> 'subject' ->> 'reference' = patientRef
+         join patient p on p.id = SPLIT_PART(patientRef, '/', 2)
+         join (select * from careplan cp
+             where
+                         cp.resource ->> 'status' = 'active' or
+                         cp.resource ->> 'status' = 'results_are_ready' or
+                         cp.resource ->> 'status' = 'waiting_results') cp
+             on cp.resource -> 'subject' ->> 'reference' = patientRef
 where items.item ->> 'linkId' = 'Severity'
-  and (cp.resource ->> 'status' = 'active' or
-       cp.resource ->> 'status' = 'results_are_ready' or
-       cp.resource ->> 'status' = 'waiting_results')
 ;

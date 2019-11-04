@@ -163,9 +163,7 @@ class ResourceServiceImpl : ResourceService {
         }
 
         fun setParametersTo(query: Query) {
-            params.forEachIndexed { idx, value ->
-                query.setParameter(idx + 1, value)
-            }
+            query.setParameters(params)
         }
 
         private fun addWherePart(filter: Map<String, String?>?, filterLike: Boolean) {

@@ -12,7 +12,6 @@ import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.valueSets.*
-import java.sql.*
 import java.util.Date
 
 @SpringBootTest(
@@ -126,7 +125,7 @@ class ObservationServiceImplTest {
 
         // TODO: убрать, когда заменим метод поиска обследований
         // Поиск обследования по id пациента и статусу обследования
-        val createdObservation = observationService.findByPatientAndStatus(patient.id, ObservationStatus.registered).firstOrNull()
+        val createdObservation = observationService.byPatientAndStatus(patient.id, ObservationStatus.registered).firstOrNull()
         assertNotNull(createdObservation)
 
         // Ждем результатов обследования
