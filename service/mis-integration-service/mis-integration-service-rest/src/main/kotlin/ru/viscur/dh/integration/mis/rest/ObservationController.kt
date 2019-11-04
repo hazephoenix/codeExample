@@ -20,9 +20,10 @@ class ObservationController(
 ) {
     /**
      * Получить обследование по статусу и id пациента
+     * Если [status] не задан, выбираются без ограничения по статусу
      */
     @GetMapping
-    fun getByPatientAndStatus(@RequestParam patientId: String, @RequestParam status: ObservationStatus? = null) =
+    fun byPatientAndStatus(@RequestParam patientId: String, @RequestParam status: ObservationStatus? = null) =
             observationService.byPatientAndStatus(patientId, status)
 
     /**

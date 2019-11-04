@@ -213,7 +213,8 @@ class Helpers {
                               patientId: String = "ignored",
                               valueInt: Int? = null,
                               valueString: String? = null,
-                              basedOnServiceRequestId: String? = null
+                              basedOnServiceRequestId: String? = null,
+                              status: ObservationStatus = ObservationStatus.registered
         ) = Observation(
                 performer = listOf(referenceToPractitioner(practitionerId)),
                 subject = referenceToPatient(patientId),
@@ -225,7 +226,8 @@ class Helpers {
                 ),
                 valueInteger = valueInt,
                 valueString = valueString,
-                basedOn = basedOnServiceRequestId?.let { Reference(resourceType = ResourceType.ServiceRequest.id, id = basedOnServiceRequestId) }
+                basedOn = basedOnServiceRequestId?.let { Reference(resourceType = ResourceType.ServiceRequest.id, id = basedOnServiceRequestId) },
+                status = status
         )
 
         fun createPractitionerListResource(practitionerId: String) = ListResource(

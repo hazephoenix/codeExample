@@ -50,4 +50,10 @@ class ExaminationServiceImpl(
         queueManagerService.deleteFromOfficeQueue(patientId)
         return clinicalImpressionService.complete(clinicalImpression)
     }
+
+    @Tx
+    override fun cancelClinicalImpression(patientId: String) {
+        queueManagerService.deleteFromOfficeQueue(patientId)
+        clinicalImpressionService.cancelActive(patientId)
+    }
 }

@@ -24,10 +24,15 @@ class ObservationServiceImpl(
             select r.resource
                 from Observation r
                 where r.resource -> 'basedOn' ->> 'reference' in (
-                        select
-                            jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                        from CarePlan cp
-                        where cp.resource -> 'subject' ->> 'reference' = ?1
+                    select
+                        jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                    from CarePlan cp
+                    where 'CarePlan/' || r.id in (
+                        select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                        from clinicalImpression ci
+                        where ci.resource -> 'subject' ->> 'reference' = ?1
+                          and ci.resource ->> 'status' = 'active'
+                    )
                 )                
         """
         val params = mutableListOf("Patient/$patientId")

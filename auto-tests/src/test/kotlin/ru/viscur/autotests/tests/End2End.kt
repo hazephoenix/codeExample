@@ -1,22 +1,20 @@
 package ru.viscur.autotests.tests
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
-import ru.viscur.autotests.dto.QueueItemInfo
-import ru.viscur.autotests.dto.QueueItemsOfOffice
+import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Helpers
-import ru.viscur.autotests.utils.checkQueueItems
+import ru.viscur.autotests.utils.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
+import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class End2End {
 
     companion object {
@@ -32,8 +30,9 @@ class End2End {
     @Order(1)
     fun patientE2e() {
         QueRequests.deleteQue()
+        val observationOfSurgeonCode = "СтХир"
         val servRequests = listOf(
-                Helpers.createServiceRequestResource("СтХир")
+                Helpers.createServiceRequestResource(observationOfSurgeonCode)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         val office139Id = "Office:139"
@@ -45,17 +44,23 @@ class End2End {
         assertEquals(1, responseBundle.entry.size, "number of servicerequests in response")
         assertEquals(ResourceType.ServiceRequest.id, responseBundle.entry.first().resource.resourceType, "")
 
-        //проверка что есть первый Service Request и он в нужный кабинет
-        val actServiceRequest = responseBundle.entry.get(0).resource as ServiceRequest
-        assertNotNull(actServiceRequest.subject?.id, "wrong id patient")
-        assertEquals(office139Id, actServiceRequest.locationReference?.first()?.id, "code ... ")
+        val serviceRequestsFromResponse = responseBundle.resources(ResourceType.ServiceRequest)
+        val patientId = patientIdFromServiceRequests(serviceRequestsFromResponse)
 
-        val patientId = actServiceRequest.subject?.id!!
-        assertEquals(servRequests.first().code.code(), actServiceRequest.code.code(), "code ... ")
+        //проверка Service Request-ов из ответа
+        compareServiceRequests(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id)), serviceRequestsFromResponse)
 
+        //проверка состояний в базе: состояние очереди, назначения, обследования
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office139Id, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+        checkServiceRequestsOfPatient(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id)))
+        checkObservationsOfPatient(patientId, listOf())
+        checkPatientsOfResp(listOf(
+                PatientsOfRespInfo("фельдшер_Колосова", listOf(
+                        PatientOfRespInfo(patientId, Severity.RED)
                 ))
         ))
 
@@ -79,19 +84,15 @@ class End2End {
         val actPatient = QueRequests.resource(ResourceType.Patient, patientId)
 
         //проверка что в кабинете необходимые обследования и пациент
-        assertEquals(1, actServicesInOffice.size, "wrong number of office's service requests")
-        assertEquals(PatientQueueStatus.ON_OBSERVATION, actPatient.extension.queueStatus, "wrong patient status")
+        compareServiceRequests(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id)), serviceRequestsFromResponse)
 
         //т к единственное обследование - осмотр отв. - завершение обследования:
         val actServiceInOffice = actServicesInOffice.first()
-        assertEquals(servRequests.first().code.code(), actServiceInOffice.code.code(), "wrong service request code at office")
-        assertEquals(patientId, actServiceInOffice.subject?.id, "wrong patientId of service request")
-
-        //завершение обращения
         val obsOfRespPract = Helpers.createObservation(code = actServiceInOffice.code.code(),
                 valueString = "состояние удовлетворительное",
                 practitionerId = actServiceInOffice.performer?.first()?.id!!,
-                basedOnServiceRequestId = actServiceInOffice.id
+                basedOnServiceRequestId = actServiceInOffice.id,
+                status = ObservationStatus.final
         )
         val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
                 diagnosisCode = "A00.0",
@@ -106,6 +107,16 @@ class End2End {
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
+        checkQueueItems(listOf())
+        checkServiceRequestsOfPatient(patientId, listOf())
+        checkObservationsOfPatient(patientId, listOf())
+    }
+
+    private fun patientIdFromServiceRequests(serviceRequestsFromResponse: List<ServiceRequest>): String {
+        assertTrue(serviceRequestsFromResponse.size > 0, "list of service requests can't be empty")
+        assertNotNull(serviceRequestsFromResponse.first().subject?.id, "wrong id patient")
+        val patientId = serviceRequestsFromResponse.first().subject?.id!!
+        return patientId
     }
 
     @Test
@@ -118,6 +129,7 @@ class End2End {
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         val office139 = "Office:139"
         val office104 = "Office:104"
+        val office116 = "Office:116"
         QueRequests.officeIsBusy(referenceToLocation(office139))
         val responseBundle = QueRequests.createPatient(bundle)
 
@@ -125,8 +137,8 @@ class End2End {
         assertEquals(1, responseBundle.entry.size, "number of servicerequests in response")
         assertEquals(ResourceType.ServiceRequest.id, responseBundle.entry.first().resource.resourceType, "")
 
-        val serviceRequest = responseBundle.entry.first().resource as ServiceRequest
-        val patientId = serviceRequest.subject?.id!!
+        val actServiceRequests = responseBundle.resources(ResourceType.ServiceRequest)
+        val patientId = patientIdFromServiceRequests(actServiceRequests)
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office139, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
@@ -163,6 +175,12 @@ class End2End {
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
+        checkServiceRequestsOfPatient(patientId, listOf(
+                ServiceRequestInfo(code = "СтХир", locationId = office139),
+                ServiceRequestInfo(code = "A04.16.001", locationId = office116),
+                ServiceRequestInfo(code = "B03.016.006ГМУ_СП", locationId = office104)
+        ))
+        checkObservationsOfPatient(patientId, listOf())
     }
 
     @Test

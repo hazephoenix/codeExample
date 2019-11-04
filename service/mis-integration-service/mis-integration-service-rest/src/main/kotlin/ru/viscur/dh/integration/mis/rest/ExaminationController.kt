@@ -42,4 +42,12 @@ class ExaminationController(
      */
     @GetMapping("/serviceRequests")
     fun serviceRequests(@RequestParam patientId: String) = Bundle(entry = serviceRequestService.all(patientId).map { BundleEntry(it) })
+
+    /**
+     * Отменить обращение пациента
+     */
+    @GetMapping("/cancel")
+    fun cancel(@RequestParam patientId: String) {
+        examinationService.cancelClinicalImpression(patientId)
+    }
 }

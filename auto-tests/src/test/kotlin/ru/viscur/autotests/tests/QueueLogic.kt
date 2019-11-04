@@ -1,5 +1,6 @@
 package ru.viscur.autotests.tests
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
@@ -12,7 +13,7 @@ import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class QueueLogic {
 
     companion object {
