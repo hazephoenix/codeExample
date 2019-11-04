@@ -22,10 +22,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.web.client.RestTemplate
 import ru.viscur.dh.apps.paramedicdevice.configuration.AppUID
-import ru.viscur.dh.apps.paramedicdevice.dto.Task
-import ru.viscur.dh.apps.paramedicdevice.dto.TaskStatus
-import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
-import ru.viscur.dh.apps.paramedicdevice.dto.TvesResponse
+import ru.viscur.dh.apps.paramedicdevice.dto.*
+import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
 import java.util.*
 import java.util.regex.Pattern
 
@@ -100,7 +98,7 @@ class TaskApiTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", matchesRegex(Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))))
                 .andExpect(jsonPath("$.type", `is`(TaskType.Height.name)))
-                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name, TaskStatus.Complete.name)))))
+                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name, TaskStatus.InProgress.name, TaskStatus.Complete.name)))))
                 .andReturn()
         val mapper = ObjectMapper()
         val task = mapper.readValue(res.response.contentAsString, Task::class.java)
@@ -151,5 +149,36 @@ class TaskApiTest {
                 .andExpect(jsonPath("$.result.unit", `is`("кг.")))
                 .andExpect(jsonPath("$.result.code", `is`("OK")))
                 .andExpect(jsonPath("$.result.message", `is`("OK")))
+    }
+
+    @Test
+    fun tonometerTest() {
+        val auth = "Basic ${Base64.getEncoder().encodeToString("${uid.uid}:${uid.apiPassword}".toByteArray())}"
+        val res = mvc.perform(
+                post("/api/task/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\": \"Tonometer\"}")
+                        .header(HttpHeaders.AUTHORIZATION, auth)
+        )
+                .andExpect(status().isOk)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", matchesRegex(Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))))
+                .andExpect(jsonPath("$.type", `is`(TaskType.Tonometer.name)))
+                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name, TaskStatus.InProgress.name, TaskStatus.Complete.name)))))
+                .andReturn()
+        val mapper = ObjectMapper()
+        val task = mapper.readValue(res.response.contentAsString, Task::class.java)
+        var taskStatus = TaskStatus.InProgress
+        while(taskStatus != TaskStatus.Complete && taskStatus != TaskStatus.Error) {
+            mvc.perform(get("/api/task/status/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+                    .andExpect(status().isOk)
+                    .andDo { taskStatus = mapper.readValue(it.response.contentAsString, TaskStatus::class.java) }
+        }
+        if (taskStatus == TaskStatus.Complete) {
+            mvc.perform(get("/api/task/result/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+                    .andExpect(status().isOk)
+                    .andExpect(jsonPath("$.result.tonometerModel", `is`("TM2655")))
+                    .andExpect(jsonPath("$.result.error.code", `is`(TonometerErrorCode.E00.name)))
+        }
     }
 }

@@ -24,5 +24,9 @@ enum class TaskType {
     /**
      * Неизвестный тип
      */
-    Unknown
+    Unknown,
+    /**
+     * Измерения тонометра (АД, ЧСС)
+     */
+    Tonometer
 }
