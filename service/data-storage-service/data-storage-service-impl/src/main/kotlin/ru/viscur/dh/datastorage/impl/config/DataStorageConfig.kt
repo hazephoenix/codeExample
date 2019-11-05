@@ -25,7 +25,7 @@ private const val PROPERTIES_PREFIX = "ru.viscur.dh.data-storage"
 
 private const val BASE_PACKAGE = "ru.viscur.dh.datastorage.impl"
 private const val REPOSITORY_PACKAGE = "$BASE_PACKAGE.repository"
-private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entities"
+private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entity"
 
 
 @Configuration
