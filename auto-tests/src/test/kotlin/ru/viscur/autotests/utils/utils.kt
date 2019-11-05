@@ -165,3 +165,10 @@ fun observationsToString(patientId: String, servReqInfos: List<ObservationInfo>,
                         ", valueInt: " + it.valueInteger + ", valueStr: " + it.valueString
             } + "\n\n"
 }
+
+fun patientIdFromServiceRequests(serviceRequestsFromResponse: List<ServiceRequest>): String {
+    Assertions.assertTrue(serviceRequestsFromResponse.size > 0, "list of service requests can't be empty")
+    Assertions.assertNotNull(serviceRequestsFromResponse.first().subject?.id, "wrong id patient")
+    val patientId = serviceRequestsFromResponse.first().subject?.id!!
+    return patientId
+}

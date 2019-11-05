@@ -3,7 +3,6 @@ package ru.viscur.autotests.utils
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
-import ru.viscur.autotests.tests.End2End
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
@@ -46,10 +45,10 @@ class Helpers {
         //создание bundle для пациента
         fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>): Bundle {
             val patient = createPatientResource(enp = enp)
-            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = End2End.paramedicId)
-            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = createQuestResponseResource(severity)
             val personalDataConsent = createConsentResource()
-            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = End2End.paramedicId)
+            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
             val list = createPractitionerListResource(surgeonId)
             val claim = createClaimResource()
 
