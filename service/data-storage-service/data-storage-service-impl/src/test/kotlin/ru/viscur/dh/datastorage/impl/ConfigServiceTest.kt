@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import ru.viscur.dh.datastorage.api.ConfigService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 
@@ -19,7 +20,7 @@ import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
         classes = [DataStorageConfig::class]
 )
 @EnableAutoConfiguration
-@Disabled("Debug purposes only")
+@EnableJpaRepositories(entityManagerFactoryRef = "dsEntityManagerFactory", transactionManagerRef = "dsTxManager")
 class ConfigServiceTest {
 
     @Autowired
@@ -35,6 +36,7 @@ class ConfigServiceTest {
         val value = "test"
         configService.write(code1, value)
         assertEquals(value, configService.read(code1))
+        configService.write(code1)
     }
 
     @Test
@@ -45,13 +47,14 @@ class ConfigServiceTest {
         value = "test2"
         configService.write(code1, value)
         assertEquals(value, configService.read(code1))
+        configService.write(code1)
     }
 
     @Test
     fun `delete config`() {
         val value = "test"
         configService.write(code1, value)
-        configService.write(code1, null)
+        configService.write(code1)
         assertNull(configService.read(code1))
     }
 
@@ -63,5 +66,9 @@ class ConfigServiceTest {
         configService.write(code2, value2)
         assertEquals(value1, configService.read(code1))
         assertEquals(value2, configService.read(code2))
+        configService.write(code1)
+        configService.write(code2)
+
+//        service.deleteAll()
     }
 }

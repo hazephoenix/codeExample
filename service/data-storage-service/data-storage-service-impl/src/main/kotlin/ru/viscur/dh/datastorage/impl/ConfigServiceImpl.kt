@@ -11,7 +11,6 @@ import ru.viscur.dh.transaction.desc.config.annotation.Tx
  * Created at 05.11.2019 14:54 by SherbakovaMA
  */
 @Service
-@EnableJpaRepositories(entityManagerFactoryRef = "dsEntityManagerFactory", transactionManagerRef = "dsTxManager")
 class ConfigServiceImpl(
         private val configRepository: ConfigRepository
 ) : ConfigService {

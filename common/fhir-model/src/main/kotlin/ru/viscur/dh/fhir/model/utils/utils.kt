@@ -14,6 +14,11 @@ import java.time.ZoneOffset
 import java.util.*
 
 /**
+ * Количество секунд в минуте
+ */
+const val SECONDS_IN_MINUTE = 60
+
+/**
  * Текущее время в формате Date
  */
 fun now() = Date.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant())
