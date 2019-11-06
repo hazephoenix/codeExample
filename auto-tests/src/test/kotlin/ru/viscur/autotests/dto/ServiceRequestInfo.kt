@@ -10,5 +10,6 @@ import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 data class ServiceRequestInfo(
     val code: String,
     val locationId: String,
-    val status: ServiceRequestStatus = ServiceRequestStatus.active
+    val status: ServiceRequestStatus = ServiceRequestStatus.active,
+    val execDuration: Int? = null
 )

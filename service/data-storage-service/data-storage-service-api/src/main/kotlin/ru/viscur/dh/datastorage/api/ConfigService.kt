@@ -17,4 +17,9 @@ interface ConfigService {
      * Если value = null, то происходит удаление настройки
      */
     fun write(code: String, value: String? = null)
+
+    /**
+     * Удаление
+     */
+    fun delete(code: String) = write(code)
 }

@@ -15,13 +15,13 @@ import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.LocationExtension
 import ru.viscur.dh.fhir.model.type.LocationExtensionLastPatientInfo
 import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.fhir.model.utils.msToSeconds
+import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.queue.impl.ageGroup
-import ru.viscur.dh.queue.impl.msToSeconds
-import ru.viscur.dh.queue.impl.now
 
 @Service
 class OfficeServiceImpl(

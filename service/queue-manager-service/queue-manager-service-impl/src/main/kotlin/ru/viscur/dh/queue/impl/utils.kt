@@ -1,6 +1,7 @@
 package ru.viscur.dh.queue.impl
 
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.utils.now
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.Period
@@ -15,26 +16,6 @@ import java.util.*
  *
  * TODO часть можно унести в common
  */
-
-/**
- * Текущее время
- */
-fun now() = Date.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant())
-
-/**
- * Количество миллисекунд в секунде
- */
-const val MILLISECONDS_IN_SECOND = 1000
-
-/**
- * Количество секунд в минуте
- */
-const val SECONDS_IN_MINUTE = 60
-
-/**
- * Перевод миллисекунд в секунды
- */
-fun msToSeconds(ms: Long) = (ms / MILLISECONDS_IN_SECOND).toInt()
 
 /**
  * Приоритетные степени тяжести пациента

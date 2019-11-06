@@ -5,7 +5,9 @@ import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.Period
@@ -14,14 +16,34 @@ import java.time.ZoneOffset
 import java.util.*
 
 /**
+ * Количество миллисекунд в секунде
+ */
+const val MILLISECONDS_IN_SECOND = 1000
+
+/**
  * Количество секунд в минуте
  */
 const val SECONDS_IN_MINUTE = 60
 
 /**
+ * Перевод миллисекунд в секунды
+ */
+fun msToSeconds(ms: Long) = (ms / MILLISECONDS_IN_SECOND).toInt()
+
+/**
  * Текущее время в формате Date
  */
 fun now() = Date.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant())
+
+/**
+ * Текущее время в формате TimeStamp
+ */
+fun nowAsTimeStamp() = now().toTimestamp()
+
+/**
+ * Преобразование Date в Timestamp
+ */
+fun Date.toTimestamp(): Timestamp = Timestamp.from(this.toInstant())
 
 /**
  * Дата в формате строки yyyy.MM.dd HH:mm:ss
@@ -83,3 +105,9 @@ fun valueSetNameById(id: String) = ValueSetName.values().find { it.id == id }
 
 fun <T> Bundle.resources(type: ResourceType<T>): List<T> where T : BaseResource =
         this.entry.map { it.resource }.filter { it.resourceType == type.id }.map { it as T }
+
+/**
+ * Продолжительность выполнения услуги
+ * Если одно из execStart, execEnd не задано, то возвращает null
+ */
+fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execStart != null) msToSeconds(execEnd!!.time - execStart!!.time) else null

@@ -107,16 +107,7 @@ class ClinicalImpressionServiceImpl(
      * добавляется
      */
     @Tx
-    override fun completeRelated(bundle: Bundle): ClinicalImpression {
-        val observation = bundle.resources(ResourceType.Observation)
-                .singleOrNull()
-                ?: throw Exception("Error. Not found single observation in bundle: '${bundle.toJsonb()}'")
-
-        val updatedServiceRequest = serviceRequestService.updateStatusByObservation(observation)
-        val patientId = updatedServiceRequest.subject?.id
-                ?: throw Error("Not defined patient in subject of ServiceRequest with id: '${updatedServiceRequest.id}'")
-        observationService.create(patientId, observation)
-
+    override fun completeRelated(patientId: String, bundle: Bundle): ClinicalImpression {
         return active(patientId)?.let { clinicalImpression ->
             resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
                 val refToPatient = referenceToPatient(patientId)

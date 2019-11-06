@@ -32,7 +32,7 @@ interface ClinicalImpressionService {
     /**
      * Завершить все, что связано с активным обращением пациента
      */
-    fun completeRelated(bundle: Bundle): ClinicalImpression
+    fun completeRelated(patientId: String, bundle: Bundle): ClinicalImpression
 
     /**
      * Завершить активное обращение пациента

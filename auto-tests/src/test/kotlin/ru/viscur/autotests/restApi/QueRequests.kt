@@ -78,6 +78,10 @@ class QueRequests {
                         .extract().response().`as`(resourceType.entityClass)
 
         //observation
+        fun startObservation(serviceRequestId: String) =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.START_OBSERVATION + "?serviceRequestId=$serviceRequestId").then().statusCode(200)
+                        .extract()
+
         fun createObservation(observation : Observation) = Helpers.createRequestSpec(observation).log().all().
                 `when`().
                 post(Endpoints.CREATE_OBSERVATION).

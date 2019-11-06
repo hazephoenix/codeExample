@@ -4,13 +4,18 @@ import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
+import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
+import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.execDuration
+import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import javax.persistence.*
 
 @Service
 class ObservationServiceImpl(
         private val resourceService: ResourceService,
-        private val serviceRequestService: ServiceRequestService
+        private val serviceRequestService: ServiceRequestService,
+        private val observationDurationService: ObservationDurationEstimationService
 ) : ObservationService {
 
     @PersistenceContext
@@ -55,15 +60,31 @@ class ObservationServiceImpl(
         return query.fetchResourceList<Observation>().firstOrNull()
     }
 
+    override fun start(serviceRequestId: String) {
+        resourceService.update(ResourceType.ServiceRequest, serviceRequestId) {
+            extension = extension?.apply { execStart = now() }
+                    ?: ServiceRequestExtension(execStart = now())
+        }
+    }
+
     /**
      * Зарегистрировать обследование
      *
      * Обследование обязательно должно содержать поле basedOn
      * со ссылкой на ServiceRequest
      */
-    override fun create(patientId: String, observation: Observation): Observation {
-        observation.apply {
-            subject = referenceToPatient(patientId)
+    override fun create(patientId: String, observation: Observation, diagnosis: String?, severity: Severity): Observation {
+        observation.subject = referenceToPatient(patientId)
+        observation.basedOn?.id?.run {
+            val updatedServiceRequest = resourceService.update(ResourceType.ServiceRequest, this) {
+                extension = extension?.apply { execEnd = now() }
+                        ?: ServiceRequestExtension(execEnd = now())
+                observation.code = this.code
+            }
+            val duration = updatedServiceRequest.extension?.execDuration()
+            if (diagnosis != null && duration != null) {
+                observationDurationService.saveToHistory(updatedServiceRequest.code.code(), diagnosis, severity, duration)
+            }
         }
         updateRelated(patientId, observation)
         return resourceService.create(observation)
