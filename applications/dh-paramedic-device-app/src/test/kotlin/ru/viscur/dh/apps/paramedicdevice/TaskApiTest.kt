@@ -100,7 +100,7 @@ class TaskApiTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", matchesRegex(Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))))
                 .andExpect(jsonPath("$.type", `is`(TaskType.Height.name)))
-                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name, TaskStatus.Complete.name)))))
+                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name, TaskStatus.Complete.name, TaskStatus.InProgress.name)))))
                 .andReturn()
         val mapper = ObjectMapper()
         val task = mapper.readValue(res.response.contentAsString, Task::class.java)

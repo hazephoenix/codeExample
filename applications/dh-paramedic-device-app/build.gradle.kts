@@ -1,9 +1,12 @@
-
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-artemis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":common:fhir-model"))
+    implementation(fileTree("libs"))
+    implementation("org.usb4java:usb4java:1.3.0")
+
     testCompile("junit:junit:4.13-rc-1")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 tasks.test {
