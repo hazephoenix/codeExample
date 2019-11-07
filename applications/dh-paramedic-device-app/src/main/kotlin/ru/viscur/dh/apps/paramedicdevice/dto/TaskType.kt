@@ -27,7 +27,16 @@ enum class TaskType {
     Temperature,
 
     /**
+     * Печать браслета
+     */
+    Wristband,
+
+    /**
      * Неизвестный тип
      */
-    Unknown
+    Unknown,
+    /**
+     * Измерения тонометра (АД, ЧСС)
+     */
+    Tonometer
 }
