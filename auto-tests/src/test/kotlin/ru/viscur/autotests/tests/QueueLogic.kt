@@ -157,6 +157,40 @@ class QueueLogic {
     }
 
     @Test
+    fun deleteFirstPositionPatientInQue() {
+        QueRequests.officeIsBusy(referenceToLocation(office101))
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource("B03.016.002ГМУ_СП")
+        )
+        val bundle1 = bundle("1122", "RED", servRequests)
+        val bundle2 = bundle("1121", "YELLOW", servRequests)
+        val bundle3 = bundle("1123", "GREEN", servRequests)
+        val responseBundle1 = QueRequests.createPatient(bundle1)
+        val responseBundle2 = QueRequests.createPatient(bundle2)
+        val responseBundle3 = QueRequests.createPatient(bundle3)
+        val patientId1 = patientIdFromServiceRequests(responseBundle1.resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(responseBundle2.resources(ResourceType.ServiceRequest))
+        val patientId3 = patientIdFromServiceRequests(responseBundle3.resources(ResourceType.ServiceRequest))
+
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
+                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+
+        QueRequests.deletePatientFromQueue(referenceToPatient(patientId1))
+
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
+                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+    }
+
+    @Test
     fun deleteLastPositionPatientInQue() {
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
@@ -271,10 +305,8 @@ class QueueLogic {
         val patientId4 = servReqUzi4.subject!!.id!!
         val servReqUzi5 = QueRequests.createPatient(bundleGreen2).entry.first().resource as ServiceRequest
         val patientId5 = servReqUzi5.subject!!.id!!
-        /*val servReqUzi6 = QueRequests.createPatient(bundleRed3).entry.first().resource as ServiceRequest
-        val patientId6 = servReqUzi6.subject!!.id!!*/
-
-        //проверка что оба пациента в очереди в разные кабинеты узи
+        val servReqUzi6 = QueRequests.createPatient(bundleRed3).entry.first().resource as ServiceRequest
+        val patientId6 = servReqUzi6.subject!!.id!!
     }
 
     @Test
@@ -341,5 +373,4 @@ class QueueLogic {
                 ))
         ))
     }
-
 }

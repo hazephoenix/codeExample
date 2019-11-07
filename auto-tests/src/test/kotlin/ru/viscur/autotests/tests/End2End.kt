@@ -155,10 +155,10 @@ class End2End {
         assertEquals(1, actServicesInOffice.size, "wrong number of office's service requests")
         assertEquals(PatientQueueStatus.ON_OBSERVATION, actPatient.extension.queueStatus, "wrong patient status")
 
+        //добавление ответственным дополнительного Service Request
         val additionalServiceRequests = listOf(
                 Helpers.createServiceRequestResource("B03.016.002ГМУ_СП", patientId)
         )
-
         val bundleForExamin = Bundle(
                 entry = additionalServiceRequests.map { BundleEntry(it) }
         )

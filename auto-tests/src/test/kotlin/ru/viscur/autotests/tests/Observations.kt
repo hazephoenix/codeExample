@@ -4,19 +4,25 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ObservationInfo
+import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkObservationsOfPatient
+import ru.viscur.autotests.utils.checkServiceRequestsOfPatient
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
 import ru.viscur.dh.fhir.model.enums.ObservationStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class Observations {
 
     companion object {
         val observationCode = "B03.016.002ГМУ_СП"
+        val office101 = "Office:101"
+        val observationCode2 = "СтХир"
+        val office139 = "Office:139"
     }
 
     @BeforeEach
@@ -37,20 +43,36 @@ class Observations {
         val patientId = patientIdFromServiceRequests(actServRequests)
         val servRequstId = actServRequests.first().id
 
-        //создание Observation со статусом final
+        //создание Observation со статусом registered
         val obs = Helpers.createObservation(
                 code = observationCode,
-                status = ObservationStatus.final,
+                status = ObservationStatus.registered,
                 basedOnServiceRequestId = servRequstId,
                 valueString = "good quality of blood"
         )
         QueRequests.createObservation(obs)
+
+        //проверка созданного Observation
         checkObservationsOfPatient(patientId, listOf(
                 ObservationInfo(
                         basedOnId = servRequstId,
                         code = observationCode,
-                        status = ObservationStatus.final,
+                        status = ObservationStatus.registered,
                         valueStr = "good quality of blood"
+                )
+        ))
+
+        //проверка изменения статуса в Service Requests пациента
+        checkServiceRequestsOfPatient(patientId, listOf(
+                ServiceRequestInfo(
+                        code = observationCode,
+                        locationId = office101,
+                        status = ServiceRequestStatus.waiting_result
+                ),
+                ServiceRequestInfo(
+                        code = observationCode2,
+                        locationId = office139,
+                        status = ServiceRequestStatus.active
                 )
         ))
     }
@@ -83,12 +105,27 @@ class Observations {
                 id = actObs.id,
                 valueString = "quality of blood is good")
         QueRequests.updateObservation(updatedObs)
+
+        //проверка обновленного Observation
         checkObservationsOfPatient(patientId, listOf(
                 ObservationInfo(
                         basedOnId = servRequstId,
                         code = observationCode,
                         status = ObservationStatus.final,
                         valueStr = "quality of blood is good")))
-    }
 
+        //проверка изменения статуса в Service Request
+        checkServiceRequestsOfPatient(patientId, listOf(
+                ServiceRequestInfo(
+                        code = observationCode,
+                        locationId = office101,
+                        status = ServiceRequestStatus.completed
+                ),
+                ServiceRequestInfo(
+                        code = observationCode2,
+                        locationId = office139,
+                        status = ServiceRequestStatus.active
+                )
+        ))
+    }
 }
