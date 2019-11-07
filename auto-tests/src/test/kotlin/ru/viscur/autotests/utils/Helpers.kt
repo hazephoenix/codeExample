@@ -6,10 +6,7 @@ import io.restassured.specification.RequestSpecification
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
-import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
-import ru.viscur.dh.fhir.model.utils.referenceToPractitioner
+import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import java.util.*
@@ -64,6 +61,7 @@ class Helpers {
             return bundle
         }
         //создание ресурсов
+
         fun createPatientResource(enp: String) = Patient(
                 identifier = listOf(
                         Identifier(
@@ -213,7 +211,8 @@ class Helpers {
                               valueInt: Int? = null,
                               valueString: String? = null,
                               basedOnServiceRequestId: String? = null,
-                              status: ObservationStatus = ObservationStatus.registered
+                              status: ObservationStatus = ObservationStatus.registered,
+                              id: String = genId()
         ) = Observation(
                 performer = listOf(referenceToPractitioner(practitionerId)),
                 subject = referenceToPatient(patientId),
@@ -226,7 +225,8 @@ class Helpers {
                 valueInteger = valueInt,
                 valueString = valueString,
                 basedOn = basedOnServiceRequestId?.let { Reference(resourceType = ResourceType.ServiceRequest.id, id = basedOnServiceRequestId) },
-                status = status
+                status = status,
+                id = id
         )
 
         fun createPractitionerListResource(practitionerId: String) = ListResource(

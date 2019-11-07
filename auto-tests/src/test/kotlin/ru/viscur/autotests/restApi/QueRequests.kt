@@ -1,7 +1,5 @@
 package ru.viscur.autotests.restApi
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
@@ -21,10 +19,15 @@ class QueRequests {
         fun deleteQue() = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
                 `when`().delete(Endpoints.QUE_DELETE_ALL).then().statusCode(200)
 
-        fun getOfficeQue(cabinetRef: Reference) = Helpers.createRequestSpec(cabinetRef).
+        fun getOfficeQue(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
                 `when`().get(Endpoints.OFFICE_QUE).
                 then().statusCode(200).extract().response().`as`(Bundle::class.java)
 
+        fun queueItems() = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
+                `when`().get(Endpoints.QUE_ITEMS).
+                then().statusCode(200).extract().response().`as`(QueueItemsResponse::class.java)
+
+        //patient
         fun addPatientToQue(patientRef: Reference) = Helpers.createRequestSpec(patientRef).
                 `when`().
                 post(Endpoints.QUE_ADD_PATIENT).
@@ -35,11 +38,7 @@ class QueRequests {
                 delete(Endpoints.QUE_DELETE_PATIENT).
                 then()
 
-        fun queueItems() = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
-                `when`().get(Endpoints.QUE_ITEMS).
-                then().statusCode(200).extract().response().`as`(QueueItemsResponse::class.java)
-
-        //cabinet
+        //office
         fun officeIsReady(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
                 `when`().
                 post(Endpoints.QUE_OFFICE_READY).
@@ -66,6 +65,17 @@ class QueRequests {
                 then().statusCode(200).extract().response().`as`(Bundle::class.java)
                 .let { it.entry.map { it.resource as ServiceRequest } }
 
+        fun patientLeft(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
+                `when`().
+                post(Endpoints.PATIENT_LEFT).
+                then().statusCode(200)
+
+        fun cancelEntering(officeRef: Reference) = Helpers.createRequestSpec(officeRef).log().all().
+                `when`().
+                post(Endpoints.CANCEL_ENTERING).
+                then().statusCode(200).extract().response()
+
+
         //patient
         fun createPatient(bundle : Bundle) = Helpers.createRequestSpec(bundle).
                 `when`().
@@ -81,7 +91,12 @@ class QueRequests {
         fun createObservation(observation : Observation) = Helpers.createRequestSpec(observation).log().all().
                 `when`().
                 post(Endpoints.CREATE_OBSERVATION).
-                then().statusCode(200)
+                then().statusCode(200).log().all().extract().response().`as`(Observation::class.java)
+
+        fun updateObservation(observation : Observation) = Helpers.createRequestSpec(observation).log().all().
+                `when`().
+                put(Endpoints.CREATE_OBSERVATION).
+                then().statusCode(200).log().all().extract().response().`as`(Observation::class.java)
 
         fun observations(patientId: String? = null) =
                 Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.OBSERVATIONS + "?patientId=$patientId").then().statusCode(200)
@@ -97,6 +112,10 @@ class QueRequests {
                 `when`().
                 post(Endpoints.SUPPOSED_SERVICE_REQUEST).
                 then().statusCode(200)
+
+        fun getPatientServRequests(patientId: String) =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.PATIENT_SERVICE_REQUESTS + "?patientId=$patientId").then().statusCode(200)
+                        .extract().response().`as`(Bundle::class.java)
 
         //examination
         fun completeExamination(bundle : Bundle) = Helpers.createRequestSpec(bundle).log().all().

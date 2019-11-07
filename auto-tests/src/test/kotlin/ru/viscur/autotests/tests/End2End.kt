@@ -41,7 +41,6 @@ class End2End {
     @Test
     @Order(1)
     fun patientGettingRequestsAndFinishingThem() {
-        QueRequests.deleteQue()
         val observationOfSurgeonCode = "СтХир"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode)
@@ -125,7 +124,6 @@ class End2End {
     @Test
     @Order(1)
     fun patientAdditionalServRequestAdding() {
-        QueRequests.deleteQue()
         val servRequests = listOf(
                 Helpers.createServiceRequestResource("СтХир")
         )
@@ -158,18 +156,17 @@ class End2End {
         assertEquals(PatientQueueStatus.ON_OBSERVATION, actPatient.extension.queueStatus, "wrong patient status")
 
         val additionalServiceRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.002ГМУ_СП", patientId),
-                Helpers.createServiceRequestResource("B03.016.006ГМУ_СП", patientId)
+                Helpers.createServiceRequestResource("B03.016.002ГМУ_СП", patientId)
         )
 
         val bundleForExamin = Bundle(
                 entry = additionalServiceRequests.map { BundleEntry(it) }
         )
-        QueRequests.officeIsBusy(referenceToLocation(office104))
+        QueRequests.officeIsBusy(referenceToLocation(office101))
         val updatedCarePlan = QueRequests.addServiceRequests(bundleForExamin)
 
         //в CarePlan должны быть добавленные ServiceRequests и осмотр ответственного, пациент должен встать в очередь в другой кабинет
-        assertEquals(3, updatedCarePlan.activity.size, "wrong care plan activities")
+        assertEquals(2, updatedCarePlan.activity.size, "wrong care plan activities")
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
@@ -177,8 +174,7 @@ class End2End {
         ))
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = "СтХир", locationId = office139),
-                ServiceRequestInfo(code = "B03.016.002ГМУ_СП", locationId = office101),
-                ServiceRequestInfo(code = "B03.016.006ГМУ_СП", locationId = office104)
+                ServiceRequestInfo(code = "B03.016.002ГМУ_СП", locationId = office101)
         ))
         checkObservationsOfPatient(patientId, listOf())
     }
@@ -187,7 +183,6 @@ class End2End {
     @Order(1)
     fun fullPositiveE2ePatient() {
         //Todo написать полный тест с поочередным прохождением всех requests, заполнением observations и завершением
-        QueRequests.deleteQue()
         val patientServiceRequests = listOf(
                 Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
                 Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
@@ -196,14 +191,12 @@ class End2End {
         val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
         val responseBundle = QueRequests.createPatient(patientBundle)
         assertEquals(4, responseBundle.entry.size, "wrong number of service request")
-
     }
 
-    @Test
+    /*@Test
     @Order(1)
-    fun fullPositiveE2ePatient2() {
+    fun addingNumberOfPatients() {
         //Todo додумать и написать тест с добавлением множества пациентов
-        QueRequests.deleteQue()
         val patientServiceRequests = listOf(
                 Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
                 Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
@@ -223,6 +216,5 @@ class End2End {
         val responseBundle11 = QueRequests.createPatient(Helpers.bundle("1011", "RED", patientServiceRequests))
         val responseBundle12 = QueRequests.createPatient(Helpers.bundle("1012", "RED", patientServiceRequests))
         val responseBundle13 = QueRequests.createPatient(Helpers.bundle("1013", "RED", patientServiceRequests))
-    }
-
+    }*/
 }

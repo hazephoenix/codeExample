@@ -13,6 +13,5 @@ class ServiceRequests {
         val diagnosis = " {\"diagnosis\": \"A01\",\"complaints\": [\"Сильная боль в правом подреберье\", \"Тошнит\"],\"gender\": \"male\"}"
         QueRequests.getSupposedServRequests(diagnosis).
                 assertThat().body("entry.size()", equalTo(6))
-
     }
 }
