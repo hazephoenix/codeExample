@@ -2,6 +2,7 @@ package ru.viscur.dh.apps.paramedicdevice.device
 
 import com.fazecast.jSerialComm.*
 import org.slf4j.*
+import org.springframework.beans.factory.annotation.*
 import org.springframework.context.*
 import org.springframework.context.event.*
 import org.springframework.stereotype.*
@@ -18,7 +19,11 @@ import java.sql.*
  * В ОС Linux требуются root-права доступа к порту
  */
 @Component
-class Tonometer(private val publisher: ApplicationEventPublisher) {
+class Tonometer(
+        @Value("\${paramedic.serial.port.system.name}")
+        private val systemPortName: String,
+        private val publisher: ApplicationEventPublisher
+) {
     private val log: Logger = LoggerFactory.getLogger(Tonometer::class.java)
 
     @EventListener(TaskRequested::class)
@@ -35,7 +40,7 @@ class Tonometer(private val publisher: ApplicationEventPublisher) {
      */
     private fun doMeasure(task: Task) {
         try {
-            SerialPort.getCommPorts().first()?.let { port ->
+            SerialPort.getCommPort(systemPortName).let { port ->
                 port.openPort()
                 // По умолчанию скорость передачи данных тонометра - 2400 бит/с
                 port.baudRate = 2400
