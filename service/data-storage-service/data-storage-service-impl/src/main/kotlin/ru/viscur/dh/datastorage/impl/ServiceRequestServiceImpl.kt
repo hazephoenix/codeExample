@@ -2,7 +2,7 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
-import ru.viscur.dh.datastorage.impl.config.annotation.*
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
@@ -100,4 +100,15 @@ class ServiceRequestServiceImpl(
             }
         } ?: throw Error("No active CarePlan found")
     }
+
+    @Tx
+    override fun updateStatusByObservation(observation: Observation): ServiceRequest =
+            observation.basedOn?.id?.let { serviceRequestId ->
+                resourceService.update(ResourceType.ServiceRequest, serviceRequestId) {
+                    status = when (observation.status) {
+                        ObservationStatus.final -> ServiceRequestStatus.completed
+                        else -> ServiceRequestStatus.waiting_result
+                    }
+                }
+            } ?: throw Error("Not found ServiceRequest by Observation.basedOn.id: '${observation.basedOn?.id}'")
 }

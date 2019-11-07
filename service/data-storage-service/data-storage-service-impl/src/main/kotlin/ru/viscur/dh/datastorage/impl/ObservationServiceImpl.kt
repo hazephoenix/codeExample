@@ -4,10 +4,14 @@ import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
+import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import javax.persistence.*
 
 @Service
-class ObservationServiceImpl(private val resourceService: ResourceService) : ObservationService {
+class ObservationServiceImpl(
+        private val resourceService: ResourceService,
+        private val serviceRequestService: ServiceRequestService
+) : ObservationService {
 
     @PersistenceContext
     private lateinit var em: EntityManager
@@ -15,24 +19,29 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
     /**
      * Найти все обследования по id пациента и статусу обследования
      */
-    override fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?> {
-        val query = em.createNativeQuery("""
+    override fun byPatientAndStatus(patientId: String, status: ObservationStatus?): List<Observation?> {
+        var queryStr = """
             select r.resource
                 from Observation r
                 where r.resource -> 'basedOn' ->> 'reference' in (
-                    select 'ServiceRequest/' || sr.id
-                    from ServiceRequest sr
-                    where 'ServiceRequest/' || sr.id in (
-                        select
-                            jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                        from CarePlan cp
-                        where cp.resource -> 'subject' ->> 'id' = :patientId
-                        )
-                )
-                and r.resource ->> 'status' = :status
-        """)
-        query.setParameter("patientId", patientId)
-        query.setParameter("status", status.toString())
+                    select
+                        jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                    from CarePlan cp
+                    where 'CarePlan/' || r.id in (
+                        select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                        from clinicalImpression ci
+                        where ci.resource -> 'subject' ->> 'reference' = ?1
+                          and ci.resource ->> 'status' = 'active'
+                    )
+                )                
+        """
+        val params = mutableListOf("Patient/$patientId")
+        status?.run {
+            queryStr += "\nand r.resource ->> 'status' = ?2"
+            params += status.toString()
+        }
+        val query = em.createNativeQuery(queryStr)
+        query.setParameters(params)
         return query.fetchResourceList()
     }
 
@@ -52,15 +61,18 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
      * Обследование обязательно должно содержать поле basedOn
      * со ссылкой на ServiceRequest
      */
-    override fun create(observation: Observation): Observation? {
-        updateRelated(observation)
+    override fun create(patientId: String, observation: Observation): Observation {
+        observation.apply {
+            subject = referenceToPatient(patientId)
+        }
+        updateRelated(patientId, observation)
         return resourceService.create(observation)
     }
 
     /**
      * Обновить обследование (добавить результаты)
      */
-    override fun update(observation: Observation): Observation {
+    override fun update(patientId: String, observation: Observation): Observation {
         val updatedObservation = resourceService.update(ResourceType.Observation, observation.id) {
             performer = (performer + observation.performer).distinctBy { item -> item.id }
             status = observation.status
@@ -70,7 +82,7 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
             valueSampledData = observation.valueSampledData
             valueString = observation.valueString
         }
-        updateRelated(updatedObservation)
+        updateRelated(patientId, updatedObservation)
         return updatedObservation
     }
 
@@ -78,26 +90,27 @@ class ObservationServiceImpl(private val resourceService: ResourceService) : Obs
      * Обновить связанные ресурсы -
      *  статус направления на обследование и маршрутного листа
      */
-    private fun updateRelated(observation: Observation) =
-            observation.basedOn?.id?.let { serviceRequestId ->
-                // Обновить статус направления на обследование
-                val updatedServiceRequest = resourceService.update(ResourceType.ServiceRequest, serviceRequestId) {
-                    status = when (observation.status) {
-                        ObservationStatus.final -> ServiceRequestStatus.completed
-                        else -> ServiceRequestStatus.waiting_result
-                    }
-                }
-                // Обновить статус маршрутного листа
-                updateCarePlan(updatedServiceRequest.id)
-            } ?: throw Error("No correct ServiceRequest.id provided (basedOn)")
+    private fun updateRelated(patientId: String, observation: Observation) {
+        // Обновить статус направления на обследование
+        val updatedServiceRequest = serviceRequestService.updateStatusByObservation(observation)
+        // Обновить статус маршрутного листа
+        updateCarePlan(patientId, updatedServiceRequest.id)
+    }
+
 
     /**
      * Обновить соответствующий направлению [ServiceRequest] маршрутный лист [CarePlan]
      */
-    private fun updateCarePlan(serviceRequestId: String) {
+    private fun updateCarePlan(patientId: String, serviceRequestId: String) {
         getCarePlanByServiceRequestId(serviceRequestId)?.let { carePlan ->
             resourceService.update(ResourceType.CarePlan, carePlan.id) {
-                status = if (getUncompletedServiceRequests(id).isEmpty()) CarePlanStatus.results_are_ready else CarePlanStatus.waiting_results
+                val serviceRequests = serviceRequestService.all(patientId)
+                val serviceRequestsWithoutResp = serviceRequests.filter { it.performer.isNullOrEmpty() }
+                status = when {
+                    serviceRequestsWithoutResp.any { it.status == ServiceRequestStatus.active } -> CarePlanStatus.active
+                    serviceRequestsWithoutResp.all { it.status == ServiceRequestStatus.completed } -> CarePlanStatus.results_are_ready
+                    else -> CarePlanStatus.waiting_results
+                }
             }
         }
     }

@@ -81,6 +81,9 @@ class QueueController(private val queueManagerService: QueueManagerService) {
     @GetMapping
     fun queueOfOffice(@RequestBody officeReference: Reference) = queueManagerService.queueOfOffice(officeReference.id!!)
 
+    @GetMapping("/queueItems")
+    fun queueItems() = queueManagerService.queueItems()
+
     @GetMapping("/info")
     fun queueInfo() = queueManagerService.loqAndValidate()
 

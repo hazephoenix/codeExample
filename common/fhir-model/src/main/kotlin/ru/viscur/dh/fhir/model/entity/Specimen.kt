@@ -8,7 +8,7 @@ import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.genId
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 04.10.2019 9:35 by SherbakovaMA
@@ -27,6 +27,6 @@ class Specimen @JsonCreator constructor(
         @JsonProperty("status") val status: SpecimenStatus,
         @JsonProperty("type") val type: CodeableConcept,
         @JsonProperty("subject") val subject: Reference,
-        @JsonProperty("receivedTime") val receivedTime: Timestamp
+        @JsonProperty("receivedTime") val receivedTime: Date
 //todo много полей, добавим по необходимости
 ) : BaseResource(id, identifier, resourceType)

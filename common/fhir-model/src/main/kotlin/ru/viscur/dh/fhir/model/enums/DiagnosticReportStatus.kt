@@ -6,11 +6,6 @@ package ru.viscur.dh.fhir.model.enums
  * Статус диагноза [ru.viscur.dh.fhir.model.entity.DiagnosticReport]
  */
 enum class DiagnosticReportStatus {
-    registered,
-    /**
-     * Частичный
-     */
-    partial,
     /**
      * Предварительный
      */

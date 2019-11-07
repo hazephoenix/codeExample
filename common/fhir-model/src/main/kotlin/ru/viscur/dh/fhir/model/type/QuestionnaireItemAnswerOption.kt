@@ -2,7 +2,7 @@ package ru.viscur.dh.fhir.model.type
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.sql.Timestamp
+import java.util.*
 import java.util.*
 
 /**
@@ -16,7 +16,7 @@ import java.util.*
 class QuestionnaireItemAnswerOption @JsonCreator constructor(
         @JsonProperty("valueInteger") val valueInteger: Int? = null,
         @JsonProperty("valueDate") val valueDate: Date? = null,
-        @JsonProperty("valueTime") val valueTime: Timestamp? = null,
+        @JsonProperty("valueTime") val valueTime: Date? = null,
         @JsonProperty("valueString") val valueString: String? = null,
         @JsonProperty("valueCoding") val valueCoding: Coding? = null,
         @JsonProperty("valueRegerence") val valueRegerence: Reference? = null,

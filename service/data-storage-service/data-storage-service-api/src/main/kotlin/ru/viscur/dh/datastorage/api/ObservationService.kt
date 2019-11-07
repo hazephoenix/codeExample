@@ -7,7 +7,11 @@ import ru.viscur.dh.fhir.model.enums.*
  * Сервис для работы с обследованиями
  */
 interface ObservationService {
-    fun findByPatientAndStatus(patientId: String, status: ObservationStatus): List<Observation?>
+
+    /**
+     * По пациенту и статусу
+     */
+    fun byPatientAndStatus(patientId: String, status: ObservationStatus? = null): List<Observation?>
 
     /**
      * По назначению-основанию (basedOn - ServiceRequest)
@@ -17,10 +21,10 @@ interface ObservationService {
     /**
      * Создать запись об обследовании
      */
-    fun create(observation: Observation): Observation?
+    fun create(patientId: String, observation: Observation): Observation
 
     /**
      * Обновить запись об исследовании
      */
-    fun update(observation: Observation): Observation
+    fun update(patientId: String, observation: Observation): Observation
 }

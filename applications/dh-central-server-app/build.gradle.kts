@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":service:location-service:location-service-api"))
     implementation(project(":service:mis-integration-service:mis-integration-service-api"))
 
+    runtime(project(":common:transaction-desc"))
     runtime(project(":service:data-storage-service:data-storage-service-impl"))
     runtime(project(":service:queue-manager-service:queue-manager-service-impl"))
     runtime(project(":service:queue-manager-service:queue-manager-service-rest"))

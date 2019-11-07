@@ -1,5 +1,7 @@
 package ru.viscur.dh.fhir.model.utils
 
+import ru.viscur.dh.fhir.model.entity.BaseResource
+import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Reference
@@ -73,3 +75,6 @@ fun CodeableConcept.code(): String = this.coding.first().code
  */
 fun valueSetNameById(id: String) = ValueSetName.values().find { it.id == id }
         ?: throw Exception("Error. Can't find ValueSet with id '$id'. Available ids: ${ValueSetName.values().map { it.id }.joinToString()}")
+
+fun <T> Bundle.resources(type: ResourceType<T>): List<T> where T : BaseResource =
+        this.entry.map { it.resource }.filter { it.resourceType == type.id }.map { it as T }

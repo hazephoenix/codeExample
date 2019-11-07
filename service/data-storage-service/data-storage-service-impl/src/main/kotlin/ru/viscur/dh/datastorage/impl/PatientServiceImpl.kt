@@ -2,7 +2,7 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
-import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.datastorage.impl.utils.*
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
@@ -10,9 +10,9 @@ import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.*
-import java.sql.Timestamp
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
+import javax.persistence.Query
 
 /**
  * Created at 15.10.2019 11:52 by SherbakovaMA
@@ -171,7 +171,12 @@ class PatientServiceImpl(
 
         val patientReference = Reference(patient)
         val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
-                .first().let { resourceService.create(it) }
+                .firstOrNull()?.let {
+                    resourceService.create(it.apply {
+                        subject = patientReference
+                    })
+                }
+                ?: throw Error("No DiagnosticReport provided")
         val paramedicReference = diagnosticReport.performer.first()
         val date = now()
 
@@ -201,12 +206,11 @@ class PatientServiceImpl(
                 author = responsiblePractitionerRef, // ответственный врач
                 contributor = paramedicReference,
                 status = CarePlanStatus.active,
-                created = Timestamp(date.time),
+                created = date,
                 title = "Маршрутный лист",
                 activity = resultServices
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
-//        val encounter = Encounter(subject = patientReference).let { resourceService.create(it) }todo encounter это инфа о госпитализации, создадим при заполнении инфы о госпитализации. и в supportingInfo класть?
         val claim = getResourcesFromList<Claim>(resources, ResourceType.ResourceTypeId.Claim).first().let {
             resourceService.create(it.apply {
                 it.patient = patientReference
@@ -241,10 +245,17 @@ class PatientServiceImpl(
         return patient.id
     }
 
-    override fun patientsToExamine(practitionerId: String): List<PatientToExamine> {
-        val query = em.createNativeQuery("""
-            select * from patients_to_examine
-        """)
+    override fun patientsToExamine(practitionerId: String?): List<PatientToExamine> {
+        var queryStr = """
+            select * from patients_to_examine            
+        """
+        val params = mutableListOf<String>()
+        practitionerId?.run {
+            queryStr += "where resp_practitioner_id = ?1"
+            params += practitionerId
+        }
+        val query = em.createNativeQuery(queryStr)
+        query.setParameters(params)
         return query.patientsToExamine()
     }
 
@@ -254,5 +265,22 @@ class PatientServiceImpl(
     private fun observationTypeOfResponsiblePractitioner(responsiblePractitionerId: String): String {
         val responsiblePractitioner = practitionerService.byId(responsiblePractitionerId)
         return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualification.code.code())
+    }
+
+    private fun Query.patientsToExamine(): List<PatientToExamine> {
+        return this.resultList
+                .asSequence()
+                .map {
+                    it as Array<*>
+                    PatientToExamine(
+                            practitionerId = it[0] as String,
+                            patientId = it[1] as String,
+                            severity = it[2] as String,
+                            carePlanStatus = enumValueOf(it[3] as String),
+                            patient = it[4].toResourceEntity()!!
+                    )
+                }
+                .filterNotNull()
+                .toList()
     }
 }

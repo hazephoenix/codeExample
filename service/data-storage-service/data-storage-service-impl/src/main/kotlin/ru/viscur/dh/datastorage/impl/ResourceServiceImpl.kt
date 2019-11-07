@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
-import ru.viscur.dh.datastorage.impl.config.annotation.Tx
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
@@ -163,9 +163,7 @@ class ResourceServiceImpl : ResourceService {
         }
 
         fun setParametersTo(query: Query) {
-            params.forEachIndexed { idx, value ->
-                query.setParameter(idx + 1, value)
-            }
+            query.setParameters(params)
         }
 
         private fun addWherePart(filter: Map<String, String?>?, filterLike: Boolean) {

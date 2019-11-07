@@ -9,7 +9,7 @@ enum class TaskType {
     /**
      * Сканирование документов
      */
-    Documents,
+    Document,
 
     /**
      * Измерение веса
@@ -20,6 +20,16 @@ enum class TaskType {
      * Измерение роста
      */
     Height,
+
+    /**
+     * Температура
+     */
+    Temperature,
+
+    /**
+     * Печать браслета
+     */
+    Wristband,
 
     /**
      * Неизвестный тип

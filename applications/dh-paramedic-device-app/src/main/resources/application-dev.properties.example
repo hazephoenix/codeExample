@@ -1,8 +1,15 @@
+#Настройки для разработки
+
 # App properties
 spring.profiles.active=dev
 paramedic.tves.url=http://vagrant-10:1221/tves
 uid=developer-paramedic-device
 api.password=developer-paramedic-device
+paramedic.native-service.url=http://localhost:8850
+
+wristband.yellow=50J191806000
+wristband.green=50J191806005
+wristband.red=50J191806008
 
 # Spring properties
 spring.artemis.host=192.168.10.78
@@ -10,3 +17,4 @@ spring.artemis.user=admin
 spring.artemis.password=admin
 server.port=9111
 logging.file.name=paramedic.log
+logging.level.ru.viscur.dh.apps.paramedicdevice.device.WristbandPrinter=DEBUG

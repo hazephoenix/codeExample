@@ -2,15 +2,12 @@ package ru.viscur.dh.datastorage.impl
 
 import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.node.*
-import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
-import ru.viscur.dh.fhir.model.type.*
 import javax.persistence.*
 
 private val dbResourceObjectMapper = ObjectMapper()
         .apply {
-            // TODO в ответе есть атрибут meta, но в моделе у нас его нет
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
 
@@ -53,18 +50,8 @@ fun <T> Query.fetchResourceList(): List<T>
             }.toList()
 }
 
-fun Query.patientsToExamine(): List<PatientToExamine> {
-    return this.resultList
-            .asSequence()
-            .map {
-                it as Array<*>
-                PatientToExamine(
-                        patient = it[2].toResourceEntity(),
-                        patientId = it[1] as String,
-                        carePlanStatus = CarePlanStatus.valueOf((it[3] as TextNode).asText()),
-                        severity = dbResourceObjectMapper.treeToValue(it[0] as ObjectNode, Coding::class.java) as Coding
-                )
-            }
-            .filterNotNull()
-            .toList()
+fun Query.setParameters(params: List<Any>) {
+    params.forEachIndexed { index, param ->
+        this.setParameter(index + 1, param)
+    }
 }

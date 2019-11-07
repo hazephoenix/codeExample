@@ -1,13 +1,11 @@
 package ru.viscur.dh.integration.mis.rest
 
-import org.springframework.http.*
 import org.springframework.validation.annotation.*
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
-import ru.viscur.dh.fhir.model.enums.*
-import ru.viscur.dh.queue.api.*
+import ru.viscur.dh.fhir.model.type.BundleEntry
+import ru.viscur.dh.integration.mis.rest.api.ExaminationService
 
 /**
  * Контроллер для осмотра пациентов ответственным врачом
@@ -17,42 +15,39 @@ import ru.viscur.dh.queue.api.*
 @Validated
 class ExaminationController(
         private val patientService: PatientService,
-        private val clinicalImpressionService: ClinicalImpressionService,
-        private val serviceRequestService: ServiceRequestService,
-        private val queueManagerService: QueueManagerService
+        private val examinationService: ExaminationService,
+        private val serviceRequestService: ServiceRequestService
 ) {
     /**
      * Получить список активных пациентов ответсвенного врача
      */
     @GetMapping("/patients")
-    fun activeByPractitioner(@RequestParam practitionerId: String) =
-        mapOf("patients" to patientService.patientsToExamine(practitionerId))
+    fun activeByPractitioner(@RequestParam practitionerId: String? = null) =
+            mapOf("patients" to patientService.patientsToExamine(practitionerId))
 
     /**
      * Назначить дообследование пациенту
      */
     @PostMapping("/serviceRequests")
-    fun addServiceRequests(@RequestBody bundle: Bundle): CarePlan {
-        try {
-            val patientId = bundle.entry.first { it.resource.resourceType == ResourceType.ResourceTypeId.ServiceRequest }
-                    .let {
-                        val req = it.resource as ServiceRequest
-                        patientService.byId(req.subject?.id!!).id
-                    }
-
-            val carePlan = serviceRequestService.add(patientId, bundle.entry.map { it.resource as ServiceRequest })
-            queueManagerService.deleteFromOfficeQueue(patientId)
-            queueManagerService.calcServiceRequestExecOrders(patientId)
-            queueManagerService.addToOfficeQueue(patientId)
-            return carePlan
-        } catch (exception: Exception) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Active CarePlan or Patient not found")
-        }
-    }
+    fun addServiceRequests(@RequestBody bundle: Bundle) = examinationService.addServiceRequests(bundle)
 
     /**
      * Завершить осмотр пациента
      */
     @PostMapping
-    fun finishExamination(@RequestBody bundle: Bundle) = clinicalImpressionService.finish(bundle)
+    fun completeExamination(@RequestBody bundle: Bundle) = examinationService.completeExamination(bundle)
+
+    /**
+     * Все назначения пациента
+     */
+    @GetMapping("/serviceRequests")
+    fun serviceRequests(@RequestParam patientId: String) = Bundle(entry = serviceRequestService.all(patientId).map { BundleEntry(it) })
+
+    /**
+     * Отменить обращение пациента
+     */
+    @GetMapping("/cancel")
+    fun cancel(@RequestParam patientId: String) {
+        examinationService.cancelClinicalImpression(patientId)
+    }
 }

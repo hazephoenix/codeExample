@@ -10,8 +10,8 @@ import ru.viscur.dh.datastorage.impl.config.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
+import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.valueSets.*
-import java.sql.*
 import java.util.Date
 
 @SpringBootTest(
@@ -39,7 +39,7 @@ class ObservationServiceImplTest {
                                         code = IdentifierType.PASSPORT.toString()
                                 ),
                                 assigner = Reference(display = "ОУФМС по ТО..."),//кем выдан
-                                period = Period(start = Timestamp(1222222))
+                                period = Period(start = now())
                         ),
                         //полис
                         Identifier(
@@ -49,7 +49,7 @@ class ObservationServiceImplTest {
                                         code = IdentifierType.DIGITAL_ASSURANCE.toString()
                                 ),//|| physicalPolis - полис + вид полиса
                                 assigner = Reference(display = "ОУФМС по ТО..."),//кем выдан
-                                period = Period(start = Timestamp(1222222), end = Timestamp(1222222))//действует с по
+                                period = Period(start = now(), end = now())//действует с по
                         ),
                         //ЕНП
                         Identifier(value = "7878 77521487",/*серия номер*/ type = IdentifierType.ENP),
@@ -77,7 +77,7 @@ class ObservationServiceImplTest {
                 name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван", "Алексеевич"))),
                 qualification = PractitionerQualification(
                         code = CodeableConcept(systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id, code = "Hirurg"),
-                        period = Period(Timestamp(1), Timestamp(2))
+                        period = Period(now(), now())
                 )
 
         ).let { resourceService.create(it) }.also { createdResources.add(it) }
@@ -97,11 +97,11 @@ class ObservationServiceImplTest {
                 author = Reference(practitioner),
                 subject = Reference(patient),
                 activity = listOf(CarePlanActivity(Reference(servReq))),
-                created = Timestamp(Date().time)
+                created = now()
         ).let { resourceService.create(it) }.also { createdResources.add(it) }
 
         // Добавляем обследование
-        val observation = observationService.create(
+        val observation = observationService.create(patient.id,
             Observation(
                     basedOn = Reference(servReq),
                     subject = Reference(patient),
@@ -112,7 +112,7 @@ class ObservationServiceImplTest {
                             display = "Осмотр хирурга"
                     ),
                     valueString = "Слизистые носоглотки без изменений",
-                    issued = Timestamp(1212)
+                    issued = now()
             )
         )
         createdResources.add(observation as BaseResource)
@@ -125,7 +125,7 @@ class ObservationServiceImplTest {
 
         // TODO: убрать, когда заменим метод поиска обследований
         // Поиск обследования по id пациента и статусу обследования
-        val createdObservation = observationService.findByPatientAndStatus(patient.id, ObservationStatus.registered).firstOrNull()
+        val createdObservation = observationService.byPatientAndStatus(patient.id, ObservationStatus.registered).firstOrNull()
         assertNotNull(createdObservation)
 
         // Ждем результатов обследования
@@ -134,7 +134,7 @@ class ObservationServiceImplTest {
         // Добавляем результаты в обследование и завершаем его
         observation.valueInteger = 180
         observation.status = ObservationStatus.final
-        observationService.update(observation)
+        observationService.update(patient.id, observation)
 
         // Проверяем, что статусы направления и маршрутного листа обновились
         assertEquals(resourceService.byId(ResourceType.ServiceRequest, servReq.id).status, ServiceRequestStatus.completed)

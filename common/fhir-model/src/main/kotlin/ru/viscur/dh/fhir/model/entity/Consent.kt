@@ -8,7 +8,7 @@ import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.genId
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 01.10.2019 13:24 by SherbakovaMA
@@ -29,7 +29,7 @@ class Consent @JsonCreator constructor(
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Consent.id,
         @JsonProperty("category") val category: List<CodeableConcept>,
         @JsonProperty("status") val status: ConsentStatus = ConsentStatus.active,
-        @JsonProperty("dateTime") val dateTime: Timestamp,
+        @JsonProperty("dateTime") val dateTime: Date,
         @JsonProperty("patient") var patient: Reference,
         @JsonProperty("performer") var performer: Reference? = null,
         @JsonProperty("organization") val organization: List<Reference>
