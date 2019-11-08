@@ -113,9 +113,10 @@ class QueRequests {
                 post(Endpoints.SUPPOSED_SERVICE_REQUEST).
                 then().statusCode(200)
 
-        fun getPatientServRequests(patientId: String) =
-                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.PATIENT_SERVICE_REQUESTS + "?patientId=$patientId").then().statusCode(200)
+        fun serviceRequestsOfPatients(patientId: String) =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.SERVICE_REQUEST + "?patientId=$patientId").then().statusCode(200)
                         .extract().response().`as`(Bundle::class.java)
+                        .let { it.entry.map { it.resource as ServiceRequest } }
 
         //examination
         fun completeExamination(bundle : Bundle) = Helpers.createRequestSpec(bundle).log().all().
@@ -123,14 +124,15 @@ class QueRequests {
                 post(Endpoints.COMPLETE_EXAMINATION).
                 then().statusCode(200).extract().response().`as`(ClinicalImpression::class.java)
 
+        fun cancelExamination(patientId : String) = Helpers.createRequestSpecWithoutBody().
+                `when`().
+                get(Endpoints.CANCEL_EXAMINATION + "?patientId=$patientId").
+                then().statusCode(200)
+
         fun patientsOfResp(practitionerId: String? = null) =
                 Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.PATIENTS_OF_RESP + if (practitionerId == null) "" else "?practitionerId=$practitionerId").then().statusCode(200)
                         .extract().response().`as`(PatientsOfRespResponse::class.java)["patients"]!!
 
-        fun serviceRequestsOfPatients(patientId: String) =
-                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.SERVICE_REQUEST + "?patientId=$patientId").then().statusCode(200)
-                        .extract().response().`as`(Bundle::class.java)
-                        .let { it.entry.map { it.resource as ServiceRequest } }
     }
 }
 

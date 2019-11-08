@@ -1,10 +1,7 @@
 package ru.viscur.autotests.tests
 
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.*
@@ -182,39 +179,102 @@ class End2End {
     @Test
     @Order(1)
     fun fullPositiveE2ePatient() {
-        //Todo написать полный тест с поочередным прохождением всех requests, заполнением observations и завершением
+        //Todo добавить проверки
+        //создание пациента с 4 обследованиями
+        val observation101Office = "B03.016.004ГМУ_СП"
+        val observation117Office = "A04.16.001"
+        val observation104Office = "A09.28.029ГМУ_СП"
+        val observation139Office = "СтХир"
+
+
         val patientServiceRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
-                Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
-                Helpers.createServiceRequestResource("A04.16.001")
+                Helpers.createServiceRequestResource(observation101Office),
+                Helpers.createServiceRequestResource(observation104Office),
+                Helpers.createServiceRequestResource(observation117Office)
         )
         val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
         val responseBundle = QueRequests.createPatient(patientBundle)
-        assertEquals(4, responseBundle.entry.size, "wrong number of service request")
-    }
+        val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
+        QueRequests.officeIsReady(referenceToLocation(office101))
+        QueRequests.officeIsReady(referenceToLocation(office104))
+        QueRequests.officeIsReady(referenceToLocation(office117))
+        QueRequests.officeIsReady(referenceToLocation(office139))
 
-    /*@Test
-    @Order(1)
-    fun addingNumberOfPatients() {
-        //Todo додумать и написать тест с добавлением множества пациентов
-        val patientServiceRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
-                Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
-                Helpers.createServiceRequestResource("A04.16.001")
+        assertEquals(4, responseBundle.entry.size, "wrong number of service request")
+        //прохождение всех обследований поочередно
+        //office101
+        val servRequestOf101office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office101)).first() as ServiceRequest
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                ))
+        ))
+        val obs = Helpers.createObservation(
+                code = observation101Office,
+                status = ObservationStatus.final,
+                basedOnServiceRequestId = servRequestOf101office.id,
+                valueString = "результат анализа"
         )
-        val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
-        val responseBundle = QueRequests.createPatient(Helpers.bundle("1001", "RED", patientServiceRequests))
-        val responseBundle2 = QueRequests.createPatient(Helpers.bundle("1002", "RED", patientServiceRequests))
-        val responseBundle3 = QueRequests.createPatient(Helpers.bundle("1003", "RED", patientServiceRequests))
-        val responseBundle4 = QueRequests.createPatient(Helpers.bundle("1004", "RED", patientServiceRequests))
-        val responseBundle5 = QueRequests.createPatient(Helpers.bundle("1005", "RED", patientServiceRequests))
-        val responseBundle6 = QueRequests.createPatient(Helpers.bundle("1006", "RED", patientServiceRequests))
-        val responseBundle7 = QueRequests.createPatient(Helpers.bundle("1007", "RED", patientServiceRequests))
-        val responseBundle8 = QueRequests.createPatient(Helpers.bundle("1008", "RED", patientServiceRequests))
-        val responseBundle9 = QueRequests.createPatient(Helpers.bundle("1009", "RED", patientServiceRequests))
-        val responseBundle10 = QueRequests.createPatient(Helpers.bundle("1010", "RED", patientServiceRequests))
-        val responseBundle11 = QueRequests.createPatient(Helpers.bundle("1011", "RED", patientServiceRequests))
-        val responseBundle12 = QueRequests.createPatient(Helpers.bundle("1012", "RED", patientServiceRequests))
-        val responseBundle13 = QueRequests.createPatient(Helpers.bundle("1013", "RED", patientServiceRequests))
-    }*/
+        QueRequests.createObservation(obs)
+        QueRequests.patientLeft(referenceToLocation(office101))
+        //office104
+        val servRequestOf104office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office104)).first() as ServiceRequest
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office104, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                ))
+        ))
+        val obs2 = Helpers.createObservation(
+                code = observation104Office,
+                status = ObservationStatus.final,
+                basedOnServiceRequestId = servRequestOf104office.id,
+                valueString = "результат анализа"
+        )
+        QueRequests.createObservation(obs2)
+        QueRequests.patientLeft(referenceToLocation(office104))
+        //office117
+        val servRequestOf117office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office117)).first() as ServiceRequest
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office117, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                ))
+        ))
+        val obs3 = Helpers.createObservation(
+                code = observation104Office,
+                status = ObservationStatus.final,
+                basedOnServiceRequestId = servRequestOf117office.id,
+                valueString = "результат анализа"
+        )
+        QueRequests.createObservation(obs3)
+        QueRequests.patientLeft(referenceToLocation(office117))
+        //office 139 осмотр ответственного и завершение маршрутного листа с госпитализацией
+        val servRequestOf139office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office139)).first() as ServiceRequest
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office139, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                ))
+        ))
+        val obsOfRespPract = Helpers.createObservation(code = observation139Office,
+                valueString = "состояние удовлетворительное",
+                practitionerId =servRequestOf139office.performer?.first()?.id!!,
+                basedOnServiceRequestId = servRequestOf139office.id,
+                status = ObservationStatus.final
+        )
+        val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
+                diagnosisCode = "A00.0",
+                practitionerId = Helpers.surgeonId,
+                status = DiagnosticReportStatus.final
+        )
+        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму")
+        val bundleForExamination = Bundle(entry = listOf(
+                BundleEntry(obsOfRespPract),
+                BundleEntry(diagnosticReportOfResp),
+                BundleEntry(encounter)
+        ))
+        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+        Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
+        checkQueueItems(listOf())
+        checkServiceRequestsOfPatient(patientId, listOf())
+        checkObservationsOfPatient(patientId, listOf())
+    }
 }

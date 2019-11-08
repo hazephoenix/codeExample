@@ -31,6 +31,7 @@ class Endpoints {
         const val COMPLETE_EXAMINATION: String = "$BASE_URI/examination"
         const val PATIENTS_OF_RESP: String = "$BASE_URI/examination/patients"
         const val SERVICE_REQUEST: String = "$BASE_URI/examination/serviceRequests"
+        const val CANCEL_EXAMINATION: String = "$BASE_URI/examination/cancel"
         //service request
         const val PATIENT_SERVICE_REQUESTS: String = "$BASE_URI/examination/serviceRequests"
     }
