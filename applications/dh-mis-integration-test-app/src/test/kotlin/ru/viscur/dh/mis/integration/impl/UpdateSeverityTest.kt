@@ -53,15 +53,15 @@ class UpdateSeverityTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(true)
         var i = 0
-        val red1 = createPatient(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val checking = createPatient(severity = Severity.RED, servReqs = listOf(
+        val red1 = forTestService.createPatientWithQueueItem(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val checking = forTestService.createPatientWithQueueItem(severity = Severity.RED, servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel1 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel2 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre1 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre2 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel1 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre1 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = checking),
@@ -90,15 +90,15 @@ class UpdateSeverityTest {
     fun testRedToYellow() {
         forTestService.cleanDb()
         var i = 0
-        val red1 = createPatient(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val checking = createPatient(severity = Severity.RED, servReqs = listOf(
+        val red1 = forTestService.createPatientWithQueueItem(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val checking = forTestService.createPatientWithQueueItem(severity = Severity.RED, servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel1 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel2 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre1 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre2 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel1 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre1 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = checking),
@@ -126,15 +126,15 @@ class UpdateSeverityTest {
     fun testRedToRed() {
         forTestService.cleanDb()
         var i = 0
-        val checking = createPatient(severity = Severity.RED, servReqs = listOf(
+        val checking = forTestService.createPatientWithQueueItem(severity = Severity.RED, servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val red1 = createPatient(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel1 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel2 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre1 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre2 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val red1 = forTestService.createPatientWithQueueItem(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel1 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre1 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = red1),
@@ -162,15 +162,15 @@ class UpdateSeverityTest {
     fun testGreenToRed() {
         forTestService.cleanDb()
         var i = 0
-        val red1 = createPatient(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val red2 = createPatient(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel1 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel2 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val checking = createPatient(severity = Severity.GREEN, servReqs = listOf(
+        val red1 = forTestService.createPatientWithQueueItem(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val red2 = forTestService.createPatientWithQueueItem(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel1 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val checking = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre2 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = red2),
@@ -198,12 +198,12 @@ class UpdateSeverityTest {
     fun testGreenToYellow() {
         forTestService.cleanDb()
         var i = 0
-        val red1 = createPatient(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val red2 = createPatient(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel1 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val yel2 = createPatient(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val gre1 = createPatient(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        val checking = createPatient(severity = Severity.GREEN, servReqs = listOf(
+        val red1 = forTestService.createPatientWithQueueItem(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val red2 = forTestService.createPatientWithQueueItem(severity = Severity.RED, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel1 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val gre1 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
+        val checking = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
@@ -243,16 +243,5 @@ class UpdateSeverityTest {
 
         examinationService.updateSeverity(checking, Severity.YELLOW)
         assertEquals(Severity.YELLOW, patientService.severity(checking))
-    }
-
-    private fun createPatient(severity: Severity, servReqs: List<ServiceRequestSimple>? = null, officeId: String, queueStatus: PatientQueueStatus, index: Int): String {
-        val patientId = forTestService.createPatient(severity = severity, officeId = officeId, queueStatus = queueStatus, servReqs = servReqs)
-        resourceService.create(QueueItem(
-                onum = index,
-                subject = referenceToPatient(patientId),
-                estDuration = 5 * SECONDS_IN_MINUTE,
-                location = referenceToLocation(officeId)
-        ))
-        return patientId
     }
 }

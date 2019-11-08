@@ -10,10 +10,7 @@ import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
-import ru.viscur.dh.fhir.model.utils.code
-import ru.viscur.dh.fhir.model.utils.genId
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
+import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -105,6 +102,17 @@ class ForTestService {
         return queueItems.sortedBy { it.location.id }.groupBy { it.location.id }.map { (locationId, items) ->
             "$locationId:\n  ${items.sortedBy { it.onum }.joinToString("\n  ") { "${it.onum}. ${it.patientQueueStatus}, ${it.severity}, ${it.estDuration}, ${it.subject.id}" }}"
         }.joinToString("\n")
+    }
+
+    fun createPatientWithQueueItem(severity: Severity, servReqs: List<ServiceRequestSimple>? = null, officeId: String, queueStatus: PatientQueueStatus, index: Int): String {
+        val patientId = createPatient(severity = severity, officeId = officeId, queueStatus = queueStatus, servReqs = servReqs)
+        resourceService.create(QueueItem(
+                onum = index,
+                subject = referenceToPatient(patientId),
+                estDuration = 5 * SECONDS_IN_MINUTE,
+                location = referenceToLocation(officeId)
+        ))
+        return patientId
     }
 
     fun createPatient(severity: Severity, servReqs: List<ServiceRequestSimple>? = null,
