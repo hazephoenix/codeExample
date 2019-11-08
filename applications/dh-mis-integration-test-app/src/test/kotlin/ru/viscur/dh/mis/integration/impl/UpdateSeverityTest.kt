@@ -1,6 +1,7 @@
 package ru.viscur.dh.mis.integration.impl
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -29,6 +30,7 @@ import ru.viscur.dh.queue.api.QueueManagerService
         classes = [MisIntegrationTestConfig::class]
 )
 @EnableAutoConfiguration
+@Disabled("Debug purposes only. Test cleans and modifies db")
 class UpdateSeverityTest {
 
     @Autowired
