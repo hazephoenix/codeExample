@@ -30,6 +30,12 @@ interface PatientService {
     fun severity(patientId: String): Severity
 
     /**
+     * Задать степень тяжести пациенту
+     * Возвращает true если поменяли на новое. Иначе пытались поменять на тот же тип
+     */
+    fun updateSeverity(patientId: String, severity: Severity): Boolean
+
+    /**
      * Узнать статус пациента в очереди [PatientQueueStatus]
      */
     fun queueStatusOfPatient(patientId: String): PatientQueueStatus

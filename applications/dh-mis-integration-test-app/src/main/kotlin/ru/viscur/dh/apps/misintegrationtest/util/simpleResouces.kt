@@ -24,13 +24,22 @@ open class BaseTestCase(
 class QueueOfOfficeSimple(
         val officeId: String,
         val items: List<QueueItemSimple>
-)
+) {
+    override fun toString(): String {
+        return "QueueOfOfficeSimple(officeId='$officeId', items=$items)"
+    }
+}
 
 class QueueItemSimple(
-        val status: PatientQueueStatus,
-        val severity: Severity,
-        val estDuration: Int = 10 * SECONDS_IN_MINUTE
-)
+        val status: PatientQueueStatus? = null,
+        val severity: Severity? = null,
+        val estDuration: Int = 10 * SECONDS_IN_MINUTE,
+        val patientId: String? = null
+) {
+    override fun toString(): String {
+        return "QueueItemSimple(status=$status, severity=$severity, estDuration=$estDuration, patientId=$patientId)"
+    }
+}
 
 class CarePlanSimple(
         val severity: Severity,

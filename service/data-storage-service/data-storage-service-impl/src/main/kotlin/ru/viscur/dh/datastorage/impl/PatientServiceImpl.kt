@@ -57,6 +57,27 @@ class PatientServiceImpl(
         return enumValueOf(severityStr)
     }
 
+    override fun updateSeverity(patientId: String, severity: Severity): Boolean {
+        val questionnaireResponse = questionnaireResponseForSeverityCriteria(patientId)
+                ?: throw Exception("not found questionnaireResponse for SeverityCriteria of patient with id '$patientId'")
+        var updated = false
+        resourceService.update(ResourceType.QuestionnaireResponse, questionnaireResponse.id) {
+            val linkIdOfSeverity = "Severity"
+            item = item.map {
+                if (it.linkId == linkIdOfSeverity) {
+                    if(it.answer.first().valueCoding?.code != severity.name) {
+                        it.answer = listOf(QuestionnaireResponseItemAnswer(
+                                valueCoding = Coding(code = severity.name, display = severity.translation, system = ValueSetName.SEVERITY.id)
+                        ))
+                        updated = true
+                    }
+                }
+                it
+            }
+        }
+        return updated
+    }
+
     override fun queueStatusOfPatient(patientId: String): PatientQueueStatus {
         val patient = byId(patientId)
         return patient.extension.queueStatus!!
@@ -256,6 +277,22 @@ class PatientServiceImpl(
         val query = em.createNativeQuery(queryStr)
         query.setParameters(params)
         return query.patientsToExamine()
+    }
+
+    private fun questionnaireResponseForSeverityCriteria(patientId: String): QuestionnaireResponse? {
+        val q = em.createNativeQuery("""
+            select r.resource
+                     from questionnaireResponse r
+                     where r.resource ->> 'questionnaire' = 'Questionnaire/Severity_criteria'
+                       and 'QuestionnaireResponse/' || r.id in (
+                         select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                         from clinicalImpression ci
+                         where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                            and ci.resource ->> 'status' = 'active'
+                     )
+        """.trimIndent())
+        q.setParameter("patientRef", "Patient/$patientId")
+        return q.fetchResource()
     }
 
     /**

@@ -1,4 +1,4 @@
-package ru.viscur.dh.integration.mis.rest.impl.service
+package ru.viscur.dh.integration.mis.impl
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
@@ -8,8 +8,9 @@ import ru.viscur.dh.fhir.model.entity.CarePlan
 import ru.viscur.dh.fhir.model.entity.ClinicalImpression
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.utils.resources
-import ru.viscur.dh.integration.mis.rest.api.ExaminationService
+import ru.viscur.dh.integration.mis.api.ExaminationService
 import ru.viscur.dh.queue.api.QueueManagerService
 
 /**
@@ -68,5 +69,15 @@ class ExaminationServiceImpl(
     override fun cancelClinicalImpression(patientId: String) {
         queueManagerService.deleteFromOfficeQueue(patientId)
         clinicalImpressionService.cancelActive(patientId)
+    }
+
+    @Tx
+    override fun updateSeverity(patientId: String, severity: Severity) {
+        val updated = patientService.updateSeverity(patientId, severity)
+        if (updated) {
+            val officeId = queueService.isPatientInOfficeQueue(patientId)
+            queueManagerService.deleteFromOfficeQueue(patientId)
+            officeId?.run { queueManagerService.addToOfficeQueue(patientId, officeId) }
+        }
     }
 }

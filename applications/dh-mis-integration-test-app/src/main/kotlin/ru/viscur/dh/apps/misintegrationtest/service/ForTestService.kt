@@ -38,6 +38,9 @@ class ForTestService {
     @Autowired
     lateinit var conceptService: ConceptService
 
+    companion object {
+        private val defaultOfficeStatus = LocationStatus.BUSY
+    }
 
     fun cleanDb() {
         resourceService.deleteAll(ResourceType.ServiceRequest)
@@ -55,7 +58,6 @@ class ForTestService {
 
     fun prepareDb(case: BaseTestCase): String {
         //кабинеты busy
-        val defaultOfficeStatus = LocationStatus.BUSY
         officeService.all().forEach {
             resourceService.update(ResourceType.Location, it.id) {
                 status = defaultOfficeStatus
@@ -64,30 +66,38 @@ class ForTestService {
         //все для очереди
         case.queue.forEach { queueOfOffice ->
             queueOfOffice.items.forEachIndexed { index, item ->
-                val patientId = createPatient(severity = item.severity, officeId = queueOfOffice.officeId, queueStatus = item.status)
+                val patientId = createPatient(severity = item.severity!!, officeId = queueOfOffice.officeId, queueStatus = item.status!!)
                 resourceService.create(QueueItem(
                         onum = index,
                         subject = referenceToPatient(patientId),
                         estDuration = item.estDuration,
                         location = referenceToLocation(queueOfOffice.officeId)
                 ))
+            }
+        }
+        updateOfficeStatuses()
+        //все для маршрутного листа пациента
+        return createPatient(severity = case.carePlan.severity, servReqs = case.carePlan.servReqs)
+    }
+
+    private fun updateOfficeStatuses() {
+        queueManagerService.queueItems().groupBy { it.location.id!! }.forEach { officeId, items ->
+            items.sortedBy { it.onum }.forEachIndexed { index, item ->
                 if (index == 0) {
-                    val officeStatus = when (item.status) {
+                    val officeStatus = when (item.patientQueueStatus) {
                         PatientQueueStatus.ON_OBSERVATION -> LocationStatus.OBSERVATION
                         PatientQueueStatus.IN_QUEUE -> defaultOfficeStatus
                         PatientQueueStatus.GOING_TO_OBSERVATION -> LocationStatus.WAITING_PATIENT
                         else -> defaultOfficeStatus
                     }
                     if (officeStatus != defaultOfficeStatus) {
-                        resourceService.update(ResourceType.Location, queueOfOffice.officeId) {
+                        resourceService.update(ResourceType.Location, officeId) {
                             status = officeStatus
                         }
                     }
                 }
             }
         }
-        //все для маршрутного листа пациента
-        return createPatient(severity = case.carePlan.severity, servReqs = case.carePlan.servReqs)
     }
 
     fun formQueueInfo(): String {
@@ -97,9 +107,9 @@ class ForTestService {
         }.joinToString("\n")
     }
 
-    private fun createPatient(severity: Severity, servReqs: List<ServiceRequestSimple>? = null,
-                              officeId: String? = null,
-                              queueStatus: PatientQueueStatus = PatientQueueStatus.READY): String {
+    fun createPatient(severity: Severity, servReqs: List<ServiceRequestSimple>? = null,
+                      officeId: String? = null,
+                      queueStatus: PatientQueueStatus = PatientQueueStatus.READY): String {
         val patientId = resourceService.create(Helpers.createPatientResource(enp = genId(), queueStatus = queueStatus)).id
         val servRequests = servReqs?.map { Helpers.createServiceRequestResource(servRequestCode = it.code, patientId = patientId, status = it.status) }
                 ?: run {

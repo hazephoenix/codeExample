@@ -7,6 +7,7 @@ import org.springframework.context.annotation.*
         basePackages = [
             "ru.viscur.dh.apps.misintegrationtest.service",
             "ru.viscur.dh.datastorage.impl",
+            "ru.viscur.dh.integration.mis.api",
             "ru.viscur.dh.queue.impl.service"
         ]
 )

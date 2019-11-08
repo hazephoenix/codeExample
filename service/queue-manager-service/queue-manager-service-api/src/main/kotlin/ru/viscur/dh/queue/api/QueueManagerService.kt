@@ -39,6 +39,11 @@ interface QueueManagerService {
     fun addToQueue(patientId: String, prevOfficeId: String? = null)
 
     /**
+     * Добавление пациента в очередь в указанный кабинет
+     */
+    fun addToOfficeQueue(patientId: String, officeId: String)
+
+    /**
      * Вызов пациента на обследование в кабинет (принудительно, в обход очереди, где бы он не стоял)
      * Статус кабинета д б занят/свободен/закрыт
      */

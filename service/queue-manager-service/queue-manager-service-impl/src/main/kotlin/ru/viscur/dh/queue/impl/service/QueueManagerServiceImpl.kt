@@ -70,6 +70,13 @@ class QueueManagerServiceImpl(
         }
     }
 
+    @Tx
+    override fun addToOfficeQueue(patientId: String, officeId: String) {
+        officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId))
+        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
+        checkEntryToOffice(officeId)
+    }
+
     /**
      * Проверить вход в кабинет: если есть возможность запускаем первого в очереди
      */
@@ -308,15 +315,6 @@ class QueueManagerServiceImpl(
         }
         log.info("\n${str.joinToString("\n")}")
         return str.joinToString("\n<br/>")
-    }
-
-    /**
-     * Добавление пациента в очередь в указанный кабинет
-     */
-    private fun addToOfficeQueue(patientId: String, officeId: String) {
-        officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId))
-        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
-        checkEntryToOffice(officeId)
     }
 
     /**
