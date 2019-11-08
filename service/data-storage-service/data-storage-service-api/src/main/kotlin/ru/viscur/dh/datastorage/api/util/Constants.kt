@@ -16,6 +16,7 @@ const val RECEPTION = "RECEPTION"
  */
 const val OFFICE_101 = "Office:101"
 const val OFFICE_140 = "Office:140"
+const val OFFICE_150 = "Office:150"
 const val OFFICE_151 = "Office:151"
 const val OFFICE_116 = "Office:116"
 const val OFFICE_117 = "Office:117"

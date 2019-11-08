@@ -9,21 +9,14 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
-import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
-import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.apps.misintegrationtest.service.*
+import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.util.*
-import ru.viscur.dh.fhir.model.entity.QueueItem
-import ru.viscur.dh.fhir.model.enums.*
-import ru.viscur.dh.fhir.model.enums.Severity.GREEN
-import ru.viscur.dh.fhir.model.enums.Severity.RED
-import ru.viscur.dh.fhir.model.enums.Severity.YELLOW
-import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
+import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
+import ru.viscur.dh.fhir.model.enums.Severity.*
 import ru.viscur.dh.fhir.model.utils.SECONDS_IN_MINUTE
-import ru.viscur.dh.fhir.model.utils.genId
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
-import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.QueueManagerService
 import java.util.stream.Stream
 
@@ -43,27 +36,17 @@ class AddToQueueTest {
     lateinit var queueManagerService: QueueManagerService
 
     @Autowired
-    lateinit var resourceService: ResourceService
+    lateinit var forTestService: ForTestService
 
-    @Autowired
-    lateinit var officeService: OfficeService
-
-    data class TestCase(
-            val desc: String,
-            val queue: List<QueueOfOfficeSimple>,
-            val carePlan: CarePlanSimple,
+    class TestCase(
+            desc: String,
+            queue: List<QueueOfOfficeSimple>,
+            carePlan: CarePlanSimple,
             val expOfficeId: String,
             val expOnum: Int
-    )
+    ) : BaseTestCase(desc, queue, carePlan)
 
     companion object {
-
-        //приоритет 0.9:
-        private const val OBSERVATION_IN_OFFICE_101 = "B03.016.004ГМУ_СП"
-        //приоритет 0.5:
-        private const val OBSERVATION_IN_OFFICE_116_AND_117 = "A04.16.001"
-        private const val OBSERVATION_IN_OFFICE_202 = "A06.03.005"
-        private const val OBSERVATION_IN_OFFICE_130 = "A05.10.002"
         private val testCases = listOf(
                 TestCase(desc = "1 блок. Порядок по степени тяжести. Зеленые в очереди. Ставим красного",
                         queue = listOf(QueueOfOfficeSimple(
@@ -361,108 +344,19 @@ class AddToQueueTest {
     @ParameterizedTest(name = "{index} => case={0}")
     @MethodSource("casesProvider")
     fun test(case: TestCase) {
-        cleanDb()
-        val patientId = prepareDb(case)
+        forTestService.cleanDb()
+        val patientId = forTestService.prepareDb(case)
+
+        queueManagerService.recalcNextOffice(true)
         queueManagerService.addToQueue(patientId)
+
         val queueItems = queueManagerService.queueItems()
         val foundQueueItem = queueItems.find { it.subject.id == patientId }
-        val queueStr = queueItems.sortedBy { it.location.id }.groupBy { it.location.id }.map { (locationId, items) ->
-            "$locationId:\n  ${items.sortedBy { it.onum }.joinToString("\n  ") { "${it.onum}. ${it.patientQueueStatus}, ${it.severity}, ${it.estDuration}, ${it.subject.id}" }}"
-        }.joinToString("\n")
+        val queueStr = forTestService.formQueueInfo()
         assertNotNull(foundQueueItem, "${case.desc}. not found queueItem of patient with id '$patientId'. actual queue:\n$queueStr\n")
         foundQueueItem?.let {
             assertEquals(case.expOfficeId, it.location.id, "${case.desc}. wrong location of patientId '$patientId'. actual queue:\n$queueStr\n")
             assertEquals(case.expOnum, it.onum, "${case.desc}. wrong onum of patientId '$patientId'. actual queue:\n$queueStr\n")
         }
     }
-
-    private fun prepareDb(case: TestCase): String {
-        queueManagerService.recalcNextOffice(true)
-        //кабинеты busy
-        val defaultOfficeStatus = LocationStatus.BUSY
-        officeService.all().forEach {
-            resourceService.update(ResourceType.Location, it.id) {
-                status = defaultOfficeStatus
-            }
-        }
-        //все для очереди
-        case.queue.forEach { queueOfOffice ->
-            queueOfOffice.items.forEachIndexed { index, item ->
-                val patientId = createPatient(severity = item.severity, officeId = queueOfOffice.officeId, queueStatus = item.status)
-                resourceService.create(QueueItem(
-                        onum = index,
-                        subject = referenceToPatient(patientId),
-                        estDuration = item.estDuration,
-                        location = referenceToLocation(queueOfOffice.officeId)
-                ))
-                if (index == 0) {
-                    val officeStatus = when (item.status) {
-                        PatientQueueStatus.ON_OBSERVATION -> LocationStatus.OBSERVATION
-                        PatientQueueStatus.IN_QUEUE -> defaultOfficeStatus
-                        PatientQueueStatus.GOING_TO_OBSERVATION -> LocationStatus.WAITING_PATIENT
-                        else -> defaultOfficeStatus
-                    }
-                    if (officeStatus != defaultOfficeStatus) {
-                        resourceService.update(ResourceType.Location, queueOfOffice.officeId) {
-                            status = officeStatus
-                        }
-                    }
-                }
-            }
-        }
-        //все для маршрутного листа пациента
-        return createPatient(severity = case.carePlan.severity, servReqs = case.carePlan.servReqs)
-    }
-
-    private fun createPatient(severity: Severity, servReqs: List<ServiceRequestSimple>? = null,
-                              officeId: String? = null,
-                              queueStatus: PatientQueueStatus = PatientQueueStatus.READY): String {
-        val patientId = resourceService.create(Helpers.createPatientResource(enp = genId(), queueStatus = queueStatus)).id
-        val servRequests = servReqs?.map { Helpers.createServiceRequestResource(servRequestCode = it.code, patientId = patientId, status = it.status) }
-                ?: listOf(Helpers.createServiceRequestResource(
-                        resourceService.byId(ResourceType.Location, officeId!!).extension!!.observationType!!.first().code,
-                        patientId
-                ))
-        val createdServRequests = servRequests.map { resourceService.create(it) }
-        val carePlan = resourceService.create(Helpers.createCarePlan(patientId, createdServRequests))
-        val diagnosticReport = resourceService.create(Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", patientId = patientId))
-        val questionnaireResponse = resourceService.create(Helpers.createQuestResponseResource(severity = severity.name, patientId = patientId))
-        resourceService.create(Helpers.createClinicalImpression(patientId, listOf(Reference(questionnaireResponse), Reference(carePlan), Reference(diagnosticReport))))
-        return patientId
-    }
-
-    private fun cleanDb() {
-        resourceService.deleteAll(ResourceType.ServiceRequest)
-        resourceService.deleteAll(ResourceType.CarePlan)
-        resourceService.deleteAll(ResourceType.Patient)
-        resourceService.deleteAll(ResourceType.Consent)
-        resourceService.deleteAll(ResourceType.Claim)
-        resourceService.deleteAll(ResourceType.ClinicalImpression)
-        resourceService.deleteAll(ResourceType.DiagnosticReport)
-        resourceService.deleteAll(ResourceType.Observation)
-        resourceService.deleteAll(ResourceType.ClinicalImpression)
-        resourceService.deleteAll(ResourceType.QuestionnaireResponse)
-        resourceService.deleteAll(ResourceType.QueueItem)
-    }
-
-    class QueueOfOfficeSimple(
-            val officeId: String,
-            val items: List<QueueItemSimple>
-    )
-
-    class QueueItemSimple(
-            val status: PatientQueueStatus,
-            val severity: Severity,
-            val estDuration: Int = 10 * SECONDS_IN_MINUTE
-    )
-
-    class CarePlanSimple(
-            val severity: Severity,
-            val servReqs: List<ServiceRequestSimple>
-    )
-
-    class ServiceRequestSimple(
-            val code: String,
-            val status: ServiceRequestStatus = ServiceRequestStatus.active
-    )
 }

@@ -11,7 +11,7 @@ import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
-import ru.viscur.dh.queue.impl.utils.DistanceBetweenOfficesCalculator
+import ru.viscur.dh.queue.impl.utils.DistanceCoefBetweenOfficesCalculator
 
 /**
  * Created at 07.11.2019 9:08 by SherbakovaMA
@@ -103,7 +103,7 @@ class ServiceRequestsExecutionCalculator(
         }
         //пытаемся найти один с минимальным коэф. дальности
         val locationsWithDistanceCoef = locationsWithMinLevelOfEstWaiting.map {
-            Pair(DistanceBetweenOfficesCalculator().calculate(prevOfficeId ?: RECEPTION, it.locationId), it)
+            Pair(DistanceCoefBetweenOfficesCalculator().calculate(prevOfficeId ?: RECEPTION, it.locationId), it)
         }
         val minDistanceCoef = locationsWithDistanceCoef.map { it.first }.min()
         val locationsWithMinDistanceCoef = locationsWithDistanceCoef.filter { it.first == minDistanceCoef }.map { it.second }

@@ -12,10 +12,10 @@ import ru.viscur.dh.datastorage.api.util.RECEPTION
 /**
  * Created at 06.11.2019 8:48 by SherbakovaMA
  *
- * Тест для [DistanceBetweenOfficesCalculator]
+ * Тест для [DistanceCoefBetweenOfficesCalculator]
  */
 @RunWith(Parameterized::class)
-class DistanceBetweenOfficesCalculatorTest(val case: TestCase) {
+class DistanceCoefBetweenOfficesCalculatorTest(val case: TestCase) {
 
     data class TestCase(
             val desc: String,
@@ -38,7 +38,7 @@ class DistanceBetweenOfficesCalculatorTest(val case: TestCase) {
 
     @Test
     fun test() {
-        assertEquals(case.exp, DistanceBetweenOfficesCalculator().calculate(case.from, case.to),
+        assertEquals(case.exp, DistanceCoefBetweenOfficesCalculator().calculate(case.from, case.to),
                 "${case.desc}. wrong calculating of distance between ${case.from} and ${case.to}")
     }
 }
