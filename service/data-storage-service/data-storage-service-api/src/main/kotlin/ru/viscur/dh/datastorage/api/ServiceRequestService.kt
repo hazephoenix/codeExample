@@ -9,7 +9,7 @@ interface ServiceRequestService {
     fun all(patientId: String): List<ServiceRequest>
 
     /**
-     * Все непройденные назначения в маршрутном листе в определенном кабинете,
+     * Все непройденные назначения в маршрутном листе, которые могут быть проведены в заданном кабинете,
      * упорядочены по [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
     fun active(patientId: String, officeId: String): List<ServiceRequest>

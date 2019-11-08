@@ -13,6 +13,11 @@ interface ConfigService {
     fun read(code: String): String?
 
     /**
+     * Чтение булевой настройки
+     */
+    fun readBool(code: String) = read(code)?.toBoolean() ?: false
+
+    /**
      * Запись настройки
      * Если value = null, то происходит удаление настройки
      */

@@ -1,6 +1,6 @@
 package ru.viscur.dh.queue.impl.utils
 
-import ru.viscur.dh.queue.impl.*
+import ru.viscur.dh.datastorage.api.util.*
 
 /**
  * Created at 05.11.2019 17:26 by SherbakovaMA
@@ -10,21 +10,21 @@ import ru.viscur.dh.queue.impl.*
 class DistanceBetweenOfficesCalculator {
     companion object {
         private val distances = listOf(
-                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE101, OFFICE104), 0.1),
-                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE140, OFFICE139, OFFICE129, OFFICE130), 0.2),
-                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE151, OFFICE149), 0.4),
-                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE117), 0.5),
-                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE202), 0.7),
-                DistanceBetweenOffices(listOf(OFFICE101, OFFICE104), listOf(OFFICE140, OFFICE139, OFFICE129, OFFICE130), 0.3),
-                DistanceBetweenOffices(listOf(OFFICE101, OFFICE104), listOf(OFFICE151, OFFICE149), 0.5),
-                DistanceBetweenOffices(listOf(OFFICE101, OFFICE104), listOf(OFFICE117), 0.6),
-                DistanceBetweenOffices(listOf(OFFICE101, OFFICE104), listOf(OFFICE202), 0.8),
-                DistanceBetweenOffices(listOf(OFFICE140, OFFICE139, OFFICE129, OFFICE130), listOf(OFFICE151, OFFICE149), 0.1),
-                DistanceBetweenOffices(listOf(OFFICE140, OFFICE139, OFFICE129, OFFICE130), listOf(OFFICE117), 0.5),
-                DistanceBetweenOffices(listOf(OFFICE140, OFFICE139, OFFICE129, OFFICE130), listOf(OFFICE202), 0.7),
-                DistanceBetweenOffices(listOf(OFFICE151, OFFICE149), listOf(OFFICE117), 0.6),
-                DistanceBetweenOffices(listOf(OFFICE151, OFFICE149), listOf(OFFICE202), 0.8),
-                DistanceBetweenOffices(listOf(OFFICE117), listOf(OFFICE202), 0.9)
+                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE_101, OFFICE_104), 0.1),
+                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), 0.2),
+                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE_151, OFFICE_149), 0.4),
+                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE_116, OFFICE_117), 0.5),
+                DistanceBetweenOffices(listOf(RECEPTION), listOf(OFFICE_202), 0.7),
+                DistanceBetweenOffices(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), 0.3),
+                DistanceBetweenOffices(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_151, OFFICE_149), 0.5),
+                DistanceBetweenOffices(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_116, OFFICE_117), 0.6),
+                DistanceBetweenOffices(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_202), 0.8),
+                DistanceBetweenOffices(listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), listOf(OFFICE_151, OFFICE_149), 0.1),
+                DistanceBetweenOffices(listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), listOf(OFFICE_116, OFFICE_117), 0.5),
+                DistanceBetweenOffices(listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), listOf(OFFICE_202), 0.7),
+                DistanceBetweenOffices(listOf(OFFICE_151, OFFICE_149), listOf(OFFICE_116, OFFICE_117), 0.6),
+                DistanceBetweenOffices(listOf(OFFICE_151, OFFICE_149), listOf(OFFICE_202), 0.8),
+                DistanceBetweenOffices(listOf(OFFICE_116, OFFICE_117), listOf(OFFICE_202), 0.9)
         )
     }
 

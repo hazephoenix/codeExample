@@ -4,10 +4,10 @@ import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import ru.viscur.dh.queue.impl.OFFICE101
-import ru.viscur.dh.queue.impl.OFFICE104
-import ru.viscur.dh.queue.impl.OFFICE149
-import ru.viscur.dh.queue.impl.RECEPTION
+import ru.viscur.dh.datastorage.api.util.OFFICE_101
+import ru.viscur.dh.datastorage.api.util.OFFICE_104
+import ru.viscur.dh.datastorage.api.util.OFFICE_149
+import ru.viscur.dh.datastorage.api.util.RECEPTION
 
 /**
  * Created at 06.11.2019 8:48 by SherbakovaMA
@@ -28,11 +28,11 @@ class DistanceBetweenOfficesCalculatorTest(val case: TestCase) {
         @JvmStatic
         @Parameterized.Parameters
         fun testCases() = listOf(
-                TestCase(desc = "Простое определение", from = OFFICE101, to = OFFICE149, exp = 0.5),
-                TestCase(desc = "Обратный путь", from = OFFICE149, to = OFFICE101, exp = 0.5),
-                TestCase(desc = "Источник и назначение из одной группы", from = OFFICE101, to = OFFICE104, exp = 0.0),
-                TestCase(desc = "Источник и назначение совпадают", from = OFFICE101, to = OFFICE101, exp = 0.0),
-                TestCase(desc = "Источник из фиктивного id", from = RECEPTION, to = OFFICE101, exp = 0.1)
+                TestCase(desc = "Простое определение", from = OFFICE_101, to = OFFICE_149, exp = 0.5),
+                TestCase(desc = "Обратный путь", from = OFFICE_149, to = OFFICE_101, exp = 0.5),
+                TestCase(desc = "Источник и назначение из одной группы", from = OFFICE_101, to = OFFICE_104, exp = 0.0),
+                TestCase(desc = "Источник и назначение совпадают", from = OFFICE_101, to = OFFICE_101, exp = 0.0),
+                TestCase(desc = "Источник из фиктивного id", from = RECEPTION, to = OFFICE_101, exp = 0.1)
         )
     }
 

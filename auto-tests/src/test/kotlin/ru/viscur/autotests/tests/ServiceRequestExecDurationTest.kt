@@ -7,9 +7,7 @@ import ru.viscur.autotests.utils.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.resources
 
 /**
  * Created at 06.11.2019 16:37 by SherbakovaMA

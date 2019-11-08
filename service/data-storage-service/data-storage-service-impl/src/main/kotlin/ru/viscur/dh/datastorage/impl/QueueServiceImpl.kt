@@ -1,15 +1,18 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
+import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
+import ru.viscur.dh.fhir.model.enums.ResourceType
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -19,7 +22,8 @@ import javax.persistence.PersistenceContext
 @Service
 class QueueServiceImpl(
         private val locationService: LocationService,
-        private val patientService: PatientService
+        private val patientService: PatientService,
+        private val resourceService: ResourceService
 ): QueueService {
 
     @PersistenceContext
@@ -33,13 +37,7 @@ class QueueServiceImpl(
             order by r.resource ->> 'onum'
             """)
         query.setParameter("officeRef", "Location/$officeId")
-        return query.fetchResourceList<QueueItem>().map { queueItem ->
-            val patientId = queueItem.subject.id
-            queueItem.apply {
-                severity = patientService.severity(patientId!!)
-                patientQueueStatus = patientService.byId(patientId).extension.queueStatus
-            }
-        }.toMutableList()
+        return query.fetchResourceList<QueueItem>().fillExtraFields().toMutableList()
     }
 
     @Tx
@@ -82,5 +80,16 @@ class QueueServiceImpl(
             """)
         query.setParameter("READY", PatientQueueStatus.READY.toString())
         return query.fetchResourceList()
+    }
+
+    override fun queueItems(): List<QueueItem> =
+            resourceService.all(ResourceType.QueueItem, RequestBodyForResources(filter = mapOf())).fillExtraFields()
+
+    fun List<QueueItem>.fillExtraFields() = this.map { queueItem ->
+        val patientId = queueItem.subject.id
+        queueItem.apply {
+            severity = patientService.severity(patientId!!)
+            patientQueueStatus = patientService.byId(patientId).extension.queueStatus
+        }
     }
 }

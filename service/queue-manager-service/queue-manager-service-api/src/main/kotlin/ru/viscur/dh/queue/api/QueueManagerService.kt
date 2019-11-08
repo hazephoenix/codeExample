@@ -10,6 +10,16 @@ import ru.viscur.dh.fhir.model.entity.ServiceRequest
 interface QueueManagerService {
 
     /**
+     * Значение настройки пересчитывать следующий кабинет в очереди
+     */
+    fun needRecalcNextOffice(): Boolean
+
+    /**
+     * Задать значение настройки пересчитывать следующий кабинет в очереди
+     */
+    fun recalcNextOffice(value: Boolean)
+
+    /**
      * Пациент получил маршрутный лист: вносим в систему
      * Возвращаем список обследований с заполненными №пп [ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
@@ -18,7 +28,7 @@ interface QueueManagerService {
     /**
      * Проставление/перепроставление порядка у невыполненных назначений в маршрутном листе пациента
      */
-    fun calcServiceRequestExecOrders(patientId: String): List<ServiceRequest>
+    fun calcServiceRequestExecOrders(patientId: String, prevOfficeId: String? = null): List<ServiceRequest>
 
     /**
      * Поставить пациента в очередь
@@ -26,7 +36,7 @@ interface QueueManagerService {
      * этой функцией мы снова добавляем его в очередь
      * Если пациент уже в очереди, то ничего не происходит
      */
-    fun addToOfficeQueue(patientId: String)
+    fun addToQueue(patientId: String, prevOfficeId: String? = null)
 
     /**
      * Вызов пациента на обследование в кабинет (принудительно, в обход очереди, где бы он не стоял)

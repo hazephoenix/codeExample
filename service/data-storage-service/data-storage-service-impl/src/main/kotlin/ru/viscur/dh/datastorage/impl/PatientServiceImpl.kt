@@ -52,7 +52,8 @@ class PatientServiceImpl(
             where items.item ->> 'linkId' = 'Severity'
         """.trimIndent())
         q.setParameter("patientRef", "Patient/$patientId")
-        val severityStr = q.singleResult as String
+        val severityStr = q.resultList.map { it as String }.firstOrNull()
+                ?: throw Exception("not found severity for patient id '$patientId'")
         return enumValueOf(severityStr)
     }
 

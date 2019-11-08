@@ -1,7 +1,5 @@
 package ru.viscur.autotests.restApi
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine

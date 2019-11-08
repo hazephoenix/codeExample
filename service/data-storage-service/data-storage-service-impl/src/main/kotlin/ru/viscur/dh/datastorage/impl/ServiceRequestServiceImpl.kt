@@ -39,29 +39,43 @@ class ServiceRequestServiceImpl(
     }
 
     override fun active(patientId: String, officeId: String): List<ServiceRequest> {
-        //active clinicalImpression -> carePlan -> active serviceRequests in office
+        //коды непройденных назначений:
+        //  active clinicalImpression -> carePlan -> active serviceRequests in office -> code
+        //ищутся по code или parentCode, указанных в проводимых обследованиях кабинета
         val query = em.createNativeQuery("""
             select sr.resource
-            from serviceRequest sr
-            where 'ServiceRequest/' || sr.id in (
-                select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                from carePlan cp
-                where 'CarePlan/' || cp.id in (
-                    select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                    from clinicalImpression ci
-                    where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                      and ci.resource ->> 'status' = 'active'
-                )
-              )
-              and sr.resource ->> 'status' = 'active'
-              and :officeRef in (
-                select jsonb_array_elements(sIntr.resource -> 'locationReference') ->> 'reference'
-                from serviceRequest sIntr
-                where sIntr.id = sr.id)
+            from (
+                     select jsonb_array_elements(r.resource -> 'code' -> 'coding') ->> 'code' code, r.resource
+                     from serviceRequest r
+                     where 'ServiceRequest/' || r.id in (
+                         select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                         from carePlan cp
+                         where 'CarePlan/' || cp.id in (
+                             select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                             from clinicalImpression ci
+                             where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                               and ci.resource ->> 'status' = 'active'
+                         )
+                     )
+                       and r.resource ->> 'status' = 'active'
+                 ) sr
+            join (
+                select r.resource ->> 'code' code, r.resource ->> 'parentCode' parentCode
+                from concept r
+                where r.resource ->> 'system' = 'ValueSet/Observation_types'
+            ) c
+            on sr.code = c.code
+            join (
+                select jsonb_array_elements(r.resource -> 'extension' -> 'observationType') ->> 'code' obsType
+                from location r
+                where r.resource -> 'extension' -> 'observationType' <> 'null'
+                  and r.id = :officeId
+            ) of
+            on c.code = of.obsType or c.parentCode = of.obsType
             order by sr.resource -> 'extension' ->> 'executionOrder'
             """)
         query.setParameter("patientRef", "Patient/$patientId")
-        query.setParameter("officeRef", "Location/$officeId")
+        query.setParameter("officeId", officeId)
         return query.fetchResourceList()
     }
 
@@ -98,7 +112,7 @@ class ServiceRequestServiceImpl(
                 status = CarePlanStatus.active // results_are_ready -> active
                 activity = activities + activity
             }
-        } ?: throw Error("No active CarePlan found")
+        } ?: throw Error("No active CarePlan found for patient with id '$patientId'")
     }
 
     @Tx

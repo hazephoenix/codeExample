@@ -13,14 +13,15 @@ import ru.viscur.dh.queue.api.QueueManagerService
  *
  * Контроллер для очереди
  */
-
 @RestController
 @RequestMapping("/queue")
 class QueueController(private val queueManagerService: QueueManagerService) {
 
-    @PostMapping("/registerPatient")
-    fun registerPatient(@RequestBody patientReference: Reference) =
-            logAndValidateAfter { queueManagerService.registerPatient(patientReference.id!!) }
+    @GetMapping("recalcNextOffice")
+    fun needRecalcNextOffice() = queueManagerService.needRecalcNextOffice()
+
+    @PostMapping("recalcNextOffice")
+    fun recalcNextOffice(@RequestParam value: Boolean) = queueManagerService.recalcNextOffice(value)
 
     @PostMapping("/office/patientEntered")
     fun patientEntered(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
@@ -62,7 +63,7 @@ class QueueController(private val queueManagerService: QueueManagerService) {
     @PostMapping("/patient/addToQueue")
     fun addToOfficeQueue(
             @RequestBody patientReference: Reference
-    ) = logAndValidateAfter { queueManagerService.addToOfficeQueue(patientReference.id!!) }
+    ) = logAndValidateAfter { queueManagerService.addToQueue(patientReference.id!!) }
 
     @DeleteMapping("/patient")
     fun patientLeftQueue(

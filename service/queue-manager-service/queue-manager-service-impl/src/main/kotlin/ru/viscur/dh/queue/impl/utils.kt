@@ -53,21 +53,3 @@ fun ageGroup(birthDate: Date?): Int {
  * Из строки в дату
  */
 fun date(timeStr: String) = SimpleDateFormat("dd.MM.yyyy hh:mm").parse(timeStr)
-
-/**
- * Место приема пациентов фельдшером - фиктивный id
- */
-const val RECEPTION = "RECEPTION"
-/**
- * id кабинетов
- */
-const val OFFICE101 = "Office:101"
-const val OFFICE140 = "Office:140"
-const val OFFICE151 = "Office:151"
-const val OFFICE117 = "Office:117"
-const val OFFICE104 = "Office:104"
-const val OFFICE139 = "Office:139"
-const val OFFICE149 = "Office:149"
-const val OFFICE129 = "Office:129"
-const val OFFICE130 = "Office:130"
-const val OFFICE202 = "Office:202"

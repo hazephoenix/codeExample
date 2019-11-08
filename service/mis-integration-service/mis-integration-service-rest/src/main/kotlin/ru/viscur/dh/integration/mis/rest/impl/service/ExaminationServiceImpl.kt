@@ -1,10 +1,7 @@
 package ru.viscur.dh.integration.mis.rest.impl.service
 
 import org.springframework.stereotype.Service
-import ru.viscur.dh.datastorage.api.ClinicalImpressionService
-import ru.viscur.dh.datastorage.api.ObservationService
-import ru.viscur.dh.datastorage.api.PatientService
-import ru.viscur.dh.datastorage.api.ServiceRequestService
+import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.CarePlan
@@ -24,6 +21,7 @@ class ExaminationServiceImpl(
         private val clinicalImpressionService: ClinicalImpressionService,
         private val serviceRequestService: ServiceRequestService,
         private val queueManagerService: QueueManagerService,
+        private val queueService: QueueService,
         private val observationService: ObservationService
 ) : ExaminationService {
 
@@ -36,16 +34,15 @@ class ExaminationServiceImpl(
                 }
 
         val carePlan = serviceRequestService.add(patientId, bundle.entry.map { it.resource as ServiceRequest })
+        val prevOfficeId = queueService.isPatientInOfficeQueue(patientId)
         queueManagerService.deleteFromOfficeQueue(patientId)
-        queueManagerService.calcServiceRequestExecOrders(patientId)
-        queueManagerService.addToOfficeQueue(patientId)
+        queueManagerService.calcServiceRequestExecOrders(patientId, prevOfficeId)
+        queueManagerService.addToQueue(patientId, prevOfficeId)
         return carePlan
     }
 
     @Tx
     override fun completeExamination(bundle: Bundle): ClinicalImpression {
-        //todo возможно логичнее: завершить обследование, удалить из очереди, завершить обращение и связанное
-
         //завершить обследование отв-ого
         val observation = bundle.resources(ResourceType.Observation)
                 .singleOrNull()
@@ -62,7 +59,7 @@ class ExaminationServiceImpl(
         queueManagerService.patientLeftByPatientId(patientId)
         //удалить из очереди (если пациент со статусом В очереди)
         queueManagerService.deleteFromOfficeQueue(patientId)
-        //завершить обращение
+        //завершить обращение и связанное
         val clinicalImpression = clinicalImpressionService.completeRelated(patientId, bundle)
         return clinicalImpressionService.complete(clinicalImpression)
     }
