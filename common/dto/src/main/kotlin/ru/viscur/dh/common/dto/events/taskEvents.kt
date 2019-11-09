@@ -1,7 +1,7 @@
-package ru.viscur.dh.apps.paramedicdevice.events
+package ru.viscur.dh.common.dto.events
 
 import org.springframework.context.ApplicationEvent
-import ru.viscur.dh.apps.paramedicdevice.dto.Task
+import ru.viscur.dh.common.dto.task.Task
 
 /**
  * Created at 28.10.2019 11:28 by TimochkinEA

@@ -1,4 +1,4 @@
-package ru.viscur.dh.apps.paramedicdevice.dto
+package ru.viscur.dh.common.dto.task
 
 import java.util.*
 
@@ -8,6 +8,7 @@ import java.util.*
  * Задача для АРМ фельдшера
  *
  * @property id         id задачи (UUID)
+ * @property desktopId  id АРМ фельдшера, на котором надо выполнить задачу
  * @property type       тип задачи, см. [TaskType]
  * @property status     текущий статус задачи, см. [TaskStatus]
  * @property result     результат выполнения задачи
@@ -15,6 +16,7 @@ import java.util.*
  */
 data class Task(
         val id: String = UUID.randomUUID().toString(),
+        val desktopId: String = "",
         val type: TaskType = TaskType.Unknown,
         var status: TaskStatus = TaskStatus.Await,
         var result: Any? = null,

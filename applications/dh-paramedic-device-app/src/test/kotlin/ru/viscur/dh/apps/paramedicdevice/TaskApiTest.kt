@@ -22,8 +22,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.web.client.RestTemplate
 import ru.viscur.dh.apps.paramedicdevice.configuration.AppUID
-import ru.viscur.dh.apps.paramedicdevice.dto.*
+import ru.viscur.dh.apps.paramedicdevice.dto.TvesResponse
 import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskStatus
+import ru.viscur.dh.common.dto.task.TaskType
 import java.util.*
 import java.util.regex.Pattern
 

@@ -18,7 +18,8 @@ include(
         "applications:dh-central-server-app",
         "applications:dh-paramedic-device-app",
         "auto-tests",
-        "common:transaction-desc"
+        "common:transaction-desc",
+        "common:dto"
         /*TODO "applications:dh-rfid-location-device-app"*/
 )
 
