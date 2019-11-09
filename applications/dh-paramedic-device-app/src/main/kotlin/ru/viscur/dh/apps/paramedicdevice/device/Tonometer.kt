@@ -1,16 +1,23 @@
 package ru.viscur.dh.apps.paramedicdevice.device
 
-import com.fazecast.jSerialComm.*
-import org.slf4j.*
-import org.springframework.beans.factory.annotation.*
-import org.springframework.context.*
-import org.springframework.context.event.*
-import org.springframework.stereotype.*
-import ru.viscur.dh.apps.paramedicdevice.dto.*
-import ru.viscur.dh.apps.paramedicdevice.enums.*
-import ru.viscur.dh.apps.paramedicdevice.events.*
+import com.fazecast.jSerialComm.SerialPort
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Component
+import ru.viscur.dh.apps.paramedicdevice.dto.Task
+import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
+import ru.viscur.dh.apps.paramedicdevice.dto.TonometerError
+import ru.viscur.dh.apps.paramedicdevice.dto.TonometerResponse
+import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
+import ru.viscur.dh.apps.paramedicdevice.events.TaskComplete
+import ru.viscur.dh.apps.paramedicdevice.events.TaskError
+import ru.viscur.dh.apps.paramedicdevice.events.TaskRequested
+import ru.viscur.dh.apps.paramedicdevice.events.TaskStarted
 import ru.viscur.dh.apps.paramedicdevice.utils.*
-import java.sql.*
+import java.sql.Timestamp
 
 /**
  * Класс для работы с тонометром A&D TM-2655P
@@ -20,7 +27,7 @@ import java.sql.*
  */
 @Component
 class Tonometer(
-        @Value("\${paramedic.serial.port.system.name}")
+        @Value("\${paramedic.serial.port.system.name:0}")
         private val systemPortName: String,
         private val publisher: ApplicationEventPublisher
 ) {

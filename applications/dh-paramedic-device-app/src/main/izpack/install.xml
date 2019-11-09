@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<izpack:installation xmlns:izpack="http://izpack.org/schema/installation"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     version="5.0"
+                     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+    <info>
+        <appname>Paramedic Desktop</appname>
+        <appversion>1.0</appversion>
+        <javaversion>11</javaversion>
+    </info>
+
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+
+    <guiprefs resizable="no" width="800" height="600">
+        <laf name="substance">
+            <os family="windows"/>
+            <os family="unix"/>
+            <param name="variant" value="mist-silver"/>
+        </laf>
+    </guiprefs>
+    <panels>
+        <panel classname="com.izforge.izpack.panels.hello.HelloPanel"/>
+    </panels>
+    <packs>
+        <pack name="zebra" required="true" id="zebra">
+            <description>Zebra Printer</description>
+            <singlefile src="zebra-native.zip" target="zebra-native.zip"/>
+        </pack>
+        <pack name="tves" required="true" id="tves">
+            <description>
+                TVES Devices
+            </description>
+            <fileset dir="." targetdir="tves">
+                <filename name="tves-driver.zip"/>
+                <filename name="tves-backend.zip"/>
+            </fileset>
+        </pack>
+        <pack name="winsw" required="true">
+            <description>WINSW executable</description>
+            <singlefile src="winsw.exe" target="winsw.exe"/>
+        </pack>
+    </packs>
+    <logging>
+        <log-file append="true" level="ALL"/>
+    </logging>
+</izpack:installation>
