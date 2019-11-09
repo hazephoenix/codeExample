@@ -4,6 +4,7 @@ dependencies {
 
     api("org.springframework.boot:spring-boot-starter-web")
 
+    implementation("org.junit.jupiter:junit-jupiter-api")
 
     implementation(project(":service:data-storage-service:data-storage-service-api"))
     implementation(project(":service:queue-manager-service:queue-manager-service-api"))

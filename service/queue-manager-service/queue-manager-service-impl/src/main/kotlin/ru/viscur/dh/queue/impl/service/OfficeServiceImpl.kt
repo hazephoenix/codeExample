@@ -70,18 +70,22 @@ class OfficeServiceImpl(
         )
         val queue = queueService.queueItemsOfOffice(officeId)
         if (asFirst) {
-            queue.add(0, queueItem)
+            queue.add(queue.indexOfLast { it.patientQueueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION) } + 1, queueItem)
         } else {
             when (val userSeverity = patientService.severity(patientId)) {
                 Severity.GREEN -> queue.add(queueItem)
                 else -> {
-                    val severities = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
-                    if (queue.any { it.severity in severities }) {
-                        queue.add(queue.indexOfLast { it.severity in severities } + 1, queueItem)
+                    //степени тяжести, которые тек. пациент должен пропустить
+                    val severitiesShouldBeBefore = if (userSeverity == Severity.RED) listOf(Severity.RED) else SEVERITY_WITH_PRIORITY
+                    //если есть те которые пропускает - ставим после них
+                    if (queue.any { it.severity in severitiesShouldBeBefore }) {
+                        queue.add(queue.indexOfLast { it.severity in severitiesShouldBeBefore } + 1, queueItem)
+                        //иначе ставим перед всеми кто в очереди
                     } else {
                         if (queue.any { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }) {
                             queue.add(queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }, queueItem)
                         } else {
+                            //очереди нет: либо список пуст, либо там все GOING_TO_OBSERVATION/ON_OBSERVATION
                             queue.add(queueItem)
                         }
                     }
@@ -92,7 +96,7 @@ class OfficeServiceImpl(
     }
 
     override fun firstPatientIdInQueue(officeId: String): String? =
-            queueService.queueItemsOfOffice(officeId).firstOrNull()?.subject?.id
+            queueService.queueItemsOfOffice(officeId).filter { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }.firstOrNull()?.subject?.id
 
     override fun deleteFirstPatientFromQueue(officeId: String) {
         val queue = queueService.queueItemsOfOffice(officeId)

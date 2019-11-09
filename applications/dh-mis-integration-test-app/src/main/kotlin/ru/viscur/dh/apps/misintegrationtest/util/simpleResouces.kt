@@ -23,7 +23,8 @@ open class BaseTestCase(
 
 class QueueOfOfficeSimple(
         val officeId: String,
-        val items: List<QueueItemSimple>
+        val items: List<QueueItemSimple>,
+        val officeStatus: LocationStatus = LocationStatus.BUSY
 ) {
     override fun toString(): String {
         return "QueueOfOfficeSimple(officeId='$officeId', items=$items)"
@@ -31,7 +32,7 @@ class QueueOfOfficeSimple(
 }
 
 class QueueItemSimple(
-        val status: PatientQueueStatus? = null,
+        val status: PatientQueueStatus = PatientQueueStatus.IN_QUEUE,
         val severity: Severity? = null,
         val estDuration: Int = 10 * SECONDS_IN_MINUTE,
         val patientId: String? = null

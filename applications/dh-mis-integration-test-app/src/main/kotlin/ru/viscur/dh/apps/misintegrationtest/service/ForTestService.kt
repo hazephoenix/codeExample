@@ -1,11 +1,15 @@
 package ru.viscur.dh.apps.misintegrationtest.service
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.apps.misintegrationtest.util.BaseTestCase
+import ru.viscur.dh.apps.misintegrationtest.util.QueueOfOfficeSimple
 import ru.viscur.dh.apps.misintegrationtest.util.ServiceRequestSimple
 import ru.viscur.dh.datastorage.api.ConceptService
+import ru.viscur.dh.datastorage.api.LocationService
+import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.enums.*
@@ -33,6 +37,12 @@ class ForTestService {
     lateinit var officeService: OfficeService
 
     @Autowired
+    lateinit var locationService: LocationService
+
+    @Autowired
+    lateinit var patientService: PatientService
+
+    @Autowired
     lateinit var conceptService: ConceptService
 
     companion object {
@@ -54,12 +64,6 @@ class ForTestService {
     }
 
     fun prepareDb(case: BaseTestCase): String {
-        //кабинеты busy
-        officeService.all().forEach {
-            resourceService.update(ResourceType.Location, it.id) {
-                status = defaultOfficeStatus
-            }
-        }
         //все для очереди
         case.queue.forEach { queueOfOffice ->
             queueOfOffice.items.forEachIndexed { index, item ->
@@ -77,22 +81,22 @@ class ForTestService {
         return createPatient(severity = case.carePlan.severity, servReqs = case.carePlan.servReqs)
     }
 
-    private fun updateOfficeStatuses() {
+    fun updateOfficeStatuses() {
+        //кабинеты busy
+        officeService.all().forEach {
+            resourceService.update(ResourceType.Location, it.id) {
+                status = defaultOfficeStatus
+            }
+        }
         queueManagerService.queueItems().groupBy { it.location.id!! }.forEach { officeId, items ->
-            items.sortedBy { it.onum }.forEachIndexed { index, item ->
-                if (index == 0) {
-                    val officeStatus = when (item.patientQueueStatus) {
-                        PatientQueueStatus.ON_OBSERVATION -> LocationStatus.OBSERVATION
-                        PatientQueueStatus.IN_QUEUE -> defaultOfficeStatus
-                        PatientQueueStatus.GOING_TO_OBSERVATION -> LocationStatus.WAITING_PATIENT
-                        else -> defaultOfficeStatus
+            val officeStatus =
+                    when {
+                        items.any { it.patientQueueStatus == PatientQueueStatus.ON_OBSERVATION } -> LocationStatus.OBSERVATION
+                        items.any { it.patientQueueStatus == PatientQueueStatus.GOING_TO_OBSERVATION } -> LocationStatus.WAITING_PATIENT
+                        else -> LocationStatus.BUSY
                     }
-                    if (officeStatus != defaultOfficeStatus) {
-                        resourceService.update(ResourceType.Location, officeId) {
-                            status = officeStatus
-                        }
-                    }
-                }
+            resourceService.update(ResourceType.Location, officeId) {
+                    status = officeStatus
             }
         }
     }
@@ -104,7 +108,7 @@ class ForTestService {
         }.joinToString("\n")
     }
 
-    fun createPatientWithQueueItem(severity: Severity, servReqs: List<ServiceRequestSimple>? = null, officeId: String, queueStatus: PatientQueueStatus, index: Int): String {
+    fun createPatientWithQueueItem(severity: Severity = Severity.GREEN, servReqs: List<ServiceRequestSimple>? = null, officeId: String, queueStatus: PatientQueueStatus, index: Int): String {
         val patientId = createPatient(severity = severity, officeId = officeId, queueStatus = queueStatus, servReqs = servReqs)
         resourceService.create(QueueItem(
                 onum = index,
@@ -115,7 +119,7 @@ class ForTestService {
         return patientId
     }
 
-    fun createPatient(severity: Severity, servReqs: List<ServiceRequestSimple>? = null,
+    fun createPatient(severity: Severity = Severity.GREEN, servReqs: List<ServiceRequestSimple>? = null,
                       officeId: String? = null,
                       queueStatus: PatientQueueStatus = PatientQueueStatus.READY): String {
         val patientId = resourceService.create(Helpers.createPatientResource(enp = genId(), queueStatus = queueStatus)).id
@@ -148,5 +152,42 @@ class ForTestService {
             }
         }
         return patientId
+    }
+
+
+    fun checkQueueItems(itemsByOffices: List<QueueOfOfficeSimple>) {
+        val actQueueItems = queueManagerService.queueItems()
+        val allItems = itemsByOffices.flatMap { it.items }
+        val itemsStr = itemsToStr(itemsByOffices, actQueueItems)
+        //количество в принципе разное
+        assertEquals(allItems.size, actQueueItems.size, "wrong number of queueItems. $itemsStr")
+        itemsByOffices.forEach { byOffice ->
+            val officeId = byOffice.officeId
+            val office = locationService.byId(officeId)
+            assertEquals(byOffice.officeStatus, office.status, "wrong status of office $officeId. $itemsStr")
+            byOffice.items.forEachIndexed { index, queueItemInfo ->
+                //поиск соответствующего элемента в текущих
+                val foundInAct = actQueueItems.filter { it.subject.id == queueItemInfo.patientId && it.location.id == officeId }
+                assertEquals(1, foundInAct.size, "not found (or found multiple items) of $queueItemInfo. $itemsStr")
+                val foundItem = foundInAct.first()
+                //проверка правильности данных в найденном
+                assertEquals(index, foundItem.onum, "wrong onum of $queueItemInfo. $itemsStr")
+                val patientId = queueItemInfo.patientId!!
+                val patient = patientService.byId(patientId)
+                assertEquals(queueItemInfo.status, patient.extension.queueStatus, "wrong patientStatus with id '$patientId'. $itemsStr")
+                assertEquals(queueItemInfo.status, foundItem.patientQueueStatus, "wrong queueItem.patientQueueStatus with id '$patientId'. $itemsStr")
+            }
+        }
+    }
+
+    private fun itemsToStr(itemsByOffices: List<QueueOfOfficeSimple>, actQueueItems: List<QueueItem>): String {
+        val actByOffices = actQueueItems.groupBy { it.location.id!! }
+        return "\n\nexp queue:\n" +
+                itemsByOffices.joinToString("\n") { byOffice -> byOffice.officeId + ":\n  " + byOffice.items.mapIndexed { index, queueItemInfo -> "$index. $queueItemInfo" }.joinToString("\n  ") } +
+                "\n\nactual queue:\n" +
+                actByOffices.map { (officeId, items) ->
+                    officeId + "\n  " + items.sortedBy { it.onum }.joinToString("\n  ")
+                }.joinToString("\n  ") +
+                "\n\n"
     }
 }

@@ -10,14 +10,9 @@ import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.PatientService
-import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.api.util.OFFICE_130
-import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.fhir.model.utils.SECONDS_IN_MINUTE
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.integration.mis.api.ExaminationService
 import ru.viscur.dh.queue.api.QueueManagerService
 
@@ -43,9 +38,6 @@ class UpdateSeverityTest {
     lateinit var forTestService: ForTestService
 
     @Autowired
-    lateinit var resourceService: ResourceService
-
-    @Autowired
     lateinit var patientService: PatientService
 
     @Test
@@ -62,28 +54,29 @@ class UpdateSeverityTest {
         val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         val gre1 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.updateOfficeStatuses()
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2)
-        ))), queueManagerService.queueItems())
+        ))))
         assertEquals(Severity.RED, patientService.severity(checking))
 
         //поменяли на зеленый, должен встать в конец,
         // не меняя кабинета, хоть и рядом пустой
         examinationService.updateSeverity(checking, Severity.GREEN)
         assertEquals(Severity.GREEN, patientService.severity(checking))
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2),
                 QueueItemSimple(patientId = checking)
-        ))), queueManagerService.queueItems())
+        ))))
     }
 
     @Test
@@ -99,27 +92,28 @@ class UpdateSeverityTest {
         val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         val gre1 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.updateOfficeStatuses()
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2)
-        ))), queueManagerService.queueItems())
+        ))))
         assertEquals(Severity.RED, patientService.severity(checking))
 
         //поменяли на желтый, должен встать после желтых
         examinationService.updateSeverity(checking, Severity.YELLOW)
         assertEquals(Severity.YELLOW, patientService.severity(checking))
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2)
-        ))), queueManagerService.queueItems())
+        ))))
     }
 
     @Test
@@ -135,27 +129,28 @@ class UpdateSeverityTest {
         val yel2 = forTestService.createPatientWithQueueItem(severity = Severity.YELLOW, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         val gre1 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.updateOfficeStatuses()
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2)
-        ))), queueManagerService.queueItems())
+        ))))
         assertEquals(Severity.RED, patientService.severity(checking))
 
         //ничего не должно поменяться - с красного на красный
         examinationService.updateSeverity(checking, Severity.RED)
         assertEquals(Severity.RED, patientService.severity(checking))
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2)
-        ))), queueManagerService.queueItems())
+        ))))
     }
 
     @Test
@@ -171,27 +166,28 @@ class UpdateSeverityTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
         val gre2 = forTestService.createPatientWithQueueItem(severity = Severity.GREEN, officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.updateOfficeStatuses()
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = red2),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = gre2)
-        ))), queueManagerService.queueItems())
+        ))))
         assertEquals(Severity.GREEN, patientService.severity(checking))
 
         //после красных
         examinationService.updateSeverity(checking, Severity.RED)
         assertEquals(Severity.RED, patientService.severity(checking))
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = red2),
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre2)
-        ))), queueManagerService.queueItems())
+        ))))
     }
 
     @Test
@@ -207,27 +203,28 @@ class UpdateSeverityTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130, queueStatus = PatientQueueStatus.IN_QUEUE, index = i++)
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.updateOfficeStatuses()
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = red2),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = checking)
-        ))), queueManagerService.queueItems())
+        ))))
         assertEquals(Severity.GREEN, patientService.severity(checking))
 
         //после желтых
         examinationService.updateSeverity(checking, Severity.YELLOW)
         assertEquals(Severity.YELLOW, patientService.severity(checking))
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
                 QueueItemSimple(patientId = red1),
                 QueueItemSimple(patientId = red2),
                 QueueItemSimple(patientId = yel1),
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = checking),
                 QueueItemSimple(patientId = gre1)
-        ))), queueManagerService.queueItems())
+        ))))
     }
 
     @Test
@@ -237,8 +234,9 @@ class UpdateSeverityTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ), officeId = OFFICE_130)
-        checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
-        ))), queueManagerService.queueItems())
+        forTestService.updateOfficeStatuses()
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(OFFICE_130, listOf(
+        ))))
         assertEquals(Severity.GREEN, patientService.severity(checking))
 
         examinationService.updateSeverity(checking, Severity.YELLOW)
