@@ -1,8 +1,12 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 dependencies {
+    implementation(project(":common:fhir-model"))
+    implementation(project(":common:triton-monitor-sdk"))
+
     implementation("org.springframework.boot:spring-boot-starter-artemis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fazecast:jSerialComm:2.5.2")
-    implementation(project(":common:fhir-model"))
     implementation(fileTree("libs"))
     implementation("org.usb4java:usb4java:1.3.0")
 
@@ -16,4 +20,9 @@ tasks.test {
 
 tasks.bootRun {
     args = listOf("--spring.profiles.active=dev")
+}
+
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes")
 }

@@ -4,6 +4,7 @@ import com.fazecast.jSerialComm.*
 import org.slf4j.*
 import org.springframework.beans.factory.annotation.*
 import org.springframework.context.*
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.*
 import org.springframework.stereotype.*
 import ru.viscur.dh.apps.paramedicdevice.dto.*
@@ -17,7 +18,10 @@ import java.sql.*
  *
  * Работает как под ОС Linux, так и под Windows (7+).
  * В ОС Linux требуются root-права доступа к порту
+ *
+ * Активный в случае, если нет профиля triton-monitor, если профиль включен, то заменяется [TritonTonometer]
  */
+@Profile("!triton-monitor")
 @Component
 class Tonometer(
         @Value("\${paramedic.serial.port.system.name}")

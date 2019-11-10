@@ -7,6 +7,10 @@ package ru.viscur.dh.apps.paramedicdevice.dto
  */
 enum class TaskType {
     /**
+     * Неизвестный тип
+     */
+    Unknown,
+    /**
      * Сканирование документов
      */
     Document,
@@ -32,11 +36,18 @@ enum class TaskType {
     Wristband,
 
     /**
-     * Неизвестный тип
-     */
-    Unknown,
-    /**
      * Измерения тонометра (АД, ЧСС)
      */
-    Tonometer
+    Tonometer,
+
+    /**
+     * Снятие показаний с пульсоксиметра
+     */
+    Pulseoximeter,
+
+    /**
+     * Снятие показаний с ЭКГ
+     */
+    Electrocardiograph
+
 }
