@@ -14,7 +14,10 @@ import ru.viscur.dh.datastorage.api.ObservationDurationEstimationService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
 import ru.viscur.dh.datastorage.impl.entity.ObservationDurationHistory
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.utils.MILLISECONDS_IN_SECOND
 import ru.viscur.dh.fhir.model.utils.SECONDS_IN_MINUTE
+import ru.viscur.dh.fhir.model.utils.now
+import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -113,7 +116,9 @@ class ObservationDurationAvgTest() {
     fun test(case: TestCase) {
         service.deleteAllHistory()
         case.historyRecords.forEach {
-            service.saveToHistory(it.code!!, it.diagnosis!!, enumValueOf(it.severity!!), it.duration!!)
+            val start = now()
+            val end = Date(now().time + it.duration!! * MILLISECONDS_IN_SECOND)
+            service.saveToHistory("anyPatientId", it.code!!, it.diagnosis!!, enumValueOf(it.severity!!), start, end)
         }
         assertEquals(case.exp,
                 service.avgByHistory(case.searchingParams.code!!, case.searchingParams.diagnosis!!, enumValueOf(case.searchingParams.severity!!)),

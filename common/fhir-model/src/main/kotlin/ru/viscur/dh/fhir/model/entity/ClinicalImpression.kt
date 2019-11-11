@@ -10,8 +10,10 @@ import ru.viscur.dh.fhir.model.utils.genId
 import java.util.*
 
 /**
- * Клиническая оценка состояния больного на основании
- * первичного осмотра и измерений
+ * Клиническая оценка состояния больного
+ * при обращении
+ * Фактически описывает одно обращение пациента
+ * [info](http://fhir-ru.github.io/clinicalimpression.html)
  *
  * @param status: [ClinicalImpressionStatus] статус
  * @param date: дата (и время) вынесения решения

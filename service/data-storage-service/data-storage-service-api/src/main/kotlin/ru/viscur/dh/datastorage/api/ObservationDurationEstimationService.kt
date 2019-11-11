@@ -1,6 +1,7 @@
 package ru.viscur.dh.datastorage.api
 
 import ru.viscur.dh.fhir.model.enums.Severity
+import java.util.*
 
 /**
  * Created at 06.11.2019 12:04 by SherbakovaMA
@@ -13,7 +14,7 @@ interface ObservationDurationEstimationService {
 
     fun deleteAllHistory()
 
-    fun saveToHistory(code: String, diagnosis: String, severity: Severity, duration: Int)
+    fun saveToHistory(patientId: String, code: String, diagnosis: String, severity: Severity, start: Date, end: Date)
 
     /**
      * Определение среднего значения для заданных параметров по истории

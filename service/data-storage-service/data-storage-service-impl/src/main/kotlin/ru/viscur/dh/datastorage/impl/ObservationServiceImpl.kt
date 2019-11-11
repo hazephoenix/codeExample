@@ -83,9 +83,8 @@ class ObservationServiceImpl(
                         ?: ServiceRequestExtension(execEnd = now())
                 observation.code = this.code
             }
-            val duration = updatedServiceRequest.extension?.execDuration()
-            if (diagnosis != null && duration != null) {
-                observationDurationService.saveToHistory(updatedServiceRequest.code.code(), diagnosis, severity, duration)
+            if (diagnosis != null && updatedServiceRequest.extension?.execStart != null) {
+                observationDurationService.saveToHistory(patientId, updatedServiceRequest.code.code(), diagnosis, severity, updatedServiceRequest.extension!!.execStart!!, updatedServiceRequest.extension!!.execEnd!!)
             }
         }
         //если это кровь, то необходимо автоматом сделать прием мочи

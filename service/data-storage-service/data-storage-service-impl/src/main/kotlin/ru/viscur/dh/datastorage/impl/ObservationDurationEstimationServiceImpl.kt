@@ -8,8 +8,10 @@ import ru.viscur.dh.datastorage.impl.repository.ObservationDefaultDurationReposi
 import ru.viscur.dh.datastorage.impl.repository.ObservationDurationHistoryRepository
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.utils.SECONDS_IN_MINUTE
-import ru.viscur.dh.fhir.model.utils.nowAsTimeStamp
+import ru.viscur.dh.fhir.model.utils.msToSeconds
+import ru.viscur.dh.fhir.model.utils.toTimestamp
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
+import java.util.*
 import kotlin.math.roundToInt
 
 /**
@@ -28,13 +30,14 @@ class ObservationDurationEstimationServiceImpl(
     }
 
     @Tx
-    override fun saveToHistory(code: String, diagnosis: String, severity: Severity, duration: Int) {
+    override fun saveToHistory(patientId: String, code: String, diagnosis: String, severity: Severity, start: Date, end: Date) {
         durationHistoryRepository.save(ObservationDurationHistory(
+                patientId = patientId,
                 code = code,
-                fireDate = nowAsTimeStamp(),
+                fireDate = start.toTimestamp(),
                 diagnosis = diagnosis,
                 severity = severity.name,
-                duration = duration
+                duration = msToSeconds(end.time - start.time)
         ))
     }
 

@@ -73,3 +73,13 @@ const val BLOOD_ANALYSIS_CATEGORY = "Blood_analysis"
  * Код категории услуг по забору мочи
  */
 const val URINE_ANALYSIS_CATEGORY = "Urine_analysis"
+
+/**
+ * Код услуги "Первичный осмотр при регистрации обращения"
+ */
+const val INSPECTION_ON_RECEPTION = "Inspection_on_reception"
+
+/**
+ * linkId опросника, в котором указывается степень тяжести пациента
+ */
+const val QUESTIONNAIRE_LINK_ID_SEVERITY = "Severity"
