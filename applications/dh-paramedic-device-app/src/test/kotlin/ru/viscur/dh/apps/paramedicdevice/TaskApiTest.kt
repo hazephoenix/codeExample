@@ -3,6 +3,7 @@ package ru.viscur.dh.apps.paramedicdevice
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -27,7 +27,6 @@ import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
 import ru.viscur.dh.common.dto.task.Task
 import ru.viscur.dh.common.dto.task.TaskStatus
 import ru.viscur.dh.common.dto.task.TaskType
-import java.util.*
 import java.util.regex.Pattern
 
 /**
@@ -36,6 +35,7 @@ import java.util.regex.Pattern
 @RunWith(SpringRunner::class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Ignore("Перенести в интеграционные тесты")
 class TaskApiTest {
 
     @Autowired
@@ -74,12 +74,10 @@ class TaskApiTest {
 
     @Test
     fun addTaskTest() {
-        val auth = "Basic ${Base64.getEncoder().encodeToString("${uid.uid}:${uid.apiPassword}".toByteArray())}"
         mvc.perform(
-                post("/api/task/add")
+                post("/desktop/task/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"type\": \"Document\"}")
-                        .header(HttpHeaders.AUTHORIZATION, auth)
         )
                 .andExpect(status().isOk)
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -90,12 +88,10 @@ class TaskApiTest {
 
     @Test
     fun takeHeightTest() {
-        val auth = "Basic ${Base64.getEncoder().encodeToString("${uid.uid}:${uid.apiPassword}".toByteArray())}"
         val res = mvc.perform(
-               post("/api/task/add")
+               post("/desktop/task/add")
                        .contentType(MediaType.APPLICATION_JSON)
                        .content("{\"type\": \"Height\"}")
-                       .header(HttpHeaders.AUTHORIZATION, auth)
         )
                 .andExpect(status().isOk)
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -105,11 +101,11 @@ class TaskApiTest {
                 .andReturn()
         val mapper = ObjectMapper()
         val task = mapper.readValue(res.response.contentAsString, Task::class.java)
-        mvc.perform(get("/api/task/status/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+        mvc.perform(get("/desktop/task/status/${task.id}"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$", `is`(TaskStatus.Complete.name)))
 
-        mvc.perform(get("/api/task/result/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+        mvc.perform(get("/desktop/task/result/${task.id}"))
                 .andExpect(status().isOk)
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", `is`(task.id)))
@@ -123,12 +119,10 @@ class TaskApiTest {
 
     @Test
     fun takeWeightTest() {
-        val auth = "Basic ${Base64.getEncoder().encodeToString("${uid.uid}:${uid.apiPassword}".toByteArray())}"
         val res = mvc.perform(
-                post("/api/task/add")
+                post("/desktop/task/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"type\": \"Weight\"}")
-                        .header(HttpHeaders.AUTHORIZATION, auth)
         )
                 .andExpect(status().isOk)
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -138,11 +132,11 @@ class TaskApiTest {
                 .andReturn()
         val mapper = ObjectMapper()
         val task = mapper.readValue(res.response.contentAsString, Task::class.java)
-        mvc.perform(get("/api/task/status/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+        mvc.perform(get("/desktop/task/status/${task.id}"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$", `is`(TaskStatus.Complete.name)))
 
-        mvc.perform(get("/api/task/result/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+        mvc.perform(get("/desktop/task/result/${task.id}"))
                 .andExpect(status().isOk)
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", `is`(task.id)))
@@ -156,12 +150,10 @@ class TaskApiTest {
 
     @Test
     fun tonometerTest() {
-        val auth = "Basic ${Base64.getEncoder().encodeToString("${uid.uid}:${uid.apiPassword}".toByteArray())}"
         val res = mvc.perform(
-                post("/api/task/add")
+                post("/desktop/task/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"type\": \"Tonometer\"}")
-                        .header(HttpHeaders.AUTHORIZATION, auth)
         )
                 .andExpect(status().isOk)
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -173,12 +165,12 @@ class TaskApiTest {
         val task = mapper.readValue(res.response.contentAsString, Task::class.java)
         var taskStatus = TaskStatus.InProgress
         while(taskStatus != TaskStatus.Complete && taskStatus != TaskStatus.Error) {
-            mvc.perform(get("/api/task/status/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+            mvc.perform(get("/desktop/task/status/${task.id}"))
                     .andExpect(status().isOk)
                     .andDo { taskStatus = mapper.readValue(it.response.contentAsString, TaskStatus::class.java) }
         }
         if (taskStatus == TaskStatus.Complete) {
-            mvc.perform(get("/api/task/result/${task.id}").header(HttpHeaders.AUTHORIZATION, auth))
+            mvc.perform(get("/desktop/task/result/${task.id}"))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.result.tonometerModel", `is`("TM2655")))
                     .andExpect(jsonPath("$.result.error.code", `is`(TonometerErrorCode.E00.name)))
