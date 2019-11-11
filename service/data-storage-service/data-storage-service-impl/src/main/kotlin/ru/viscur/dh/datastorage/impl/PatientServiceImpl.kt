@@ -3,7 +3,6 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
-import ru.viscur.dh.datastorage.impl.utils.*
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -53,8 +52,30 @@ class PatientServiceImpl(
             where items.item ->> 'linkId' = 'Severity'
         """.trimIndent())
         q.setParameter("patientRef", "Patient/$patientId")
-        val severityStr = q.singleResult as String
+        val severityStr = q.resultList.map { it as String }.firstOrNull()
+                ?: throw Exception("not found severity for patient id '$patientId'")
         return enumValueOf(severityStr)
+    }
+
+    override fun updateSeverity(patientId: String, severity: Severity): Boolean {
+        val questionnaireResponse = questionnaireResponseForSeverityCriteria(patientId)
+                ?: throw Exception("not found questionnaireResponse for SeverityCriteria of patient with id '$patientId'")
+        var updated = false
+        resourceService.update(ResourceType.QuestionnaireResponse, questionnaireResponse.id) {
+            val linkIdOfSeverity = "Severity"
+            item = item.map {
+                if (it.linkId == linkIdOfSeverity) {
+                    if(it.answer.first().valueCoding?.code != severity.name) {
+                        it.answer = listOf(QuestionnaireResponseItemAnswer(
+                                valueCoding = Coding(code = severity.name, display = severity.translation, system = ValueSetName.SEVERITY.id)
+                        ))
+                        updated = true
+                    }
+                }
+                it
+            }
+        }
+        return updated
     }
 
     override fun queueStatusOfPatient(patientId: String): PatientQueueStatus {
@@ -146,8 +167,7 @@ class PatientServiceImpl(
 
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
-        val resources = bundle.entry.map { it.resource.apply { id = genId() } }
-        var patient = getResourcesFromList<Patient>(resources, ResourceType.ResourceTypeId.Patient).first()
+        var patient = bundle.resources(ResourceType.Patient).first()
         val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.toString() }?.value
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем
@@ -170,7 +190,7 @@ class PatientServiceImpl(
         clinicalImpressionService.cancelActive(patient.id)//todo может лучше сообщать о том, что есть активное обращение?
 
         val patientReference = Reference(patient)
-        val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.ResourceTypeId.DiagnosticReport)
+        val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport)
                 .firstOrNull()?.let {
                     resourceService.create(it.apply {
                         subject = patientReference
@@ -180,10 +200,10 @@ class PatientServiceImpl(
         val paramedicReference = diagnosticReport.performer.first()
         val date = now()
 
-        val serviceRequests = getResourcesFromList<ServiceRequest>(resources, ResourceType.ResourceTypeId.ServiceRequest)
+        val serviceRequests = bundle.resources(ResourceType.ServiceRequest)
 
         // Проверяем наличие направления к ответственному врачу, если нет - создаем
-        val responsiblePractitionerRef = getResourcesFromList<ListResource>(resources, ResourceType.ResourceTypeId.ListResource)
+        val responsiblePractitionerRef = bundle.resources(ResourceType.ListResource)
                 .firstOrNull()
                 ?.entry?.find { it.item.type == ResourceType.ResourceTypeId.Practitioner }?.item
                 ?: throw Error("No responsible practitioner provided")
@@ -211,24 +231,24 @@ class PatientServiceImpl(
                 activity = resultServices
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
-        val claim = getResourcesFromList<Claim>(resources, ResourceType.ResourceTypeId.Claim).first().let {
+        val claim = bundle.resources(ResourceType.Claim).first().let {
             resourceService.create(it.apply {
                 it.patient = patientReference
             })
         }
-        val consents = getResourcesFromList<Consent>(resources, ResourceType.ResourceTypeId.Consent).map {
+        val consents = bundle.resources(ResourceType.Consent).map {
             resourceService.create(it.apply {
                 it.patient = patientReference
                 performer = paramedicReference
             })
         }
-        val observations = getResourcesFromList<Observation>(resources, ResourceType.ResourceTypeId.Observation).map {
+        val observations = bundle.resources(ResourceType.Observation).map {
             resourceService.create(it.apply {
                 subject = patientReference
                 performer = listOf(paramedicReference)
             })
         }
-        val questionnaireResponse = getResourcesFromList<QuestionnaireResponse>(resources, ResourceType.ResourceTypeId.QuestionnaireResponse).map {
+        val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse).map {
             resourceService.create(it.apply {
                 source = patientReference
                 author = paramedicReference
@@ -257,6 +277,22 @@ class PatientServiceImpl(
         val query = em.createNativeQuery(queryStr)
         query.setParameters(params)
         return query.patientsToExamine()
+    }
+
+    private fun questionnaireResponseForSeverityCriteria(patientId: String): QuestionnaireResponse? {
+        val q = em.createNativeQuery("""
+            select r.resource
+                     from questionnaireResponse r
+                     where r.resource ->> 'questionnaire' = 'Questionnaire/Severity_criteria'
+                       and 'QuestionnaireResponse/' || r.id in (
+                         select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                         from clinicalImpression ci
+                         where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                            and ci.resource ->> 'status' = 'active'
+                     )
+        """.trimIndent())
+        q.setParameter("patientRef", "Patient/$patientId")
+        return q.fetchResource()
     }
 
     /**

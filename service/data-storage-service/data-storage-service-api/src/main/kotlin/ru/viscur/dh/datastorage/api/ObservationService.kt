@@ -19,9 +19,14 @@ interface ObservationService {
     fun byBaseOnServiceRequestId(id: String): Observation?
 
     /**
+     * Обследование началось
+     */
+    fun start(serviceRequestId: String)
+
+    /**
      * Создать запись об обследовании
      */
-    fun create(patientId: String, observation: Observation): Observation
+    fun create(patientId: String, observation: Observation, diagnosis: String?, severity: Severity): Observation
 
     /**
      * Обновить запись об исследовании

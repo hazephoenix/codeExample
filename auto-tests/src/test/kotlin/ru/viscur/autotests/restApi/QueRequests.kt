@@ -1,7 +1,5 @@
 package ru.viscur.autotests.restApi
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
@@ -78,6 +76,10 @@ class QueRequests {
                         .extract().response().`as`(resourceType.entityClass)
 
         //observation
+        fun startObservation(serviceRequestId: String) =
+                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.START_OBSERVATION + "?serviceRequestId=$serviceRequestId").then().statusCode(200)
+                        .extract()
+
         fun createObservation(observation : Observation) = Helpers.createRequestSpec(observation).log().all().
                 `when`().
                 post(Endpoints.CREATE_OBSERVATION).
