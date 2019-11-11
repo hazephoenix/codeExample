@@ -25,4 +25,9 @@ interface LocationService {
      * @param type код услуги/процедуры, код из "ValueSet/Observation_types"
      */
     fun byObservationType(type: String): List<String>
+
+    /**
+     * По типу места/кабинета [Location.type]
+     */
+    fun byLocationType(type: String): List<Location>
 }

@@ -1,5 +1,7 @@
 package ru.viscur.dh.datastorage.api.util
 
+import ru.viscur.dh.fhir.model.enums.Severity
+
 /**
  * Created at 07.11.2019 16:09 by SherbakovaMA
  *
@@ -27,7 +29,47 @@ const val OFFICE_129 = "Office:129"
 const val OFFICE_130 = "Office:130"
 const val OFFICE_202 = "Office:202"
 
+const val RED_ZONE = "Office:RedZone"
+const val YELLOW_ZONE_SECTION_1 = "Office:YellowZoneSection1"
+const val YELLOW_ZONE_SECTION_2 = "Office:YellowZoneSection2"
+const val YELLOW_ZONE_SECTION_3 = "Office:YellowZoneSection3"
+const val YELLOW_ZONE_SECTION_4 = "Office:YellowZoneSection4"
+const val YELLOW_ZONE_SECTION_5 = "Office:YellowZoneSection5"
+const val YELLOW_ZONE_SECTION_6 = "Office:YellowZoneSection6"
+const val GREEN_ZONE = "Office:GreenZone"
+
+/**
+ * Типы мест
+ */
+const val RED_ZONE_TYPE = "RedZone"
+const val YELLOW_ZONE_TYPE = "YellowZone"
+const val GREEN_ZONE_TYPE = "GreenZone"
+
+/**
+ * Соотвествие степени тяжести к зонам
+ */
+val severityToZoneMap = mapOf(
+        Severity.RED to RED_ZONE_TYPE,
+        Severity.YELLOW to YELLOW_ZONE_TYPE,
+        Severity.GREEN to GREEN_ZONE_TYPE
+)
+
+/**
+ * Поиск зоны, соответствующей степени тяжести
+ */
+fun Severity.toZone() = severityToZoneMap[this] ?: GREEN_ZONE_TYPE
+
 /**
  * Код настройки Пересчитывать следующий кабинет в очереди
  */
 const val RECALC_NEXT_OFFICE_CONFIG_CODE = "RECALC_NEXT_OFFICE_IN_QUEUE"
+
+/**
+ * Код категории услуг по забору крови
+ */
+const val BLOOD_ANALYSIS_CATEGORY = "Blood_analysis"
+
+/**
+ * Код категории услуг по забору мочи
+ */
+const val URINE_ANALYSIS_CATEGORY = "Urine_analysis"

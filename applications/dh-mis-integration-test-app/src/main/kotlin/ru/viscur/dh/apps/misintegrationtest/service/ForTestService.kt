@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.viscur.autotests.utils.Helpers
-import ru.viscur.dh.apps.misintegrationtest.util.BaseTestCase
-import ru.viscur.dh.apps.misintegrationtest.util.QueueOfOfficeSimple
-import ru.viscur.dh.apps.misintegrationtest.util.ServiceRequestSimple
+import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
@@ -130,7 +128,7 @@ class ForTestService {
                       officeId: String? = null,
                       queueStatus: PatientQueueStatus = PatientQueueStatus.READY): String {
         val patientId = resourceService.create(Helpers.createPatientResource(enp = genId(), queueStatus = queueStatus)).id
-        val servRequests = servReqs?.toServiceRequests(patientId)
+        var servRequests = servReqs?.toServiceRequests(patientId)
                 ?: run {
                     var servRequestCode = resourceService.byId(ResourceType.Location, officeId!!).extension!!.observationType!!.first().code
                     val subTypes = conceptService.byParent(ValueSetName.OBSERVATION_TYPES, servRequestCode)
@@ -142,6 +140,13 @@ class ForTestService {
                             patientId
                     ))
                 }
+
+        //добавление осмотра отв-ого если его нет
+        val observationTypeOfResponsible = OBSERVATION_OF_SURGEON
+        val serviceRequestOfResponsiblePr = (servRequests.find { it.code.code() == observationTypeOfResponsible }
+                ?: ServiceRequest(code = observationTypeOfResponsible))
+                .apply { performer = listOf(referenceToPractitioner(Helpers.surgeonId)) }
+        servRequests = servRequests.filterNot { it.code.code() == observationTypeOfResponsible } + serviceRequestOfResponsiblePr
         val createdServRequests = servRequests.map { resourceService.create(it) }
         val carePlan = resourceService.create(Helpers.createCarePlan(patientId, createdServRequests))
         val diagnosticReport = resourceService.create(Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", patientId = patientId))

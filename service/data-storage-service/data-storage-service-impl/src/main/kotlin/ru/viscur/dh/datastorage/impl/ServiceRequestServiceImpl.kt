@@ -79,6 +79,39 @@ class ServiceRequestServiceImpl(
         return query.fetchResourceList()
     }
 
+    override fun activeByObservationCategory(patientId: String, parentCode: String): List<ServiceRequest> {
+        //  active clinicalImpression -> carePlan -> active serviceRequests у которых коды имеют указанный parentCode
+        val query = em.createNativeQuery("""
+            select sr.resource
+            from (
+                     select jsonb_array_elements(r.resource -> 'code' -> 'coding') ->> 'code' code, r.resource
+                     from serviceRequest r
+                     where 'ServiceRequest/' || r.id in (
+                         select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                         from carePlan cp
+                         where 'CarePlan/' || cp.id in (
+                             select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                             from clinicalImpression ci
+                             where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                               and ci.resource ->> 'status' = 'active'
+                         )
+                     )
+                       and r.resource ->> 'status' = 'active'
+                 ) sr
+            join (
+                select r.resource ->> 'code' code
+                from concept r
+                where r.resource ->> 'system' = 'ValueSet/Observation_types'
+                    and r.resource ->> 'parentCode' = :parentCode
+            ) c
+            on sr.code = c.code
+            order by sr.resource -> 'extension' ->> 'executionOrder'
+            """)
+        query.setParameter("patientRef", "Patient/$patientId")
+        query.setParameter("parentCode", parentCode)
+        return query.fetchResourceList()
+    }
+
 
     override fun active(patientId: String): List<ServiceRequest> {
         //active clinicalImpression -> carePlan -> active serviceRequests

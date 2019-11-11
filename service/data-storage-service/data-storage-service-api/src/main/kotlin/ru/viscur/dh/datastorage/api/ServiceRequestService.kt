@@ -21,6 +21,11 @@ interface ServiceRequestService {
     fun active(patientId: String): List<ServiceRequest>
 
     /**
+     * Все непройденные назначения указанной категории (категория это parentCode типа услуги)
+     */
+    fun activeByObservationCategory(patientId: String, parentCode: String): List<ServiceRequest>
+
+    /**
      * Добавить направления на обследования
      */
     fun add(patientId: String, serviceRequestList: List<ServiceRequest>): CarePlan

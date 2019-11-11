@@ -3,6 +3,7 @@ package ru.viscur.dh.queue.api
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
+import ru.viscur.dh.fhir.model.enums.Severity
 
 /**
  * Сервис управления очередью пациентов
@@ -93,6 +94,11 @@ interface QueueManagerService {
      * Кабинет принимает статус "занят" (если пациентов на приеме в кабинет не осталось)
      */
     fun cancelEntering(patientId: String)
+
+    /**
+     * Функционал, который нужно сделать после изменения степени тяжести
+     */
+    fun severityUpdated(patientId: String, severity: Severity)
 
     /**
      * Кабинет готов принять пациента: смена статуса с CLOSED, BUSY на READY

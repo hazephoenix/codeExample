@@ -10,3 +10,6 @@ select resource_create('{"resourceType": "Concept", "id": "Location_types:Ultras
 select resource_create('{"resourceType": "Concept", "id": "Location_types:FunctionalDiagnostics", "code": "FunctionalDiagnostics", "system": "ValueSet/Location_types", "display": "Функциональная диагностика"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Location_types:Endoscopy", "code": "Endoscopy", "system": "ValueSet/Location_types", "display": "Эндоскопия"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Location_types:GeneralRadiology", "code": "GeneralRadiology", "system": "ValueSet/Location_types", "display": "Общая рентгенология"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Location_types:RedZone", "code": "RedZone", "system": "ValueSet/Location_types", "display": "Красная зона"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Location_types:YellowZone", "code": "YellowZone", "system": "ValueSet/Location_types", "display": "Желтая зона"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Location_types:GreenZone", "code": "GreenZone", "system": "ValueSet/Location_types", "display": "Зеленая зона"}'::jsonb);
