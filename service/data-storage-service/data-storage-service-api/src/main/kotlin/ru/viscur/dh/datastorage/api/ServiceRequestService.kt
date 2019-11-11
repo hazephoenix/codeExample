@@ -29,4 +29,14 @@ interface ServiceRequestService {
      * Обновить после выполнения - после создания соотв-щего [observation], который на нем основан
      */
     fun updateStatusByObservation(observation: Observation): ServiceRequest
+
+    /**
+     * Отменить назначения пациента в кабинете
+     */
+    fun cancelServiceRequests(patientId: String, officeId: String)
+
+    /**
+     * Отменить назначение пациента по id назначения
+     */
+    fun cancelServiceRequest(id: String): ServiceRequest
 }

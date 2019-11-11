@@ -34,23 +34,6 @@ class ClinicalImpressionServiceImpl(
         return query.fetchResource()
     }
 
-    override fun bySupportingInfoReference(refResourceType: ResourceType.ResourceTypeId, refResourceId: String): ClinicalImpression {
-        val query = em.createNativeQuery("""
-                select r.resource
-                from ClinicalImpression r
-                where :refResourceType || '/' || :refResourceId in (
-                    select
-                        jsonb_array_elements(rIntr.resource -> 'supportingInfo') ->> 'reference'
-                    from ClinicalImpression rIntr
-                    where rIntr.id = r.id
-                )
-        """)
-        query.setParameter("refResourceType", refResourceType.toString())
-        query.setParameter("refResourceId", refResourceId)
-        return query.fetchResource()
-                ?: throw Exception("Not found ClinicalImpression with reference '$refResourceType/refResourceId' in supportingInfo")
-    }
-
     override fun byServiceRequest(serviceRequestId: String): ClinicalImpression {
         val query = em.createNativeQuery("""
                 select cir
@@ -85,13 +68,7 @@ class ClinicalImpressionServiceImpl(
                             resourceService.update(ResourceType.ServiceRequest, serviceRequest.id) {
                                 status = ServiceRequestStatus.cancelled
                             }
-                            observationService.byBaseOnServiceRequestId(serviceRequest.id)?.run {
-                                if (status == ObservationStatus.registered) {
-                                    resourceService.update(ResourceType.Observation, id) {
-                                        status = ObservationStatus.cancelled
-                                    }
-                                }
-                            }
+                            observationService.cancelByBaseOnServiceRequestId(serviceRequest.id)
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-package ru.viscur.dh.integration.mis.rest.api
+package ru.viscur.dh.integration.mis.api
 
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ServiceRequest

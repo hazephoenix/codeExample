@@ -32,4 +32,14 @@ interface ObservationService {
      * Обновить запись об исследовании
      */
     fun update(patientId: String, observation: Observation): Observation
+
+    /**
+     * Отменить по назначениям в кабинете
+     */
+    fun cancelByServiceRequests(patientId: String, officeId: String)
+
+    /**
+     * Отменить по id назначения
+     */
+    fun cancelByBaseOnServiceRequestId(id: String)
 }

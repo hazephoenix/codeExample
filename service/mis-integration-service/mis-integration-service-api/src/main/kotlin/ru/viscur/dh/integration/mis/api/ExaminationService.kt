@@ -28,6 +28,16 @@ interface ExaminationService {
     fun cancelClinicalImpression(patientId: String)
 
     /**
+     * Отменить назначения пациента в кабинете
+     */
+    fun cancelServiceRequests(patientId: String, officeId: String)
+
+    /**
+     * Отменить назначение пациента по id назначения
+     */
+    fun cancelServiceRequest(id: String)
+
+    /**
      * Изменить степень тяжести пациента
      * Переставляет в очереди не меняя кабинета
      */

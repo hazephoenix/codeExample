@@ -125,4 +125,23 @@ class ServiceRequestServiceImpl(
                     }
                 }
             } ?: throw Error("Not found ServiceRequest by Observation.basedOn.id: '${observation.basedOn?.id}'")
+
+    @Tx
+    override fun cancelServiceRequests(patientId: String, officeId: String) {
+        val activeInOffice = active(patientId, officeId)
+        activeInOffice.forEach {
+            resourceService.update(ResourceType.ServiceRequest, it.id) {
+                status = ServiceRequestStatus.cancelled
+            }
+        }
+    }
+
+    @Tx
+    override fun cancelServiceRequest(id: String): ServiceRequest {
+        return resourceService.update(ResourceType.ServiceRequest, id) {
+            if (status in listOf(ServiceRequestStatus.active, ServiceRequestStatus.waiting_result)) {
+                status = ServiceRequestStatus.cancelled
+            }
+        }
+    }
 }

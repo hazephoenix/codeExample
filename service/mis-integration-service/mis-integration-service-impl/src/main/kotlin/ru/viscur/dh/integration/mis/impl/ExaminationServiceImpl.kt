@@ -36,7 +36,7 @@ class ExaminationServiceImpl(
 
         val carePlan = serviceRequestService.add(patientId, bundle.entry.map { it.resource as ServiceRequest })
         val prevOfficeId = queueService.isPatientInOfficeQueue(patientId)
-        queueManagerService.deleteFromOfficeQueue(patientId)
+        queueManagerService.deleteFromQueue(patientId)
         queueManagerService.calcServiceRequestExecOrders(patientId, prevOfficeId)
         queueManagerService.addToQueue(patientId, prevOfficeId)
         return carePlan
@@ -59,7 +59,7 @@ class ExaminationServiceImpl(
         //завершить обследование в кабинете (если пациент со статусом На обследовании)
         queueManagerService.patientLeftByPatientId(patientId)
         //удалить из очереди (если пациент со статусом В очереди)
-        queueManagerService.deleteFromOfficeQueue(patientId)
+        queueManagerService.deleteFromQueue(patientId)
         //завершить обращение и связанное
         val clinicalImpression = clinicalImpressionService.completeRelated(patientId, bundle)
         return clinicalImpressionService.complete(clinicalImpression)
@@ -67,8 +67,25 @@ class ExaminationServiceImpl(
 
     @Tx
     override fun cancelClinicalImpression(patientId: String) {
-        queueManagerService.deleteFromOfficeQueue(patientId)
+        queueManagerService.deleteFromQueue(patientId)
         clinicalImpressionService.cancelActive(patientId)
+    }
+
+    @Tx
+    override fun cancelServiceRequests(patientId: String, officeId: String) {
+        observationService.cancelByServiceRequests(patientId, officeId)
+        serviceRequestService.cancelServiceRequests(patientId, officeId)
+        queueManagerService.rebasePatientIfNeeded(patientId, officeId)
+    }
+
+    @Tx
+    override fun cancelServiceRequest(id: String) {
+        val cancelledServiceRequest = serviceRequestService.cancelServiceRequest(id)
+        observationService.cancelByBaseOnServiceRequestId(id)
+        val officeId = cancelledServiceRequest.locationReference?.first()?.id
+        officeId?.run {
+            queueManagerService.rebasePatientIfNeeded(cancelledServiceRequest.subject!!.id!!, officeId)
+        }
     }
 
     @Tx
@@ -76,7 +93,7 @@ class ExaminationServiceImpl(
         val updated = patientService.updateSeverity(patientId, severity)
         if (updated) {
             val officeId = queueService.isPatientInOfficeQueue(patientId)
-            queueManagerService.deleteFromOfficeQueue(patientId)
+            queueManagerService.deleteFromQueue(patientId)
             officeId?.run { queueManagerService.addToOfficeQueue(patientId, officeId) }
         }
     }

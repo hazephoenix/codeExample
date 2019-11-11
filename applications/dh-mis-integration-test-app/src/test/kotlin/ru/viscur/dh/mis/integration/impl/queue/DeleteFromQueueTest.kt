@@ -18,26 +18,20 @@ import ru.viscur.dh.queue.api.QueueManagerService
 /**
  * Created at 09.11.2019 10:50 by SherbakovaMA
  *
- * Тест на метод "Убрать пациента из очереди" [QueueManagerService.deleteFromOfficeQueue]
+ * Тест на метод "Убрать пациента из очереди" [QueueManagerService.deleteFromQueue]
  */
 @SpringBootTest(
         classes = [MisIntegrationTestConfig::class]
 )
 @EnableAutoConfiguration
 @Disabled("Debug purposes only. Test cleans and modifies db")
-class DeleteFromOfficeQueueTest {
+class DeleteFromQueueTest {
 
     @Autowired
     lateinit var queueManagerService: QueueManagerService
 
     @Autowired
-    lateinit var serviceRequestService: ServiceRequestService
-
-    @Autowired
     lateinit var forTestService: ForTestService
-
-    @Autowired
-    lateinit var resourceService: ResourceService
 
 
     @Test
@@ -56,7 +50,7 @@ class DeleteFromOfficeQueueTest {
                 QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
         ))))
 
-        queueManagerService.deleteFromOfficeQueue(checkP)
+        queueManagerService.deleteFromQueue(checkP)
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
                 QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
@@ -80,7 +74,7 @@ class DeleteFromOfficeQueueTest {
                 QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
         ))))
 
-        queueManagerService.deleteFromOfficeQueue(checkP)
+        queueManagerService.deleteFromQueue(checkP)
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
                 QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
@@ -107,7 +101,7 @@ class DeleteFromOfficeQueueTest {
                 QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
         ))))
 
-        queueManagerService.deleteFromOfficeQueue(checkP)
+        queueManagerService.deleteFromQueue(checkP)
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
                 QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
@@ -131,7 +125,7 @@ class DeleteFromOfficeQueueTest {
                 QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
         ))))
 
-        queueManagerService.deleteFromOfficeQueue(checkP)
+        queueManagerService.deleteFromQueue(checkP)
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
                 QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
@@ -155,7 +149,7 @@ class DeleteFromOfficeQueueTest {
                 QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
         ))))
 
-        queueManagerService.deleteFromOfficeQueue(checkP)
+        queueManagerService.deleteFromQueue(checkP)
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
                 QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
@@ -181,7 +175,7 @@ class DeleteFromOfficeQueueTest {
                 QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
         ))))
 
-        queueManagerService.deleteFromOfficeQueue(checkP)
+        queueManagerService.deleteFromQueue(checkP)
 
         //ничего не поменялось. он не в очереди
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(

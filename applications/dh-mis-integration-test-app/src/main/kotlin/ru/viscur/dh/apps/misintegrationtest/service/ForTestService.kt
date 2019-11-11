@@ -16,6 +16,7 @@ import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
+import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.QueueManagerService
 
@@ -44,6 +45,9 @@ class ForTestService {
 
     @Autowired
     lateinit var conceptService: ConceptService
+
+    @Autowired
+    lateinit var receptionService: ReceptionService
 
     companion object {
         private val defaultOfficeStatus = LocationStatus.BUSY
@@ -152,6 +156,10 @@ class ForTestService {
             }
         }
         return patientId
+    }
+
+    fun registerPatient(servReqs: List<ServiceRequestSimple>) {
+//        receptionService.registerPatient()
     }
 
 

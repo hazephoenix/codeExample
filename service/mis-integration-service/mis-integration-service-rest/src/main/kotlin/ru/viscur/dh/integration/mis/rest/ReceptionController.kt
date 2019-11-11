@@ -6,9 +6,8 @@ import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
-import ru.viscur.dh.integration.mis.rest.api.ReceptionService
+import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.integration.mis.rest.dto.ServiceRequestPredictBody
-import ru.viscur.dh.queue.api.*
 
 /**
  * Контроллер для обработки запросов подсистемы "АРМ Фельдшер"

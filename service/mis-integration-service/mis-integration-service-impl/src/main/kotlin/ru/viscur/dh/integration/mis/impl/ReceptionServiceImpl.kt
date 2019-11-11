@@ -1,11 +1,11 @@
-package ru.viscur.dh.integration.mis.rest.impl.service
+package ru.viscur.dh.integration.mis.impl
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
-import ru.viscur.dh.integration.mis.rest.api.ReceptionService
+import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.QueueManagerService
 
 /**

@@ -47,7 +47,7 @@ class QueueManagerServiceImpl(
     @Tx
     override fun registerPatient(patientId: String): List<ServiceRequest> {
         val serviceRequests = calcServiceRequestExecOrders(patientId)
-        deleteFromOfficeQueue(patientId)//на случай пересоздания маршрутного листа
+        deleteFromQueue(patientId)//на случай пересоздания маршрутного листа
         addToOfficeQueue(patientId, serviceRequests.first().locationReference?.first()?.id
                 ?: throw Exception("not defined location for service request with id '${serviceRequests.first().id}'"))
         return serviceRequests
@@ -84,14 +84,23 @@ class QueueManagerServiceImpl(
 
     @Tx
     override fun setAsFirst(patientId: String, officeId: String) {
-        deleteFromOfficeQueue(patientId)
+        deleteFromQueue(patientId)
         officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), asFirst = true)
         patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE, officeId)
         checkEntryToOffice(officeId)
     }
 
     @Tx
-    override fun deleteFromOfficeQueue(patientId: String) {
+    override fun rebasePatientIfNeeded(patientId: String, officeId: String) {
+        val currentOfficeId = queueService.isPatientInOfficeQueue(patientId)
+        if (currentOfficeId == officeId && serviceRequestService.active(patientId, officeId).isEmpty()) {
+            deleteFromQueue(patientId)
+            addToQueue(patientId)
+        }
+    }
+
+    @Tx
+    override fun deleteFromQueue(patientId: String) {
         val patient = patientService.byId(patientId)
         val patientQueueStatus = patient.extension.queueStatus
         //пациент стоит в очереди
