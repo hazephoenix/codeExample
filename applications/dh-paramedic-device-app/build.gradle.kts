@@ -5,8 +5,8 @@ dependencies {
     implementation(project(":common:triton-monitor-sdk"))
 
     implementation("org.springframework.boot:spring-boot-starter-artemis")
-    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fazecast:jSerialComm:2.5.2")
+    implementation(project(":common:dto"))
     implementation(fileTree("libs"))
     implementation("org.usb4java:usb4java:1.3.0")
 

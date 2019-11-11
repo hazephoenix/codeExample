@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import ru.viscur.dh.apps.paramedicdevice.dto.Task
-import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
-import ru.viscur.dh.apps.paramedicdevice.events.TaskComplete
-import ru.viscur.dh.apps.paramedicdevice.events.TaskError
-import ru.viscur.dh.apps.paramedicdevice.events.TaskRequested
-import ru.viscur.dh.apps.paramedicdevice.events.TaskStarted
+import ru.viscur.dh.common.dto.events.TaskComplete
+import ru.viscur.dh.common.dto.events.TaskError
+import ru.viscur.dh.common.dto.events.TaskRequested
+import ru.viscur.dh.common.dto.events.TaskStarted
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskType
 import javax.annotation.PostConstruct
 
 /**

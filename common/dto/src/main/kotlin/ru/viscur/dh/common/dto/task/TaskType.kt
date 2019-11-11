@@ -1,4 +1,4 @@
-package ru.viscur.dh.apps.paramedicdevice.dto
+package ru.viscur.dh.common.dto.task
 
 /**
  * Created at 28.10.2019 11:30 by TimochkinEA
