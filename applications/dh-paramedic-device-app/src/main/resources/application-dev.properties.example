@@ -7,6 +7,7 @@ uid=developer-paramedic-device
 api.password=developer-paramedic-device
 paramedic.native-service.url=http://localhost:8850
 paramedic.serial.port.system.name=COM7
+spring.main.web-application-type=NONE
 
 wristband.yellow=50J191806000
 wristband.green=50J191806005
