@@ -5,11 +5,6 @@ import org.springframework.web.servlet.config.annotation.*
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(
-        basePackages = [
-            "ru.viscur.dh.integration.mis.rest",
-            "ru.viscur.dh.integration.mis.api",
-            "ru.viscur.dh.queue.api"
-        ])
+@ComponentScan("ru.viscur.dh.integration.mis.rest")
 class MisIntegrationRestConfig {
 }
