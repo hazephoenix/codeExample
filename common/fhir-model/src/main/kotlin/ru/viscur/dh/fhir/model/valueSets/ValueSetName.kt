@@ -71,5 +71,9 @@ enum class ValueSetName(val id: String) {
     /**
      * Жалобы пациента
      */
-    COMPLAINTS("Complaints")
+    COMPLAINTS("Complaints"),
+    /**
+     * Коды настроек системы
+     */
+    CONFIG_CODES("Config_codes")
 }

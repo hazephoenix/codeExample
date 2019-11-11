@@ -36,4 +36,9 @@ interface QueueService {
      * "Вовлеченные в очередь пациенты": все пациенты, указанные в [QueueItem]
      */
     fun involvedPatients(): List<Patient>
+
+    /**
+     * Все [QueueItem]
+     */
+    fun queueItems(): List<QueueItem>
 }

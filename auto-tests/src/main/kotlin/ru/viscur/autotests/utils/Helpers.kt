@@ -3,7 +3,6 @@ package ru.viscur.autotests.utils
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
-import ru.viscur.autotests.tests.End2End
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
@@ -46,10 +45,10 @@ class Helpers {
         //создание bundle для пациента
         fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>): Bundle {
             val patient = createPatientResource(enp = enp)
-            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = End2End.paramedicId)
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
             val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
             val personalDataConsent = createConsentResource()
-            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = End2End.paramedicId)
+            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
             val list = createPractitionerListResource(surgeonId)
             val claim = createClaimResource()
 
@@ -64,8 +63,9 @@ class Helpers {
             ) + servRequests.map { BundleEntry(it) })
             return bundle
         }
+
         //создание ресурсов
-        fun createPatientResource(enp: String) = Patient(
+        fun createPatientResource(enp: String, queueStatus: PatientQueueStatus = PatientQueueStatus.READY) = Patient(
                 identifier = listOf(
                         Identifier(
                                 value = "7878 77521487",//серия номер
@@ -100,17 +100,19 @@ class Helpers {
                 gender = Gender.female,
                 extension = PatientExtension(
                         nationality = "Russian",//национальность
-                        birthPlace = Address(country = "Russia", text = "Россия ТО г. Томск", state = "TO", city = "Tomsk")//место рождения
+                        birthPlace = Address(country = "Russia", text = "Россия ТО г. Томск", state = "TO", city = "Tomsk"),//место рождения
+                        queueStatus = queueStatus
                 )
         )
 
-        fun createServiceRequestResource(servRequestCode: String, patientId: String = "ignore") =
+        fun createServiceRequestResource(servRequestCode: String, patientId: String = "ignore", status: ServiceRequestStatus = ServiceRequestStatus.active) =
                 ServiceRequest(
                         subject = referenceToPatient(patientId),
                         code = CodeableConcept(
                                 code = servRequestCode,
                                 systemId = ValueSetName.OBSERVATION_TYPES.id
-                        )
+                        ),
+                        status = status
                 )
 
         fun createClaimResource(patientId: String = "ignore"): Claim {
@@ -128,7 +130,7 @@ class Helpers {
         fun createDiagnosticReportResource(
                 diagnosisCode: String,
                 patientId: String = "ignored",
-                practitionerId: String,
+                practitionerId: String = paramedicId,
                 status: DiagnosticReportStatus = DiagnosticReportStatus.preliminary
         ) = DiagnosticReport(
                 subject = referenceToPatient(patientId),
@@ -243,5 +245,22 @@ class Helpers {
                 ListResourceEntry(item = referenceToPatient(patientId)),
                 ListResourceEntry(item = referenceToLocation(officeId))
         ))
+
+        fun createCarePlan(patientId: String, serviceRequests: List<ServiceRequest>) = CarePlan(
+                author = referenceToPractitioner(paramedicId),
+                contributor = referenceToPractitioner(surgeonId),
+                created = now(),
+                subject = referenceToPatient(patientId),
+                activity = serviceRequests.map { CarePlanActivity(outcomeReference = Reference(it)) }
+        )
+
+        fun createClinicalImpression(patientId: String, supportingInfo: List<Reference>) = ClinicalImpression(
+                status = ClinicalImpressionStatus.active,
+                date = now(),
+                subject = referenceToPatient(patientId),
+                assessor = referenceToPractitioner(surgeonId), // ответственный врач
+                summary = "Заключение: направлен на обследования по маршрутному листу",
+                supportingInfo = supportingInfo
+        )
     }
 }

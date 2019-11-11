@@ -1,8 +1,9 @@
-package ru.viscur.dh.integration.mis.rest.api
+package ru.viscur.dh.integration.mis.api
 
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.CarePlan
 import ru.viscur.dh.fhir.model.entity.ClinicalImpression
+import ru.viscur.dh.fhir.model.enums.Severity
 
 /**
  * Created at 31.10.2019 17:58 by SherbakovaMA
@@ -25,4 +26,10 @@ interface ExaminationService {
      * Отменить обращение пациента
      */
     fun cancelClinicalImpression(patientId: String)
+
+    /**
+     * Изменить степень тяжести пациента
+     * Переставляет в очереди не меняя кабинета
+     */
+    fun updateSeverity(patientId: String, severity: Severity)
 }

@@ -6,11 +6,11 @@ import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.QueueHistoryOfPatient
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.utils.msToSeconds
+import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.queue.api.PatientStatusService
-import ru.viscur.dh.queue.impl.msToSeconds
-import ru.viscur.dh.queue.impl.now
 import java.util.*
 
 @Service

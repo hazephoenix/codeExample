@@ -17,6 +17,7 @@ include(
         "service:location-service:location-service-impl",
         "applications:dh-central-server-app",
         "applications:dh-paramedic-device-app",
+        "applications:dh-mis-integration-test-app",
         "auto-tests",
         "common:transaction-desc",
         "common:triton-monitor-sdk"

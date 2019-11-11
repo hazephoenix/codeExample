@@ -4,8 +4,9 @@ import org.springframework.validation.annotation.*
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
+import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.BundleEntry
-import ru.viscur.dh.integration.mis.rest.api.ExaminationService
+import ru.viscur.dh.integration.mis.api.ExaminationService
 
 /**
  * Контроллер для осмотра пациентов ответственным врачом
@@ -49,5 +50,13 @@ class ExaminationController(
     @GetMapping("/cancel")
     fun cancel(@RequestParam patientId: String) {
         examinationService.cancelClinicalImpression(patientId)
+    }
+
+    @PostMapping("/severity")
+    fun updateSeverity(
+            @RequestParam patientId: String,
+            @RequestParam severity: String
+    ) {
+        examinationService.updateSeverity(patientId, enumValueOf<Severity>(severity))
     }
 }
