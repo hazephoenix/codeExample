@@ -19,6 +19,7 @@ class Examinations {
     companion object {
         val office139 = "Office:139"
         val office101 = "Office:101"
+        val observationOfSurgeonCode = "СтХир"
 
     }
 
@@ -29,7 +30,7 @@ class Examinations {
 
     @Test
     fun addingExamination() {
-        val observationOfSurgeonCode = "СтХир"
+
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode)
         )
@@ -63,7 +64,6 @@ class Examinations {
 
     @Test
     fun cancelingExamination() {
-        val observationOfSurgeonCode = "СтХир"
         val observation = "B03.016.002ГМУ_СП"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),

@@ -59,6 +59,11 @@ class QueRequests {
                 post(Endpoints.OFFICE_INVITE).
                 then().statusCode(200)
 
+        fun inviteSecondPatientToOffice(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).
+                `when`().
+                post(Endpoints.INVITE_SECOND_OFFICE).
+                then().statusCode(200)
+
         fun patientEntered(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).log().all().
                 `when`().
                 post(Endpoints.PATIENT_ENTERED).
@@ -117,6 +122,16 @@ class QueRequests {
                 Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.SERVICE_REQUEST + "?patientId=$patientId").then().statusCode(200)
                         .extract().response().`as`(Bundle::class.java)
                         .let { it.entry.map { it.resource as ServiceRequest } }
+
+        fun cancelServiceRequest(serviceRequestId: String) =
+                Helpers.createRequestSpecWithoutBody().`when`().log().all().
+                        post(Endpoints.CANCEL_SERVICER_REQUEST + "?id=$serviceRequestId").then().log().all().
+                        statusCode(200)
+
+        fun cancelOfficeServiceRequests(patientId: String, officeId: String) =
+                Helpers.createRequestSpecWithoutBody().`when`().log().all().
+                        post(Endpoints.CANCEL_SERVICER_REQUEST + "?patientId=$patientId" + "?officeId=$officeId").then().log().all().
+                        statusCode(200)
 
         //examination
         fun completeExamination(bundle : Bundle) = Helpers.createRequestSpec(bundle).log().all().
