@@ -49,5 +49,10 @@ class CarePlanSimple(
 
 class ServiceRequestSimple(
         val code: String,
-        val status: ServiceRequestStatus = ServiceRequestStatus.active
-)
+        val status: ServiceRequestStatus = ServiceRequestStatus.active,
+        val locationId: String? = null
+){
+    override fun toString(): String {
+        return "ServiceRequestSimple(code='$code', status=$status, locationId=$locationId)"
+    }
+}

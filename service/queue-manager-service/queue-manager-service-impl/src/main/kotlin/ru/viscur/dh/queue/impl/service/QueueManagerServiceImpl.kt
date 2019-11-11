@@ -97,6 +97,14 @@ class QueueManagerServiceImpl(
             deleteFromQueue(patientId)
             addToQueue(patientId)
         }
+//         todo не понятно. вроде пересчитывать даже если идет обсл-е
+//        if (currentOfficeId == officeId) {
+//            val patient = patientService.byId(patientId)
+//            if (patient.extension.queueStatus == PatientQueueStatus.IN_QUEUE && serviceRequestService.active(patientId, officeId).isEmpty()) {
+//                deleteFromQueue(patientId)
+//                addToQueue(patientId)
+//            }
+//        }
     }
 
     @Tx

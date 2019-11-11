@@ -1,6 +1,5 @@
 package ru.viscur.dh.mis.integration.impl
 
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -8,9 +7,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
+import ru.viscur.dh.datastorage.api.ObservationService
+import ru.viscur.dh.datastorage.api.util.OFFICE_101
 import ru.viscur.dh.datastorage.api.util.OFFICE_130
+import ru.viscur.dh.datastorage.api.util.OFFICE_139
+import ru.viscur.dh.datastorage.api.util.OFFICE_202
 import ru.viscur.dh.fhir.model.enums.LocationStatus
-import ru.viscur.dh.fhir.model.enums.PatientQueueStatus.*
+import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.integration.mis.api.ExaminationService
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -24,7 +27,7 @@ import ru.viscur.dh.queue.api.QueueManagerService
         classes = [MisIntegrationTestConfig::class]
 )
 @EnableAutoConfiguration
-@Disabled("Debug purposes only. Test cleans and modifies db")
+//@Disabled("Debug purposes only. Test cleans and modifies db")
 class CancelServiceRequestsTest {
 
     @Autowired
@@ -39,160 +42,320 @@ class CancelServiceRequestsTest {
     @Autowired
     lateinit var forTestService: ForTestService
 
+    @Autowired
+    lateinit var observationService: ObservationService
 
     @Test
-    fun `on observation, not first, last observation`() {
+    fun `cancel by officeId, in queue`() {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
-        forTestService.registerPatient(servReqs = listOf(
-                ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
+        forTestService.updateOfficeStatuses()
+        val servReqs1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p1 = servReqs1.first().subject!!.id!!
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
+        val checkP = checkSr.first().subject!!.id!!
+        val servReqs2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p2 = servReqs2.first().subject!!.id!!
 
-        var i = 0
-        val officeId = OFFICE_130
-        val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++)
-        val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++)
-        val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
-        forTestService.updateOfficeStatuses()
+        val officeId = OFFICE_101
 
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
-                QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = checkP, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
         ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
 
-        queueManagerService.deleteFromQueue(checkP)
+        //проверяемые действия
+        examinationService.cancelServiceRequests(checkP, officeId)
 
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
-                QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = p2)
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, items = listOf(
+                QueueItemSimple(patientId = checkP)
         ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
     }
 
     @Test
-    fun `on observation, first, last observation`() {
+    fun `cancel by officeId, not in office queue`() {
         forTestService.cleanDb()
-        var i = 0
-        val officeId = OFFICE_130
-        val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++)
-        val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++)
-        val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
+        queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
-
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
-                QueueItemSimple(patientId = checkP, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
-        ))))
-
-        queueManagerService.deleteFromQueue(checkP)
-
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
-                QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
-        ))))
-    }
-
-    @Test
-    fun `on observation, first, not last observation`() {
-        forTestService.cleanDb()
-        var i = 0
-        val officeId = OFFICE_130
-        val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++, servReqs = listOf(
-                ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
+        val servReqs1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p1 = servReqs1.first().subject!!.id!!
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++)
-        val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
-        forTestService.updateOfficeStatuses()
+        val checkP = checkSr.first().subject!!.id!!
+        val servReqs2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p2 = servReqs2.first().subject!!.id!!
 
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
-                QueueItemSimple(patientId = checkP, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
+        val officeId = OFFICE_101
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
         ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
 
-        queueManagerService.deleteFromQueue(checkP)
+        //проверяемые действия
+        examinationService.cancelServiceRequests(checkP, OFFICE_202)
 
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
-                QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
         ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202, status = ServiceRequestStatus.cancelled),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
     }
 
     @Test
-    fun `going, not first`() {
+    fun `cancel by officeId, wrong officeId`() {
         forTestService.cleanDb()
-        var i = 0
-        val officeId = OFFICE_130
-        val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
-        val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
-        val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
+        queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
-
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
-                QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
-                QueueItemSimple(patientId = checkP, status = GOING_TO_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
-        ))))
-
-        queueManagerService.deleteFromQueue(checkP)
-
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
-                QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
-        ))))
-    }
-
-    @Test
-    fun `in queue`() {
-        forTestService.cleanDb()
-        var i = 0
-        val officeId = OFFICE_130
-        val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
-        val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
-        val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
-        forTestService.updateOfficeStatuses()
-
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
-                QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
-                QueueItemSimple(patientId = checkP, status = IN_QUEUE),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
-        ))))
-
-        queueManagerService.deleteFromQueue(checkP)
-
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
-                QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
-        ))))
-    }
-
-    @Test
-    fun `not in queue`() {
-        forTestService.cleanDb()
-        var i = 0
-        val officeId = OFFICE_130
-        val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
-        val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
-        val checkP = forTestService.createPatient(servReqs = listOf(
-                ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
+        val servReqs1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p1 = servReqs1.first().subject!!.id!!
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
+        val checkP = checkSr.first().subject!!.id!!
+        val servReqs2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p2 = servReqs2.first().subject!!.id!!
+
+        val officeId = OFFICE_101
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
+
+        //проверяемые действия
+        examinationService.cancelServiceRequests(checkP, OFFICE_130)
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
+    }
+
+    @Test
+    fun `cancel by id, single servReq in office`() {
+        forTestService.cleanDb()
+        queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        val servReqs1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p1 = servReqs1.first().subject!!.id!!
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val checkP = checkSr.first().subject!!.id!!
+        val servReqs2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p2 = servReqs2.first().subject!!.id!!
 
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
-                QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
+        val officeId = OFFICE_101
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
         ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
 
-        queueManagerService.deleteFromQueue(checkP)
+        //проверяемые действия
+        examinationService.cancelServiceRequest(checkSr.first().id)
 
-        //ничего не поменялось. он не в очереди
-        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
-                QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
-                QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = p2)
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, items = listOf(
+                QueueItemSimple(patientId = checkP)
         ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
+    }
+
+    @Test
+    fun `cancel by id, multiple servReqs in office`() {
+        forTestService.cleanDb()
+        queueManagerService.recalcNextOffice(false)
+        forTestService.updateOfficeStatuses()
+        val servReqs1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p1 = servReqs1.first().subject!!.id!!
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val checkP = checkSr.first().subject!!.id!!
+        val servReqs2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p2 = servReqs2.first().subject!!.id!!
+
+        val officeId = OFFICE_101
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
+
+        //проверяемые действия
+        examinationService.cancelServiceRequest(checkSr.first().id)
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
+    }
+
+    @Test
+    fun `cancel by id, multiple servReqs in office with waiting result`() {
+        forTestService.cleanDb()
+        queueManagerService.recalcNextOffice(false)
+        forTestService.updateOfficeStatuses()
+        val servReqs1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p1 = servReqs1.first().subject!!.id!!
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val checkP = checkSr.first().subject!!.id!!
+        val servReqs2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p2 = servReqs2.first().subject!!.id!!
+
+        val officeId = OFFICE_101
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
+
+        //проверяемые действия
+        queueManagerService.officeIsReady(officeId)
+        queueManagerService.patientEntered(checkP, officeId)
+
+        examinationService.cancelServiceRequest(checkSr.first().id)
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+                QueueItemSimple(patientId = p1),
+                QueueItemSimple(patientId = checkP),
+                QueueItemSimple(patientId = p2)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
+                ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+        ))
     }
 }

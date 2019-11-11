@@ -74,8 +74,10 @@ class ExaminationServiceImpl(
     @Tx
     override fun cancelServiceRequests(patientId: String, officeId: String) {
         observationService.cancelByServiceRequests(patientId, officeId)
-        serviceRequestService.cancelServiceRequests(patientId, officeId)
-        queueManagerService.rebasePatientIfNeeded(patientId, officeId)
+        val cancelledServiceRequests = serviceRequestService.cancelServiceRequests(patientId, officeId)
+        if (cancelledServiceRequests.isNotEmpty()) {
+            queueManagerService.rebasePatientIfNeeded(patientId, officeId)
+        }
     }
 
     @Tx

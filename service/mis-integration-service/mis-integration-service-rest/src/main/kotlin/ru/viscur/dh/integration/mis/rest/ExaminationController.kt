@@ -55,7 +55,7 @@ class ExaminationController(
     /**
      * Отменить назначение пациента по id назначения
      */
-    @PostMapping("/serviceRequests/cancel")
+    @PostMapping("/serviceRequests/cancelById")
     fun cancelServiceRequest(@RequestParam id: String) {
         examinationService.cancelServiceRequest(id)
     }

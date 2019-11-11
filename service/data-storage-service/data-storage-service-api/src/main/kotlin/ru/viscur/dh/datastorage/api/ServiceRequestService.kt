@@ -33,7 +33,7 @@ interface ServiceRequestService {
     /**
      * Отменить назначения пациента в кабинете
      */
-    fun cancelServiceRequests(patientId: String, officeId: String)
+    fun cancelServiceRequests(patientId: String, officeId: String): List<ServiceRequest>
 
     /**
      * Отменить назначение пациента по id назначения
