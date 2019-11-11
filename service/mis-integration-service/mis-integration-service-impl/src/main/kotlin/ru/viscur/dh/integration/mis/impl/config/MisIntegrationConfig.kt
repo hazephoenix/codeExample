@@ -1,4 +1,4 @@
-package ru.viscur.dh.queue.impl.config
+package ru.viscur.dh.integration.mis.impl.config
 
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
@@ -14,4 +14,4 @@ private const val BASE_PACKAGE = "ru.viscur.dh.integration.mis.impl"
         basePackages = [
             BASE_PACKAGE
         ])
-class QueueManagerConfig
+class MisIntegrationConfig
