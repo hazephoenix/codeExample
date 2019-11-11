@@ -117,7 +117,7 @@ class ObservationServiceImpl(
     override fun cancelByBaseOnServiceRequestId(id: String) {
         byBaseOnServiceRequestId(id)?.run {
             if (status == ObservationStatus.registered) {
-                resourceService.update(ResourceType.Observation, id) {
+                resourceService.update(ResourceType.Observation, this.id) {
                     status = ObservationStatus.cancelled
                 }
             }
