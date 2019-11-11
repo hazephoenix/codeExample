@@ -8,8 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
-import ru.viscur.dh.datastorage.api.ResourceService
-import ru.viscur.dh.datastorage.api.ServiceRequestService
 import ru.viscur.dh.datastorage.api.util.OFFICE_130
 import ru.viscur.dh.datastorage.api.util.OFFICE_202
 import ru.viscur.dh.fhir.model.enums.LocationStatus
@@ -32,13 +30,7 @@ class SetAsFirstTest {
     lateinit var queueManagerService: QueueManagerService
 
     @Autowired
-    lateinit var serviceRequestService: ServiceRequestService
-
-    @Autowired
     lateinit var forTestService: ForTestService
-
-    @Autowired
-    lateinit var resourceService: ResourceService
 
 
     @Test

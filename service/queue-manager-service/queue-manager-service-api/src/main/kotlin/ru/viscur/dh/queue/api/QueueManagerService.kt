@@ -54,6 +54,13 @@ interface QueueManagerService {
     fun setAsFirst(patientId: String, officeId: String)
 
     /**
+     * Переставить пациента если необходимо:
+     * проверяет, актуально ли еще то, что пациент стоит в указанный кабинет - есть ли там назначения
+     * Иначе передвигает в след. кабинет
+     */
+    fun rebasePatientIfNeeded(patientId: String, officeId: String)
+
+    /**
      * Убрать пациента из очереди
      * Перевод пациента в статус [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.READY] - поставить пациента "вне очередей"
      *
@@ -62,7 +69,7 @@ interface QueueManagerService {
      * Или если даже он начал обследование, но выяснялось, что по каким-то причинам сейчас осмотр нельзя проводить.
      * Кабинет переводим в статус BUSY, если очередь пациента настала или шло обследование
      */
-    fun deleteFromOfficeQueue(patientId: String)
+    fun deleteFromQueue(patientId: String)
 
     /**
      * Пациент зашел в кабинет

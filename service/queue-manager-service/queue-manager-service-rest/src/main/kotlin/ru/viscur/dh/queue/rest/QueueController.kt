@@ -84,7 +84,7 @@ class QueueController(private val queueManagerService: QueueManagerService) {
     @DeleteMapping("/patient")
     fun patientLeftQueue(
             @RequestBody patientReference: Reference
-    ) = logAndValidateAfter { queueManagerService.deleteFromOfficeQueue(patientReference.id!!) }
+    ) = logAndValidateAfter { queueManagerService.deleteFromQueue(patientReference.id!!) }
 
     @DeleteMapping
     fun deleteQueue() = logAndValidateAfter {

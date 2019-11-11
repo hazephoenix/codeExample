@@ -107,6 +107,23 @@ class ObservationServiceImpl(
         return updatedObservation
     }
 
+    override fun cancelByServiceRequests(patientId: String, officeId: String) {
+        val activeInOffice = serviceRequestService.active(patientId, officeId)
+        activeInOffice.forEach {
+            cancelByBaseOnServiceRequestId(it.id)
+        }
+    }
+
+    override fun cancelByBaseOnServiceRequestId(id: String) {
+        byBaseOnServiceRequestId(id)?.run {
+            if (status == ObservationStatus.registered) {
+                resourceService.update(ResourceType.Observation, this.id) {
+                    status = ObservationStatus.cancelled
+                }
+            }
+        }
+    }
+
     /**
      * Обновить связанные ресурсы -
      *  статус направления на обследование и маршрутного листа

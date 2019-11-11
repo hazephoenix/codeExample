@@ -210,7 +210,7 @@ class Helpers {
                 )
         )
 
-        fun createObservation(code: String,
+        fun createObservation(code: String = "ignored",
                               practitionerId: String = "ignored",
                               patientId: String = "ignored",
                               valueInt: Int? = null,

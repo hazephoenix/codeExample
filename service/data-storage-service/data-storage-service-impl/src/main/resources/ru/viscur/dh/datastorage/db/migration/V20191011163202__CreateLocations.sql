@@ -50,7 +50,7 @@ select resource_create('{
   "extension": {"observationType": [
       {"code": "B03.016.004ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "A09.05.036.001ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "Blood_coagulation_system_D", "system": "ValueSet/Observation_types"},
+      {"code": "A09.20.003ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "A09.20.003ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "A09.05.049.01ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "B03.016.002ГМУ_СП", "system": "ValueSet/Observation_types"},
