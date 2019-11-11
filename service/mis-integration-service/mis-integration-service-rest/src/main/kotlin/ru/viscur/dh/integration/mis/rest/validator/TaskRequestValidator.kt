@@ -16,9 +16,9 @@ class TaskRequestValidator: Validator {
     override fun validate(target: Any, errors: Errors) {
         target as Task
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "desktopId", "", "desktopId is required!")
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "typeId", "", "typeId is required!")
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "type", "", "typeId is required!")
         if (TaskType.Unknown == target.type) {
-            errors.rejectValue("typeId", "", "typeId must be one of ${TaskType.values().filter{ it != TaskType.Unknown }.joinToString(",")}")
+            errors.rejectValue("type", "", "type must be one of ${TaskType.values().filter{ it != TaskType.Unknown }.joinToString(",")}")
         }
     }
 

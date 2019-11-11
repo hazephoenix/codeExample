@@ -1,22 +1,20 @@
 package ru.viscur.dh.apps.paramedicdevice.device
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import ru.viscur.dh.apps.paramedicdevice.dto.PulseoximeterResponse
-import ru.viscur.dh.apps.paramedicdevice.dto.Task
-import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
-import ru.viscur.dh.apps.paramedicdevice.events.TaskComplete
-import ru.viscur.dh.apps.paramedicdevice.events.TaskError
-import ru.viscur.dh.apps.paramedicdevice.events.TaskRequested
-import ru.viscur.dh.apps.paramedicdevice.events.TaskStarted
+import ru.viscur.dh.common.dto.events.TaskComplete
+import ru.viscur.dh.common.dto.events.TaskError
+import ru.viscur.dh.common.dto.events.TaskRequested
+import ru.viscur.dh.common.dto.events.TaskStarted
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskType
 import triton.TritonMonitorDevice
-import triton.protocol.enums.ReturnCode
 import triton.protocol.packet.ValuePacketData
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 @Component
@@ -66,6 +64,6 @@ class Pulseoximeter(
 
 
     companion object {
-        val log = LoggerFactory.getLogger(Pulseoximeter::class.java)
+        private val log: Logger = LoggerFactory.getLogger(Pulseoximeter::class.java)
     }
 }

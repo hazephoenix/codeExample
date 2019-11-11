@@ -1,11 +1,9 @@
 package ru.viscur.dh.integration.mis.impl.paramedic
 
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.jms.core.JmsTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import ru.viscur.dh.common.dto.events.TaskRequested
 import ru.viscur.dh.common.dto.task.Task
 import ru.viscur.dh.common.dto.task.TaskStatus
 import ru.viscur.dh.integration.mis.api.paramedic.TaskDispatcher
@@ -16,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @Service
 class TaskDispatcherImpl(
-        private val publisher: ApplicationEventPublisher,
         private val jmsTemplate: JmsTemplate
 ): TaskDispatcher {
 
@@ -24,7 +21,6 @@ class TaskDispatcherImpl(
 
     override fun add(task: Task): Task {
         tasks[task.id] = task
-        publisher.publishEvent(TaskRequested(task))
         jmsTemplate.convertAndSend("paramedic-requested-tasks", task)
         return task
     }
