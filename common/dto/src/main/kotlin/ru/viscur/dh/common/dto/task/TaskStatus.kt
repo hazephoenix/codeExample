@@ -24,5 +24,10 @@ enum class TaskStatus {
     /**
      * Ошибка выполнения
      */
-    Error
+    Error,
+
+    /**
+     * Превышено время выполнения задачи
+     */
+    TimedOut
 }
