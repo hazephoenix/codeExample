@@ -94,9 +94,7 @@ class ExaminationServiceImpl(
     override fun updateSeverity(patientId: String, severity: Severity) {
         val updated = patientService.updateSeverity(patientId, severity)
         if (updated) {
-            val officeId = queueService.isPatientInOfficeQueue(patientId)
-            queueManagerService.deleteFromQueue(patientId)
-            officeId?.run { queueManagerService.addToOfficeQueue(patientId, officeId) }
+            queueManagerService.severityUpdated(patientId, severity)
         }
     }
 }

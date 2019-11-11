@@ -11,13 +11,11 @@ import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.ObservationService
 import ru.viscur.dh.datastorage.api.PatientService
-import ru.viscur.dh.datastorage.api.util.OFFICE_101
-import ru.viscur.dh.datastorage.api.util.OFFICE_130
-import ru.viscur.dh.datastorage.api.util.OFFICE_139
-import ru.viscur.dh.datastorage.api.util.OFFICE_202
+import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
+import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.integration.mis.api.ExaminationService
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -84,7 +82,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
 
         //проверяемые действия
@@ -101,7 +99,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }
 
@@ -137,7 +135,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
 
         //проверяемые действия
@@ -153,7 +151,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202, status = ServiceRequestStatus.cancelled),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }
 
@@ -189,7 +187,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
 
         //проверяемые действия
@@ -205,7 +203,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }
 
@@ -239,7 +237,7 @@ class CancelServiceRequestsTest {
         forTestService.checkServiceRequestsOfPatient(checkP, listOf(
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
 
         //проверяемые действия
@@ -255,7 +253,7 @@ class CancelServiceRequestsTest {
         forTestService.checkServiceRequestsOfPatient(checkP, listOf(
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }
 
@@ -291,7 +289,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
 
         //проверяемые действия
@@ -307,7 +305,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }
 
@@ -346,7 +344,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.waiting_result),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
 
         //проверяемые действия
@@ -362,7 +360,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.waiting_result),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }
 
@@ -401,7 +399,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.waiting_result),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
 
         //проверяемые действия
@@ -416,7 +414,7 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
-                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = OFFICE_139)
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }
 }

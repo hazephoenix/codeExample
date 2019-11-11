@@ -51,4 +51,15 @@ class LocationServiceImpl(
         query.setParameter("observationCategory", observationCategory)
         return query.resultList as List<String>
     }
+
+    override fun byLocationType(type: String): List<Location> {
+        val query = em.createNativeQuery("""
+                select r.resource from
+                (select jsonb_array_elements((jsonb_array_elements(resource->'type')->'coding'))->>'code' code, resource
+                from location) r
+                where r.code = :type
+            """)
+        query.setParameter("type", type)
+        return query.fetchResourceList()
+    }
 }

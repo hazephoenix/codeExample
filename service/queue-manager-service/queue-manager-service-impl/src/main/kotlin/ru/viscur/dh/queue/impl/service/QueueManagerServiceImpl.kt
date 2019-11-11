@@ -171,6 +171,16 @@ class QueueManagerServiceImpl(
     }
 
     @Tx
+    override fun severityUpdated(patientId: String, severity: Severity) {
+        serviceRequestsExecutionCalculator.recalcOfficeForInspectionOfResp(patientId, severity)
+        val officeId = queueService.isPatientInOfficeQueue(patientId)
+        officeId?.run {
+            deleteFromQueue(patientId)
+            addToOfficeQueue(patientId, officeId)
+        }
+    }
+
+    @Tx
     override fun officeIsReady(officeId: String) {
         val office = locationService.byId(officeId)
         if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {

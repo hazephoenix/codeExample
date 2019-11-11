@@ -2,7 +2,9 @@ package ru.viscur.dh.fhir.model.utils
 
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
@@ -111,3 +113,8 @@ fun <T> Bundle.resources(type: ResourceType<T>): List<T> where T : BaseResource 
  * Если одно из execStart, execEnd не задано, то возвращает null
  */
 fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execStart != null) msToSeconds(execEnd!!.time - execStart!!.time) else null
+
+/**
+ * Назначение является осмотром ответственного - если указан исполнитель
+ */
+fun ServiceRequest.isInspectionOfResp() = !this.performer.isNullOrEmpty()
