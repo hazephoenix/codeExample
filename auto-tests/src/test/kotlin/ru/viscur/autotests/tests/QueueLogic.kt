@@ -466,6 +466,11 @@ class QueueLogic {
     }
 
     @Test
+    fun patientShouldBeSentInNextOfficeAfterCancellingServiceRequest() {
+
+    }
+
+    @Test
     fun queueDisbandment() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servReq1 = Helpers.createServiceRequestResource(observCode)
@@ -475,22 +480,6 @@ class QueueLogic {
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
         QueRequests.officeIsClosed(referenceToLocation(office101))
         checkQueueItems(listOf())
-    }
-
-    @Test
-    fun returningInQue() {
-        //ломается очередь
-        val servReq1 = Helpers.createServiceRequestResource(observCode)
-        val bundleRed1 = bundle("1111", "GREEN", listOf(servReq1))
-        val bundleRed2 = bundle("1112", "YELLOW", listOf(servReq1))
-        QueRequests.officeIsReady(referenceToLocation(office101))
-        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
-        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
-        QueRequests.patientEntered(createListResource(patientId1, office101))
-        QueRequests.cancelEntering(referenceToLocation(office101))
-        val bundleRed3 = bundle("1113", "RED", listOf(servReq1))
-        val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed3).resources(ResourceType.ServiceRequest))
-
     }
 
     @Test
@@ -508,28 +497,45 @@ class QueueLogic {
        // QueRequests.inviteSecondPatientToOffice(Helpers.createListResource(patientId1, office101))
     }
 
-    /*@Test
-    @Order(1)
-    fun addingNumberOfPatients() {
-        //Todo додумать и написать тест с добавлением множества пациентов
-        val patientServiceRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
-                Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
-                Helpers.createServiceRequestResource("A04.16.001")
+    @Test
+    fun gettingInCorrectQueueAfterFinishingObservation() {
+        //Todo доделать, должен работать при включенном переопределении очереди
+        val observationCode1 = "B03.016.002ГМУ_СП"
+        val observationCode2 = "A04.16.001"
+        val servRequests1 = listOf(
+                Helpers.createServiceRequestResource(observationCode1),
+                Helpers.createServiceRequestResource(observationCode2)
+
         )
-        val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
-        val responseBundle = QueRequests.createPatient(Helpers.bundle("1001", "RED", patientServiceRequests))
-        val responseBundle2 = QueRequests.createPatient(Helpers.bundle("1002", "RED", patientServiceRequests))
-        val responseBundle3 = QueRequests.createPatient(Helpers.bundle("1003", "RED", patientServiceRequests))
-        val responseBundle4 = QueRequests.createPatient(Helpers.bundle("1004", "RED", patientServiceRequests))
-        val responseBundle5 = QueRequests.createPatient(Helpers.bundle("1005", "RED", patientServiceRequests))
-        val responseBundle6 = QueRequests.createPatient(Helpers.bundle("1006", "RED", patientServiceRequests))
-        val responseBundle7 = QueRequests.createPatient(Helpers.bundle("1007", "RED", patientServiceRequests))
-        val responseBundle8 = QueRequests.createPatient(Helpers.bundle("1008", "RED", patientServiceRequests))
-        val responseBundle9 = QueRequests.createPatient(Helpers.bundle("1009", "RED", patientServiceRequests))
-        val responseBundle10 = QueRequests.createPatient(Helpers.bundle("1010", "RED", patientServiceRequests))
-        val responseBundle11 = QueRequests.createPatient(Helpers.bundle("1011", "RED", patientServiceRequests))
-        val responseBundle12 = QueRequests.createPatient(Helpers.bundle("1012", "RED", patientServiceRequests))
-        val responseBundle13 = QueRequests.createPatient(Helpers.bundle("1013", "RED", patientServiceRequests))
-    }*/
+        val servRequests2 = listOf(
+                Helpers.createServiceRequestResource(observationCode2)
+        )
+        val bundle1 = Helpers.bundle("1122", "RED", servRequests1)
+        val bundle2 = Helpers.bundle("1123", "RED", servRequests2)
+
+        QueRequests.officeIsReady(referenceToLocation(office101))
+        QueRequests.officeIsBusy(referenceToLocation(office117))
+        val responsePatient1 = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
+        val patientId1 = patientIdFromServiceRequests(responsePatient1)
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        QueRequests.patientEntered(createListResource(patientId1, office101))
+        val obs = Helpers.createObservation(
+                code = observationCode1,
+                status = ObservationStatus.registered,
+                basedOnServiceRequestId = responsePatient1.first().id
+        )
+        val actObs = QueRequests.createObservation(obs)
+        QueRequests.patientLeft(referenceToLocation(office101))
+        //очередь должна перераспределить первого пациента в 116
+    }
+
+    @Test
+    fun sortingWhenQueueCorrected() {
+
+    }
+
+    @Test
+    fun settingPatientAsFirst () {
+
+    }
 }

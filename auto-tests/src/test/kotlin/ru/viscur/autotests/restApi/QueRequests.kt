@@ -37,7 +37,10 @@ class QueRequests {
                 `when`().
                 delete(Endpoints.QUE_DELETE_PATIENT).
                 then()
-
+        fun setPatientFirst(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).
+                `when`().
+                post(Endpoints.SET_PATIENT_FIRST).
+                then().statusCode(200)
         //office
         fun officeIsReady(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
                 `when`().

@@ -178,7 +178,7 @@ class End2End {
 
     @Test
     @Order(1)
-    fun fullPositiveE2ePatient() {
+    fun patientObservationFullCicle() {
         //создание пациента с 4 разными по приоритету обследованиями
         val observation101Office = "B03.016.004ГМУ_СП"
         val observation117Office = "A04.16.001"
@@ -283,4 +283,6 @@ class End2End {
         checkServiceRequestsOfPatient(patientId, listOf())
         checkObservationsOfPatient(patientId, listOf())
     }
+
+
 }

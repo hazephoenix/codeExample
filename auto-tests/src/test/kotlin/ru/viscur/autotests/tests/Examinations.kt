@@ -20,7 +20,6 @@ class Examinations {
         val office139 = "Office:139"
         val office101 = "Office:101"
         val observationOfSurgeonCode = "СтХир"
-
     }
 
     @BeforeEach
@@ -62,6 +61,12 @@ class Examinations {
     }
 
     @Test
+    //Todo написать
+    fun addingExaminationWithActiveObservation() {
+
+    }
+
+    @Test
     fun cancelingClinicalImpression() {
         val observation = "B03.016.002ГМУ_СП"
         val servRequests = listOf(
@@ -87,4 +92,6 @@ class Examinations {
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
     }
+
+
 }

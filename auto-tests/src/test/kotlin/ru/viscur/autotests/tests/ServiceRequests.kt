@@ -143,4 +143,9 @@ class ServiceRequests {
                 ServiceRequestInfo(code = "B03.016.002ГМУ_СП", locationId = office101, status = ServiceRequestStatus.cancelled)
         ))*/
     }
+
+    @Test
+    fun ServiceRequestInOfficeCancelling () {
+
+    }
 }
