@@ -1,17 +1,15 @@
 package ru.viscur.dh.datastorage.impl
 
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
-import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.*
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
-import javax.persistence.Query
+import ru.viscur.dh.transaction.desc.config.annotation.*
+import javax.persistence.*
 
 /**
  * Created at 15.10.2019 11:52 by SherbakovaMA

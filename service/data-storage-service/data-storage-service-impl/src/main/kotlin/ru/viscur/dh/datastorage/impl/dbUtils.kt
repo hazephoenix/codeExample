@@ -11,6 +11,11 @@ private val dbResourceObjectMapper = ObjectMapper()
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
 
+fun <T> T?.toJson(): Any? where T : Any {
+    return dbResourceObjectMapper
+            .writeValueAsString(this)
+}
+
 fun <T> T?.toJsonb(): Any? where T : BaseResource {
     return dbResourceObjectMapper
             .writeValueAsString(this)

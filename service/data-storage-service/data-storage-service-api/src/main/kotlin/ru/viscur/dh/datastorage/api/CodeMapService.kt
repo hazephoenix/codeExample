@@ -55,6 +55,35 @@ interface CodeMapService {
     )
 
     /**
+     * Найти список кодов жалоб, соответствующих коду МКБ-10
+     */
+    fun icdToComplaints(sourceCode: String) = codeMap(
+            ValueSetName.ICD_10,
+            ValueSetName.COMPLAINTS,
+            sourceCode
+    ).targetCode.map { it.code }
+
+    /**
+     * Нати код диагноза по всем жалобам из списка
+     *
+     * @param complaints Список кодов жалоб, найденных в справочнике и соответсвующих тем,
+     *  что ввел фельдшер
+     * @param take Сколько подходящих записей необходимо найти
+     * @return List<String> Список кодов МКБ, подходящих по списку жалоб
+     */
+    fun icdByAllComplaints(complaints: List<String>, take: Int): List<String>
+
+    /**
+     * Нати код диагноза по любым из жалоб из списка
+     *
+     * @param complaints Список кодов жалоб, найденных в справочнике и соответсвующих тем,
+     *  что ввел фельдшер
+     * @param take Сколько подходящих записей необходимо найти
+     * @return List<String> Список кодов МКБ, подходящих по списку жалоб
+     */
+    fun icdByAnyComplaints(complaints: List<String>, take: Int): List<String>
+
+    /**
      * По коду специальности ответственного врача [ValueSetName.PRACTITIONER_QUALIFICATIONS] код выполняемой услуги из [ValueSetName.OBSERVATION_TYPES]
      * Берется первый элемент, т к должно быть один-к-одному. Ответсвенный врач может делать только один тип осмотра
      */

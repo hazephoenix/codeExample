@@ -33,29 +33,9 @@ enum class ValueSetName(val id: String) {
      */
     UPPER_RESPIRATORY_AIRWAY("Upper_respiratory_airway"),
     /**
-     * Частота дыхания
-     */
-    BREATHING_RATE("Breathing_rate"),
-    /**
-     * Уровень оксигенации крови
-     */
-    BLOOD_OXYGENATION_LEVEL("Blood_oxygenation_level"),
-    /**
-     * Частота сердечных сокращений в минуту
-     */
-    HEART_RATE_PER_MINUTE("Heart_rate_per_minute"),
-    /**
-     * Артериальное давление верхняя граница
-     */
-    BLOOD_PRESSURE_UPPER_LIMIT("Blood_pressure_upper_limit"),
-    /**
      * Оценка уровня сознания
      */
     CONSCIOUSNESS_ASSESSMENT("Consciousness_assessment"),
-    /**
-     * Температура тела
-     */
-    BODY_TEMPERATURE("Body_temperature"),
     /**
      * Оценка интенсивности боли
      */

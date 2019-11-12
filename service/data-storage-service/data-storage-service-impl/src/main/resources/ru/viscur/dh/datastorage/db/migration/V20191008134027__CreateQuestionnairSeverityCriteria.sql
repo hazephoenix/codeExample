@@ -15,10 +15,10 @@ select resource_create('{"resourceType": "Questionnaire", "id": "Severity_criter
         {"valueCoding": {"code": "More_than_90%_with_oxygen_inhalation", "display": "Более 90% с ингаляцией кислорода", "system": "ValueSet/Blood_oxygenation_level"}},
         {"valueCoding": {"code": "More_than_95%_without_oxygen_inhalation", "display": "Более 95% без ингаляции кислорода", "system": "ValueSet/Blood_oxygenation_level"}}
     ]},
-    {"linkId": "Heart_rate_per_minute", "text": "Частота сердечных сокращений в минуту", "type": "choice", "answerOption": [
-        {"valueCoding": {"code": "More_than_150_or_less_than_40", "display": "Более 150 или менее 40", "system": "ValueSet/Heart_rate_per_minute"}},
-        {"valueCoding": {"code": "More_than_120_and_less_than_50", "display": "Более 120 и менее 50", "system": "ValueSet/Heart_rate_per_minute"}},
-        {"valueCoding": {"code": "From_51_to_119", "display": "От 51 до 119", "system": "ValueSet/Heart_rate_per_minute"}}
+    {"linkId": "Heart_rate", "text": "Частота сердечных сокращений в минуту", "type": "choice", "answerOption": [
+      {"valueCoding": {"code": "More_than_150_or_less_than_40", "display": "Более 150 или менее 40", "system": "ValueSet/Heart_rate"}},
+      {"valueCoding": {"code": "More_than_120_and_less_than_50", "display": "Более 120 и менее 50", "system": "ValueSet/Heart_rate"}},
+      {"valueCoding": {"code": "From_51_to_119", "display": "От 51 до 119", "system": "ValueSet/Heart_rate"}}
     ]},
     {"linkId": "Blood_pressure_upper_limit", "text": "Артериальное давление нижняя граница", "type": "choice", "answerOption": [
         {"valueCoding": {"code": "Less_than_90", "display": "Менее 90", "system": "ValueSet/Blood_pressure_upper_limit"}},
@@ -45,8 +45,8 @@ select resource_create('{"resourceType": "Questionnaire", "id": "Severity_criter
         {"valueCoding": {"code": "Can_stand", "display": "Может стоять", "system": "ValueSet/Patient_can_stand"}}
     ]},
     {"linkId": "Severity", "text": "Результат сортировки", "type": "choice", "answerOption": [
-        {"valueCoding": {"code": "RED", "display": "Красный", "system": "ValueSet/Sorting_result"}},
-        {"valueCoding": {"code": "YELLOW", "display": "Желтый", "system": "ValueSet/Sorting_result"}},
-        {"valueCoding": {"code": "GREEN", "display": "Зеленый", "system": "ValueSet/Sorting_result"}}
+        {"valueCoding": {"code": "RED", "display": "Красный", "system": "ValueSet/Severity"}},
+        {"valueCoding": {"code": "YELLOW", "display": "Желтый", "system": "ValueSet/Severity"}},
+        {"valueCoding": {"code": "GREEN", "display": "Зеленый", "system": "ValueSet/Severity"}}
     ]}
 ]}'::jsonb);

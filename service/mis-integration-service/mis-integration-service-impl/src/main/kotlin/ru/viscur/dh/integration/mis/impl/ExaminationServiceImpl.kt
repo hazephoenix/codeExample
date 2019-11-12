@@ -2,15 +2,13 @@ package ru.viscur.dh.integration.mis.impl
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.*
+import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
-import ru.viscur.dh.fhir.model.entity.Bundle
-import ru.viscur.dh.fhir.model.entity.CarePlan
-import ru.viscur.dh.fhir.model.entity.ClinicalImpression
-import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.fhir.model.utils.resources
-import ru.viscur.dh.integration.mis.api.ExaminationService
+import ru.viscur.dh.fhir.model.utils.*
+import ru.viscur.dh.integration.mis.api.*
 import ru.viscur.dh.queue.api.QueueManagerService
 
 /**
@@ -23,7 +21,8 @@ class ExaminationServiceImpl(
         private val serviceRequestService: ServiceRequestService,
         private val queueManagerService: QueueManagerService,
         private val queueService: QueueService,
-        private val observationService: ObservationService
+        private val observationService: ObservationService,
+        private val diagnosisPredictor: DiagnosisPredictor
 ) : ExaminationService {
 
     @Tx
@@ -60,6 +59,11 @@ class ExaminationServiceImpl(
         queueManagerService.patientLeftByPatientId(patientId)
         //удалить из очереди (если пациент со статусом В очереди)
         queueManagerService.deleteFromQueue(patientId)
+
+        // сохранить данные для предположения диагноза перед завершением обращения
+        val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport).firstOrNull()
+                ?: throw Error("No DiagnosticReport provided")
+        diagnosisPredictor.saveTrainingSample(diagnosticReport)
         //завершить обращение и связанное
         val clinicalImpression = clinicalImpressionService.completeRelated(patientId, bundle)
         return clinicalImpressionService.complete(clinicalImpression)
