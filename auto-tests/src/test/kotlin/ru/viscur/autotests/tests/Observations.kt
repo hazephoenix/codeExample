@@ -19,10 +19,13 @@ import ru.viscur.dh.fhir.model.utils.resources
 class Observations {
 
     companion object {
-        val observationCode = "B03.016.002ГМУ_СП"
+
         val office101 = "Office:101"
-        val observationCode2 = "СтХир"
+        val office104 = "Office:104"
         val office139 = "Office:139"
+        val observationCode = "B03.016.002ГМУ_СП"
+        val observationCode2 = "СтХир"
+        val observationCode3 = "A04.16.001"
     }
 
     @BeforeEach
@@ -32,7 +35,6 @@ class Observations {
 
     @Test
     fun addingObservation() {
-        //Todo проверить изменения в carePlan
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationCode)
         )

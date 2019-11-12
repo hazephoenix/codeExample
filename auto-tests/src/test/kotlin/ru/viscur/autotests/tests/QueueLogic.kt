@@ -82,7 +82,6 @@ class QueueLogic {
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
-
     }
 
     @Test
@@ -128,25 +127,19 @@ class QueueLogic {
     }
 
     @Test
-    fun patientsShouldBeInDifferentQueues() {
-        //Patient1
-        val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
-        val bundle1 = bundle("1111", "RED", listOf(servReq1))
-        //Patient2
-        val servReq2 = Helpers.createServiceRequestResource("A04.16.001")
-        val bundle2 = bundle("1112", "RED", listOf(servReq2))
-
-        //добавление 2 пациентов на узи
-        QueRequests.officeIsBusy(referenceToLocation(office116))
-        QueRequests.officeIsBusy(referenceToLocation(office117))
+    fun GreenShouldBeFirst() {
+        QueRequests.officeIsReady(referenceToLocation(office101))
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observCode)
+        )
+        val bundle1 = bundle("1120", "GREEN", servRequests)
+        val bundle2 = bundle("1122", "RED", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
-        //проверка что оба пациента в очереди в разные кабинеты узи
+
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office117, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
-                )),
-                QueueItemsOfOffice(office116, listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
@@ -322,6 +315,31 @@ class QueueLogic {
     }
 
     @Test
+    fun patientsShouldBeInDifferentQueues() {
+        //Patient1
+        val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
+        val bundle1 = bundle("1111", "RED", listOf(servReq1))
+        //Patient2
+        val servReq2 = Helpers.createServiceRequestResource("A04.16.001")
+        val bundle2 = bundle("1112", "RED", listOf(servReq2))
+
+        //добавление 2 пациентов на узи
+        QueRequests.officeIsBusy(referenceToLocation(office116))
+        QueRequests.officeIsBusy(referenceToLocation(office117))
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        //проверка что оба пациента в очереди в разные кабинеты узи
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office117, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
+                )),
+                QueueItemsOfOffice(office116, listOf(
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+    }
+
+    @Test
     fun patientsShouldBeInDifferentQueues2() {
         //Todo додумать тест
         val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
@@ -353,6 +371,35 @@ class QueueLogic {
         val servReqUzi6 = QueRequests.createPatient(bundleRed3).entry.first().resource as ServiceRequest
         val patientId6 = servReqUzi6.subject!!.id!!
         //последнего красного должен кидать в очередь с меньшим количеством людей
+    }
+
+    @Test
+    fun gettingRightOfficeExecOrder() {
+        val observationCode1 = "B03.016.002ГМУ_СП"
+        val observationCode2 = "B03.016.006ГМУ_СП"
+        val servRequests1 = listOf(
+                Helpers.createServiceRequestResource(observationCode1)
+        )
+        val servRequests2 = listOf(
+                Helpers.createServiceRequestResource(observationCode1),
+                Helpers.createServiceRequestResource(observationCode2)
+        )
+        val bundle1 = Helpers.bundle("1122", "RED", servRequests1)
+        val bundle2 = Helpers.bundle("1123", "RED", servRequests2)
+        QueRequests.officeIsBusy(referenceToLocation(office101))
+        QueRequests.officeIsBusy(referenceToLocation(office104))
+        //2 пациента, одному только в 101, второму в 101 и 104, приоритеты одинаковые у кабинетов
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        //первый пациент должен попасть в 101, второй в 104
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
+                )),
+                QueueItemsOfOffice(office104, listOf(
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
     }
 
     @Test
@@ -444,6 +491,21 @@ class QueueLogic {
         val bundleRed3 = bundle("1113", "RED", listOf(servReq1))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed3).resources(ResourceType.ServiceRequest))
 
+    }
+
+    @Test
+    fun twoPatientInOffice() {
+        //Todo закончить тест
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observCode)
+        )
+        val bundleRed1 = bundle("1111", "GREEN", servRequests)
+        val bundleRed2 = bundle("1112", "YELLOW", servRequests)
+        QueRequests.officeIsReady(referenceToLocation(office101))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
+        QueRequests.patientEntered(createListResource(patientId2, office101))
+       // QueRequests.inviteSecondPatientToOffice(Helpers.createListResource(patientId1, office101))
     }
 
     /*@Test

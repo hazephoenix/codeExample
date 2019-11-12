@@ -30,7 +30,6 @@ class Examinations {
 
     @Test
     fun addingExamination() {
-
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode)
         )
@@ -44,6 +43,7 @@ class Examinations {
                 basedOnServiceRequestId = serviceRequest.id,
                 status = ObservationStatus.final
         )
+        //завершаем обращение пациента отвественным и проверяем отсутствие Service Requests, Observation
         val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
                 diagnosisCode = "A00.0",
                 practitionerId = Helpers.surgeonId,
@@ -57,13 +57,12 @@ class Examinations {
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
-        checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
         checkObservationsOfPatient(patientId, listOf())
     }
 
     @Test
-    fun cancelingExamination() {
+    fun cancelingClinicalImpression() {
         val observation = "B03.016.002ГМУ_СП"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),
@@ -85,7 +84,6 @@ class Examinations {
         ))
 
         QueRequests.cancelExamination(patientId).log().all()
-
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
     }

@@ -179,13 +179,11 @@ class End2End {
     @Test
     @Order(1)
     fun fullPositiveE2ePatient() {
-        //Todo добавить проверки
-        //создание пациента с 4 обследованиями
+        //создание пациента с 4 разными по приоритету обследованиями
         val observation101Office = "B03.016.004ГМУ_СП"
         val observation117Office = "A04.16.001"
         val observation104Office = "A09.28.029ГМУ_СП"
         val observation139Office = "СтХир"
-
 
         val patientServiceRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office),
@@ -247,6 +245,13 @@ class End2End {
         )
         QueRequests.createObservation(obs3)
         QueRequests.patientLeft(referenceToLocation(office117))
+        //проверка что все обследования, кроме ответственного пройдены
+        checkServiceRequestsOfPatient(patientId, listOf(
+                ServiceRequestInfo(code = observation101Office, locationId = office101, status = ServiceRequestStatus.completed),
+                ServiceRequestInfo(code = observation117Office, locationId = office117, status = ServiceRequestStatus.completed),
+                ServiceRequestInfo(code = observation104Office, locationId = office104, status = ServiceRequestStatus.completed),
+                ServiceRequestInfo(code = observation139Office, locationId = office139)
+        ))
         //office 139 осмотр ответственного и завершение маршрутного листа с госпитализацией
         val servRequestOf139office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office139)).first() as ServiceRequest
         checkQueueItems(listOf(
@@ -272,6 +277,7 @@ class End2End {
                 BundleEntry(encounter)
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+        //проверка, что маршрутный лист пациента завершен и он удален из системы очередь
         Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
