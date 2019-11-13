@@ -19,7 +19,6 @@ import ru.viscur.dh.fhir.model.utils.resources
 class Observations {
 
     companion object {
-
         val office101 = "Office:101"
         val office104 = "Office:104"
         val office139 = "Office:139"

@@ -20,6 +20,7 @@ class Examinations {
         val office139 = "Office:139"
         val office101 = "Office:101"
         val observationOfSurgeonCode = "СтХир"
+        val observation1 = "A04.16.001"
     }
 
     @BeforeEach
@@ -63,7 +64,35 @@ class Examinations {
     @Test
     //Todo написать
     fun addingExaminationWithActiveObservation() {
-
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observationOfSurgeonCode),
+                Helpers.createServiceRequestResource(observation1)
+        )
+        val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
+        val responseBundle = QueRequests.createPatient(bundle)
+        val serviceRequest = responseBundle.resources(ResourceType.ServiceRequest).first()
+        val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
+        //завершение обращения с активным ServiceRequest
+        val obsOfRespPract = Helpers.createObservation(code = serviceRequest.code.code(),
+                valueString = "состояние удовлетворительное",
+                practitionerId = serviceRequest.performer?.first()?.id!!,
+                basedOnServiceRequestId = serviceRequest.id,
+                status = ObservationStatus.final
+        )
+        val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
+                diagnosisCode = "A00.0",
+                practitionerId = Helpers.surgeonId,
+                status = DiagnosticReportStatus.final
+        )
+        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму")
+        val bundleForExamination = Bundle(entry = listOf(
+                BundleEntry(obsOfRespPract),
+                BundleEntry(diagnosticReportOfResp),
+                BundleEntry(encounter)
+        ))
+        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+        //тут должны быть все обследования со стасом completed/cancelled?
+        checkServiceRequestsOfPatient(patientId, listOf())
     }
 
     @Test
@@ -87,11 +116,10 @@ class Examinations {
                         locationId = office101
                 )
         ))
-
-        QueRequests.cancelExamination(patientId).log().all()
+        //отмена обращения и проверка что нет Service Requests и пациент удалён с очереди
+        QueRequests.cancelExamination(patientId)
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
     }
-
 
 }

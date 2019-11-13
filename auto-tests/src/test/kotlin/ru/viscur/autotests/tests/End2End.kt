@@ -41,7 +41,6 @@ class End2End {
                 Helpers.createServiceRequestResource(observationOfSurgeonCode)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-
         QueRequests.officeIsBusy(referenceToLocation(office139))
         val responseBundle = QueRequests.createPatient(bundle)
 
@@ -118,7 +117,7 @@ class End2End {
 
     @Test
     @Order(1)
-    fun patientAdditionalServRequestAdding() {
+    fun patientServiceRequestAdding() {
         val servRequests = listOf(
                 Helpers.createServiceRequestResource("СтХир")
         )
@@ -276,11 +275,10 @@ class End2End {
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         //проверка, что маршрутный лист пациента завершен и он удален из системы очередь
-        Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
+        Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status of ClinicalImpression")
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
         checkObservationsOfPatient(patientId, listOf())
     }
-
 
 }

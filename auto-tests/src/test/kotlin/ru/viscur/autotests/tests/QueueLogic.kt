@@ -467,7 +467,17 @@ class QueueLogic {
 
     @Test
     fun patientShouldBeSentInNextOfficeAfterCancellingServiceRequest() {
-
+        //Todo доделать когда заработает апи
+        val observationCode1 = "B03.016.002ГМУ_СП"
+        val observationCode2 = "B03.016.006ГМУ_СП"
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observationCode1),
+                Helpers.createServiceRequestResource(observationCode2)
+        )
+        val bundle1 = Helpers.bundle("1122", "RED", servRequests)
+        QueRequests.officeIsBusy(referenceToLocation(office101))
+        val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        QueRequests.cancelOfficeServiceRequests(patientId,office101)
     }
 
     @Test
@@ -483,7 +493,7 @@ class QueueLogic {
     }
 
     @Test
-    fun twoPatientInOffice() {
+    fun invitingSecondPatientInOffice() {
         //Todo закончить тест
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observCode)
@@ -505,7 +515,6 @@ class QueueLogic {
         val servRequests1 = listOf(
                 Helpers.createServiceRequestResource(observationCode1),
                 Helpers.createServiceRequestResource(observationCode2)
-
         )
         val servRequests2 = listOf(
                 Helpers.createServiceRequestResource(observationCode2)
@@ -530,12 +539,44 @@ class QueueLogic {
     }
 
     @Test
-    fun sortingWhenQueueCorrected() {
+    fun settingPatientAsFirst () {
+        QueRequests.officeIsBusy(referenceToLocation(office101))
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observCode)
+        )
+        val bundle1 = bundle("1111", "GREEN", servRequests)
+        val bundle2 = bundle("1112", "YELLOW", servRequests)
+        val bundle3 = bundle("1113", "RED", servRequests)
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
 
+        QueRequests.setPatientFirst(Helpers.createListResource(patientId1, office101))
+        //Зеленый пациент должен быть переставлен первым в очередь
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
+                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
     }
 
     @Test
-    fun settingPatientAsFirst () {
+    fun sortingWhenQueueCorrected() {
+        QueRequests.officeIsBusy(referenceToLocation(office101))
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observCode)
+        )
+        val bundle1 = bundle("1111", "GREEN", servRequests)
+        val bundle2 = bundle("1112", "YELLOW", servRequests)
+        val bundle3 = bundle("1113", "RED", servRequests)
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
 
+        QueRequests.setPatientFirst(Helpers.createListResource(patientId1, office101))
+        //проверка, что очередь правильно распределяет новых пациентов
     }
+
 }

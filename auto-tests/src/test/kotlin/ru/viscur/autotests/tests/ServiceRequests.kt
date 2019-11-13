@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Helpers
+import ru.viscur.autotests.utils.Helpers.Companion.createListResource
 import ru.viscur.autotests.utils.checkServiceRequestsOfPatient
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
 import ru.viscur.dh.fhir.model.entity.Bundle
@@ -28,6 +29,7 @@ class ServiceRequests {
         val office104 = "Office:104"
         val office117 = "Office:117"
         val office139 = "Office:139"
+        val office140 = "Office:140"
         val observationCode = "B03.016.002ГМУ_СП"
         val observationCode2 = "A04.16.001"
         val observationCode3 = "A09.20.003ГМУ_СП"
@@ -58,7 +60,7 @@ class ServiceRequests {
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = "СтХир", locationId = office139)
         ))
-
+        //создание дополнительного Service Request
         val additionalServiceRequests = listOf(
                 Helpers.createServiceRequestResource("B03.016.002ГМУ_СП", patientId)
         )
@@ -67,7 +69,7 @@ class ServiceRequests {
         )
         val updatedCarePlan = QueRequests.addServiceRequests(bundleForExamin)
 
-        //в CarePlan должен быть добавлен новый ServiceRequest
+        //проверка, что в в CarePlan добавлен новый ServiceRequest
         assertEquals(2, updatedCarePlan.activity.size, "wrong care plan activities")
 
         checkServiceRequestsOfPatient(patientId, listOf(
@@ -88,11 +90,31 @@ class ServiceRequests {
         //создание пациента
         QueRequests.officeIsReady(referenceToLocation(Observations.office101))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
-        val servRequestsInOffice = QueRequests.patientEntered(Helpers.createListResource(patientId, Observations.office101))
 
+        //вход в кабинет
+        val servRequestsInOffice = QueRequests.patientEntered(Helpers.createListResource(patientId, Observations.office101))
+        //проверка, что в кабинете соответствующие Service Requests
         assertEquals(2, servRequestsInOffice.size, "wrong number of service requests in $office101")
         assertEquals(observationCode, servRequestsInOffice.get(0).code.code(), "wrong service request in office")
         assertEquals(observationCode3, servRequestsInOffice.get(1).code.code(), "wrong service request in office")
+    }
+
+    @Test
+    fun gettingAllServiceRequestsWhenEnteredWrongOffice() {
+        //Todo завершить, как заработает апи
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observationCode),
+                Helpers.createServiceRequestResource(observationCode2),
+                Helpers.createServiceRequestResource(observationCode3)
+        )
+        val bundle1 = Helpers.bundle("1122", "RED", servRequests)
+
+        //создание пациента
+        QueRequests.officeIsReady(referenceToLocation(Observations.office101))
+        val response = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
+        val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        QueRequests.invitePatientToOffice(createListResource(patientId, office140))
+        val allActServRequests = QueRequests.patientEntered(createListResource(patientId, office140))
     }
 
     @Test
@@ -111,11 +133,12 @@ class ServiceRequests {
                 ServiceRequestInfo(code = "СтХир", locationId = office139),
                 ServiceRequestInfo(code = "B03.016.002ГМУ_СП", locationId = office101)
         ))
-
-        /*QueRequests.cancelServiceRequest(serviceRequestId)
+        //отмена Service request и проверка, что отменен
+        QueRequests.cancelServiceRequest(serviceRequestId)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = "СтХир", locationId = office139)
-        ))*/
+                ServiceRequestInfo(code = "СтХир", locationId = office139),
+                ServiceRequestInfo(code = "B03.016.002ГМУ_СП", locationId = office101, status = ServiceRequestStatus.cancelled)
+        ))
     }
 
     @Test
@@ -136,12 +159,13 @@ class ServiceRequests {
                 basedOnServiceRequestId = serviceRequest.id,
                 status = ObservationStatus.registered
         )
-        /*QueRequests.createObservation(observation)
+        QueRequests.createObservation(observation)
+        //отмена Service request и проверка, что отменен
         QueRequests.cancelServiceRequest(serviceRequest.id)
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = "СтХир", locationId = office139),
                 ServiceRequestInfo(code = "B03.016.002ГМУ_СП", locationId = office101, status = ServiceRequestStatus.cancelled)
-        ))*/
+        ))
     }
 
     @Test

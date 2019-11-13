@@ -83,7 +83,6 @@ class QueRequests {
                 post(Endpoints.CANCEL_ENTERING).
                 then().statusCode(200).extract().response()
 
-
         //patient
         fun createPatient(bundle : Bundle) = Helpers.createRequestSpec(bundle).
                 `when`().
@@ -136,8 +135,8 @@ class QueRequests {
                         statusCode(200)
 
         fun cancelOfficeServiceRequests(patientId: String, officeId: String) =
-                Helpers.createRequestSpecWithoutBody().`when`().log().all().
-                        post(Endpoints.CANCEL_SERVICER_REQUEST + "?patientId=$patientId" + "?officeId=$officeId").then().log().all().
+                Helpers.createRequestWithQuery(mapOf("patientId" to patientId, "officeId" to officeId)).`when`().log().all().
+                        post(Endpoints.CANCEL_SERVICER_REQUEST).then().
                         statusCode(200)
 
         //examination
@@ -154,7 +153,6 @@ class QueRequests {
         fun patientsOfResp(practitionerId: String? = null) =
                 Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.PATIENTS_OF_RESP + if (practitionerId == null) "" else "?practitionerId=$practitionerId").then().statusCode(200)
                         .extract().response().`as`(PatientsOfRespResponse::class.java)["patients"]!!
-
     }
 }
 
