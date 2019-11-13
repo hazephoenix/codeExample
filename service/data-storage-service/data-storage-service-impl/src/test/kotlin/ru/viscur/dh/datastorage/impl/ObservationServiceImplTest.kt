@@ -113,7 +113,9 @@ class ObservationServiceImplTest {
                     ),
                     valueString = "Слизистые носоглотки без изменений",
                     issued = now()
-            )
+            ),
+            "",
+            Severity.GREEN
         )
         createdResources.add(observation as BaseResource)
 

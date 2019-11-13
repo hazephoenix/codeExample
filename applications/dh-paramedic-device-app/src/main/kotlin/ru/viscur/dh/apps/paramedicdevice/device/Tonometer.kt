@@ -1,24 +1,40 @@
 package ru.viscur.dh.apps.paramedicdevice.device
 
-import com.fazecast.jSerialComm.*
-import org.slf4j.*
-import org.springframework.context.*
-import org.springframework.context.event.*
-import org.springframework.stereotype.*
-import ru.viscur.dh.apps.paramedicdevice.dto.*
-import ru.viscur.dh.apps.paramedicdevice.enums.*
-import ru.viscur.dh.apps.paramedicdevice.events.*
+import com.fazecast.jSerialComm.SerialPort
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Profile
+import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Component
+import ru.viscur.dh.apps.paramedicdevice.dto.TonometerError
+import ru.viscur.dh.apps.paramedicdevice.dto.TonometerResponse
+import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
 import ru.viscur.dh.apps.paramedicdevice.utils.*
-import java.sql.*
+import ru.viscur.dh.common.dto.events.TaskComplete
+import ru.viscur.dh.common.dto.events.TaskError
+import ru.viscur.dh.common.dto.events.TaskRequested
+import ru.viscur.dh.common.dto.events.TaskStarted
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskType
+import java.sql.Timestamp
 
 /**
  * Класс для работы с тонометром A&D TM-2655P
  *
  * Работает как под ОС Linux, так и под Windows (7+).
  * В ОС Linux требуются root-права доступа к порту
+ *
+ * Активный в случае, если нет профиля triton-monitor, если профиль включен, то заменяется [TritonTonometer]
  */
+@Profile("!triton-monitor")
 @Component
-class Tonometer(private val publisher: ApplicationEventPublisher) {
+class Tonometer(
+        @Value("\${paramedic.serial.port.system.name:0}")
+        private val systemPortName: String,
+        private val publisher: ApplicationEventPublisher
+) {
     private val log: Logger = LoggerFactory.getLogger(Tonometer::class.java)
 
     @EventListener(TaskRequested::class)
@@ -35,7 +51,7 @@ class Tonometer(private val publisher: ApplicationEventPublisher) {
      */
     private fun doMeasure(task: Task) {
         try {
-            SerialPort.getCommPorts().first()?.let { port ->
+            SerialPort.getCommPort(systemPortName).let { port ->
                 port.openPort()
                 // По умолчанию скорость передачи данных тонометра - 2400 бит/с
                 port.baudRate = 2400

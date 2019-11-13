@@ -7,10 +7,7 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "129", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}],
-  "extension": {"observationType": [
-      {"code": "СтГинек", "system": "ValueSet/Observation_types"}
-  ]}
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
 }'::jsonb);
 select resource_create('{
   "resourceType": "Location",
@@ -19,12 +16,7 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "139", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}],
-  "extension": {"observationType": [
-      {"code": "СтХир", "system": "ValueSet/Observation_types"},
-      {"code": "СтТер", "system": "ValueSet/Observation_types"},
-      {"code": "СтНев", "system": "ValueSet/Observation_types"}
-  ]}
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
 }'::jsonb);
 select resource_create('{
   "resourceType": "Location",
@@ -33,10 +25,7 @@ select resource_create('{
   "status": "READY",
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "140", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
-  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}],
-  "extension": {"observationType": [
-      {"code": "СтУрол", "system": "ValueSet/Observation_types"}
-  ]}
+  "type": [{"coding": [{"code": "ViewingRoom", "system": "ValueSet/Location_types", "display": "Cмотровая"}]}]
 }'::jsonb);
 
 select resource_create('{
@@ -50,7 +39,7 @@ select resource_create('{
   "extension": {"observationType": [
       {"code": "B03.016.004ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "A09.05.036.001ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "Blood_coagulation_system_D", "system": "ValueSet/Observation_types"},
+      {"code": "A09.20.003ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "A09.20.003ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "A09.05.049.01ГМУ_СП", "system": "ValueSet/Observation_types"},
       {"code": "B03.016.002ГМУ_СП", "system": "ValueSet/Observation_types"},
@@ -151,4 +140,55 @@ select resource_create('{
   "extension": {"observationType": [
       {"code": "X-ray", "system": "ValueSet/Observation_types"}
   ]}
+}'::jsonb);
+
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:RedZone",
+  "name": "Красная зона",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "RedZone", "system": "ValueSet/Location_types"}]}]
+}'::jsonb);
+
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:YellowZoneSection1",
+  "name": "Желтая зона. 1 смотровая",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "YellowZone", "system": "ValueSet/Location_types"}]}]
+}'::jsonb);
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:YellowZoneSection2",
+  "name": "Желтая зона. 2 смотровая",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "YellowZone", "system": "ValueSet/Location_types"}]}]
+}'::jsonb);
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:YellowZoneSection3",
+  "name": "Желтая зона. 3 смотровая",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "YellowZone", "system": "ValueSet/Location_types"}]}]
+}'::jsonb);
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:YellowZoneSection4",
+  "name": "Желтая зона. 4 смотровая",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "YellowZone", "system": "ValueSet/Location_types"}]}]
+}'::jsonb);
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:YellowZoneSection5",
+  "name": "Желтая зона. 5 смотровая",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "YellowZone", "system": "ValueSet/Location_types"}]}]
+}'::jsonb);
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:YellowZoneSection6",
+  "name": "Желтая зона. 6 смотровая",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "YellowZone", "system": "ValueSet/Location_types"}]}]
+}'::jsonb);
+
+select resource_create('{"resourceType": "Location", "status": "READY",
+  "id": "Office:GreenZone",
+  "name": "Зеленая зона",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "type": [{"coding": [{"code": "GreenZone", "system": "ValueSet/Location_types"}]}]
 }'::jsonb);

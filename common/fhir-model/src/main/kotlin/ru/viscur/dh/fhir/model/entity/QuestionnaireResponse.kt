@@ -29,5 +29,5 @@ class QuestionnaireResponse @JsonCreator constructor(
         @JsonProperty("author") var author: Reference,
         @JsonProperty("source") var source: Reference,
         @JsonProperty("questionnaire") val questionnaire: String,
-        @JsonProperty("item") val item: List<QuestionnaireResponseItem>
+        @JsonProperty("item") var item: List<QuestionnaireResponseItem>
 ) : BaseResource(id, identifier, resourceType)

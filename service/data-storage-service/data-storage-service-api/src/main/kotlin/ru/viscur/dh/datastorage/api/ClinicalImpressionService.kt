@@ -12,13 +12,9 @@ interface ClinicalImpressionService {
      */
     fun active(patientId: String): ClinicalImpression?
 
-    /** todo del
-     * По ссылке в [ClinicalImpression.supportingInfo]
-     * @param refResourceType тип ресурса в ссылке
-     * @param refResourceId id ресурса в ссылке
+    /**
+     * По id назначения
      */
-    fun bySupportingInfoReference(refResourceType: ResourceType.ResourceTypeId, refResourceId: String): ClinicalImpression
-
     fun byServiceRequest(serviceRequestId: String): ClinicalImpression
 
     /**
@@ -32,7 +28,7 @@ interface ClinicalImpressionService {
     /**
      * Завершить все, что связано с активным обращением пациента
      */
-    fun completeRelated(bundle: Bundle): ClinicalImpression
+    fun completeRelated(patientId: String, bundle: Bundle): ClinicalImpression
 
     /**
      * Завершить активное обращение пациента

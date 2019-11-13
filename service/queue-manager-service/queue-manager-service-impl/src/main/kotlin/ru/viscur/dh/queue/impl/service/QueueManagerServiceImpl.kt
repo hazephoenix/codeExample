@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -12,13 +13,10 @@ import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.BundleEntry
-import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.utils.code
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
-import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 
 @Service
@@ -26,208 +24,159 @@ class QueueManagerServiceImpl(
         private val officeService: OfficeService,
         private val patientStatusService: PatientStatusService,
         private val patientService: PatientService,
-        private val conceptService: ConceptService,
         private val locationService: LocationService,
         private val queueService: QueueService,
         private val resourceService: ResourceService,
-        private val serviceRequestService: ServiceRequestService
+        private val serviceRequestService: ServiceRequestService,
+        private val observationDurationService: ObservationDurationEstimationService,
+        private val serviceRequestsExecutionCalculator: ServiceRequestsExecutionCalculator,
+        private val configService: ConfigService
 ) : QueueManagerService {
 
     companion object {
         private val log = LoggerFactory.getLogger(QueueManagerServiceImpl::class.java)
     }
 
+    override fun needRecalcNextOffice() = configService.readBool(RECALC_NEXT_OFFICE_CONFIG_CODE)
+
+    @Tx
+    override fun recalcNextOffice(value: Boolean) {
+        configService.write(RECALC_NEXT_OFFICE_CONFIG_CODE, value.toString())
+    }
+
     @Tx
     override fun registerPatient(patientId: String): List<ServiceRequest> {
         val serviceRequests = calcServiceRequestExecOrders(patientId)
-        deleteFromOfficeQueue(patientId)//на случай пересоздания маршрутного листа
-        addToOfficeQueue(patientId)
-        return serviceRequests
-    }
-
-    private fun estDuration(officeId: String, patientId: String): Int {
-        //todo это диагноз пациента + тип пациента + типы процедур в этом кабинете -> продолжительность обслуживания. зашитое сопоставление
-        val serviceRequests = serviceRequestService.active(patientId, officeId)
-        if (serviceRequests.isEmpty()) return 0
-        return 1000
-    }
-
-    /**
-     * Предположительное время ожидания в очереди пациента с опр. степенью тяжести
-     * Сумма приблизительных продолжительностей осмотра всех пациентов перед позицией в очереди, куда бы встал пациент с своей степенью тяжести
-     */
-    private fun estWaitingInQueueWithType(severity: Severity, officeId: String): Int {
-        val queue = queueService.queueItemsOfOffice(officeId)
-        val inQueue = queue.filter { it.patientQueueStatus != PatientQueueStatus.ON_OBSERVATION }
-        val inQueueByType = when (severity) {
-            Severity.RED -> inQueue.filter { it.severity == severity }
-            Severity.YELLOW -> inQueue.filter { it.severity in SEVERITY_WITH_PRIORITY }
-            else -> inQueue
-        }
-        return inQueueByType.sumBy { it.estDuration }
-    }
-
-    /**
-     * Приоритет у услуги
-     */
-    private fun priority(serviceRequest: ServiceRequest): Double {
-        //осмотр ответсвенного в посл очередь
-        if (!serviceRequest.performer.isNullOrEmpty()) {
-            return 0.0
-        }
-        val observationType = conceptService.byCodeableConcept(serviceRequest.code)
-        observationType.parentCode
-                ?: throw Exception("Observation type ${serviceRequest.code.code()} has no parentCode")
-        val observationCategory = conceptService.parent(observationType)!!
-        return observationCategory.priority ?: 0.5
-    }
-
-    @Tx
-    override fun calcServiceRequestExecOrders(patientId: String): List<ServiceRequest> {
-        var serviceRequests = serviceRequestService.all(patientId)
-        val severity = patientService.severity(patientId)
-        val serviceRequestsWithEstWaiting = serviceRequests.map { serviceRequest ->
-            val officeIdWithEstWaiting = locationService.byObservationType(serviceRequest.code.code()).map { officeId ->
-                Pair(officeId, estWaitingInQueueWithType(severity, officeId))
-            }.minBy { it.second }
-                    ?: throw Exception("ERROR. Can't find opened office by observation type '${serviceRequest.code.code()}'")
-            serviceRequest.locationReference = listOf(referenceToLocation(officeIdWithEstWaiting.first))
-            Pair(serviceRequest, officeIdWithEstWaiting.second)
-        }
-        serviceRequests = serviceRequestsWithEstWaiting.sortedWith(
-                compareBy({
-                    -priority(it.first)
-                }, {
-                    it.second
-                })
-        ).map { it.first }
-        serviceRequests.forEachIndexed { index, serviceRequest ->
-            resourceService.update(ResourceType.ServiceRequest, serviceRequest.id) {
-                locationReference =  serviceRequest.locationReference
-                extension = extension?.apply { executionOrder = index }
-                        ?: ServiceRequestExtension(executionOrder = index)
-            }
-        }
+        deleteFromQueue(patientId)//на случай пересоздания маршрутного листа
+        addToOfficeQueue(patientId, serviceRequests.first().locationReference?.first()?.id
+                ?: throw Exception("not defined location for service request with id '${serviceRequests.first().id}'"))
         return serviceRequests
     }
 
     @Tx
-    override fun addToOfficeQueue(patientId: String) {
+    override fun calcServiceRequestExecOrders(patientId: String, prevOfficeId: String?): List<ServiceRequest> =
+            serviceRequestsExecutionCalculator.calcServiceRequestExecOrders(patientId, prevOfficeId)
+
+    @Tx
+    override fun addToQueue(patientId: String, prevOfficeId: String?) {
         val patient = patientService.byId(patientId)
         if (patient.extension.queueStatus != PatientQueueStatus.READY) {
             return
         }
-        val nextOfficeId = nextOfficeId(patientId)
+        val nextOfficeId = nextOfficeId(patientId, prevOfficeId)
         nextOfficeId?.run {
-            officeService.addPatientToQueue(nextOfficeId, patientId, estDuration(nextOfficeId, patientId))
-            patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
-            checkEntryToOffice(nextOfficeId)
+            addToOfficeQueue(patientId, nextOfficeId)
         }
     }
 
-    /**
-     * Проверить вход в кабинет: если есть возможность запускаем первого в очереди
-     */
-    private fun checkEntryToOffice(officeId: String) {
-        val office = locationService.byId(officeId)
-        if (office.status == LocationStatus.READY) {
-            sendFirstToSurvey(officeId)
-        }
+    @Tx
+    override fun addToOfficeQueue(patientId: String, officeId: String) {
+        officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId))
+        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
+        checkEntryToOffice(officeId)
     }
-
-    /**
-     * Отправить первого в очереди в кабинет
-     */
-    private fun sendFirstToSurvey(officeId: String) {
-        val patientId = officeService.firstPatientIdInQueue(officeId)
-        patientId?.run {
-            officeService.changeStatus(officeId, LocationStatus.WAITING_PATIENT)
-            patientStatusService.changeStatus(patientId, PatientQueueStatus.GOING_TO_OBSERVATION, officeId)
-            //todo уведомить о необходимоси пройти в кабинет
-        }
-    }
-
-    /**
-     * id следующего кабинета: непройденное обследование в маршрутном листе пациента с минимальным [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
-     */
-    private fun nextOfficeId(patientId: String): String? =
-            serviceRequestService.active(patientId).firstOrNull()?.locationReference?.first()?.id
 
     @Tx
     override fun forceSendPatientToObservation(patientId: String, officeId: String) {
-        val office = locationService.byId(officeId)
-        if (office.status !in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
-            deleteFromOfficeQueue(patientId)
-            officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), asFirst = true)
-            officeService.changeStatus(officeId, LocationStatus.WAITING_PATIENT)
-            patientStatusService.changeStatus(patientId, PatientQueueStatus.GOING_TO_OBSERVATION, officeId)
-        }
+        setAsFirst(patientId, officeId)
+        sendFirstToObservation(officeId)
     }
 
     @Tx
-    override fun deleteFromOfficeQueue(patientId: String) {
+    override fun setAsFirst(patientId: String, officeId: String) {
+        deleteFromQueue(patientId)
+        officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), asFirst = true)
+        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE, officeId)
+        checkEntryToOffice(officeId)
+    }
+
+    @Tx
+    override fun rebasePatientIfNeeded(patientId: String, officeId: String) {
+        val currentOfficeId = queueService.isPatientInOfficeQueue(patientId)
+        if (currentOfficeId == officeId && serviceRequestService.active(patientId, officeId).isEmpty()) {
+            deleteFromQueue(patientId)
+            addToQueue(patientId)
+        }
+//         todo не понятно. вроде пересчитывать даже если идет обсл-е
+//        if (currentOfficeId == officeId) {
+//            val patient = patientService.byId(patientId)
+//            if (patient.extension.queueStatus == PatientQueueStatus.IN_QUEUE && serviceRequestService.active(patientId, officeId).isEmpty()) {
+//                deleteFromQueue(patientId)
+//                addToQueue(patientId)
+//            }
+//        }
+    }
+
+    @Tx
+    override fun deleteFromQueue(patientId: String) {
         val patient = patientService.byId(patientId)
         val patientQueueStatus = patient.extension.queueStatus
         //пациент стоит в очереди
         if (patientQueueStatus != PatientQueueStatus.READY) {
             //пациент в очереди (ожидает, идет на обслед. или на обслед.) - необходимо удалить из очереди, освободить если нужно кабинет
             val officeId = queueService.isPatientInOfficeQueue(patientId)
-                    ?: throw Exception("Patient has queue status $patientQueueStatus but he is not in any QueueItem")
-            //его ожидают в кабинете или идет осмотр - освободим кабинет
-            if (patientQueueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION)) {
-                officeService.changeStatus(officeId, LocationStatus.BUSY)
-                officeService.deleteFirstPatientFromQueue(officeId)
-            } else {
-                //пациент просто в очереди. его очередь не настала. просто удаляем из очереди
-                officeService.deletePatientFromQueue(officeId, patientId)
-            }
+                    ?: throw Exception("Patient with id '$patientId' has queue status $patientQueueStatus but he is not in any QueueItem")
+            officeService.deletePatientFromQueue(officeId, patientId)
             //если прервано обследование, то не записываем в историю продолжительность
             val saveCurrentStatusToHistory = patientQueueStatus != PatientQueueStatus.ON_OBSERVATION
             patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId, saveCurrentStatusToHistory)
+            changeOfficeStatusNotReadyToProper(officeId)
         }
         officeService.deletePatientFromLastPatientInfo(patientId)
     }
 
     @Tx
     override fun patientEntered(patientId: String, officeId: String): List<ServiceRequest> {
-        if (officeService.firstPatientIdInQueue(officeId) == patientId) {
+        if (queueService.isPatientInOfficeQueue(patientId) == officeId) {
             val patient = patientService.byId(patientId)
             if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_OBSERVATION) {
                 officeService.changeStatus(officeId, LocationStatus.OBSERVATION, patientId)
                 patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_OBSERVATION, officeId)
-                return serviceRequestService.active(patientId, officeId)
+                var serviceRequests = serviceRequestService.active(patientId, officeId)
+                if (serviceRequests.isEmpty()) {
+                    serviceRequests = serviceRequestService.active(patientId)
+                }
+                return serviceRequests
             }
         }
         return listOf()
     }
 
     @Tx
-    override fun patientLeft(officeId: String) {
-        val patientId = officeService.firstPatientIdInQueue(officeId)!!
+    override fun patientLeft(patientId: String, officeId: String) {
         val patient = patientService.byId(patientId)
         if (patient.extension.queueStatus == PatientQueueStatus.ON_OBSERVATION) {
-            officeService.changeStatus(officeId, LocationStatus.BUSY, patientId)
-            officeService.deleteFirstPatientFromQueue(officeId)
+            officeService.deletePatientFromQueue(officeId, patientId)
             patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId)
-            addToOfficeQueue(patientId)
+            changeOfficeStatusNotReadyToProper(officeId)
+            addToQueue(patientId = patientId, prevOfficeId = officeId)
             officeService.updateLastPatientInfo(officeId, patientId, queueService.isPatientInOfficeQueue(patientId))
         }
     }
 
     @Tx
     override fun patientLeftByPatientId(patientId: String) {
-        queueService.isPatientInOfficeQueue(patientId)?.run{
-            patientLeft(this)
+        queueService.isPatientInOfficeQueue(patientId)?.run {
+            patientLeft(patientId, this)
         }
     }
 
     @Tx
-    override fun cancelEntering(officeId: String) {
-        val office = locationService.byId(officeId)
-        if (office.status in listOf(LocationStatus.OBSERVATION, LocationStatus.WAITING_PATIENT)) {
-            val patientId = officeService.firstPatientIdInQueue(officeId)!!
-            officeService.changeStatus(officeId, LocationStatus.BUSY, patientId)
-            patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE, officeId, saveCurrentStatusToHistory = false)
+    override fun cancelEntering(patientId: String) {
+        val patient = patientService.byId(patientId)
+        if (patient.extension.queueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION)) {
+            val officeId = queueService.isPatientInOfficeQueue(patientId)
+            setAsFirst(patientId, officeId!!)
+        }
+    }
+
+    @Tx
+    override fun severityUpdated(patientId: String, severity: Severity) {
+        serviceRequestsExecutionCalculator.recalcOfficeForInspectionOfResp(patientId, severity)
+        val officeId = queueService.isPatientInOfficeQueue(patientId)
+        officeId?.run {
+            deleteFromQueue(patientId)
+            addToOfficeQueue(patientId, officeId)
         }
     }
 
@@ -238,6 +187,11 @@ class QueueManagerServiceImpl(
             officeService.changeStatus(officeId, LocationStatus.READY)
             checkEntryToOffice(officeId)
         }
+    }
+
+    @Tx
+    override fun enterNextPatient(officeId: String) {
+        sendFirstToObservation(officeId)
     }
 
     @Tx
@@ -257,7 +211,7 @@ class QueueManagerServiceImpl(
             queue.forEach {
                 val patientId = it.subject.id
                 patientStatusService.changeStatus(patientId!!, PatientQueueStatus.READY)
-                addToOfficeQueue(patientId)
+                addToQueue(patientId, officeId)
             }
             queueService.deleteQueueItemsOfOffice(officeId)
         }
@@ -282,24 +236,7 @@ class QueueManagerServiceImpl(
     override fun queueOfOffice(officeId: String): Bundle =
             Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
-    override fun queueItems(): List<QueueItem> =
-            resourceService.all(ResourceType.QueueItem, RequestBodyForResources(filter = mapOf()))
-
-    //    private fun officesForSurveyType(surveyTypeId: Long): List<Office> {
-//        TODO("Not implemented");
-//    }
-//
-//
-//    /**
-//     * Кабинеты с наивысшим приоритетом посещения из непосещенных в маршрутном листе
-//     */
-//    private fun officesWithHighestPriority(routeSheet: RouteSheet): List<Office> {
-//        TODO("Restore");
-//        /* val notProcessedSurveys = routeSheet.surveys.filterNot { it.visited }
-//         val maxPriority = notProcessedSurveys.map { it.priority }.max()
-//         val surveysIdWithMaxPriority = notProcessedSurveys.filter { it.priority == maxPriority }.map { it.surveyType.id }
-//         return offices.filter { it.surveyType.id in surveysIdWithMaxPriority }*/
-//    }
+    override fun queueItems(): List<QueueItem> = queueService.queueItems()
 
     override fun loqAndValidate(): String {
         val offices = officeService.all()
@@ -380,4 +317,62 @@ class QueueManagerServiceImpl(
         log.info("\n${str.joinToString("\n")}")
         return str.joinToString("\n<br/>")
     }
+
+    /**
+     * Предположительная продолжительность осмотра в кабинете:
+     * сумма предп. продолжительностей всех непройденных услуг из маршрутного листа, которые м б проведены в этом кабинете
+     */
+    private fun estDuration(officeId: String, patientId: String): Int {
+        val serviceRequests = serviceRequestService.active(patientId, officeId)
+        if (serviceRequests.isEmpty()) return 0
+        val diagnosis = patientService.preliminaryDiagnosticConclusion(patientId)
+        diagnosis?.run {
+            return serviceRequests.sumBy {
+                observationDurationService.estimate(it.code.code(), diagnosis, patientService.severity(patientId))
+            }
+        }
+        return 0
+    }
+
+    private fun changeOfficeStatusNotReadyToProper(officeId: String) {
+        val queueItems = queueService.queueItems()
+        val officeStatus =
+                when {
+                    queueItems.any { it.patientQueueStatus == PatientQueueStatus.ON_OBSERVATION } -> LocationStatus.OBSERVATION
+                    queueItems.any { it.patientQueueStatus == PatientQueueStatus.GOING_TO_OBSERVATION } -> LocationStatus.WAITING_PATIENT
+                    else -> LocationStatus.BUSY
+                }
+        officeService.changeStatus(officeId, officeStatus)
+    }
+
+    /**
+     * Проверить вход в кабинет: если есть возможность запускаем первого в очереди
+     */
+    private fun checkEntryToOffice(officeId: String) {
+        val office = locationService.byId(officeId)
+        if (office.status == LocationStatus.READY) {
+            sendFirstToObservation(officeId)
+        }
+    }
+
+    /**
+     * Отправить первого в очереди в кабинет на обследования
+     */
+    private fun sendFirstToObservation(officeId: String) {
+        val patientId = officeService.firstPatientIdInQueue(officeId)
+        patientId?.run {
+            patientStatusService.changeStatus(patientId, PatientQueueStatus.GOING_TO_OBSERVATION, officeId)
+            changeOfficeStatusNotReadyToProper(officeId)
+            //todo уведомить о необходимоси пройти в кабинет
+        }
+    }
+
+    /**
+     * id следующего кабинета:
+     * если выключена настройка [needRecalcNextOffice]: непройденное обследование в маршрутном листе пациента с минимальным [executionOrder][ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
+     * если включена то оптимальный след. кабинет учитывая приоритет, очереди, дальность и т.д.
+     */
+    private fun nextOfficeId(patientId: String, prevOfficeId: String?): String? =
+            if (needRecalcNextOffice()) serviceRequestsExecutionCalculator.calcNextOfficeId(patientId, prevOfficeId)
+            else serviceRequestService.active(patientId).firstOrNull()?.locationReference?.first()?.id
 }

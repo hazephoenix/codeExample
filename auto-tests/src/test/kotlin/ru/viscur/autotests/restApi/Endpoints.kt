@@ -25,6 +25,7 @@ class Endpoints {
         const val CANCEL_ENTERING: String = "$BASE_URI/queue/office/cancelEntering"
         const val INVITE_SECOND_OFFICE: String = "$BASE_URI/queue/office/nextPatient"
         //observation
+        const val START_OBSERVATION: String = "$BASE_URI/Observation/start"
         const val CREATE_OBSERVATION: String = "$BASE_URI/Observation"
         const val OBSERVATIONS: String = "$BASE_URI/Observation"
         const val SUPPOSED_SERVICE_REQUEST: String = "$BASE_URI/reception/serviceRequests"

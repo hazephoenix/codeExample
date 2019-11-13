@@ -1,10 +1,10 @@
 package ru.viscur.autotests.utils
 
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
-import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.entity.Observation
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -12,6 +12,7 @@ import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.execDuration
 
 /**
  * Проверка состояния очереди
@@ -123,6 +124,9 @@ fun compareServiceRequests(patientId: String, servReqInfos: List<ServiceRequestI
         Assertions.assertEquals(patientId, foundItem.subject?.id, "wrong patientId of $servReqInfo. $servReqsStr")
         Assertions.assertEquals(servReqInfo.status, foundItem.status, "wrong status of $servReqInfo. $servReqsStr")
         Assertions.assertEquals(servReqInfo.locationId, foundItem.locationReference?.first()?.id, "wrong locationId of $servReqInfo. $servReqsStr")
+        servReqInfo.execDuration?.run {
+            assertEquals(servReqInfo.execDuration, foundItem.extension?.execDuration(), "wrong execDuration of $servReqInfo. $servReqsStr")
+        }
     }
 }
 
@@ -169,6 +173,5 @@ fun observationsToString(patientId: String, servReqInfos: List<ObservationInfo>,
 fun patientIdFromServiceRequests(serviceRequestsFromResponse: List<ServiceRequest>): String {
     Assertions.assertTrue(serviceRequestsFromResponse.size > 0, "list of service requests can't be empty")
     Assertions.assertNotNull(serviceRequestsFromResponse.first().subject?.id, "wrong id patient")
-    val patientId = serviceRequestsFromResponse.first().subject?.id!!
-    return patientId
+    return serviceRequestsFromResponse.first().subject?.id!!
 }

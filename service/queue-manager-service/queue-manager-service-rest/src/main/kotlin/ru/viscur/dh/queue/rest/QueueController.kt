@@ -13,14 +13,15 @@ import ru.viscur.dh.queue.api.QueueManagerService
  *
  * Контроллер для очереди
  */
-
 @RestController
 @RequestMapping("/queue")
 class QueueController(private val queueManagerService: QueueManagerService) {
 
-    @PostMapping("/registerPatient")
-    fun registerPatient(@RequestBody patientReference: Reference) =
-            logAndValidateAfter { queueManagerService.registerPatient(patientReference.id!!) }
+    @GetMapping("recalcNextOffice")
+    fun needRecalcNextOffice() = queueManagerService.needRecalcNextOffice()
+
+    @PostMapping("recalcNextOffice")
+    fun recalcNextOffice(@RequestParam value: Boolean) = queueManagerService.recalcNextOffice(value)
 
     @PostMapping("/office/patientEntered")
     fun patientEntered(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
@@ -39,17 +40,33 @@ class QueueController(private val queueManagerService: QueueManagerService) {
         )
     }
 
+    @PostMapping("/office/setAsFirst")
+    fun setAsFirst(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
+        queueManagerService.setAsFirst(
+                listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id!!,
+                listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id!!
+        )
+    }
+
     @PostMapping("/office/patientLeft")
-    fun patientLeft(@RequestBody officeReference: Reference) =
-            logAndValidateAfter { queueManagerService.patientLeft(officeReference.id!!) }
+    fun patientLeft(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
+        queueManagerService.patientLeft(
+                listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id!!,
+                listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id!!
+        )
+    }
 
     @PostMapping("/office/cancelEntering")
-    fun cancelEntering(@RequestBody officeReference: Reference) =
-            logAndValidateAfter { queueManagerService.cancelEntering(officeReference.id!!) }
+    fun cancelEntering(@RequestBody patientReference: Reference) =
+            logAndValidateAfter { queueManagerService.cancelEntering(patientReference.id!!) }
 
     @PostMapping("/office/ready")
     fun officeIsReady(@RequestBody officeReference: Reference) =
             logAndValidateAfter { queueManagerService.officeIsReady(officeReference.id!!) }
+
+    @PostMapping("/office/nextPatient")
+    fun enterNextPatient(@RequestBody officeReference: Reference) =
+            logAndValidateAfter { queueManagerService.enterNextPatient(officeReference.id!!) }
 
     @PostMapping("/office/busy")
     fun officeIsBusy(@RequestBody officeReference: Reference) =
@@ -62,12 +79,12 @@ class QueueController(private val queueManagerService: QueueManagerService) {
     @PostMapping("/patient/addToQueue")
     fun addToOfficeQueue(
             @RequestBody patientReference: Reference
-    ) = logAndValidateAfter { queueManagerService.addToOfficeQueue(patientReference.id!!) }
+    ) = logAndValidateAfter { queueManagerService.addToQueue(patientReference.id!!) }
 
     @DeleteMapping("/patient")
     fun patientLeftQueue(
             @RequestBody patientReference: Reference
-    ) = logAndValidateAfter { queueManagerService.deleteFromOfficeQueue(patientReference.id!!) }
+    ) = logAndValidateAfter { queueManagerService.deleteFromQueue(patientReference.id!!) }
 
     @DeleteMapping
     fun deleteQueue() = logAndValidateAfter {

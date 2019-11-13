@@ -9,13 +9,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import ru.viscur.dh.apps.paramedicdevice.dto.Task
-import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
 import ru.viscur.dh.apps.paramedicdevice.dto.TemperatureResponse
-import ru.viscur.dh.apps.paramedicdevice.events.TaskComplete
-import ru.viscur.dh.apps.paramedicdevice.events.TaskError
-import ru.viscur.dh.apps.paramedicdevice.events.TaskRequested
-import ru.viscur.dh.apps.paramedicdevice.events.TaskStarted
+import ru.viscur.dh.common.dto.events.TaskComplete
+import ru.viscur.dh.common.dto.events.TaskError
+import ru.viscur.dh.common.dto.events.TaskRequested
+import ru.viscur.dh.common.dto.events.TaskStarted
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskType
 
 /**
  * Температура теля
@@ -45,13 +45,13 @@ class Temperature(
                 .getForEntity<ResponseWrapper>("$nativeServiceUrl/fora/ir20b/read-value", ResponseWrapper::class.java)
         if (response.statusCode == HttpStatus.OK) {
             executor.run {
-                var running = true;
+                var running = true
                 while (running) {
                     val response = restTemplate
                             .getForEntity<ResponseWrapper>("$nativeServiceUrl/fora/ir20b/check-result", ResponseWrapper::class.java)
-                    val resp = response.body;
+                    val resp = response.body
                     if (resp == null) {
-                        running = false;
+                        running = false
                         publisher.publishEvent(TaskError(task))
                     } else {
                         running = handleCheckResponse(resp, task)
@@ -59,7 +59,7 @@ class Temperature(
                 }
             }
         } else {
-            publisher.publishEvent(TaskError(task));
+            publisher.publishEvent(TaskError(task))
         }
     }
 
@@ -68,7 +68,7 @@ class Temperature(
         when (resp.status) {
             Status.Processing -> {
                 repeat = true
-                Thread.sleep(1000);
+                Thread.sleep(1000)
             }
             Status.Ok -> {
                 task.result = resp.value
@@ -119,5 +119,5 @@ class Temperature(
          * Произошла ошибка выполнения
          */
         Error
-    };
+    }
 }

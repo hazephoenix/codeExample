@@ -4,6 +4,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.ClinicalImpressionService
 import ru.viscur.dh.datastorage.api.ObservationService
+import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.fhir.model.entity.Observation
 import ru.viscur.dh.fhir.model.enums.ObservationStatus
 import ru.viscur.dh.integration.mis.rest.config.annotation.ResourceExists
@@ -16,7 +17,8 @@ import ru.viscur.dh.integration.mis.rest.config.annotation.ResourceExists
 @Validated
 class ObservationController(
         private val observationService: ObservationService,
-        private val clinicalImpressionService: ClinicalImpressionService
+        private val clinicalImpressionService: ClinicalImpressionService,
+        private val patientService: PatientService
 ) {
     /**
      * Получить обследование по статусу и id пациента
@@ -26,13 +28,20 @@ class ObservationController(
     fun byPatientAndStatus(@RequestParam patientId: String, @RequestParam status: ObservationStatus? = null) =
             observationService.byPatientAndStatus(patientId, status)
 
+    @GetMapping("/start")
+    fun start(@RequestParam serviceRequestId: String) {
+        observationService.start(serviceRequestId)
+    }
+
     /**
      * Создать обследование
      */
     @PostMapping
     fun create(@RequestBody observation: Observation): Observation? {
         val patientId = patientIdByObservation(observation)
-        return observationService.create(patientId, observation)
+        val diagnosis = patientService.preliminaryDiagnosticConclusion(patientId)
+        val severity = patientService.severity(patientId)
+        return observationService.create(patientId, observation, diagnosis, severity)
     }
 
     /**

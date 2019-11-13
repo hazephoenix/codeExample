@@ -3,11 +3,22 @@ package ru.viscur.dh.queue.api
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
+import ru.viscur.dh.fhir.model.enums.Severity
 
 /**
  * Сервис управления очередью пациентов
  */
 interface QueueManagerService {
+
+    /**
+     * Значение настройки Пересчитывать следующий кабинет в очереди
+     */
+    fun needRecalcNextOffice(): Boolean
+
+    /**
+     * Задать значение настройки Пересчитывать следующий кабинет в очереди
+     */
+    fun recalcNextOffice(value: Boolean)
 
     /**
      * Пациент получил маршрутный лист: вносим в систему
@@ -18,7 +29,7 @@ interface QueueManagerService {
     /**
      * Проставление/перепроставление порядка у невыполненных назначений в маршрутном листе пациента
      */
-    fun calcServiceRequestExecOrders(patientId: String): List<ServiceRequest>
+    fun calcServiceRequestExecOrders(patientId: String, prevOfficeId: String? = null): List<ServiceRequest>
 
     /**
      * Поставить пациента в очередь
@@ -26,13 +37,29 @@ interface QueueManagerService {
      * этой функцией мы снова добавляем его в очередь
      * Если пациент уже в очереди, то ничего не происходит
      */
-    fun addToOfficeQueue(patientId: String)
+    fun addToQueue(patientId: String, prevOfficeId: String? = null)
+
+    /**
+     * Добавление пациента в очередь в указанный кабинет
+     */
+    fun addToOfficeQueue(patientId: String, officeId: String)
 
     /**
      * Вызов пациента на обследование в кабинет (принудительно, в обход очереди, где бы он не стоял)
-     * Статус кабинета д б занят/свободен/закрыт
      */
     fun forceSendPatientToObservation(patientId: String, officeId: String)
+
+    /**
+     * Поставить пациента первым в очередь в кабинет
+     */
+    fun setAsFirst(patientId: String, officeId: String)
+
+    /**
+     * Переставить пациента если необходимо:
+     * проверяет, актуально ли еще то, что пациент стоит в указанный кабинет - есть ли там назначения
+     * Иначе передвигает в след. кабинет
+     */
+    fun rebasePatientIfNeeded(patientId: String, officeId: String)
 
     /**
      * Убрать пациента из очереди
@@ -43,7 +70,7 @@ interface QueueManagerService {
      * Или если даже он начал обследование, но выяснялось, что по каким-то причинам сейчас осмотр нельзя проводить.
      * Кабинет переводим в статус BUSY, если очередь пациента настала или шло обследование
      */
-    fun deleteFromOfficeQueue(patientId: String)
+    fun deleteFromQueue(patientId: String)
 
     /**
      * Пациент зашел в кабинет
@@ -53,7 +80,7 @@ interface QueueManagerService {
     /**
      * Пациент выходит из кабинета (все обследования в этом кабинете, которые есть в маршрутном листе проведены)
      */
-    fun patientLeft(officeId: String)
+    fun patientLeft(patientId: String, officeId: String)
 
     /**
      * Аналог [patientLeft]
@@ -62,17 +89,27 @@ interface QueueManagerService {
 
     /**
      * Отменить "вход" пациента в кабинет
-     * Если статус кабинета [ru.viscur.dh.fhir.model.enums.LocationStatus.WAITING_PATIENT] или [ru.viscur.dh.fhir.model.enums.LocationStatus.OBSERVATION]
+     * Если статус пациента [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.GOING_TO_OBSERVATION] или [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.ON_OBSERVATION]
      * Пациент отправляется обратно первым в очередь
-     * Кабинет принимает статус "занят"
+     * Кабинет принимает статус "занят" (если пациентов на приеме в кабинет не осталось)
      */
-    fun cancelEntering(officeId: String)
+    fun cancelEntering(patientId: String)
+
+    /**
+     * Функционал, который нужно сделать после изменения степени тяжести
+     */
+    fun severityUpdated(patientId: String, severity: Severity)
 
     /**
      * Кабинет готов принять пациента: смена статуса с CLOSED, BUSY на READY
      * Если кабинет находится в статусе назначенного пациента, ничего не делаем
      */
     fun officeIsReady(officeId: String)
+
+    /**
+     * Пригласить след. пациента из очереди в кабинет
+     */
+    fun enterNextPatient(officeId: String)
 
     /**
      * Смена статуса кабинета с "готов принять" или с "закрыт" на занят

@@ -2,11 +2,11 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
-import ru.viscur.dh.datastorage.impl.utils.getResourcesFromList
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
+import ru.viscur.dh.fhir.model.utils.resources
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -32,23 +32,6 @@ class ClinicalImpressionServiceImpl(
             """)
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResource()
-    }
-
-    override fun bySupportingInfoReference(refResourceType: ResourceType.ResourceTypeId, refResourceId: String): ClinicalImpression {
-        val query = em.createNativeQuery("""
-                select r.resource
-                from ClinicalImpression r
-                where :refResourceType || '/' || :refResourceId in (
-                    select
-                        jsonb_array_elements(rIntr.resource -> 'supportingInfo') ->> 'reference'
-                    from ClinicalImpression rIntr
-                    where rIntr.id = r.id
-                )
-        """)
-        query.setParameter("refResourceType", refResourceType.toString())
-        query.setParameter("refResourceId", refResourceId)
-        return query.fetchResource()
-                ?: throw Exception("Not found ClinicalImpression with reference '$refResourceType/refResourceId' in supportingInfo")
     }
 
     override fun byServiceRequest(serviceRequestId: String): ClinicalImpression {
@@ -85,13 +68,7 @@ class ClinicalImpressionServiceImpl(
                             resourceService.update(ResourceType.ServiceRequest, serviceRequest.id) {
                                 status = ServiceRequestStatus.cancelled
                             }
-                            observationService.byBaseOnServiceRequestId(serviceRequest.id)?.run {
-                                if (status == ObservationStatus.registered) {
-                                    resourceService.update(ResourceType.Observation, id) {
-                                        status = ObservationStatus.cancelled
-                                    }
-                                }
-                            }
+                            observationService.cancelByBaseOnServiceRequestId(serviceRequest.id)
                         }
                     }
                 }
@@ -107,24 +84,14 @@ class ClinicalImpressionServiceImpl(
      * добавляется
      */
     @Tx
-    override fun completeRelated(bundle: Bundle): ClinicalImpression {
-        val resources = bundle.entry.map { it.resource }
-        val observation = getResourcesFromList<Observation>(resources, ResourceType.Observation.id)
-                .singleOrNull()
-                ?: throw Exception("Error. Not found single observation in bundle: '${bundle.toJsonb()}'")
-
-        val updatedServiceRequest = serviceRequestService.updateStatusByObservation(observation)
-        val patientId = updatedServiceRequest.subject?.id
-                ?: throw Error("Not defined patient in subject of ServiceRequest with id: '${updatedServiceRequest.id}'")
-        observationService.create(patientId, observation)
-
+    override fun completeRelated(patientId: String, bundle: Bundle): ClinicalImpression {
         return active(patientId)?.let { clinicalImpression ->
             resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
                 val refToPatient = referenceToPatient(patientId)
-                val diagnosticReport = getResourcesFromList<DiagnosticReport>(resources, ResourceType.DiagnosticReport.id).first()
+                val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport).first()
                 val createdDiagnosticReport = resourceService.create(diagnosticReport.apply { subject = refToPatient })
                 val refs = mutableListOf(Reference(createdDiagnosticReport))
-                getResourcesFromList<Encounter>(resources, ResourceType.Encounter.id)
+                bundle.resources(ResourceType.Encounter)
                         .singleOrNull()
                         ?.let { encounter ->
                             val createdEncounter = resourceService.create(encounter.apply { subject = refToPatient })
