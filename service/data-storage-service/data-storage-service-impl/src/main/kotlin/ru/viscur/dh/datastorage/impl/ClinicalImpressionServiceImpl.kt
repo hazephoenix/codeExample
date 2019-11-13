@@ -1,6 +1,7 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -23,12 +24,15 @@ class ClinicalImpressionServiceImpl(
     @PersistenceContext
     private lateinit var em: EntityManager
 
+    override fun allActive(): List<ClinicalImpression> =
+            resourceService.all(ResourceType.ClinicalImpression, RequestBodyForResources(filter = mapOf("status" to ClinicalImpressionStatus.active.name)))
+
     override fun active(patientId: String): ClinicalImpression? {
         val query = em.createNativeQuery("""
                 select ci.resource
                 from clinicalImpression ci
                 where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                  and ci.resource ->> 'status' = 'active'
+                  and ci.resource ->> 'status' = '${ClinicalImpressionStatus.active.name}'
             """)
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResource()
@@ -39,7 +43,6 @@ class ClinicalImpressionServiceImpl(
                 select cir
                 from (select ci.resource cir, jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference' ciSiRef
                       from clinicalimpression ci
-                      where ci.resource ->> 'status' = 'active'
                      ) ciInfo
                          join
                      (select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference' srRef, cp.id cpId
@@ -49,7 +52,7 @@ class ClinicalImpressionServiceImpl(
         """)
         query.setParameter("servReqId", serviceRequestId)
         return query.fetchResource()
-                ?: throw Exception("Not found active ClinicalImpression by serviceRequest with id: '$serviceRequestId'")
+                ?: throw Exception("Not found ClinicalImpression by serviceRequest with id: '$serviceRequestId'")
     }
 
     override fun cancelActive(patientId: String) {

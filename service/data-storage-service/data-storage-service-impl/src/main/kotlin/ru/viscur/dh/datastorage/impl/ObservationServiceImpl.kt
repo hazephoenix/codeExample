@@ -10,6 +10,7 @@ import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
+import java.util.*
 import javax.persistence.*
 
 @Service
@@ -23,10 +24,24 @@ class ObservationServiceImpl(
     @PersistenceContext
     private lateinit var em: EntityManager
 
+    override fun byPeriod(start: Date, end: Date): List<Observation> {
+        val query = em.createNativeQuery("""
+            select r.resource
+            from Observation r
+            where r.resource->'basedOn' <> 'null' 
+              and (r.resource->>'issued')\:\:bigint >= :periodStart
+              and (r.resource->>'issued')\:\:bigint <= :periodEnd
+            order by r.resource ->> 'issued'
+            """)
+        query.setParameter("periodStart", start.time)
+        query.setParameter("periodEnd", end.time)
+        return query.fetchResourceList()
+    }
+
     /**
      * Найти все обследования по id пациента и статусу обследования
      */
-    override fun byPatientAndStatus(patientId: String, status: ObservationStatus?): List<Observation?> {
+    override fun byPatientAndStatus(patientId: String, status: ObservationStatus?): List<Observation> {
         var queryStr = """
             select r.resource
                 from Observation r
@@ -86,7 +101,7 @@ class ObservationServiceImpl(
             if (diagnosis != null && updatedServiceRequest.extension?.execStart != null) {
                 observationDurationService.saveToHistory(patientId, updatedServiceRequest.code.code(), diagnosis, severity, updatedServiceRequest.extension!!.execStart!!, updatedServiceRequest.extension!!.execEnd!!)
             }
-        }
+        } ?: throw Exception("not defined serviceRequestId in basedOn of observation")
         //если это кровь, то необходимо автоматом сделать прием мочи
         val observationTypeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, observation.code.code())
         if (observationTypeConcept.parentCode == BLOOD_ANALYSIS_CATEGORY) {

@@ -251,13 +251,14 @@ class Helpers {
                 activity = serviceRequests.map { CarePlanActivity(outcomeReference = Reference(it)) }
         )
 
-        fun createClinicalImpression(patientId: String, supportingInfo: List<Reference>) = ClinicalImpression(
+        fun createClinicalImpression(patientId: String, severity: Severity, supportingInfo: List<Reference>) = ClinicalImpression(
                 status = ClinicalImpressionStatus.active,
                 date = now(),
                 subject = referenceToPatient(patientId),
                 assessor = referenceToPractitioner(surgeonId), // ответственный врач
                 summary = "Заключение: направлен на обследования по маршрутному листу",
-                supportingInfo = supportingInfo
+                supportingInfo = supportingInfo,
+                extension = ClinicalImpressionExtension(severity = severity)
         )
     }
 }

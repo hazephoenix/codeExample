@@ -786,7 +786,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             }
           },
           {
-            "value": "7878 11113",
+            "value": "7878 11111",
             "type": {
               "coding": [
                 {
@@ -834,7 +834,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             ]
           }
         ],
-        "birthDate": "2019-10-11T04:07:05.243+0000",
+        "birthDate": "2000-10-11T04:07:05.243+0000",
         "gender": "female",
         "extension": {
           "nationality": "Russian",
@@ -923,7 +923,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             {
               "valueCoding": {
                 "code": "RED",
-                "display": "Красный",
                 "system": "ValueSet/Sorting_result"
               }
             }

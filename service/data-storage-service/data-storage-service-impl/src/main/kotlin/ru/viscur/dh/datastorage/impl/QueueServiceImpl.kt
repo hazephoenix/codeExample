@@ -9,10 +9,13 @@ import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
+import ru.viscur.dh.fhir.model.entity.QueueHistoryOfPatient
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.utils.MILLISECONDS_IN_SECOND
+import java.util.*
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -24,7 +27,7 @@ class QueueServiceImpl(
         private val locationService: LocationService,
         private val patientService: PatientService,
         private val resourceService: ResourceService
-): QueueService {
+) : QueueService {
 
     @PersistenceContext
     private lateinit var em: EntityManager
@@ -91,5 +94,35 @@ class QueueServiceImpl(
             severity = patientService.severity(patientId!!)
             patientQueueStatus = patientService.byId(patientId).extension.queueStatus
         }
+    }
+
+    override fun queueHistoryOfPatient(patientId: String, periodStart: Date, periodEnd: Date): List<QueueHistoryOfPatient> {
+        val query = em.createNativeQuery("""
+            select r.resource
+            from QueueHistoryOfPatient r
+            where r.resource -> 'subject' ->> 'reference' = :patientRef
+                and (r.resource->>'fireDate')\:\:bigint / $MILLISECONDS_IN_SECOND >= :periodStart / $MILLISECONDS_IN_SECOND
+                and (r.resource->>'fireDate')\:\:bigint / $MILLISECONDS_IN_SECOND <= :periodEnd / $MILLISECONDS_IN_SECOND
+            order by r.resource ->> 'fireDate'
+            """)
+        query.setParameter("patientRef", "Patient/$patientId")
+        query.setParameter("periodStart", periodStart.time)
+        query.setParameter("periodEnd", periodEnd.time)
+        return query.fetchResourceList()
+    }
+
+    override fun queueHistoryByPeriod(periodStart: Date, periodEnd: Date): List<QueueHistoryOfPatient> {
+        //при сравнении переводим в секунды, чтобы в сравнении округление было до секунд
+        val query = em.createNativeQuery("""
+            select r.resource
+            from QueueHistoryOfPatient r
+            where r.resource->>'status' = '${PatientQueueStatus.IN_QUEUE}' 
+                and (r.resource->>'fireDate')\:\:bigint / $MILLISECONDS_IN_SECOND <= :periodEnd / $MILLISECONDS_IN_SECOND
+                and ((r.resource->>'fireDate')\:\:bigint + (r.resource->>'duration')\:\:bigint * $MILLISECONDS_IN_SECOND) / $MILLISECONDS_IN_SECOND >= :periodStart / $MILLISECONDS_IN_SECOND
+            order by r.resource ->> 'fireDate'
+            """)
+        query.setParameter("periodStart", periodStart.time)
+        query.setParameter("periodEnd", periodEnd.time)
+        return query.fetchResourceList()
     }
 }

@@ -2,6 +2,7 @@ package ru.viscur.dh.datastorage.api
 
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
+import java.util.*
 
 /**
  * Сервис для работы с обследованиями
@@ -9,9 +10,15 @@ import ru.viscur.dh.fhir.model.enums.*
 interface ObservationService {
 
     /**
+     * Выполненных по назначению в маршр. листе в заданный период (по дате создания, при update (внесении результатов) дата не меняется)
+     * не включаются те, которые были сделаны при регистрации (вес, рост и т.д.)
+     */
+    fun byPeriod(start: Date, end: Date): List<Observation>
+
+    /**
      * По пациенту и статусу
      */
-    fun byPatientAndStatus(patientId: String, status: ObservationStatus? = null): List<Observation?>
+    fun byPatientAndStatus(patientId: String, status: ObservationStatus? = null): List<Observation>
 
     /**
      * По назначению-основанию (basedOn - ServiceRequest)

@@ -2,8 +2,10 @@ package ru.viscur.dh.datastorage.api
 
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
+import ru.viscur.dh.fhir.model.entity.QueueHistoryOfPatient
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
+import java.util.*
 
 /**
  * Created at 16.10.2019 12:13 by SherbakovaMA
@@ -41,4 +43,16 @@ interface QueueService {
      * Все [QueueItem]
      */
     fun queueItems(): List<QueueItem>
+
+    /**
+     * История проведения пациента в очереди за период
+     */
+    fun queueHistoryOfPatient(patientId: String, periodStart: Date, periodEnd: Date): List<QueueHistoryOfPatient>
+
+    /**
+     * История очереди за период
+     * Выборка только со статусом [PatientQueueStatus.IN_QUEUE]
+     * В результат попадают интервалы, имеющие пересечения с заданным периодом или полностью находятся в периоде
+     */
+    fun queueHistoryByPeriod(periodStart: Date, periodEnd: Date): List<QueueHistoryOfPatient>
 }

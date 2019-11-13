@@ -37,45 +37,27 @@ class PatientServiceImpl(
 
     override fun severity(patientId: String): Severity {
         //находим clinicalImpression пациента со статусом active
-        //у него находим questionnaireResponse по Questionnaire/Severity_criteria
-        //у него находим ответ item по linkId = Severity, из него берем answer-valueCoding-code
+        //у него указан severity
         val q = em.createNativeQuery("""
-            select jsonb_array_elements(items.item -> 'answer') -> 'valueCoding' ->> 'code' as severity
-            from (
-                     select jsonb_array_elements(r.resource -> 'item') as item
-                     from questionnaireResponse r
-                     where r.resource ->> 'questionnaire' = 'Questionnaire/Severity_criteria'
-                       and 'QuestionnaireResponse/' || r.id in (
-                         select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                         from clinicalImpression ci
-                         where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                            and ci.resource ->> 'status' = 'active'
-                     )
-                 ) as items
-            where items.item ->> 'linkId' = 'Severity'
+            select ci.resource -> 'extension' ->> 'severity'
+            from clinicalImpression ci
+            where ci.resource -> 'subject' ->> 'reference' = :patientRef
+            and ci.resource ->> 'status' = 'active'
         """.trimIndent())
         q.setParameter("patientRef", "Patient/$patientId")
         val severityStr = q.resultList.map { it as String }.firstOrNull()
-                ?: throw Exception("not found severity for patient id '$patientId'")
+                ?: throw Exception("not found active clinical impression for patient id '$patientId' (for calculation of severity)")
         return enumValueOf(severityStr)
     }
 
     override fun updateSeverity(patientId: String, severity: Severity): Boolean {
-        val questionnaireResponse = questionnaireResponseForSeverityCriteria(patientId)
-                ?: throw Exception("not found questionnaireResponse for SeverityCriteria of patient with id '$patientId'")
         var updated = false
-        resourceService.update(ResourceType.QuestionnaireResponse, questionnaireResponse.id) {
-            val linkIdOfSeverity = QUESTIONNAIRE_LINK_ID_SEVERITY
-            item = item.map {
-                if (it.linkId == linkIdOfSeverity) {
-                    if (it.answer.first().valueCoding?.code != severity.name) {
-                        it.answer = listOf(QuestionnaireResponseItemAnswer(
-                                valueCoding = Coding(code = severity.name, display = severity.translation, system = ValueSetName.SEVERITY.id)
-                        ))
-                        updated = true
-                    }
-                }
-                it
+        val activeClinicalImpression = clinicalImpressionService.active(patientId)
+                ?: throw Exception("not found active ClinicalImpression for patient with id '$patientId'")
+        resourceService.update(ResourceType.ClinicalImpression, activeClinicalImpression.id) {
+            if (extension.severity.name != severity.name) {
+                extension.severity = severity
+                updated = true
             }
         }
         return updated
@@ -185,6 +167,7 @@ class PatientServiceImpl(
             }
         } ?: let {
             resourceService.create(patient.apply {
+                id = genId()
                 extension.queueStatusUpdatedAt = now()
                 extension.queueStatus = PatientQueueStatus.READY
             })
@@ -270,7 +253,8 @@ class PatientServiceImpl(
                 subject = patientReference,
                 assessor = responsiblePractitionerRef, // ответственный врач
                 summary = "Заключение: ${diagnosticReport.conclusion}",
-                supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) }
+                supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) },
+                extension = ClinicalImpressionExtension(severity = enumValueOf(severity))
         ).let { resourceService.create(it) }
         inspectionOnReceptionStart?.run {
             observationDurationService.saveToHistory(
