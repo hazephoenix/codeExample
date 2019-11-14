@@ -7,10 +7,13 @@ import org.springframework.stereotype.Service
 import ru.viscur.dh.common.dto.task.Task
 import ru.viscur.dh.common.dto.task.TaskStatus
 import ru.viscur.dh.integration.mis.api.paramedic.TaskDispatcher
+import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Created at 28.10.2019 11:25 by TimochkinEA
+ *
+ * Диспетчер задач (лол) для АРМ фельдшера
  */
 @Service
 class TaskDispatcherImpl(
@@ -42,8 +45,21 @@ class TaskDispatcherImpl(
      * Удаление выполненных и выполненных с ошибкой задач
      */
     @Scheduled(fixedDelay = 600_000L)
-    fun cleanCompletedTasks() {
-        val completedAndError = tasks.filterValues { it.status in arrayOf(TaskStatus.Complete, TaskStatus.Error) }
+    private fun cleanCompletedTasks() {
+        val completedAndError = tasks.filterValues { it.status in arrayOf(TaskStatus.Complete, TaskStatus.Error, TaskStatus.TimedOut) }
         completedAndError.forEach{ (k, _) -> tasks.remove(k) }
+    }
+
+    /**
+     * Проверяем не истекло ли время исполнения задачи
+     */
+    @Scheduled(fixedDelay = 3000L)
+    private fun checkTaskTTL() {
+        val notCompletedTasks = tasks.filterValues { it.status in arrayOf(TaskStatus.Await, TaskStatus.InProgress) }
+        notCompletedTasks.forEach { (k, v) ->
+            if (v.addedTime + v.ttl > LocalDateTime.now()) {
+                tasks[k]!!.status = TaskStatus.TimedOut
+            }
+        }
     }
 }

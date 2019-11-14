@@ -1,5 +1,8 @@
 package ru.viscur.dh.common.dto.task
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 
 /**
@@ -13,6 +16,9 @@ import java.util.*
  * @property status     текущий статус задачи, см. [TaskStatus]
  * @property result     результат выполнения задачи
  * @property payload    полезная нагрузка для задачи (параметры и всё такое)
+ * @property ttl        "время жизни" задачи в статусах [TaskStatus.InProgress] и [TaskStatus.Await], если оно превышено,
+ *                      задача переходит в статус [TaskStatus.TimedOut]
+ *
  */
 data class Task(
         val id: String = UUID.randomUUID().toString(),
@@ -20,5 +26,9 @@ data class Task(
         val type: TaskType = TaskType.Unknown,
         var status: TaskStatus = TaskStatus.Await,
         var result: Any? = null,
-        var payload: Map<String, Any>? = null
+        var payload: Map<String, Any>? = null,
+        @JsonIgnore
+        val ttl: Duration = Duration.ofSeconds(60L),
+        @JsonIgnore
+        val addedTime: LocalDateTime = LocalDateTime.now()
 )
