@@ -2,6 +2,7 @@ package ru.viscur.dh.apps.misintegrationtest.util
 
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.utils.SECONDS_IN_MINUTE
+import java.util.*
 
 /**
  * Created at 08.11.2019 11:39 by SherbakovaMA
@@ -56,3 +57,14 @@ class ServiceRequestSimple(
         return "ServiceRequestSimple(code='$code', status=$status, locationId=$locationId)"
     }
 }
+
+data class ObservationDurationSimple(
+        val code: String,
+        val duration: Int
+)
+
+data class QueueHistoryOfPatientSimple(
+        val status: PatientQueueStatus,
+        val duration: Int,
+        val officeId: String? = null
+)

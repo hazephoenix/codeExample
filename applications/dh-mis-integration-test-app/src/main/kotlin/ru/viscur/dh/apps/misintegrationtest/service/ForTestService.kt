@@ -1,11 +1,14 @@
 package ru.viscur.dh.apps.misintegrationtest.service
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.fhir.model.dto.ObservationDuration
+import ru.viscur.dh.fhir.model.dto.QueueStatusDuration
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -15,8 +18,11 @@ import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import ru.viscur.dh.integration.mis.api.ReceptionService
+import ru.viscur.dh.integration.mis.api.ReportService
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.QueueManagerService
+import java.util.*
+import kotlin.math.abs
 
 /**
  * Created at 08.11.2019 11:44 by SherbakovaMA
@@ -49,6 +55,9 @@ class ForTestService {
 
     @Autowired
     lateinit var serviceRequestService: ServiceRequestService
+
+    @Autowired
+    lateinit var reportService: ReportService
 
     companion object {
         private val defaultOfficeStatus = LocationStatus.BUSY
@@ -151,7 +160,7 @@ class ForTestService {
         val carePlan = resourceService.create(Helpers.createCarePlan(patientId, createdServRequests))
         val diagnosticReport = resourceService.create(Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", patientId = patientId))
         val questionnaireResponse = resourceService.create(Helpers.createQuestResponseResource(severity = severity.name, patientId = patientId))
-        resourceService.create(Helpers.createClinicalImpression(patientId, listOf(Reference(questionnaireResponse), Reference(carePlan), Reference(diagnosticReport))))
+        resourceService.create(Helpers.createClinicalImpression(patientId, severity, listOf(Reference(questionnaireResponse), Reference(carePlan), Reference(diagnosticReport))))
         queueManagerService.calcServiceRequestExecOrders(patientId)
 
         if (!servReqs.isNullOrEmpty()) {
@@ -262,6 +271,53 @@ class ForTestService {
                 servReqs.joinToString("\n  ") { it.toString() } +
                 "\n\nactual:\n  " +
                 actServRequests.joinToString("\n  ") { "code: " + it.code.code() + ", status: " + it.status + ", locationId: " + it.locationReference?.first()?.id } +
+                "\n\n"
+    }
+
+
+    fun checkObsDuration(patientId: String, exp: List<ObservationDurationSimple>) {
+        val act = reportService.observationHistoryOfPatient(patientId)
+        val obsDurationStr = obsDurationToString(patientId, exp, act)
+        //количество в принципе разное
+        assertEquals(exp.size, act.size, "wrong number of observation durations. $obsDurationStr")
+        exp.forEachIndexed { index, obsDurationInfo ->
+            val foundItem = act[index]
+            //проверка правильности данных в найденном
+            assertEquals(patientId, foundItem.patientId, "wrong patientId of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
+            assertEquals(obsDurationInfo.code, foundItem.code, "wrong code of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
+            val durationDiffTiny = abs(obsDurationInfo.duration- foundItem.duration) /obsDurationInfo.duration < 0.02
+            assertTrue(durationDiffTiny, "huge duration difference of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
+        }
+    }
+
+    private fun obsDurationToString(patientId: String, exp: List<ObservationDurationSimple>, act: List<ObservationDuration>): Any {
+        return "\n\nfor patient '$patientId'\nexp durations:\n  " +
+                exp.joinToString("\n  ") { it.toString() } +
+                "\n\nactual:\n  " +
+                act.joinToString("\n  ") {"code: " + it.code + ", duration: " + it.duration + ", patientId: " + it.patientId + ", fireDate: " + it.fireDate.toStringFmtWithSeconds() } +
+                "\n\n"
+    }
+
+    fun checkQueueHistoryOfPatient(patientId: String, exp: List<QueueHistoryOfPatientSimple>) {
+        val act = reportService.queueHistoryOfPatient(patientId)
+        val obsDurationStr = queueHistoryOfPatientToString(patientId, exp, act)
+        //количество в принципе разное
+        assertEquals(exp.size, act.size, "wrong number of queue history of patient. $obsDurationStr")
+        exp.forEachIndexed { index, obsDurationInfo ->
+            val foundItem = act[index]
+            //проверка правильности данных в найденном
+            assertEquals(patientId, foundItem.patientId, "wrong patientId of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
+            assertEquals(obsDurationInfo.status.name, foundItem.status, "wrong status of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
+            assertEquals(obsDurationInfo.duration, foundItem.duration, "wrong duration of ${foundItem.fireDate.toStringFmtWithSeconds()} (${foundItem.status}). $obsDurationStr")
+            assertEquals(obsDurationInfo.officeId, foundItem.officeId, "wrong officeId of ${foundItem.fireDate.toStringFmtWithSeconds()} (${foundItem.status}). $obsDurationStr")
+        }
+    }
+
+    private fun queueHistoryOfPatientToString(patientId: String, exp: List<QueueHistoryOfPatientSimple>, act: List<QueueStatusDuration>): Any {
+        return "\n\nfor patient '$patientId'\nexp durations:\n  " +
+                exp.joinToString("\n  ") { it.toString() } +
+                "\n\nactual:\n  " +
+                act.joinToString("\n  ") {"status: " + it.status + ", officeId: " + it.officeId + ", duration: " + it.duration + ", fireDate: " + it.fireDate.toStringFmtWithSeconds() + ", patientId: " + it.patientId } +
                 "\n\n"
     }
 }

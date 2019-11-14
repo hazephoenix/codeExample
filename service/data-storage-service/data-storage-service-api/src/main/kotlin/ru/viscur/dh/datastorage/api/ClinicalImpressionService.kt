@@ -7,6 +7,12 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
  * Сервис для работы с обращениями пациентов
  */
 interface ClinicalImpressionService {
+
+    /**
+     * Все активные обращения пациентов
+     */
+    fun allActive(): List<ClinicalImpression>
+
     /**
      * Активное обращение пациента
      */

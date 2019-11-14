@@ -15,10 +15,7 @@ import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.LocationExtension
 import ru.viscur.dh.fhir.model.type.LocationExtensionLastPatientInfo
 import ru.viscur.dh.fhir.model.type.Reference
-import ru.viscur.dh.fhir.model.utils.msToSeconds
-import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
+import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.queue.impl.ageGroup
@@ -43,7 +40,7 @@ class OfficeServiceImpl(
                 location = Reference(office),
                 status = office.status,
                 fireDate = office.extension?.statusUpdatedAt,
-                duration = office.extension?.statusUpdatedAt?.let { msToSeconds(now.time - it.time) }
+                duration = office.extension?.statusUpdatedAt?.let { durationInSeconds(it, now) }
         )
 
         patientIdOfPrevProcess?.run {

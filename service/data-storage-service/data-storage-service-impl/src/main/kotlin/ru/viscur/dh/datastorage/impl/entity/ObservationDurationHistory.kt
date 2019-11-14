@@ -10,6 +10,7 @@ import javax.persistence.*
  * История(статистика) продолжительности проведения обследований/услуг
  *
  * @param code код услуги из [ru.viscur.dh.fhir.model.valueSets.ValueSetName.OBSERVATION_TYPES]
+ * @param patientId id пациента
  * @param fireDate дата добавления записи
  * @param diagnosis код диагноза из [ru.viscur.dh.fhir.model.valueSets.ValueSetName.ICD_10]
  * @param severity степень тяжести пациента, [Severity]
@@ -22,6 +23,8 @@ data class ObservationDurationHistory(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_seq")
         var id: Long = 0L,
+        @Column(name = "patient_id")
+        var patientId: String? = null,
         @Column(name = "fire_date")
         var fireDate: Timestamp? = null,
         @Column

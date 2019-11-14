@@ -6,6 +6,7 @@ drop table if exists observation_duration_history cascade;
 create table observation_duration_history
 (
     id         bigint not null default nextval('pk_seq') constraint observation_duration_history_pkey primary key,
+    patient_id text not null,
     fire_date  timestamp not null,
     code       text not null,
     diagnosis  text not null,
@@ -15,6 +16,7 @@ create table observation_duration_history
 
 comment on table observation_duration_history is 'История продолжительности проведения услуг';
 comment on column observation_duration_history.id is 'id';
+comment on column observation_duration_history.patient_id is 'id пациента';
 comment on column observation_duration_history.fire_date is 'время добавления записи';
 comment on column observation_duration_history.code is 'код услуги';
 comment on column observation_duration_history.diagnosis is 'код диагноза';

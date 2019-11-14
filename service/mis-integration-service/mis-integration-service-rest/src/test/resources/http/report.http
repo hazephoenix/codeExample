@@ -1,0 +1,73 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###                                             Информация о продолжительности проведения пациента в этапах очереди за последние сутки
+###
+GET http://localhost:8080/report/queueHistoryOfPatient?patientId=
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                             Информация о продолжительности проведения услуг пациенту за последние сутки
+###
+GET http://localhost:8080/report/observationHistoryOfPatient?patientId=
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              вся очередь на тек момент
+###
+GET http://localhost:8080/report/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              очередь на тек момент в опр кабинет
+###
+GET http://localhost:8080/report/queue?officeId=Office:104
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              очередь на тек момент к врачу (опр. как в кабинет)
+###
+GET http://localhost:8080/report/queue?practitionerId=терапевт_Иванов
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              Текущая нагрузка на врачей (то же самое что и информация об очередях + кто в кабинете)
+###
+GET http://localhost:8080/report/workload
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              История нагрузки на врачей за период
+###
+GET http://localhost:8080/report/workloadHistory
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "start": "2019-11-01T00:57:04.242+0000",
+  "end": "2019-11-20T00:57:04.242+0000"
+}
+
+###                                              Информация об очередях в кабинет за период
+###
+GET http://localhost:8080/report/queueHistory
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "start": "2019-11-01T00:57:04.242+0000",
+  "end": "2019-11-20T00:57:04.242+0000"
+}
+
+###

@@ -2,6 +2,7 @@ package ru.viscur.dh.integration.mis.impl
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.CLINICAL_IMPRESSION
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.CarePlan
@@ -9,6 +10,7 @@ import ru.viscur.dh.fhir.model.entity.ClinicalImpression
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.utils.resources
 import ru.viscur.dh.integration.mis.api.ExaminationService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -23,6 +25,7 @@ class ExaminationServiceImpl(
         private val serviceRequestService: ServiceRequestService,
         private val queueManagerService: QueueManagerService,
         private val queueService: QueueService,
+        private val observationDurationService: ObservationDurationEstimationService,
         private val observationService: ObservationService
 ) : ExaminationService {
 
@@ -60,8 +63,10 @@ class ExaminationServiceImpl(
         queueManagerService.patientLeftByPatientId(patientId)
         //удалить из очереди (если пациент со статусом В очереди)
         queueManagerService.deleteFromQueue(patientId)
-        //завершить обращение и связанное
+        //завершить обращение и связанное (сохранить окончательный диагноз и т.д.
         val clinicalImpression = clinicalImpressionService.completeRelated(patientId, bundle)
+        //сохранить в историю продолжительность обработки обращения пациента
+        observationDurationService.saveToHistory(patientId, CLINICAL_IMPRESSION, diagnosis, severity, clinicalImpression.date, now())
         return clinicalImpressionService.complete(clinicalImpression)
     }
 

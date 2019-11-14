@@ -73,6 +73,10 @@ enum class ValueSetName(val id: String) {
      */
     COMPLAINTS("Complaints"),
     /**
+     * Типы мест
+     */
+    LOCATION_TYPE("Location_types"),
+    /**
      * Коды настроек системы
      */
     CONFIG_CODES("Config_codes")

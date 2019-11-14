@@ -86,7 +86,7 @@ class QueueManagerServiceImpl(
     override fun setAsFirst(patientId: String, officeId: String) {
         deleteFromQueue(patientId)
         officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), asFirst = true)
-        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE, officeId)
+        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
         checkEntryToOffice(officeId)
     }
 

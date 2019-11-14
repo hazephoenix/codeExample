@@ -1,0 +1,13 @@
+package ru.viscur.dh.fhir.model.valueSets
+
+/**
+ * Created at 13.11.2019 9:02 by SherbakovaMA
+ *
+ * Настройки автокорректировки регламентного времени обслуживания по степени тяжести
+ * Являются частью значений из [ValueSetName.CONFIG_CODES]
+ */
+enum class AutoCorrectionOfDefaultClinicalImpressionDuration(val code: String) {
+    AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_RED("AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_RED"),
+    AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_YELLOW("AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_YELLOW"),
+    AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_GREEN("AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_GREEN")
+}

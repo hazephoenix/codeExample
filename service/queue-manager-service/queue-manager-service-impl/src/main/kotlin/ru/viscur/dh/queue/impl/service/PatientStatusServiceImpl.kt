@@ -6,10 +6,7 @@ import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.fhir.model.entity.QueueHistoryOfPatient
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
-import ru.viscur.dh.fhir.model.utils.msToSeconds
-import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
+import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.queue.api.PatientStatusService
 import java.util.*
 
@@ -37,10 +34,11 @@ class PatientStatusServiceImpl(
         val queueStatusUpdatedAt = patient.extension.queueStatusUpdatedAt
         val queueHistoryOfPatient = QueueHistoryOfPatient(
                 subject = referenceToPatient(id = patientId),
+                severity = patientService.severity(patientId),
                 location = officeIdOfPrevProcess?.let { referenceToLocation(id = officeIdOfPrevProcess) },
                 status = patient.extension.queueStatus!!,
                 fireDate = queueStatusUpdatedAt!!,
-                duration = msToSeconds(now.time - queueStatusUpdatedAt.time)
+                duration = durationInSeconds(queueStatusUpdatedAt, now)
         )
         resourceService.create(queueHistoryOfPatient)
     }

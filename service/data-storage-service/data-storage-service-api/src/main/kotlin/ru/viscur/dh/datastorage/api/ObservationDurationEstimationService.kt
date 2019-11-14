@@ -1,6 +1,8 @@
 package ru.viscur.dh.datastorage.api
 
+import ru.viscur.dh.fhir.model.dto.ObservationDuration
 import ru.viscur.dh.fhir.model.enums.Severity
+import java.util.*
 
 /**
  * Created at 06.11.2019 12:04 by SherbakovaMA
@@ -11,9 +13,14 @@ import ru.viscur.dh.fhir.model.enums.Severity
  */
 interface ObservationDurationEstimationService {
 
+    /**
+     * Информация о продолжительности проведения услуг пациенту за последние сутки
+     */
+    fun recentObservationsByPatientId(patientId: String): List<ObservationDuration>
+
     fun deleteAllHistory()
 
-    fun saveToHistory(code: String, diagnosis: String, severity: Severity, duration: Int)
+    fun saveToHistory(patientId: String, code: String, diagnosis: String?, severity: Severity, start: Date, end: Date)
 
     /**
      * Определение среднего значения для заданных параметров по истории
@@ -33,4 +40,27 @@ interface ObservationDurationEstimationService {
      * то дает фиксированное значение
      */
     fun estimate(code: String, diagnosis: String, severity: Severity): Int
+
+    /**
+     * Поиск дефолтного значения для указанных услуги и степени тяжести
+     * Если несколько в базе есть несколько совпадений, вернется первый
+     * Если не найдено, то это исключение
+     */
+    fun defaultDuration(code: String, severity: Severity): Int
+
+    /**
+     * Среднее по истории для заданного кода и степени тяжести
+     * Ищется полное соответствие
+     */
+    fun avgByHistoryStrictSearch(code: String, severity: Severity): Int?
+
+    /**
+     * Задать дефолтное/регламентное время выполнения услуги по степени тяжести
+     */
+    fun updateDefaultDuration(code: String, severity: Severity, duration: Int)
+
+    /**
+     * Пересчитать регламентное время обслуживания обращения пациентов, если включены соответсвующие настройки
+     */
+    fun recalcDefaultClinicalImpressionDurations()
 }
