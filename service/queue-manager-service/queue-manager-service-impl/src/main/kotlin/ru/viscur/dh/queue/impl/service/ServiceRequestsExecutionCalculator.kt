@@ -38,12 +38,17 @@ class ServiceRequestsExecutionCalculator(
         return updateServiceRequests(sortedServiceRequestExecInfos)
     }
 
-    private fun updateServiceRequests(sortedServiceRequestExecInfos: List<ServiceRequestExecLocationInfo>): List<ServiceRequest> =
+    /**
+     * Обновляет кабинет и, если указан [updateOrder]=true, порядок
+     */
+    private fun updateServiceRequests(sortedServiceRequestExecInfos: List<ServiceRequestExecLocationInfo>, updateOrder: Boolean = true): List<ServiceRequest> =
             sortedServiceRequestExecInfos.mapIndexed { index, info ->
                 resourceService.update(ResourceType.ServiceRequest, info.serviceRequestId) {
                     locationReference = listOf(referenceToLocation(info.locationId))
-                    extension = extension?.apply { executionOrder = index }
-                            ?: ServiceRequestExtension(executionOrder = index)
+                    if (updateOrder) {
+                        extension = extension?.apply { executionOrder = index }
+                                ?: ServiceRequestExtension(executionOrder = index)
+                    }
                 }
             }
 
@@ -92,7 +97,7 @@ class ServiceRequestsExecutionCalculator(
         val sortedServiceRequestExecInfos = calcLocationAndOrder(listOf(
                 ServiceRequestExecInfo(inspectionOfResp.id, priority(inspectionOfResp), locationInfos)
         ))
-        updateServiceRequests(sortedServiceRequestExecInfos)
+        updateServiceRequests(sortedServiceRequestExecInfos = sortedServiceRequestExecInfos, updateOrder = false)
     }
 
     /**

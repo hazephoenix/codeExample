@@ -154,7 +154,10 @@ class ForTestService {
         val observationTypeOfResponsible = OBSERVATION_OF_SURGEON
         val serviceRequestOfResponsiblePr = (servRequests.find { it.code.code() == observationTypeOfResponsible }
                 ?: ServiceRequest(code = observationTypeOfResponsible))
-                .apply { performer = listOf(referenceToPractitioner(Helpers.surgeonId)) }
+                .apply {
+                    performer = listOf(referenceToPractitioner(Helpers.surgeonId))
+                    subject = referenceToPatient(patientId)
+                }
         servRequests = servRequests.filterNot { it.code.code() == observationTypeOfResponsible } + serviceRequestOfResponsiblePr
         val createdServRequests = servRequests.map { resourceService.create(it) }
         val carePlan = resourceService.create(Helpers.createCarePlan(patientId, createdServRequests))

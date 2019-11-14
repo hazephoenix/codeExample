@@ -283,22 +283,6 @@ class PatientServiceImpl(
         return query.patientsToExamine()
     }
 
-    private fun questionnaireResponseForSeverityCriteria(patientId: String): QuestionnaireResponse? {
-        val q = em.createNativeQuery("""
-            select r.resource
-                     from questionnaireResponse r
-                     where r.resource ->> 'questionnaire' = 'Questionnaire/Severity_criteria'
-                       and 'QuestionnaireResponse/' || r.id in (
-                         select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                         from clinicalImpression ci
-                         where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                            and ci.resource ->> 'status' = 'active'
-                     )
-        """.trimIndent())
-        q.setParameter("patientRef", "Patient/$patientId")
-        return q.fetchResource()
-    }
-
     /**
      * Тип обследования у отв врача по его id
      */
@@ -317,7 +301,8 @@ class PatientServiceImpl(
                             patientId = it[1] as String,
                             severity = it[2] as String,
                             carePlanStatus = enumValueOf(it[3] as String),
-                            patient = it[4].toResourceEntity()!!
+                            queueOfficeId = it[4] as String,
+                            patient = it[5].toResourceEntity()!!
                     )
                 }
                 .filterNotNull()

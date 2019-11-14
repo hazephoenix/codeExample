@@ -8,33 +8,33 @@
 
 ###                                             Информация о продолжительности проведения пациента в этапах очереди за последние сутки
 ###
-GET http://localhost:8080/report/queueHistoryOfPatient?patientId=
+GET http://localhost:8080/report/queueHistoryOfPatient?patientId=d33cc085-ee65-40f1-b856-0d7e47da6fea
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                             Информация о продолжительности проведения услуг пациенту за последние сутки
 ###
-GET http://localhost:8080/report/observationHistoryOfPatient?patientId=
+GET http://localhost:8080/report/observationHistoryOfPatient?patientId=d33cc085-ee65-40f1-b856-0d7e47da6fea
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
-###                                              вся очередь на тек момент
+###                                              вся очередь на тек момент/Информация об очередях в кабинеты
 ###
 GET http://localhost:8080/report/queue
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
-###                                              очередь на тек момент в опр кабинет
+###                                              очередь на тек момент в опр кабинет/Информация об очереди в кабинет на тек. момент
 ###
 GET http://localhost:8080/report/queue?officeId=Office:104
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
-###                                              очередь на тек момент к врачу (опр. как в кабинет)
+###                                              очередь на тек момент к врачу (опр. как в кабинет)/Информация об очереди для врача на тек. момент
 ###
 GET http://localhost:8080/report/queue?practitionerId=терапевт_Иванов
 Content-Type: application/json
@@ -69,5 +69,34 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "start": "2019-11-01T00:57:04.242+0000",
   "end": "2019-11-20T00:57:04.242+0000"
 }
+###                                              Информация о продолжительности текущих/активных обращений пациентов
+###
+GET http://localhost:8080/clinicalImpressionDuration
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###                                              Информация о регламентных значений продолжительности обслуживания обращения пациентов
+###
+GET http://localhost:8080/clinicalImpressionDuration/default
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              Задать значение регламентного времени обслуживания обращения пациентов для указанной степени тяжести
+###
+POST http://localhost:8080/clinicalImpressionDuration/duration?severity=RED&duration=1801
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              Задать значение настройки Автокорректировка регламентного времени обслуживания по степени тяжести
+###
+POST http://localhost:8080/clinicalImpressionDuration/autoRecalc?severity=RED&value=true
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
 
 ###
