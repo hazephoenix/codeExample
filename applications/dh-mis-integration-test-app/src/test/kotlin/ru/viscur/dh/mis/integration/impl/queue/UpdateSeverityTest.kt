@@ -10,7 +10,7 @@ import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.PatientService
-import ru.viscur.dh.datastorage.api.util.OFFICE_130
+import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.integration.mis.api.ExaminationService
@@ -241,5 +241,30 @@ class UpdateSeverityTest {
 
         examinationService.updateSeverity(checking, Severity.YELLOW)
         assertEquals(Severity.YELLOW, patientService.severity(checking))
+    }
+
+    @Test
+    fun testZoneGreenToYellowWithoutQueue() {
+        forTestService.cleanDb()
+        forTestService.updateOfficeStatuses()
+        val servReqsFromRegister = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val patientId = servReqsFromRegister.first().subject!!.id!!
+        forTestService.checkServiceRequestsOfPatient(patientId, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_130, locationId = OFFICE_130),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
+        ))
+        assertEquals(Severity.GREEN, patientService.severity(patientId))
+
+        examinationService.updateSeverity(patientId, Severity.YELLOW)
+        assertEquals(Severity.YELLOW, patientService.severity(patientId))
+        forTestService.checkServiceRequestsOfPatient(patientId, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_130, locationId = OFFICE_130),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = YELLOW_ZONE_SECTION_1)
+        ))
     }
 }

@@ -16,18 +16,15 @@ import java.util.*
 /**
  * Created at 15.10.2019 9:12 by SherbakovaMA
  *
- * История (статистика) прохождения пациента в очереди
+ * История статусов очереди по кабинетам
+ * (Как менялись статусы каждого из кабинетов)
  */
 class QueueHistoryOfOffice @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.QueueHistoryOfOffice.id,
-        @JsonProperty("subject") val subject: Reference? = null,
         @JsonProperty("location") val location: Reference,
         @JsonProperty("status") val status: LocationStatus,
         @JsonProperty("fireDate") val fireDate: Date?,
-        @JsonProperty("duration") var duration: Int?,
-        @JsonProperty("severity") var severity: Severity? = null,
-        @JsonProperty("diagnosticConclusion") var diagnosticConclusion: String? = null,
-        @JsonProperty("ageGroup") var ageGroup: Int? = null
+        @JsonProperty("duration") var duration: Int?
 ) : BaseResource(id, identifier, resourceType)

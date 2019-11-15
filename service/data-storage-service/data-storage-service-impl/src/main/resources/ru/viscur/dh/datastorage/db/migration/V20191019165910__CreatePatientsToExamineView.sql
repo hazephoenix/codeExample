@@ -7,14 +7,16 @@ select
        SPLIT_PART(patientRef, '/', 2) as patient_id,
        severity as severity,
        cp.resource ->> 'status' as care_plan_status,
+       SPLIT_PART(oq.officeOfQueue, '/', 2) as queue_office_id,
        p.resource as patient
-from (
-         select ci.resource -> 'assessor' ->> 'reference' as respPractRef,
-                ci.resource -> 'subject' ->> 'reference'  as patientRef,
-                ci.resource -> 'extension' ->> 'severity' as severity
-         from clinicalImpression ci
-         where ci.resource ->> 'status' = 'active'
-     ) as ci
+from
+         (
+             select ci.resource -> 'assessor' ->> 'reference' as respPractRef,
+                    ci.resource -> 'subject' ->> 'reference'  as patientRef,
+                    ci.resource -> 'extension' ->> 'severity' as severity
+             from clinicalImpression ci
+             where ci.resource ->> 'status' = 'active'
+         ) as ci
          join patient p on p.id = SPLIT_PART(patientRef, '/', 2)
          join (select *
                from careplan cp
@@ -25,4 +27,11 @@ from (
                    )
              ) cp
              on cp.resource -> 'subject' ->> 'reference' = patientRef
+         left join (
+            select q.resource-> 'location' ->>'reference' as officeOfQueue,
+                   q.resource
+            from queueitem q
+         ) oq
+         on oq.resource -> 'subject' ->> 'reference' = patientRef
+order by cp.resource ->> 'created'
 ;

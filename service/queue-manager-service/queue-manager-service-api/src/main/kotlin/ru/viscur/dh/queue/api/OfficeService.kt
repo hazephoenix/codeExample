@@ -17,7 +17,7 @@ interface OfficeService {
      * Изменение статуса кабинета [office] на [newStatus]
      * @param patientIdOfPrevProcess id пациента закончившегося процесса
      */
-    fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String? = null)
+    fun changeStatus(officeId: String, newStatus: LocationStatus)
 
     /**
      * Добавление пациента в очередь в кабинет

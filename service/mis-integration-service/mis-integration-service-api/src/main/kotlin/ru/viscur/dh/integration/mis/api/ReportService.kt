@@ -23,17 +23,17 @@ interface ReportService {
     fun observationHistoryOfPatient(patientId: String): List<ObservationDuration>
 
     /**
-     * Информация об очередях в кабинеты
+     * Информация об очередях в кабинеты на тек. момент
      */
     fun queueInOffices(withPractitioners: Boolean = false): List<QueueInOfficeDto>
 
     /**
-     * Информация об очереди в кабинет
+     * Информация об очереди в кабинет на тек. момент
      */
     fun queueInOffice(officeId: String): List<QueueInOfficeDto>
 
     /**
-     * Информация об очереди для врача
+     * Информация об очереди для врача на тек. момент
      * Определяется в каком кабинете находится врач и определяется по [queueInOffice]
      */
     fun queueOfPractitioner(practitionerId: String): List<QueueInOfficeDto>

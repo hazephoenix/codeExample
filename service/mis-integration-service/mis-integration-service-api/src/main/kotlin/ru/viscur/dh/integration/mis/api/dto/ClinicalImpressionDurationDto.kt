@@ -9,7 +9,7 @@ import java.util.*
  * @param patientId id пациента
  * @param start время начала
  * @param duration продолжительность (в секундах)
- * @param defaultDuration регламентное значение пролодложительности
+ * @param defaultDuration регламентное значение продолжительности
  */
 data class ClinicalImpressionDurationDto(
         val patientId: String,

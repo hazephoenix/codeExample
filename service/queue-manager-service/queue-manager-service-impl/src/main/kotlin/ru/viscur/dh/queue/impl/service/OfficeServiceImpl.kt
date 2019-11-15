@@ -18,7 +18,6 @@ import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
-import ru.viscur.dh.queue.impl.ageGroup
 
 @Service
 class OfficeServiceImpl(
@@ -33,7 +32,7 @@ class OfficeServiceImpl(
             filterLike = true
     ))
 
-    override fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
+    override fun changeStatus(officeId: String, newStatus: LocationStatus) {
         val now = now()
         val office = locationService.byId(officeId)
         val queueHistoryOfOffice = QueueHistoryOfOffice(
@@ -42,15 +41,6 @@ class OfficeServiceImpl(
                 fireDate = office.extension?.statusUpdatedAt,
                 duration = office.extension?.statusUpdatedAt?.let { durationInSeconds(it, now) }
         )
-
-        patientIdOfPrevProcess?.run {
-            val patient = patientService.byId(this)
-            queueHistoryOfOffice.apply {
-                severity = patientService.severity(patientIdOfPrevProcess)
-                diagnosticConclusion = patientService.preliminaryDiagnosticConclusion(patientIdOfPrevProcess)
-                ageGroup = ageGroup(patient.birthDate)
-            }
-        }
         resourceService.create(queueHistoryOfOffice)
         resourceService.update(ResourceType.Location, officeId) {
             status = newStatus

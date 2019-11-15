@@ -16,6 +16,7 @@ import java.util.*
  * Created at 15.10.2019 9:12 by SherbakovaMA
  *
  * История (статистика) прохождения пациента в очереди
+ * (Как менялись статусы у пациента)
  */
 class QueueHistoryOfPatient @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
