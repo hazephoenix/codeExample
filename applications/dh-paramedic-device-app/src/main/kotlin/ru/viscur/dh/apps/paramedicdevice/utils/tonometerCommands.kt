@@ -23,3 +23,4 @@ const val BCCStop = (0x01 xor 0x30 xor 0x30 xor 0x02 xor 0x53 xor 0x50 xor 0x03)
  * Начать измерение
  */
 val startMeasuringCmd = byteArrayOf(SYN, SYN, SOH, addressByte, addressByte, STX, 0x53, 0x54, ETX, BCCStart)
+val stopMeasuringCmd = byteArrayOf(SYN, SYN, SOH, addressByte, addressByte, STX, 0x53, 0x50, ETX, BCCStop)

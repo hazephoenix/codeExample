@@ -54,6 +54,10 @@ class WristbandPrinter(
     fun listener(event: TaskRequested) {
         val task = event.task
         if (task.type == TaskType.Wristband) {
+            if (log.isDebugEnabled) {
+                log.debug("Take request to print wristband!")
+                log.debug("$task")
+            }
             publisher.publishEvent(TaskStarted(task))
             printWristband(task)
         }

@@ -19,6 +19,8 @@ import ru.viscur.dh.common.dto.events.TaskStarted
 import ru.viscur.dh.common.dto.task.Task
 import ru.viscur.dh.common.dto.task.TaskType
 import java.sql.Timestamp
+import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
 /**
  * Класс для работы с тонометром A&D TM-2655P
@@ -37,6 +39,20 @@ class Tonometer(
 ) {
     private val log: Logger = LoggerFactory.getLogger(Tonometer::class.java)
 
+    private lateinit var comPort: SerialPort
+
+    @PostConstruct
+    fun postCreate() {
+        comPort = SerialPort.getCommPort(systemPortName)
+        comPort.openPort()
+        comPort.baudRate = 2400
+    }
+
+    @PreDestroy
+    fun preDestroy() {
+        comPort.closePort()
+    }
+
     @EventListener(TaskRequested::class)
     fun listener(event: TaskRequested) {
         val task = event.task
@@ -51,32 +67,27 @@ class Tonometer(
      */
     private fun doMeasure(task: Task) {
         try {
-            SerialPort.getCommPort(systemPortName).let { port ->
-                port.openPort()
-                // По умолчанию скорость передачи данных тонометра - 2400 бит/с
-                port.baudRate = 2400
-                log.info("Serial Port baud rate settings: ${port.baudRate}")
-                log.info("Serial Port is opened: ${port.isOpen}")
+                log.info("Serial Port baud rate settings: ${comPort.baudRate}")
+                log.info("Serial Port is opened: ${comPort.isOpen}")
 
-                port.writeBytes(startMeasuringCmd, startMeasuringCmd.size.toLong())
+                comPort.writeBytes(stopMeasuringCmd, stopMeasuringCmd.size.toLong())
+                comPort.writeBytes(startMeasuringCmd, startMeasuringCmd.size.toLong())
                 var measuring = true
                 var resultArray = byteArrayOf()
                 while (measuring) {
-                    while (port.bytesAvailable() == 0)
+                    while (comPort.bytesAvailable() == 0)
                         Thread.sleep(20)
 
-                    val readBuffer = ByteArray(port.bytesAvailable())
-                    port.readBytes(readBuffer, readBuffer.size.toLong())
+                    val readBuffer = ByteArray(comPort.bytesAvailable())
+                    comPort.readBytes(readBuffer, readBuffer.size.toLong())
                     resultArray += readBuffer
 
                     if (readBuffer.find { it == ETX } != null) {
                         measuring = false
-                        port.closePort()
                         task.result = rbResult(resultArray)
                         publisher.publishEvent(TaskComplete(task))
                     }
                 }
-            }
         } catch (e: Exception) {
             log.error("Error while take tonometer results!: ${e.message}", e)
             publisher.publishEvent(TaskError(task))
