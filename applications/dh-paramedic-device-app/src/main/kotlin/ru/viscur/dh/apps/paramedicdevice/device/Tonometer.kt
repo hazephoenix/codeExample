@@ -28,7 +28,7 @@ import java.sql.Timestamp
  *
  * Активный в случае, если нет профиля triton-monitor, если профиль включен, то заменяется [TritonTonometer]
  */
-@Profile("!triton-monitor")
+@Profile("!triton-monitor & !fake-device")
 @Component
 class Tonometer(
         @Value("\${paramedic.serial.port.system.name:0}")

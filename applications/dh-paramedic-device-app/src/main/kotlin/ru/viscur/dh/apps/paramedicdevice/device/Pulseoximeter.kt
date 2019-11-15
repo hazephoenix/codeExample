@@ -18,7 +18,7 @@ import triton.protocol.packet.ValuePacketData
 import java.util.concurrent.TimeUnit
 
 @Component
-@Profile("triton-monitor")
+@Profile("triton-monitor & !fake-device")
 class Pulseoximeter(
         private val publisher: ApplicationEventPublisher,
         private val monitor: TritonMonitorDevice

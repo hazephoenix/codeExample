@@ -20,7 +20,7 @@ import triton.protocol.packet.WavePacketData3
 import java.util.concurrent.TimeUnit
 
 @Component
-@Profile("triton-monitor")
+@Profile("triton-monitor & !fake-device")
 class Electrocardiograph(
         private val publisher: ApplicationEventPublisher,
         private val monitor: TritonMonitorDevice

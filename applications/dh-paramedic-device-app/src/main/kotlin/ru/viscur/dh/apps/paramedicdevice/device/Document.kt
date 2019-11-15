@@ -4,12 +4,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import ru.viscur.dh.apps.paramedicdevice.dto.TemperatureResponse
+import ru.viscur.dh.apps.paramedicdevice.dto.DocumentResponse
 import ru.viscur.dh.common.dto.events.TaskComplete
 import ru.viscur.dh.common.dto.events.TaskError
 import ru.viscur.dh.common.dto.events.TaskRequested
@@ -21,6 +22,7 @@ import ru.viscur.dh.common.dto.task.TaskType
  * Сканер документов
  */
 @Component
+@Profile("!fake-device")
 class Document(
         private val restTemplate: RestTemplate,
         @Value("\${paramedic.native-service.url:http://localhost:8850}")
@@ -84,7 +86,7 @@ class Document(
 
     data class ResponseWrapper(
             val status: Status,
-            val value: TemperatureResponse?
+            val value: DocumentResponse?
     )
 
     data class ScanResponse(
