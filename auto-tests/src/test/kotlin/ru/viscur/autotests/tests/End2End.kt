@@ -26,6 +26,8 @@ class End2End {
         val office101 = "Office:101"
         val office139 = "Office:139"
         val office104 = "Office:104"
+        val office140 = "Office:140"
+        val redZone = "Office:RedZone"
     }
 
     @BeforeEach
@@ -62,11 +64,6 @@ class End2End {
         ))
         checkServiceRequestsOfPatient(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139)))
         checkObservationsOfPatient(patientId, listOf())
-       /* checkPatientsOfResp(listOf(
-                PatientsOfRespInfo("фельдшер_Колосова", listOf(
-                        PatientOfRespInfo(patientId, Severity.RED)
-                ))
-        ))*/
 
         //кабинет READY
         QueRequests.officeIsReady(referenceToLocation(office139))
@@ -176,29 +173,26 @@ class End2End {
     @Test
     @Order(1)
     fun patientObservationFullCicle() {
-        //создание пациента с 4 разными по приоритету обследованиями
+        //создание пациента с 3 разными по приоритету обследованиями
         val observation101Office = "B03.016.004ГМУ_СП"
-        val observation117Office = "A04.16.001"
-        val observation104Office = "A09.28.029ГМУ_СП"
-        val observation139Office = "СтХир"
+        val observation116Office = "A04.16.001"
+        val observationOfResp = "СтХир"
 
         val patientServiceRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office),
-                Helpers.createServiceRequestResource(observation104Office),
-                Helpers.createServiceRequestResource(observation117Office)
+                Helpers.createServiceRequestResource(observation116Office)
         )
-        val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
+        val patientBundle = Helpers.bundle("1333", "RED", patientServiceRequests)
         val responseBundle = QueRequests.createPatient(patientBundle)
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
         QueRequests.officeIsReady(referenceToLocation(office101))
-        QueRequests.officeIsReady(referenceToLocation(office104))
         QueRequests.officeIsReady(referenceToLocation(office117))
         QueRequests.officeIsReady(referenceToLocation(office139))
 
-        assertEquals(4, responseBundle.entry.size, "wrong number of service request")
+        assertEquals(3, responseBundle.entry.size, "wrong number of service request")
         //прохождение всех обследований поочередно
         //office101
-        val servRequestOf101office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office101)).first() as ServiceRequest
+        val servRequestOf101office = QueRequests.patientEntered(Helpers.createListResource(patientId, office101)).find{it.code.code() == observation101Office} as ServiceRequest
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
@@ -211,55 +205,35 @@ class End2End {
                 valueString = "результат анализа"
         )
         QueRequests.createObservation(obs)
-        QueRequests.patientLeft(referenceToLocation(office101))
-        //office104
-        val servRequestOf104office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office104)).first() as ServiceRequest
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office104, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
-                ))
-        ))
-        val obs2 = Helpers.createObservation(
-                code = observation104Office,
-                status = ObservationStatus.final,
-                basedOnServiceRequestId = servRequestOf104office.id,
-                valueString = "результат анализа"
-        )
-        QueRequests.createObservation(obs2)
-        QueRequests.patientLeft(referenceToLocation(office104))
-        //office117
-        val servRequestOf117office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office117)).first() as ServiceRequest
+        QueRequests.patientLeft(Helpers.createListResource(patientId, office101))
+        //office116
+        val servRequestOf116office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office116)).find{it.code.code() == observation116Office} as ServiceRequest
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office117, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
                 ))
         ))
         val obs3 = Helpers.createObservation(
-                code = observation104Office,
+                code = observation116Office,
                 status = ObservationStatus.final,
-                basedOnServiceRequestId = servRequestOf117office.id,
+                basedOnServiceRequestId = servRequestOf116office.id,
                 valueString = "результат анализа"
         )
         QueRequests.createObservation(obs3)
-        QueRequests.patientLeft(referenceToLocation(office117))
+        QueRequests.patientLeft(Helpers.createListResource(patientId, office116))
         //проверка что все обследования, кроме ответственного пройдены
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = observation101Office, locationId = office101, status = ServiceRequestStatus.completed),
-                ServiceRequestInfo(code = observation117Office, locationId = office117, status = ServiceRequestStatus.completed),
-                ServiceRequestInfo(code = observation104Office, locationId = office104, status = ServiceRequestStatus.completed),
-                ServiceRequestInfo(code = observation139Office, locationId = office139)
+                ServiceRequestInfo(code = observation116Office, locationId = office116, status = ServiceRequestStatus.completed),
+                ServiceRequestInfo(code = observationOfResp,  locationId = redZone)
         ))
         //office 139 осмотр ответственного и завершение маршрутного листа с госпитализацией
-        val servRequestOf139office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office139)).first() as ServiceRequest
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office139, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
-                ))
-        ))
-        val obsOfRespPract = Helpers.createObservation(code = observation139Office,
+        val servRequestOfResp = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office139)).find{it.code.code() == observationOfResp} as ServiceRequest
+        QueRequests.officeIsBusy(referenceToLocation(office140))
+        val obsOfRespPract = Helpers.createObservation(code = observationOfResp,
                 valueString = "состояние удовлетворительное",
-                practitionerId =servRequestOf139office.performer?.first()?.id!!,
-                basedOnServiceRequestId = servRequestOf139office.id,
+                practitionerId =servRequestOfResp.performer?.first()?.id!!,
+                basedOnServiceRequestId = servRequestOfResp.id,
                 status = ObservationStatus.final
         )
         val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(

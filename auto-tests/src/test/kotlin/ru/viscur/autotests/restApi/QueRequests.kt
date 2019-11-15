@@ -62,7 +62,7 @@ class QueRequests {
                 post(Endpoints.OFFICE_INVITE).
                 then().statusCode(200)
 
-        fun inviteSecondPatientToOffice(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).
+        fun inviteNextPatientToOffice(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).
                 `when`().
                 post(Endpoints.INVITE_SECOND_OFFICE).
                 then().statusCode(200)
@@ -73,7 +73,7 @@ class QueRequests {
                 then().statusCode(200).extract().response().`as`(Bundle::class.java)
                 .let { it.entry.map { it.resource as ServiceRequest } }
 
-        fun patientLeft(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
+        fun patientLeft(patientAndOfficeRef: ListResource) = Helpers.createRequestSpec(patientAndOfficeRef).
                 `when`().
                 post(Endpoints.PATIENT_LEFT).
                 then().statusCode(200)
@@ -87,7 +87,7 @@ class QueRequests {
         fun createPatient(bundle : Bundle) = Helpers.createRequestSpec(bundle).
                 `when`().
                 post(Endpoints.CREATE_PATIENT).
-                then().statusCode(200).extract().response().`as`(Bundle::class.java)
+                then().log().all().statusCode(200).extract().response().`as`(Bundle::class.java)
 
         fun <T> resource(resourceType: ResourceType<T>, id: String): T
                 where T : BaseResource =

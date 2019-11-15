@@ -19,6 +19,7 @@ class Examinations {
     companion object {
         val office139 = "Office:139"
         val office101 = "Office:101"
+        val redZone = "Office:RedZone"
         val observationOfSurgeonCode = "СтХир"
         val observation1 = "A04.16.001"
     }
@@ -62,7 +63,6 @@ class Examinations {
     }
 
     @Test
-    //Todo написать
     fun addingExaminationWithActiveObservation() {
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),
@@ -72,10 +72,10 @@ class Examinations {
         val responseBundle = QueRequests.createPatient(bundle)
         val serviceRequest = responseBundle.resources(ResourceType.ServiceRequest).first()
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
-        //завершение обращения с активным ServiceRequest
+
         val obsOfRespPract = Helpers.createObservation(code = serviceRequest.code.code(),
                 valueString = "состояние удовлетворительное",
-                practitionerId = serviceRequest.performer?.first()?.id!!,
+                practitionerId = Helpers.surgeonId,
                 basedOnServiceRequestId = serviceRequest.id,
                 status = ObservationStatus.final
         )
@@ -91,7 +91,6 @@ class Examinations {
                 BundleEntry(encounter)
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
-        //тут должны быть все обследования со стасом completed/cancelled?
         checkServiceRequestsOfPatient(patientId, listOf())
     }
 
@@ -105,20 +104,20 @@ class Examinations {
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
-
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
                         code = observationOfSurgeonCode,
-                        locationId = office139
+                        locationId = redZone,
+                        status = ServiceRequestStatus.active
                 ),
                 ServiceRequestInfo(
                         code = observation,
-                        locationId = office101
+                        locationId = office101,
+                        status = ServiceRequestStatus.active
                 )
         ))
-        //отмена обращения и проверка что нет Service Requests и пациент удалён с очереди
+        //отмена обращения и проверка что у пациента больше нет ServiceRequest
         QueRequests.cancelExamination(patientId)
-        checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
     }
 

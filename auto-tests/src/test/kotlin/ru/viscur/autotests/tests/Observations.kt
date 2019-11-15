@@ -22,6 +22,7 @@ class Observations {
         val office101 = "Office:101"
         val office104 = "Office:104"
         val office139 = "Office:139"
+        val redZone = "Office:RedZone"
         val observationCode = "B03.016.002ГМУ_СП"
         val observationCode2 = "СтХир"
         val observationCode3 = "A04.16.001"
@@ -72,7 +73,7 @@ class Observations {
                 ),
                 ServiceRequestInfo(
                         code = observationCode2,
-                        locationId = office139,
+                        locationId = redZone,
                         status = ServiceRequestStatus.active
                 )
         ))
@@ -124,7 +125,7 @@ class Observations {
                 ),
                 ServiceRequestInfo(
                         code = observationCode2,
-                        locationId = office139,
+                        locationId = redZone,
                         status = ServiceRequestStatus.active
                 )
         ))
