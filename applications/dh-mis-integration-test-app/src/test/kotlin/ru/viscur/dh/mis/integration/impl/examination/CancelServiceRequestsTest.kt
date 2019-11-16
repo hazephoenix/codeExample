@@ -55,6 +55,7 @@ class CancelServiceRequestsTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
@@ -108,6 +109,7 @@ class CancelServiceRequestsTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
@@ -160,6 +162,7 @@ class CancelServiceRequestsTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
@@ -212,6 +215,7 @@ class CancelServiceRequestsTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
@@ -262,6 +266,7 @@ class CancelServiceRequestsTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
@@ -314,6 +319,7 @@ class CancelServiceRequestsTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val checkSr = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
@@ -369,6 +375,7 @@ class CancelServiceRequestsTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val checkSr = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),

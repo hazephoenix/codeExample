@@ -10,6 +10,7 @@ import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.api.ServiceRequestService
+import ru.viscur.dh.datastorage.api.util.OFFICE_119
 import ru.viscur.dh.datastorage.api.util.OFFICE_130
 import ru.viscur.dh.datastorage.api.util.OFFICE_202
 import ru.viscur.dh.fhir.model.enums.LocationStatus
@@ -51,6 +52,7 @@ class PatientLeftTest {
         val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++)
         val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
                 QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
@@ -77,6 +79,7 @@ class PatientLeftTest {
         val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++)
         val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
                 QueueItemSimple(patientId = checkP, status = ON_OBSERVATION),
@@ -97,6 +100,7 @@ class PatientLeftTest {
     @Test
     fun `on observation, first, not last observation`() {
         forTestService.cleanDb()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         var i = 0
         val officeId = OFFICE_130
         val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = ON_OBSERVATION, index = i++, servReqs = listOf(
@@ -134,6 +138,7 @@ class PatientLeftTest {
         val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
         val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
                 QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
