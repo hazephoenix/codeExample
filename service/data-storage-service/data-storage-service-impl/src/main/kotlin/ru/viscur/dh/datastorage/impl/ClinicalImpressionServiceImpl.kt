@@ -3,6 +3,7 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
@@ -21,7 +22,7 @@ class ClinicalImpressionServiceImpl(
         private val serviceRequestService: ServiceRequestService
 ) : ClinicalImpressionService {
 
-    @PersistenceContext
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun allActive(): List<ClinicalImpression> =

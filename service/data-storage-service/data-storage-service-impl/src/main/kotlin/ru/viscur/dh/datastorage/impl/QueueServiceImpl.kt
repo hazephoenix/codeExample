@@ -6,6 +6,7 @@ import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.QueueService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Patient
@@ -29,7 +30,7 @@ class QueueServiceImpl(
         private val resourceService: ResourceService
 ) : QueueService {
 
-    @PersistenceContext
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun queueItemsOfOffice(officeId: String): MutableList<QueueItem> {

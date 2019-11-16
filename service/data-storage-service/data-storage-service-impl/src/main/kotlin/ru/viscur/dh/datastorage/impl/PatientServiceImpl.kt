@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.INSPECTION_ON_RECEPTION
 import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_LINK_ID_SEVERITY
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
@@ -28,7 +29,7 @@ class PatientServiceImpl(
         private val practitionerService: PractitionerService
 ) : PatientService {
 
-    @PersistenceContext
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byId(id: String): Patient = resourceService.byId(ResourceType.Patient, id)

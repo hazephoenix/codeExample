@@ -2,6 +2,7 @@ package ru.viscur.dh.queue.impl.config
 
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
@@ -28,6 +29,7 @@ private const val ENTITY_PACKAGE = "$PERSISTENCE_PACKAGE.model"
  */
 @Configuration
 @ComponentScan(BASE_PACKAGE)
+@AutoConfigureAfter(name = ["ru.viscur.dh.datastorage.impl.config.DataStorageConfig"])
 class QueueManagerConfig {
 
 

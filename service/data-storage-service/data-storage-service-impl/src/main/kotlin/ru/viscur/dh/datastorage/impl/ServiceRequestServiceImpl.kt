@@ -2,6 +2,7 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -14,7 +15,7 @@ class ServiceRequestServiceImpl(
         private val carePlanService: CarePlanService
 ) : ServiceRequestService {
 
-    @PersistenceContext
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun all(patientId: String): List<ServiceRequest> {
