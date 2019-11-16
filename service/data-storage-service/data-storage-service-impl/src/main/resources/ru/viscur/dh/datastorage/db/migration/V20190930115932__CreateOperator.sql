@@ -2,7 +2,7 @@
 -- что PostgreSQL-оператор ?
 
 -- Hibernate использует оператор ? для позиционных аргументов
-drop operator #-# (jsonb, text);
+drop operator if exists #-# (jsonb, text[]);
 
 CREATE OPERATOR #-#(
   PROCEDURE = jsonb_exists_any,

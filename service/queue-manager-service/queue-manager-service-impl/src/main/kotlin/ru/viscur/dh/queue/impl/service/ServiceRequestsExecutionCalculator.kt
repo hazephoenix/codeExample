@@ -9,6 +9,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.isInspectionOfResp
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.queue.impl.utils.DistanceCoefBetweenOfficesCalculator
@@ -34,27 +35,42 @@ class ServiceRequestsExecutionCalculator(
     fun calcServiceRequestExecOrders(patientId: String, prevOfficeId: String?): List<ServiceRequest> {
         val serviceRequestExecInfos = serviceRequestInfos(patientId)
         val sortedServiceRequestExecInfos = calcLocationAndOrder(serviceRequestExecInfos, prevOfficeId)
-        return sortedServiceRequestExecInfos.mapIndexed { index, info ->
-            resourceService.update(ResourceType.ServiceRequest, info.serviceRequestId) {
-                locationReference = listOf(referenceToLocation(info.locationId))
-                extension = extension?.apply { executionOrder = index }
-                        ?: ServiceRequestExtension(executionOrder = index)
-            }
-        }
+        return updateServiceRequests(sortedServiceRequestExecInfos)
     }
+
+    /**
+     * Обновляет кабинет и, если указан [updateOrder]=true, порядок
+     */
+    private fun updateServiceRequests(sortedServiceRequestExecInfos: List<ServiceRequestExecLocationInfo>, updateOrder: Boolean = true): List<ServiceRequest> =
+            sortedServiceRequestExecInfos.mapIndexed { index, info ->
+                resourceService.update(ResourceType.ServiceRequest, info.serviceRequestId) {
+                    locationReference = listOf(referenceToLocation(info.locationId))
+                    if (updateOrder) {
+                        extension = extension?.apply { executionOrder = index }
+                                ?: ServiceRequestExtension(executionOrder = index)
+                    }
+                }
+            }
 
     /**
      * Получение информации о непройденных назначениях пациента [ServiceRequestExecInfo]:
      * id назначения, приоритет услуги,
      * список незакрытых кабинетов, где м б оказана процедура с указанием ожидания в очереди в каждый
      */
-    private fun serviceRequestInfos(patientId: String): List<ServiceRequestExecInfo> {
-        val serviceRequests = serviceRequestService.active(patientId)
+    private fun serviceRequestInfos(patientId: String, forQueueOnly: Boolean = false): List<ServiceRequestExecInfo> {
+        val serviceRequests = if (forQueueOnly) serviceRequestService.activeForQueue(patientId) else serviceRequestService.active(patientId)
         val severity = patientService.severity(patientId)
         return serviceRequests.map { serviceRequest ->
             val serviceRequestId = serviceRequest.id
-            val locationInfos = locationService.byObservationType(serviceRequest.code.code()).map { officeId ->
-                ServiceRequestExecLocationInfo(serviceRequestId, officeId, estWaitingInQueueWithType(officeId, severity))
+            val officeIds =
+                    if (serviceRequest.isInspectionOfResp()) {
+                        val locationType = severity.zoneForInspectionOfResp
+                        locationService.byLocationType(locationType).map { it.id }
+                    } else {
+                        locationService.byObservationType(serviceRequest.code.code())
+                    }
+            val locationInfos = officeIds.map { officeId ->
+                ServiceRequestExecLocationInfo(serviceRequestId, serviceRequest.code.code(), officeId, estWaitingInQueueWithType(officeId, severity))
             }
             if (locationInfos.isEmpty()) {
                 throw Exception("ERROR. Can't find opened office by observation type '${serviceRequest.code.code()}'")
@@ -63,17 +79,31 @@ class ServiceRequestsExecutionCalculator(
         }
     }
 
-    fun calcNextOfficeId(patientId: String, prevOfficeId: String?): String? {
-        val serviceRequestExecInfos = serviceRequestInfos(patientId)
+    fun calcNextOfficeId(patientId: String, prevOfficeId: String?, forQueueOnly: Boolean = false): String? {
+        val serviceRequestExecInfos = serviceRequestInfos(patientId, forQueueOnly)
         if (serviceRequestExecInfos.isEmpty()) return null
         val nextServiceRequestInfo = nextServiceRequest(serviceRequestExecInfos, prevOfficeId)
         return nextServiceRequestInfo.locationId
     }
 
+    fun recalcOfficeForInspectionOfResp(patientId: String, severity: Severity) {
+        val inspectionOfResp = serviceRequestService.active(patientId).find { it.isInspectionOfResp() }
+                ?: throw Exception("not found inspection of responsible practitioner for patient with id '$patientId'")
+        val locationType = severity.zoneForInspectionOfResp
+        val locationInfos = locationService.byLocationType(locationType).map {
+            val officeId = it.id
+            ServiceRequestExecLocationInfo(inspectionOfResp.id, inspectionOfResp.code.code(), officeId, estWaitingInQueueWithType(officeId, severity))
+        }
+        val sortedServiceRequestExecInfos = calcLocationAndOrder(listOf(
+                ServiceRequestExecInfo(inspectionOfResp.id, priority(inspectionOfResp), locationInfos)
+        ))
+        updateServiceRequests(sortedServiceRequestExecInfos = sortedServiceRequestExecInfos, updateOrder = false)
+    }
+
     /**
      * Однозначно определяет в каком кабинете нужно провести назначение, упорядочивает список назначений
      */
-    private fun calcLocationAndOrder(initServiceRequests: List<ServiceRequestExecInfo>, prevOfficeId: String?): List<ServiceRequestExecLocationInfo> {
+    private fun calcLocationAndOrder(initServiceRequests: List<ServiceRequestExecInfo>, prevOfficeId: String? = null): List<ServiceRequestExecLocationInfo> {
         var initSr = initServiceRequests
         val result = mutableListOf<ServiceRequestExecLocationInfo>()
         var prevOfficeIdIntr = prevOfficeId
@@ -114,7 +144,7 @@ class ServiceRequestsExecutionCalculator(
         val locationsWithEstWaitingTotal = locationsWithMinDistanceCoef.map { Pair(estWaitingInQueueWithType(it.locationId), it) }
         val minEstWaitingTotal = locationsWithEstWaitingTotal.map { it.first }.min()
         val locationsWithMinEstWaitingTotal = locationsWithEstWaitingTotal.filter { it.first == minEstWaitingTotal }.map { it.second }
-        return locationsWithMinEstWaitingTotal.minBy { it.locationId }!!
+        return locationsWithMinEstWaitingTotal.sortedWith(compareBy({ it.locationId }, { it.code })).first()
     }
 
     /**
@@ -138,7 +168,7 @@ class ServiceRequestsExecutionCalculator(
      */
     private fun priority(serviceRequest: ServiceRequest): Double {
         //осмотр ответсвенного в посл очередь
-        if (!serviceRequest.performer.isNullOrEmpty()) {
+        if (serviceRequest.isInspectionOfResp()) {
             return 0.0
         }
         val observationType = conceptService.byCodeableConcept(serviceRequest.code)
@@ -163,11 +193,13 @@ class ServiceRequestsExecutionCalculator(
     /**
      * Информация о кабинете, в котором может быть проведена услуга
      * @param serviceRequestId id назначения
+     * @param code тип обследования
      * @param locationId id кабинета
      * @param estWaiting предположительное ожидание в очереди
      */
     private class ServiceRequestExecLocationInfo(
             val serviceRequestId: String,
+            val code: String,
             val locationId: String,
             val estWaiting: Int
     )

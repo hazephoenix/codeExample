@@ -2,29 +2,47 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.BLOOD_ANALYSIS_CATEGORY
+import ru.viscur.dh.datastorage.api.util.URINE_ANALYSIS_CATEGORY
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
+import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
-import ru.viscur.dh.fhir.model.utils.code
-import ru.viscur.dh.fhir.model.utils.execDuration
-import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
+import ru.viscur.dh.fhir.model.utils.*
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
+import java.util.*
 import javax.persistence.*
 
 @Service
 class ObservationServiceImpl(
         private val resourceService: ResourceService,
         private val serviceRequestService: ServiceRequestService,
-        private val observationDurationService: ObservationDurationEstimationService
+        private val observationDurationService: ObservationDurationEstimationService,
+        private val conceptService: ConceptService
 ) : ObservationService {
 
-    @PersistenceContext
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
+
+    override fun byPeriod(start: Date, end: Date): List<Observation> {
+        val query = em.createNativeQuery("""
+            select r.resource
+            from Observation r
+            where r.resource->'basedOn' <> 'null' 
+              and (r.resource->>'issued')\:\:bigint >= :periodStart
+              and (r.resource->>'issued')\:\:bigint <= :periodEnd
+            order by r.resource ->> 'issued'
+            """)
+        query.setParameter("periodStart", start.time)
+        query.setParameter("periodEnd", end.time)
+        return query.fetchResourceList()
+    }
 
     /**
      * Найти все обследования по id пациента и статусу обследования
      */
-    override fun byPatientAndStatus(patientId: String, status: ObservationStatus?): List<Observation?> {
+    override fun byPatientAndStatus(patientId: String, status: ObservationStatus?): List<Observation> {
         var queryStr = """
             select r.resource
                 from Observation r
@@ -81,11 +99,25 @@ class ObservationServiceImpl(
                         ?: ServiceRequestExtension(execEnd = now())
                 observation.code = this.code
             }
-            val duration = updatedServiceRequest.extension?.execDuration()
-            if (diagnosis != null && duration != null) {
-                observationDurationService.saveToHistory(updatedServiceRequest.code.code(), diagnosis, severity, duration)
+            if (diagnosis != null && updatedServiceRequest.extension?.execStart != null) {
+                observationDurationService.saveToHistory(patientId, updatedServiceRequest.code.code(), diagnosis, severity, updatedServiceRequest.extension!!.execStart!!, updatedServiceRequest.extension!!.execEnd!!)
             }
-        }
+        } ?: throw Exception("not defined serviceRequestId in basedOn of observation")
+        //если это кровь, то необходимо автоматом сделать прием мочи
+        //todo пред. версия. если не вернемся к ней, можно удалить
+//        val observationTypeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, observation.code.code())
+//        if (observationTypeConcept.parentCode == BLOOD_ANALYSIS_CATEGORY) {
+//            val urineServiceRequests = serviceRequestService.activeByObservationCategory(patientId, URINE_ANALYSIS_CATEGORY)
+//            urineServiceRequests.forEach {
+//                create(patientId, Observation(
+//                        code = it.code,
+//                        subject = observation.subject,
+//                        performer = listOf(),
+//                        basedOn = Reference(it),
+//                        issued = now()
+//                ), diagnosis, severity)
+//            }
+//        }
         updateRelated(patientId, observation)
         return resourceService.create(observation)
     }
@@ -143,7 +175,7 @@ class ObservationServiceImpl(
         getCarePlanByServiceRequestId(serviceRequestId)?.let { carePlan ->
             resourceService.update(ResourceType.CarePlan, carePlan.id) {
                 val serviceRequests = serviceRequestService.all(patientId)
-                val serviceRequestsWithoutResp = serviceRequests.filter { it.performer.isNullOrEmpty() }
+                val serviceRequestsWithoutResp = serviceRequests.filter { !it.isInspectionOfResp() }
                 status = when {
                     serviceRequestsWithoutResp.any { it.status == ServiceRequestStatus.active } -> CarePlanStatus.active
                     serviceRequestsWithoutResp.all { it.status == ServiceRequestStatus.completed } -> CarePlanStatus.results_are_ready

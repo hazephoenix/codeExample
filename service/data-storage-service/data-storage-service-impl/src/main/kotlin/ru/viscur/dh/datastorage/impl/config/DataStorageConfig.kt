@@ -15,8 +15,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.*
 import org.springframework.context.annotation.ComponentScan.Filter
+import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.orm.jpa.JpaTransactionManager
+import org.springframework.scheduling.TaskScheduler
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import java.util.concurrent.Executor
 import javax.persistence.EntityManagerFactory
 
 const val PERSISTENCE_UNIT_NAME = "datastoragePersistenceUnit"
@@ -40,6 +45,7 @@ private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entity"
             )
         ]
 )
+@EnableAsync
 @EnableTransactionManagement
 @EnableConfigurationProperties
 @AutoConfigureAfter(HibernateJpaAutoConfiguration::class)
@@ -97,4 +103,13 @@ class DataStorageConfig {
     @Bean(name = ["dsTxManager"])
     fun txManager(@Qualifier("dsEntityManagerFactory") dsEntityManagerFactory: EntityManagerFactory) = JpaTransactionManager(dsEntityManagerFactory)
 
+    @Bean
+    fun taskExecutor(): Executor {
+        return SimpleAsyncTaskExecutor()
+    }
+
+    @Bean
+    fun taskScheduler(): TaskScheduler {
+        return ConcurrentTaskScheduler()
+    }
 }

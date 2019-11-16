@@ -48,6 +48,11 @@ class QueueController(private val queueManagerService: QueueManagerService) {
         )
     }
 
+    @PostMapping("/office/delayGoingToObservation")
+    fun delayGoingToObservation(@RequestBody patientReference: Reference) = logAndValidateAfter {
+        queueManagerService.delayGoingToObservation(patientId = patientReference.id!!, onlyIfFirstInQueueIsLongWaiting = false)
+    }
+
     @PostMapping("/office/patientLeft")
     fun patientLeft(@RequestBody listOfReference: ListResource) = logAndValidateAfter {
         queueManagerService.patientLeft(
@@ -57,8 +62,9 @@ class QueueController(private val queueManagerService: QueueManagerService) {
     }
 
     @PostMapping("/office/cancelEntering")
-    fun cancelEntering(@RequestBody patientReference: Reference) =
-            logAndValidateAfter { queueManagerService.cancelEntering(patientReference.id!!) }
+    fun cancelEntering(@RequestBody patientReference: Reference) = logAndValidateAfter {
+        logAndValidateAfter { queueManagerService.cancelEntering(patientReference.id!!) }
+    }
 
     @PostMapping("/office/ready")
     fun officeIsReady(@RequestBody officeReference: Reference) =
@@ -100,6 +106,9 @@ class QueueController(private val queueManagerService: QueueManagerService) {
 
     @GetMapping("/queueItems")
     fun queueItems() = queueManagerService.queueItems()
+
+    @GetMapping("/locationMonitor")
+    fun locationMonitor(@RequestParam officeId: String) = queueManagerService.locationMonitor(officeId)
 
     @GetMapping("/info")
     fun queueInfo() = queueManagerService.loqAndValidate()

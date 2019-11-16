@@ -12,16 +12,12 @@ import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.fhir.model.type.LocationExtension
-import ru.viscur.dh.fhir.model.type.LocationExtensionLastPatientInfo
+import ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo
 import ru.viscur.dh.fhir.model.type.Reference
-import ru.viscur.dh.fhir.model.utils.msToSeconds
-import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
+import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
-import ru.viscur.dh.queue.impl.ageGroup
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 
 @Service
 class OfficeServiceImpl(
@@ -36,41 +32,34 @@ class OfficeServiceImpl(
             filterLike = true
     ))
 
-    override fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String?) {
+    @Tx
+    override fun changeStatus(officeId: String, newStatus: LocationStatus) {
         val now = now()
         val office = locationService.byId(officeId)
         val queueHistoryOfOffice = QueueHistoryOfOffice(
                 location = Reference(office),
                 status = office.status,
-                fireDate = office.extension?.statusUpdatedAt,
-                duration = office.extension?.statusUpdatedAt?.let { msToSeconds(now.time - it.time) }
+                fireDate = office.extension.statusUpdatedAt,
+                duration = durationInSeconds(office.extension.statusUpdatedAt, now)
         )
-
-        patientIdOfPrevProcess?.run {
-            val patient = patientService.byId(this)
-            queueHistoryOfOffice.apply {
-                severity = patientService.severity(patientIdOfPrevProcess)
-                diagnosticConclusion = patientService.preliminaryDiagnosticConclusion(patientIdOfPrevProcess)
-                ageGroup = ageGroup(patient.birthDate)
-            }
-        }
         resourceService.create(queueHistoryOfOffice)
         resourceService.update(ResourceType.Location, officeId) {
             status = newStatus
-            extension = extension?.apply { statusUpdatedAt = now }
-                    ?: LocationExtension(statusUpdatedAt = now)
+            extension = extension.apply { statusUpdatedAt = now }
         }
     }
 
-    override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, asFirst: Boolean) {
+    @Tx
+    override fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, toIndex: Int?) {
         val queueItem = QueueItem(
                 subject = referenceToPatient(id = patientId),
                 location = referenceToLocation(id = officeId),
-                estDuration = estDuration
+                estDuration = estDuration,
+                queueNumber = patientService.queueNumber(patientId)
         )
         val queue = queueService.queueItemsOfOffice(officeId)
-        if (asFirst) {
-            queue.add(queue.indexOfLast { it.patientQueueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION) } + 1, queueItem)
+        if (toIndex != null) {
+            queue.add(queue.indexOfLast { it.patientQueueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION) } + 1 + toIndex, queueItem)
         } else {
             when (val userSeverity = patientService.severity(patientId)) {
                 Severity.GREEN -> queue.add(queueItem)
@@ -95,9 +84,11 @@ class OfficeServiceImpl(
         saveQueue(officeId, queue)
     }
 
+    @Tx
     override fun firstPatientIdInQueue(officeId: String): String? =
             queueService.queueItemsOfOffice(officeId).filter { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }.firstOrNull()?.subject?.id
 
+    @Tx
     override fun deleteFirstPatientFromQueue(officeId: String) {
         val queue = queueService.queueItemsOfOffice(officeId)
         if (queue.isEmpty()) return
@@ -105,33 +96,36 @@ class OfficeServiceImpl(
         saveQueue(officeId, queue)
     }
 
+    @Tx
     override fun deletePatientFromQueue(officeId: String, patientId: String) {
         val queue = queueService.queueItemsOfOffice(officeId)
         queue.removeAt(queue.indexOfFirst { it.subject.id == patientId })
         saveQueue(officeId, queue)
     }
 
-    override fun deletePatientFromLastPatientInfo(patientId: String) {
-        locationService.withPatientInLastPatientInfo(patientId).forEach {
+    @Tx
+    override fun deletePatientFromNextOfficesForPatientsInfo(patientId: String) {
+        locationService.withPatientInNextOfficeForPatientsInfo(patientId).forEach {
             resourceService.update(ResourceType.Location, it.id) {
-                if (extension?.lastPatientInfo?.subject?.id == patientId) {
-                    extension?.lastPatientInfo = null
-                }
+                extension.nextOfficeForPatientsInfo = extension.nextOfficeForPatientsInfo.filterNot { it.subject.id!! == patientId }
             }
         }
     }
 
-    override fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?) {
+    @Tx
+    override fun addToNextOfficeForPatientsInfo(officeId: String, patientId: String, nextOfficeId: String) {
         resourceService.update(ResourceType.Location, officeId) {
-            val newLastPatientInfo = LocationExtensionLastPatientInfo(
+            val newNextOfficeForPatientInfo = LocationExtensionNextOfficeForPatientInfo(
                     subject = referenceToPatient(patientId),
-                    nextOffice = nextOfficeId?.let { referenceToLocation(nextOfficeId) }
+                    severity = patientService.severity(patientId),
+                    queueNumber = patientService.queueNumber(patientId),
+                    nextOffice = referenceToLocation(nextOfficeId)
             )
-            extension = extension?.apply { lastPatientInfo = newLastPatientInfo }
-                    ?: LocationExtension(lastPatientInfo = newLastPatientInfo)
+            extension.nextOfficeForPatientsInfo = extension.nextOfficeForPatientsInfo + newNextOfficeForPatientInfo
         }
     }
 
+    @Tx
     private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
         queueService.deleteQueueItemsOfOffice(officeId)
         queue.forEachIndexed { index, it -> resourceService.create(it.apply { onum = index }) }

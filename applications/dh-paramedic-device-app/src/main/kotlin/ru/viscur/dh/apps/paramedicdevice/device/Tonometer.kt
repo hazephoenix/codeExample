@@ -1,17 +1,26 @@
 package ru.viscur.dh.apps.paramedicdevice.device
 
-import com.fazecast.jSerialComm.*
-import org.slf4j.*
-import org.springframework.beans.factory.annotation.*
-import org.springframework.context.*
+import com.fazecast.jSerialComm.SerialPort
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Profile
-import org.springframework.context.event.*
-import org.springframework.stereotype.*
-import ru.viscur.dh.apps.paramedicdevice.dto.*
-import ru.viscur.dh.apps.paramedicdevice.enums.*
-import ru.viscur.dh.apps.paramedicdevice.events.*
+import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Component
+import ru.viscur.dh.apps.paramedicdevice.dto.TonometerError
+import ru.viscur.dh.apps.paramedicdevice.dto.TonometerResponse
+import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
 import ru.viscur.dh.apps.paramedicdevice.utils.*
-import java.sql.*
+import ru.viscur.dh.common.dto.events.TaskComplete
+import ru.viscur.dh.common.dto.events.TaskError
+import ru.viscur.dh.common.dto.events.TaskRequested
+import ru.viscur.dh.common.dto.events.TaskStarted
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskType
+import java.sql.Timestamp
+import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
 /**
  * Класс для работы с тонометром A&D TM-2655P
@@ -21,14 +30,28 @@ import java.sql.*
  *
  * Активный в случае, если нет профиля triton-monitor, если профиль включен, то заменяется [TritonTonometer]
  */
-@Profile("!triton-monitor")
+@Profile("!triton-monitor & !fake-device")
 @Component
 class Tonometer(
-        @Value("\${paramedic.serial.port.system.name}")
+        @Value("\${paramedic.serial.port.system.name:0}")
         private val systemPortName: String,
         private val publisher: ApplicationEventPublisher
 ) {
     private val log: Logger = LoggerFactory.getLogger(Tonometer::class.java)
+
+    private lateinit var comPort: SerialPort
+
+    @PostConstruct
+    fun postCreate() {
+        comPort = SerialPort.getCommPort(systemPortName)
+        comPort.openPort()
+        comPort.baudRate = 2400
+    }
+
+    @PreDestroy
+    fun preDestroy() {
+        comPort.closePort()
+    }
 
     @EventListener(TaskRequested::class)
     fun listener(event: TaskRequested) {
@@ -44,32 +67,27 @@ class Tonometer(
      */
     private fun doMeasure(task: Task) {
         try {
-            SerialPort.getCommPort(systemPortName).let { port ->
-                port.openPort()
-                // По умолчанию скорость передачи данных тонометра - 2400 бит/с
-                port.baudRate = 2400
-                log.info("Serial Port baud rate settings: ${port.baudRate}")
-                log.info("Serial Port is opened: ${port.isOpen}")
+                log.info("Serial Port baud rate settings: ${comPort.baudRate}")
+                log.info("Serial Port is opened: ${comPort.isOpen}")
 
-                port.writeBytes(startMeasuringCmd, startMeasuringCmd.size.toLong())
+                comPort.writeBytes(stopMeasuringCmd, stopMeasuringCmd.size.toLong())
+                comPort.writeBytes(startMeasuringCmd, startMeasuringCmd.size.toLong())
                 var measuring = true
                 var resultArray = byteArrayOf()
                 while (measuring) {
-                    while (port.bytesAvailable() == 0)
+                    while (comPort.bytesAvailable() == 0)
                         Thread.sleep(20)
 
-                    val readBuffer = ByteArray(port.bytesAvailable())
-                    port.readBytes(readBuffer, readBuffer.size.toLong())
+                    val readBuffer = ByteArray(comPort.bytesAvailable())
+                    comPort.readBytes(readBuffer, readBuffer.size.toLong())
                     resultArray += readBuffer
 
                     if (readBuffer.find { it == ETX } != null) {
                         measuring = false
-                        port.closePort()
                         task.result = rbResult(resultArray)
                         publisher.publishEvent(TaskComplete(task))
                     }
                 }
-            }
         } catch (e: Exception) {
             log.error("Error while take tonometer results!: ${e.message}", e)
             publisher.publishEvent(TaskError(task))

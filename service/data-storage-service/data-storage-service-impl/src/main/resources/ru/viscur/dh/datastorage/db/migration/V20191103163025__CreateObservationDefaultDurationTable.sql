@@ -7,7 +7,7 @@ create table observation_default_duration
 (
     id         bigint not null default nextval('pk_seq') constraint observation_default_duration_pkey primary key,
     code       text not null,
-    diagnosis  text not null,
+    diagnosis  text,
     severity   text not null,
     duration   integer not null
 );

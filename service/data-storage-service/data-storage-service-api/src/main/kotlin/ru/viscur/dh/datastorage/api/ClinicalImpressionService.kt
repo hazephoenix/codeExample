@@ -7,10 +7,23 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
  * Сервис для работы с обращениями пациентов
  */
 interface ClinicalImpressionService {
+
+    /**
+     * Все активные обращения пациентов
+     */
+    fun allActive(): List<ClinicalImpression>
+
+    /**
+     * Есть ли активное обращение
+     * Если есть, то возвращается найденное
+     */
+    fun hasActive(patientId: String): ClinicalImpression?
+
     /**
      * Активное обращение пациента
+     * Падение, если не найдено
      */
-    fun active(patientId: String): ClinicalImpression?
+    fun active(patientId: String): ClinicalImpression
 
     /**
      * По id назначения

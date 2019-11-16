@@ -24,10 +24,11 @@ open class BaseTestCase(
 class QueueOfOfficeSimple(
         val officeId: String,
         val items: List<QueueItemSimple>,
-        val officeStatus: LocationStatus = LocationStatus.BUSY
+        val officeStatus: LocationStatus = LocationStatus.BUSY,
+        val nextOfficeForPatientsInfo: List<NextOfficeForPatientInfoSimple>? = null
 ) {
     override fun toString(): String {
-        return "QueueOfOfficeSimple(officeId='$officeId', items=$items)"
+        return "QueueOfOfficeSimple(officeId='$officeId', items=$items, nextOfficeForPatientsInfo=$nextOfficeForPatientsInfo)"
     }
 }
 
@@ -41,6 +42,11 @@ class QueueItemSimple(
         return "QueueItemSimple(status=$status, severity=$severity, estDuration=$estDuration, patientId=$patientId)"
     }
 }
+
+data class NextOfficeForPatientInfoSimple(
+        val patientId: String,
+        val nextOfficeId: String
+)
 
 class CarePlanSimple(
         val severity: Severity,
@@ -56,3 +62,14 @@ class ServiceRequestSimple(
         return "ServiceRequestSimple(code='$code', status=$status, locationId=$locationId)"
     }
 }
+
+data class ObservationDurationSimple(
+        val code: String,
+        val duration: Int
+)
+
+data class QueueHistoryOfPatientSimple(
+        val status: PatientQueueStatus,
+        val duration: Int,
+        val officeId: String? = null
+)

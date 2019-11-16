@@ -91,6 +91,29 @@ class SetAsFirstTest {
     }
 
     @Test
+    fun `in another queue, single`() {
+        forTestService.cleanDb()
+        val officeId = OFFICE_130
+        val checkP = forTestService.createPatientWithQueueItem(officeId = OFFICE_202, queueStatus = IN_QUEUE, index = 0, servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        forTestService.updateOfficeStatuses()
+
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = checkP, status = IN_QUEUE)
+        ))))
+
+        queueManagerService.setAsFirst(checkP, officeId)
+
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = checkP, status = IN_QUEUE)
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, officeStatus = LocationStatus.BUSY, items = listOf(
+        ))))
+    }
+
+    @Test
     fun `not in queue, going exists`() {
         forTestService.cleanDb()
         var i = 0

@@ -5,28 +5,33 @@ as
 select
        SPLIT_PART(respPractRef, '/', 2) as resp_practitioner_id,
        SPLIT_PART(patientRef, '/', 2) as patient_id,
-       jsonb_array_elements(items.item -> 'answer') -> 'valueCoding'->>'code' as severity,
+       severity as severity,
        cp.resource ->> 'status' as care_plan_status,
+       SPLIT_PART(oq.officeOfQueue, '/', 2) as queue_office_id,
        p.resource as patient
-from (
-         select jsonb_array_elements(r.resource -> 'item') as item,
-                r.resource -> 'source' ->> 'reference' as patientRef,
-                r.resource -> 'author' ->> 'reference' as respPractRef
-         from questionnaireResponse r
-         where r.resource ->> 'questionnaire' = 'Questionnaire/Severity_criteria'
-           and 'QuestionnaireResponse/' || r.id in (
-             select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+from
+         (
+             select ci.resource -> 'assessor' ->> 'reference' as respPractRef,
+                    ci.resource -> 'subject' ->> 'reference'  as patientRef,
+                    ci.resource -> 'extension' ->> 'severity' as severity
              from clinicalImpression ci
              where ci.resource ->> 'status' = 'active'
-               and ci.resource -> 'subject' ->> 'reference' = r.resource -> 'source' ->> 'reference'
-         )
-     ) as items
+         ) as ci
          join patient p on p.id = SPLIT_PART(patientRef, '/', 2)
-         join (select * from careplan cp
-             where
-                         cp.resource ->> 'status' = 'active' or
-                         cp.resource ->> 'status' = 'results_are_ready' or
-                         cp.resource ->> 'status' = 'waiting_results') cp
+         join (select *
+               from careplan cp
+               where cp.resource ->> 'status' in (
+                      'active',
+                      'results_are_ready',
+                      'waiting_results'
+                   )
+             ) cp
              on cp.resource -> 'subject' ->> 'reference' = patientRef
-where items.item ->> 'linkId' = 'Severity'
+         left join (
+            select q.resource-> 'location' ->>'reference' as officeOfQueue,
+                   q.resource
+            from queueitem q
+         ) oq
+         on oq.resource -> 'subject' ->> 'reference' = patientRef
+order by cp.resource ->> 'created'
 ;

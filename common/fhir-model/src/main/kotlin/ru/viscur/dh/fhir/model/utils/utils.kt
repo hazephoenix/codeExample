@@ -2,6 +2,7 @@ package ru.viscur.dh.fhir.model.utils
 
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Reference
@@ -26,9 +27,24 @@ const val MILLISECONDS_IN_SECOND = 1000
 const val SECONDS_IN_MINUTE = 60
 
 /**
+ * Количество минут в часе
+ */
+const val MINUTES_IN_HOUR = 60
+
+/**
+ * Количество часов в сутках
+ */
+const val HOURS_IN_DAY = 24
+
+/**
  * Перевод миллисекунд в секунды
  */
 fun msToSeconds(ms: Long) = (ms / MILLISECONDS_IN_SECOND).toInt()
+
+/**
+ * Продолжительность периода от start до end в секундах
+ */
+fun durationInSeconds(start: Date, end: Date) = msToSeconds(end.time - start.time)
 
 /**
  * Текущее время в формате Date
@@ -44,6 +60,26 @@ fun nowAsTimeStamp() = now().toTimestamp()
  * Преобразование Date в Timestamp
  */
 fun Date.toTimestamp(): Timestamp = Timestamp.from(this.toInstant())
+
+/**
+ * Преобразование Timestamp в Date
+ */
+fun Timestamp.toDate(): Date = Date.from(this.toInstant())
+
+/**
+ * Прибавить кол-во дней
+ */
+fun Date.plusDays(days: Int) = Date(this.time + days * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND)
+
+/**
+ * Прибавить кол-во минут
+ */
+fun Date.plusMinutes(minutes: Int) = Date(this.time + minutes * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND)
+
+/**
+ * Прибавить кол-во секунд
+ */
+fun Date.plusSeconds(seconds: Int) = Date(this.time + seconds * MILLISECONDS_IN_SECOND)
 
 /**
  * Дата в формате строки yyyy.MM.dd HH:mm:ss
@@ -110,4 +146,28 @@ fun <T> Bundle.resources(type: ResourceType<T>): List<T> where T : BaseResource 
  * Продолжительность выполнения услуги
  * Если одно из execStart, execEnd не задано, то возвращает null
  */
-fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execStart != null) msToSeconds(execEnd!!.time - execStart!!.time) else null
+fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execStart != null) durationInSeconds(execStart!!, execEnd!!) else null
+
+/**
+ * Назначение является осмотром ответственного - если указан исполнитель
+ */
+fun ServiceRequest.isInspectionOfResp() = !this.performer.isNullOrEmpty()
+
+/**
+ * Критичное время для удаления [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]
+ * Все записи старее этого времени должны быть удалены
+ */
+fun criticalTimeForDeletingNextOfficeForPatientsInfo(): Date {
+    //сколько минут отображается информация о последующем кабинете для пациентов
+    val minutesForShowingNextOfficeForPatients = 3
+    return now().plusMinutes(-minutesForShowingNextOfficeForPatients)
+}
+
+/**
+ * Критичное время для того, чтобы отложить прием пациента, который долго находится в статусе [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.GOING_TO_OBSERVATION]
+ */
+fun criticalTimeForDelayGoingToObservation(): Date {
+    //сколько секунд ожидаем пациента со статусом [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.GOING_TO_OBSERVATION]
+    val secondsToWaitGoingToObservationPatient = 30
+    return now().plusSeconds(-secondsToWaitGoingToObservationPatient)
+}

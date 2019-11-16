@@ -4,23 +4,25 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import ru.viscur.dh.apps.paramedicdevice.dto.Task
-import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
-import ru.viscur.dh.apps.paramedicdevice.dto.TemperatureResponse
-import ru.viscur.dh.apps.paramedicdevice.events.TaskComplete
-import ru.viscur.dh.apps.paramedicdevice.events.TaskError
-import ru.viscur.dh.apps.paramedicdevice.events.TaskRequested
-import ru.viscur.dh.apps.paramedicdevice.events.TaskStarted
+import ru.viscur.dh.apps.paramedicdevice.dto.DocumentResponse
+import ru.viscur.dh.common.dto.events.TaskComplete
+import ru.viscur.dh.common.dto.events.TaskError
+import ru.viscur.dh.common.dto.events.TaskRequested
+import ru.viscur.dh.common.dto.events.TaskStarted
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskType
 
 /**
  * Сканер документов
  */
 @Component
+@Profile("!fake-device")
 class Document(
         private val restTemplate: RestTemplate,
         @Value("\${paramedic.native-service.url:http://localhost:8850}")
@@ -45,12 +47,12 @@ class Document(
         if (scanResponse.statusCode == HttpStatus.OK && !scanResponse.body?.uuid.isNullOrBlank()) {
             val checkUrl = "$nativeServiceUrl/document-reader/check-result?request-uuid=${scanResponse.body!!.uuid}"
             executor.run {
-                var running = true;
+                var running = true
                 while (running) {
                     val response = restTemplate.getForEntity(checkUrl, ResponseWrapper::class.java)
-                    val resp = response.body;
+                    val resp = response.body
                     if (resp == null) {
-                        running = false;
+                        running = false
                         publisher.publishEvent(TaskError(task))
                     } else {
                         running = handleCheckResponse(resp, task)
@@ -58,7 +60,7 @@ class Document(
                 }
             }
         } else {
-            publisher.publishEvent(TaskError(task));
+            publisher.publishEvent(TaskError(task))
         }
     }
 
@@ -66,8 +68,8 @@ class Document(
         var repeatRequest = false
         when (resp.status) {
             Status.InProgress -> {
-                repeatRequest = true;
-                Thread.sleep(1000);
+                repeatRequest = true
+                Thread.sleep(1000)
             }
             Status.Ok -> {
                 task.result = resp.value
@@ -84,7 +86,7 @@ class Document(
 
     data class ResponseWrapper(
             val status: Status,
-            val value: TemperatureResponse?
+            val value: DocumentResponse?
     )
 
     data class ScanResponse(

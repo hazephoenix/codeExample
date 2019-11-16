@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import javax.persistence.EntityManager
@@ -17,7 +18,7 @@ class PractitionerServiceImpl(
         private val resourceService: ResourceService
 ) : PractitionerService {
 
-    @PersistenceContext
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun all() = resourceService.all(ResourceType.Practitioner, RequestBodyForResources(filter = mapOf()))

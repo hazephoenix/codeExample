@@ -2,6 +2,8 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.filterForQueue
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -14,7 +16,7 @@ class ServiceRequestServiceImpl(
         private val carePlanService: CarePlanService
 ) : ServiceRequestService {
 
-    @PersistenceContext
+    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun all(patientId: String): List<ServiceRequest> {
@@ -79,6 +81,39 @@ class ServiceRequestServiceImpl(
         return query.fetchResourceList()
     }
 
+    override fun activeByObservationCategory(patientId: String, parentCode: String): List<ServiceRequest> {
+        //  active clinicalImpression -> carePlan -> active serviceRequests у которых коды имеют указанный parentCode
+        val query = em.createNativeQuery("""
+            select sr.resource
+            from (
+                     select jsonb_array_elements(r.resource -> 'code' -> 'coding') ->> 'code' code, r.resource
+                     from serviceRequest r
+                     where 'ServiceRequest/' || r.id in (
+                         select jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
+                         from carePlan cp
+                         where 'CarePlan/' || cp.id in (
+                             select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                             from clinicalImpression ci
+                             where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                               and ci.resource ->> 'status' = 'active'
+                         )
+                     )
+                       and r.resource ->> 'status' = 'active'
+                 ) sr
+            join (
+                select r.resource ->> 'code' code
+                from concept r
+                where r.resource ->> 'system' = 'ValueSet/Observation_types'
+                    and r.resource ->> 'parentCode' = :parentCode
+            ) c
+            on sr.code = c.code
+            order by sr.resource -> 'extension' ->> 'executionOrder'
+            """)
+        query.setParameter("patientRef", "Patient/$patientId")
+        query.setParameter("parentCode", parentCode)
+        return query.fetchResourceList()
+    }
+
 
     override fun active(patientId: String): List<ServiceRequest> {
         //active clinicalImpression -> carePlan -> active serviceRequests
@@ -101,6 +136,9 @@ class ServiceRequestServiceImpl(
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResourceList()
     }
+
+    override fun activeForQueue(patientId: String, officeId: String?): List<ServiceRequest> =
+            (officeId?.run { active(patientId, officeId) } ?: run { active(patientId) }).filterForQueue()
 
     @Tx
     override fun add(patientId: String, serviceRequestList: List<ServiceRequest>): CarePlan {

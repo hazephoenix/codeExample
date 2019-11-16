@@ -17,13 +17,13 @@ interface OfficeService {
      * Изменение статуса кабинета [office] на [newStatus]
      * @param patientIdOfPrevProcess id пациента закончившегося процесса
      */
-    fun changeStatus(officeId: String, newStatus: LocationStatus, patientIdOfPrevProcess: String? = null)
+    fun changeStatus(officeId: String, newStatus: LocationStatus)
 
     /**
      * Добавление пациента в очередь в кабинет
-     * @param asFirst принять как первого в очереди - на первую позицию. Иначе в зависимости от степени тяжести
+     * @param toIndex в какую позицию поставить (нумерация с 0, если первыйм = 0). Если не задано, то в зависимости от степени тяжести
      */
-    fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, asFirst: Boolean = false)
+    fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, toIndex: Int? = null)
 
     /**
      * Id первого пациента в очереди в кабинета
@@ -41,12 +41,12 @@ interface OfficeService {
     fun deletePatientFromQueue(officeId: String, patientId: String)
 
     /**
-     * Удаление пациента из информации о последнем пациенте (если он фигурирует в такой информации в каком-либо кабинете)
+     * Удаление пациента из информации о последующем кабинете пациента (если он фигурирует в такой информации в каком-либо кабинете)
      */
-    fun deletePatientFromLastPatientInfo(patientId: String)
+    fun deletePatientFromNextOfficesForPatientsInfo(patientId: String)
 
     /**
-     * Обновление информации о последнем пациенте у кабинета
+     * Добавление в информацию о последующих кабинетов для пациентов у кабинета
      */
-    fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?)
+    fun addToNextOfficeForPatientsInfo(officeId: String, patientId: String, nextOfficeId: String)
 }

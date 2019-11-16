@@ -6,10 +6,7 @@ import io.restassured.specification.RequestSpecification
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
-import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.utils.referenceToLocation
-import ru.viscur.dh.fhir.model.utils.referenceToPatient
-import ru.viscur.dh.fhir.model.utils.referenceToPractitioner
+import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import java.util.*
@@ -18,6 +15,8 @@ class Helpers {
 
 
     companion object {
+
+        private var counter = 0
 
         /**
          * id фельдшера
@@ -91,8 +90,8 @@ class Helpers {
                                 type = IdentifierType.SNILS
                         ),
                         Identifier(
-                                value = "7878 77521487",//номер
-                                type = IdentifierType.BRACELET
+                                value = "З-018",//номер
+                                type = IdentifierType.QUEUE_CODE
                         )
                 ),
                 name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван", "Алексеевич"))),
@@ -146,7 +145,7 @@ class Helpers {
                         systemId = ValueSetName.CONSENT_CATEGORIES.id,
                         display = "Согласие на обарботку ПДн"
                 )),
-                dateTime = now(),
+                dateTime = Date(now().time - 120 * MILLISECONDS_IN_SECOND),
                 patient = referenceToPatient(patientId),
                 performer = referenceToPractitioner("ignored"),
                 organization = listOf(Reference(Organization(name = "СибГМУ")))
@@ -254,13 +253,17 @@ class Helpers {
                 activity = serviceRequests.map { CarePlanActivity(outcomeReference = Reference(it)) }
         )
 
-        fun createClinicalImpression(patientId: String, supportingInfo: List<Reference>) = ClinicalImpression(
+        fun createClinicalImpression(patientId: String, severity: Severity, supportingInfo: List<Reference>) = ClinicalImpression(
                 status = ClinicalImpressionStatus.active,
                 date = now(),
                 subject = referenceToPatient(patientId),
                 assessor = referenceToPractitioner(surgeonId), // ответственный врач
                 summary = "Заключение: направлен на обследования по маршрутному листу",
-                supportingInfo = supportingInfo
+                supportingInfo = supportingInfo,
+                extension = ClinicalImpressionExtension(
+                        severity = severity,
+                        queueNumber = severity.display.substring(0, 1) + "00" + counter++
+                )
         )
     }
 }

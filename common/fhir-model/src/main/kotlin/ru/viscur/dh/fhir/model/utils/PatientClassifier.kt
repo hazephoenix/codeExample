@@ -33,7 +33,7 @@ class PatientClassifier {
                     severity = Concept(
                             code = it.severity.toString(),
                             system = "ValueSet/${ValueSetName.SEVERITY.id}",
-                            display = it.severity.translation
+                            display = it.severity.display
                     ),
                     mainSyndrome = mainSyndromePredictor.predict(),
                     severityReason = it.reason

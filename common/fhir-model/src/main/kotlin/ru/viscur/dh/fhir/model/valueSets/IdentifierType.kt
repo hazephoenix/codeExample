@@ -35,9 +35,9 @@ enum class IdentifierType {
      */
     PAPER_ASSURANCE,
     /**
-     * Идентификатор браслета
+     * Код, отображаемый в очереди
      */
-    BRACELET,
+    QUEUE_CODE,
     /**
      * Идентификатор RFID метки
      */

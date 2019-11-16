@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
+import ru.viscur.dh.datastorage.api.util.filterForQueue
+import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
+import ru.viscur.dh.fhir.model.dto.LocationMonitorNextOfficeForPatientInfoDto
+import ru.viscur.dh.fhir.model.dto.LocationMonitorQueueItemDto
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -14,6 +18,8 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.criticalTimeForDelayGoingToObservation
+import ru.viscur.dh.fhir.model.utils.criticalTimeForDeletingNextOfficeForPatientsInfo
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -30,6 +36,7 @@ class QueueManagerServiceImpl(
         private val serviceRequestService: ServiceRequestService,
         private val observationDurationService: ObservationDurationEstimationService,
         private val serviceRequestsExecutionCalculator: ServiceRequestsExecutionCalculator,
+        private val clinicalImpressionService: ClinicalImpressionService,
         private val configService: ConfigService
 ) : QueueManagerService {
 
@@ -48,7 +55,7 @@ class QueueManagerServiceImpl(
     override fun registerPatient(patientId: String): List<ServiceRequest> {
         val serviceRequests = calcServiceRequestExecOrders(patientId)
         deleteFromQueue(patientId)//на случай пересоздания маршрутного листа
-        addToOfficeQueue(patientId, serviceRequests.first().locationReference?.first()?.id
+        addToOfficeQueue(patientId, serviceRequests.filterForQueue().first().locationReference?.first()?.id
                 ?: throw Exception("not defined location for service request with id '${serviceRequests.first().id}'"))
         return serviceRequests
     }
@@ -77,17 +84,39 @@ class QueueManagerServiceImpl(
     }
 
     @Tx
-    override fun forceSendPatientToObservation(patientId: String, officeId: String) {
+    override fun forceSendPatientToObservation(patientId: String, officeId: String): List<ServiceRequest> {
         setAsFirst(patientId, officeId)
         sendFirstToObservation(officeId)
+        return activeServiceRequestInOffice(patientId, officeId)
     }
 
     @Tx
     override fun setAsFirst(patientId: String, officeId: String) {
+        val prevOfficeId = queueService.isPatientInOfficeQueue(patientId)
         deleteFromQueue(patientId)
-        officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), asFirst = true)
-        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE, officeId)
+        officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), toIndex = 0)
+        patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
         checkEntryToOffice(officeId)
+        if (prevOfficeId != null && prevOfficeId != officeId) {
+            officeService.addToNextOfficeForPatientsInfo(prevOfficeId, patientId, officeId)
+        }
+    }
+
+    @Tx
+    override fun delayGoingToObservation(patientId: String, onlyIfFirstInQueueIsLongWaiting: Boolean) {
+        val patient = patientService.byId(patientId)
+        if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_OBSERVATION) {
+            val officeId = queueService.isPatientInOfficeQueue(patientId) ?: return
+            val firstPatientIdInQueue = officeService.firstPatientIdInQueue(officeId)
+            firstPatientIdInQueue?.run {
+                if (!onlyIfFirstInQueueIsLongWaiting || patientService.byId(firstPatientIdInQueue).extension.queueStatusUpdatedAt?.before(criticalTimeForDelayGoingToObservation()) != false) {
+                    deleteFromQueue(patientId)
+                    officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), toIndex = 1)
+                    patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
+                    enterNextPatient(officeId)
+                }
+            }
+        }
     }
 
     @Tx
@@ -96,6 +125,8 @@ class QueueManagerServiceImpl(
         if (currentOfficeId == officeId && serviceRequestService.active(patientId, officeId).isEmpty()) {
             deleteFromQueue(patientId)
             addToQueue(patientId)
+            val nextOfficeId = queueService.isPatientInOfficeQueue(patientId)
+            nextOfficeId?.run { officeService.addToNextOfficeForPatientsInfo(officeId, patientId, nextOfficeId) }
         }
 //         todo не понятно. вроде пересчитывать даже если идет обсл-е
 //        if (currentOfficeId == officeId) {
@@ -122,7 +153,7 @@ class QueueManagerServiceImpl(
             patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId, saveCurrentStatusToHistory)
             changeOfficeStatusNotReadyToProper(officeId)
         }
-        officeService.deletePatientFromLastPatientInfo(patientId)
+        officeService.deletePatientFromNextOfficesForPatientsInfo(patientId)
     }
 
     @Tx
@@ -130,13 +161,10 @@ class QueueManagerServiceImpl(
         if (queueService.isPatientInOfficeQueue(patientId) == officeId) {
             val patient = patientService.byId(patientId)
             if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_OBSERVATION) {
-                officeService.changeStatus(officeId, LocationStatus.OBSERVATION, patientId)
+                officeService.changeStatus(officeId, LocationStatus.OBSERVATION)
                 patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_OBSERVATION, officeId)
-                var serviceRequests = serviceRequestService.active(patientId, officeId)
-                if (serviceRequests.isEmpty()) {
-                    serviceRequests = serviceRequestService.active(patientId)
-                }
-                return serviceRequests
+                officeService.deletePatientFromNextOfficesForPatientsInfo(patientId)
+                return activeServiceRequestInOffice(patientId, officeId)
             }
         }
         return listOf()
@@ -150,7 +178,8 @@ class QueueManagerServiceImpl(
             patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId)
             changeOfficeStatusNotReadyToProper(officeId)
             addToQueue(patientId = patientId, prevOfficeId = officeId)
-            officeService.updateLastPatientInfo(officeId, patientId, queueService.isPatientInOfficeQueue(patientId))
+            val nextOfficeId = queueService.isPatientInOfficeQueue(patientId)
+            nextOfficeId?.run { officeService.addToNextOfficeForPatientsInfo(officeId, patientId, nextOfficeId) }
         }
     }
 
@@ -167,6 +196,16 @@ class QueueManagerServiceImpl(
         if (patient.extension.queueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION)) {
             val officeId = queueService.isPatientInOfficeQueue(patientId)
             setAsFirst(patientId, officeId!!)
+        }
+    }
+
+    @Tx
+    override fun severityUpdated(patientId: String, severity: Severity) {
+        serviceRequestsExecutionCalculator.recalcOfficeForInspectionOfResp(patientId, severity)
+        val officeId = queueService.isPatientInOfficeQueue(patientId)
+        officeId?.run {
+            deleteFromQueue(patientId)
+            addToOfficeQueue(patientId, officeId)
         }
     }
 
@@ -208,6 +247,16 @@ class QueueManagerServiceImpl(
     }
 
     @Tx
+    override fun deleteOldNextOfficeForPatientsInfo() {
+        locationService.withOldNextOfficeForPatientsInfo().forEach {
+            resourceService.update(ResourceType.Location, it.id) {
+                extension.nextOfficeForPatientsInfo =
+                        extension.nextOfficeForPatientsInfo.filter { it.fireDate.after(criticalTimeForDeletingNextOfficeForPatientsInfo()) }
+            }
+        }
+    }
+
+    @Tx
     override fun deleteQueue() {
         queueService.involvedOffices().forEach {
             officeService.changeStatus(it.id, LocationStatus.BUSY)
@@ -215,9 +264,15 @@ class QueueManagerServiceImpl(
         queueService.involvedPatients().forEach {
             patientStatusService.changeStatus(it.id, PatientQueueStatus.READY)
         }
+        resourceService.all(ResourceType.Location, RequestBodyForResources(mapOf())).forEach {
+            resourceService.update(ResourceType.Location, it.id) {
+                extension.nextOfficeForPatientsInfo = listOf()
+            }
+        }
         resourceService.deleteAll(ResourceType.QueueItem)
     }
 
+    @Tx
     override fun deleteHistory() {
         resourceService.deleteAll(ResourceType.QueueHistoryOfOffice)
         resourceService.deleteAll(ResourceType.QueueHistoryOfPatient)
@@ -227,6 +282,33 @@ class QueueManagerServiceImpl(
             Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
     override fun queueItems(): List<QueueItem> = queueService.queueItems()
+
+    override fun locationMonitor(officeId: String): LocationMonitorDto {
+        val office = locationService.byId(officeId)
+        clinicalImpressionService
+        return LocationMonitorDto(
+                officeId = officeId,
+                officeStatus = office.status.name,
+                locationType = office.type(),
+                items = queueService.queueItemsOfOffice(officeId).map { queueItem ->
+                    LocationMonitorQueueItemDto(
+                            onum = queueItem.onum!!,
+                            patientId = queueItem.subject.id!!,
+                            status = queueItem.patientQueueStatus!!.name,
+                            severity = queueItem.severity!!.name,
+                            queueNumber = queueItem.queueNumber
+                    )
+                },
+                nextOfficeForPatientsInfo = office.extension.nextOfficeForPatientsInfo.map { nextOfficeForPatientInfo ->
+                    LocationMonitorNextOfficeForPatientInfoDto(
+                            patientId = nextOfficeForPatientInfo.subject.id!!,
+                            severity = nextOfficeForPatientInfo.severity.name,
+                            queueNumber = nextOfficeForPatientInfo.queueNumber,
+                            nextOfficeId = nextOfficeForPatientInfo.nextOffice.id!!
+                    )
+                }
+        )
+    }
 
     override fun loqAndValidate(): String {
         val offices = officeService.all()
@@ -238,9 +320,11 @@ class QueueManagerServiceImpl(
             queue.forEach { queueItem ->
                 str.add("$queueItem")
             }
-            office.extension?.lastPatientInfo?.run {
-                str.add("  lastPatientInfo: " + (this.subject.reference) + ", " +
-                        (this.nextOffice?.reference ?: ""))
+            if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
+                str.add("  lastPatientInfo:")
+                office.extension.nextOfficeForPatientsInfo.forEach {
+                    str.add("    " + it.subject.id + " (${it.severity}) to " + it.nextOffice.id)
+                }
             }
 
             //при пустой очереди кабинет не должен иметь назначенного пациента
@@ -251,15 +335,20 @@ class QueueManagerServiceImpl(
                 return@forEach
             }
 
-            val firstPatientId = officeService.firstPatientIdInQueue(office.id)
+            val firstPatientId = queue.first().subject.id
             val firstPatient = patientService.byId(firstPatientId!!)
             //статус первого в очереди
             if (firstPatient.extension.queueStatus !in listOf(PatientQueueStatus.ON_OBSERVATION, PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.IN_QUEUE)) {
                 str.add("ERROR. first patient in queue to office ${office.id} has wrong status ${firstPatient.extension.queueStatus}")
             }
-            //статусы всех кроме первого в очереди
-            if (queue.filterIndexed { i, _ -> i > 0 }.any { it.patientQueueStatus != PatientQueueStatus.IN_QUEUE }) {
-                str.add("ERROR. all patients except first must have status IN_QUEUE. Office with error: ${office.id}")
+            //статусы всех кроме первых (на обсл. или проходящих на обсл.) в очереди
+            //это первый со статусом IN_QUEUE
+            val firstPatientInQueueId = officeService.firstPatientIdInQueue(office.id)
+            firstPatientInQueueId?.run {
+                val firstPatientInQueueIndex = queue.find { it.subject.id!! == firstPatientInQueueId }?.onum!!
+                if (queue.filterIndexed { i, _ -> i >= firstPatientInQueueIndex }.any { it.patientQueueStatus != PatientQueueStatus.IN_QUEUE }) {
+                    str.add("ERROR. all patients except several first patients must have status IN_QUEUE. Office with error: ${office.id}")
+                }
             }
             //один пациент не может стоять в очереди несколько раз в один офис
             queue.groupBy { it.subject.id }.forEach { (patientId, queueItems) ->
@@ -267,29 +356,27 @@ class QueueManagerServiceImpl(
                     str.add("ERROR. patient with id $patientId is in several queue items to ${office.id}")
                 }
             }
-            //совпадение статуса кабинета и статуса первого в очереди
-            if (office.status == LocationStatus.WAITING_PATIENT) {
-                if (firstPatient.extension.queueStatus != PatientQueueStatus.GOING_TO_OBSERVATION) {
-                    str.add("ERROR. ${office.id} is waiting patient but first patient has wrong status: $firstPatient")
-                }
-            } else if (office.status == LocationStatus.OBSERVATION) {
-                if (firstPatient.extension.queueStatus != PatientQueueStatus.ON_OBSERVATION) {
-                    str.add("ERROR. ${office.id} has survey status but first patient has wrong status: $firstPatient")
-                }
-            } else if (firstPatient.extension.queueStatus != PatientQueueStatus.IN_QUEUE) {
-                str.add("ERROR. ${office.id} has one of inactive status but first patient has wrong status: $firstPatient")
+            //совпадение статуса кабинета и статусов пациентов в очереди
+            val expOfficeStatus =
+                    when {
+                        queue.any { it.patientQueueStatus == PatientQueueStatus.ON_OBSERVATION } -> LocationStatus.OBSERVATION
+                        queue.any { it.patientQueueStatus == PatientQueueStatus.GOING_TO_OBSERVATION } -> LocationStatus.WAITING_PATIENT
+                        else -> LocationStatus.BUSY
+                    }
+            if (office.status != expOfficeStatus) {
+                str.add("ERROR. ${office.id} is has wrong status. exp: $expOfficeStatus, actual: ${office.status}")
             }
-            //Порядок очереди: кр, ж, з
-            val lastRed = queue.indexOfLast { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.RED }
-            val firstYellow = queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.YELLOW }
-            val lastYellow = queue.indexOfLast { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.YELLOW }
-            val firstGreen = queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.GREEN }
-            if (firstYellow != -1 && lastRed != -1 && lastRed > firstYellow) {
-                str.add("ERROR. in ${office.id} index of yellow severity patient ($firstYellow) is less than index of red severity patient ($lastRed)")
-            }
-            if (firstGreen != -1 && lastYellow != -1 && lastYellow > firstGreen) {
-                str.add("ERROR. in ${office.id} index of green severity patient ($firstYellow) is less than index of yellow severity patient ($lastYellow)")
-            }
+//            //Порядок очереди: кр, ж, з
+//            val lastRed = queue.indexOfLast { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.RED }
+//            val firstYellow = queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.YELLOW }
+//            val lastYellow = queue.indexOfLast { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.YELLOW }
+//            val firstGreen = queue.indexOfFirst { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE && it.severity == Severity.GREEN }
+//            if (firstYellow != -1 && lastRed != -1 && lastRed > firstYellow) {
+//                str.add("ERROR. in ${office.id} index of yellow severity patient ($firstYellow) is less than index of red severity patient ($lastRed)")
+//            }
+//            if (firstGreen != -1 && lastYellow != -1 && lastYellow > firstGreen) {
+//                str.add("ERROR. in ${office.id} index of green severity patient ($firstYellow) is less than index of yellow severity patient ($lastYellow)")
+//            }
         }
         //один пациент не может стоять в несколько очередей в разные кабинеты
         val allQueueItems = resourceService.all(ResourceType.QueueItem, RequestBodyForResources(filter = mapOf()))
@@ -299,9 +386,9 @@ class QueueManagerServiceImpl(
             }
         }
         //один пациент не должен отображаться в информации о посл пациенте в неск кабинетах
-        offices.mapNotNull { it.extension?.lastPatientInfo }.groupBy { it.subject.id }.forEach { (patientId, offices) ->
+        offices.map { it.extension.nextOfficeForPatientsInfo }.flatten().groupBy { it.subject.id }.forEach { (patientId, offices) ->
             if (offices.size > 1) {
-                str.add("ERROR. patient with id $patientId is in several lastPatientInfo $offices")
+                str.add("ERROR. patient with id $patientId is in several nextOfficeForPatientsInfo $offices")
             }
         }
         log.info("\n${str.joinToString("\n")}")
@@ -364,5 +451,17 @@ class QueueManagerServiceImpl(
      */
     private fun nextOfficeId(patientId: String, prevOfficeId: String?): String? =
             if (needRecalcNextOffice()) serviceRequestsExecutionCalculator.calcNextOfficeId(patientId, prevOfficeId)
-            else serviceRequestService.active(patientId).firstOrNull()?.locationReference?.first()?.id
+            else serviceRequestService.activeForQueue(patientId).firstOrNull()?.locationReference?.first()?.id
+
+    /**
+     * Непройденные назначения, которые могут быть пройдены в этом кабинете
+     * Если таковых нет, то все непройденные назначения
+     */
+    private fun activeServiceRequestInOffice(patientId: String, officeId: String): List<ServiceRequest> {
+        var serviceRequests = serviceRequestService.active(patientId, officeId)
+        if (serviceRequests.isEmpty()) {
+            serviceRequests = serviceRequestService.active(patientId)
+        }
+        return serviceRequests
+    }
 }

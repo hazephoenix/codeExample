@@ -56,7 +56,7 @@ class ObservationServiceImplTest {
                         //СНИЛС
                         Identifier(value = "7878 77521487",/*номер*/ type = IdentifierType.SNILS),
                         //qr браслета
-                        Identifier(value = "7878 77521487",/*номер*/ type = IdentifierType.BRACELET)
+                        Identifier(value = "З-018",/*номер*/ type = IdentifierType.QUEUE_CODE)
                 ),
                 name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван", "Алексеевич"))),
                 birthDate = Date(),

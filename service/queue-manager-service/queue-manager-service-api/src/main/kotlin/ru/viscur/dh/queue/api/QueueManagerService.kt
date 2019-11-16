@@ -1,8 +1,10 @@
 package ru.viscur.dh.queue.api
 
+import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
+import ru.viscur.dh.fhir.model.enums.Severity
 
 /**
  * Сервис управления очередью пациентов
@@ -46,12 +48,25 @@ interface QueueManagerService {
     /**
      * Вызов пациента на обследование в кабинет (принудительно, в обход очереди, где бы он не стоял)
      */
-    fun forceSendPatientToObservation(patientId: String, officeId: String)
+    fun forceSendPatientToObservation(patientId: String, officeId: String): List<ServiceRequest>
 
     /**
      * Поставить пациента первым в очередь в кабинет
      */
     fun setAsFirst(patientId: String, officeId: String)
+
+    /**
+     * Отложить прием ожидаемого пациента в кабинет
+     * @param onlyIfFirstInQueueIsLongWaiting только если первый в очереди долго ожидает
+     *  Необоходимо для различия кейсов:
+     *  1) если врач в кабинете сама принудительно вызывает эту функцию, то мы не проверяем сколько ждет первый в очереди
+     *  2) если вызов функции происходит по шедулеру нужно проверять сколько ждет первый в очереди, т к
+     *   2.а) если на момент приглашения первого за ним был пациент, то по истечению 30 сек нужно отложить первого, пригласить второго
+     *   2.б) если на момент приглашения никого больше не было, то мы его не откладываем, т к некого приглашать
+     *     а как только приходит следующий за ним, то мы опять засекаем 30 сек и только после этого откладываем первого
+     *     вот в этом случае эта проверка не даст отложить пациента, если первый в очереди ожидает не долго
+     */
+    fun delayGoingToObservation(patientId: String, onlyIfFirstInQueueIsLongWaiting: Boolean = true)
 
     /**
      * Переставить пациента если необходимо:
@@ -95,6 +110,11 @@ interface QueueManagerService {
     fun cancelEntering(patientId: String)
 
     /**
+     * Функционал, который нужно сделать после изменения степени тяжести
+     */
+    fun severityUpdated(patientId: String, severity: Severity)
+
+    /**
      * Кабинет готов принять пациента: смена статуса с CLOSED, BUSY на READY
      * Если кабинет находится в статусе назначенного пациента, ничего не делаем
      */
@@ -117,6 +137,11 @@ interface QueueManagerService {
     fun officeIsClosed(officeId: String)
 
     /**
+     * Удалить устаревшие [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]
+     */
+    fun deleteOldNextOfficeForPatientsInfo()
+
+    /**
      * Удалить всю очередь: из базы и из системы
      * и пациентов, и маршрутные листы
      */
@@ -136,6 +161,11 @@ interface QueueManagerService {
      * Все [QueueItem] - все элементы очередей для всех кабинетов
      */
     fun queueItems(): List<QueueItem>
+
+    /**
+     * Информация для монитора для отображения очереди/приема в кабинет/зоне
+     */
+    fun locationMonitor(officeId: String): LocationMonitorDto
 
     /**
      * Отобразить в логах очередь и провалидировать

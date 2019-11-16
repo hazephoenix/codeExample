@@ -30,6 +30,12 @@ interface PatientService {
     fun severity(patientId: String): Severity
 
     /**
+     * Код в очереди, [ru.viscur.dh.fhir.model.type.ClinicalImpressionExtension.queueNumber]
+     * Только если есть активное обращение
+     */
+    fun queueNumber(patientId: String): String
+
+    /**
      * Задать степень тяжести пациенту
      * Возвращает true если поменяли на новое. Иначе пытались поменять на тот же тип
      */
@@ -70,4 +76,9 @@ interface PatientService {
      * Если [practitionerId] не задан, возвращаются все
      */
     fun patientsToExamine(practitionerId: String? = null): List<PatientToExamine>
+
+    /**
+     * Id пациентов, которые долгое время имеют статус [PatientQueueStatus.GOING_TO_OBSERVATION]
+     */
+    fun withLongGoingToObservation(): List<String>
 }
