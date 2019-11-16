@@ -36,6 +36,7 @@ class RegisterPatientTest {
     fun `check zone for resp, green`() {
         forTestService.cleanDb()
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         //проверяемые действия
         val checkSr = forTestService.registerPatient(servReqs = listOf(
@@ -63,6 +64,7 @@ class RegisterPatientTest {
     fun `check zone for resp, red`() {
         forTestService.cleanDb()
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         //проверяемые действия
         val checkSr = forTestService.registerPatient(severity = Severity.RED, servReqs = listOf(
@@ -90,6 +92,7 @@ class RegisterPatientTest {
     fun `check zone for resp, yellow`() {
         forTestService.cleanDb()
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         //проверяемые действия
         val checkSr = forTestService.registerPatient(severity = Severity.YELLOW, servReqs = listOf(

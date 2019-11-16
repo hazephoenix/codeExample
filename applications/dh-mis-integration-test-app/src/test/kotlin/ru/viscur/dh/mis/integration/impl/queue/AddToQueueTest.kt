@@ -346,6 +346,7 @@ class AddToQueueTest {
     fun test(case: TestCase) {
         forTestService.cleanDb()
         val patientId = forTestService.prepareDb(case)
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         queueManagerService.recalcNextOffice(true)
         queueManagerService.addToQueue(patientId)

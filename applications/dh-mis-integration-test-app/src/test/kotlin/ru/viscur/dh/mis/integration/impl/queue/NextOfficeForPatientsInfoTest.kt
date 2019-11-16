@@ -12,6 +12,7 @@ import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.ObservationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.util.OFFICE_101
+import ru.viscur.dh.datastorage.api.util.OFFICE_119
 import ru.viscur.dh.datastorage.api.util.OFFICE_202
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.LocationStatus
@@ -55,6 +56,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
@@ -86,6 +88,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
@@ -126,6 +129,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
@@ -154,6 +158,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
@@ -185,6 +190,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
@@ -216,6 +222,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
@@ -252,6 +259,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
@@ -283,6 +291,7 @@ class NextOfficeForPatientsInfoTest {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val p1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
