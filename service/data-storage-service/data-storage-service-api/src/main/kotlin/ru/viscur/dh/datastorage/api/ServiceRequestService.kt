@@ -21,6 +21,13 @@ interface ServiceRequestService {
     fun active(patientId: String): List<ServiceRequest>
 
     /**
+     * Все непройденные обследования в маршрутном листе, которые проводит очередь
+     * Так, очередь игнорирует непройденные назначения по моче
+     * то же самое что и [active] полностью или по кабинету, но с фильтрацией
+     */
+    fun activeForQueue(patientId: String, officeId: String? = null): List<ServiceRequest>
+
+    /**
      * Все непройденные назначения указанной категории (категория это parentCode типа услуги)
      */
     fun activeByObservationCategory(patientId: String, parentCode: String): List<ServiceRequest>

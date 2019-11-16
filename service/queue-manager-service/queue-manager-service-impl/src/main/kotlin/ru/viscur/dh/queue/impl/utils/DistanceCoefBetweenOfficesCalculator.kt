@@ -9,22 +9,47 @@ import ru.viscur.dh.datastorage.api.util.*
  */
 class DistanceCoefBetweenOfficesCalculator {
     companion object {
+
+
+        val GROUP_1 = listOf(
+                RECEPTION,
+                RED_ZONE,
+                YELLOW_ZONE_SECTION_1,
+                YELLOW_ZONE_SECTION_2,
+                YELLOW_ZONE_SECTION_3,
+                YELLOW_ZONE_SECTION_4,
+                YELLOW_ZONE_SECTION_5,
+                YELLOW_ZONE_SECTION_6,
+                GREEN_ZONE
+        )
+        val GROUP_2 = listOf(OFFICE_101, OFFICE_104)
+        val GROUP_3 = listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130)
+        val GROUP_4 = listOf(OFFICE_150, OFFICE_151, OFFICE_149)
+        val GROUP_5 = listOf(OFFICE_116, OFFICE_117)
+        val GROUP_6 = listOf(OFFICE_202)
+        val GROUP_7 = listOf(OFFICE_120, OFFICE_120)
         private val coefs = listOf(
-                DistanceCoef(listOf(RECEPTION), listOf(OFFICE_101, OFFICE_104), 0.1),
-                DistanceCoef(listOf(RECEPTION), listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), 0.2),
-                DistanceCoef(listOf(RECEPTION), listOf(OFFICE_150, OFFICE_151, OFFICE_149), 0.4),
-                DistanceCoef(listOf(RECEPTION), listOf(OFFICE_116, OFFICE_117), 0.5),
-                DistanceCoef(listOf(RECEPTION), listOf(OFFICE_202), 0.7),
-                DistanceCoef(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), 0.3),
-                DistanceCoef(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_150, OFFICE_151, OFFICE_149), 0.5),
-                DistanceCoef(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_116, OFFICE_117), 0.6),
-                DistanceCoef(listOf(OFFICE_101, OFFICE_104), listOf(OFFICE_202), 0.8),
-                DistanceCoef(listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), listOf(OFFICE_150, OFFICE_151, OFFICE_149), 0.1),
-                DistanceCoef(listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), listOf(OFFICE_116, OFFICE_117), 0.5),
-                DistanceCoef(listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130), listOf(OFFICE_202), 0.7),
-                DistanceCoef(listOf(OFFICE_150, OFFICE_151, OFFICE_149), listOf(OFFICE_116, OFFICE_117), 0.6),
-                DistanceCoef(listOf(OFFICE_150, OFFICE_151, OFFICE_149), listOf(OFFICE_202), 0.8),
-                DistanceCoef(listOf(OFFICE_116, OFFICE_117), listOf(OFFICE_202), 0.9)
+                DistanceCoef(GROUP_1, GROUP_2, 0.1),
+                DistanceCoef(GROUP_1, GROUP_3, 0.2),
+                DistanceCoef(GROUP_1, GROUP_4, 0.4),
+                DistanceCoef(GROUP_1, GROUP_5, 0.5),
+                DistanceCoef(GROUP_1, GROUP_6, 0.7),
+                DistanceCoef(GROUP_1, GROUP_7, 0.8),
+                DistanceCoef(GROUP_2, GROUP_3, 0.3),
+                DistanceCoef(GROUP_2, GROUP_4, 0.5),
+                DistanceCoef(GROUP_2, GROUP_5, 0.6),
+                DistanceCoef(GROUP_2, GROUP_6, 0.8),
+                DistanceCoef(GROUP_2, GROUP_7, 0.9),
+                DistanceCoef(GROUP_3, GROUP_4, 0.1),
+                DistanceCoef(GROUP_3, GROUP_5, 0.5),
+                DistanceCoef(GROUP_3, GROUP_6, 0.7),
+                DistanceCoef(GROUP_3, GROUP_7, 0.6),
+                DistanceCoef(GROUP_4, GROUP_5, 0.6),
+                DistanceCoef(GROUP_4, GROUP_6, 0.8),
+                DistanceCoef(GROUP_4, GROUP_7, 0.4),
+                DistanceCoef(GROUP_5, GROUP_6, 0.9),
+                DistanceCoef(GROUP_5, GROUP_7, 1.0),
+                DistanceCoef(GROUP_6, GROUP_7, 1.1)
         )
     }
 

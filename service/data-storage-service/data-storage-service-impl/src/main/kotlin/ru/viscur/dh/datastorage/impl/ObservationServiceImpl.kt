@@ -104,19 +104,20 @@ class ObservationServiceImpl(
             }
         } ?: throw Exception("not defined serviceRequestId in basedOn of observation")
         //если это кровь, то необходимо автоматом сделать прием мочи
-        val observationTypeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, observation.code.code())
-        if (observationTypeConcept.parentCode == BLOOD_ANALYSIS_CATEGORY) {
-            val urineServiceRequests = serviceRequestService.activeByObservationCategory(patientId, URINE_ANALYSIS_CATEGORY)
-            urineServiceRequests.forEach {
-                create(patientId, Observation(
-                        code = it.code,
-                        subject = observation.subject,
-                        performer = listOf(),
-                        basedOn = Reference(it),
-                        issued = now()
-                ), diagnosis, severity)
-            }
-        }
+        //todo пред. версия. если не вернемся к ней, можно удалить
+//        val observationTypeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, observation.code.code())
+//        if (observationTypeConcept.parentCode == BLOOD_ANALYSIS_CATEGORY) {
+//            val urineServiceRequests = serviceRequestService.activeByObservationCategory(patientId, URINE_ANALYSIS_CATEGORY)
+//            urineServiceRequests.forEach {
+//                create(patientId, Observation(
+//                        code = it.code,
+//                        subject = observation.subject,
+//                        performer = listOf(),
+//                        basedOn = Reference(it),
+//                        issued = now()
+//                ), diagnosis, severity)
+//            }
+//        }
         updateRelated(patientId, observation)
         return resourceService.create(observation)
     }

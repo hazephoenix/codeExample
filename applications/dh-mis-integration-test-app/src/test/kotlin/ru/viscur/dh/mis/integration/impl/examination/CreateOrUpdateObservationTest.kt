@@ -17,6 +17,7 @@ import ru.viscur.dh.datastorage.api.util.OFFICE_104
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
+import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.QueueManagerService
 
@@ -44,8 +45,8 @@ class CreateOrUpdateObservationTest {
     @Autowired
     lateinit var patientService: PatientService
 
-    @Test
-    fun `auto createing urine observation`() {
+    //    @Test todo не актуально
+    fun `auto creating urine observation`() {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
@@ -101,6 +102,65 @@ class CreateOrUpdateObservationTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.waiting_result),
                 ServiceRequestSimple(code = OBSERVATION2_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.waiting_result),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_104, locationId = OFFICE_104, status = ServiceRequestStatus.waiting_result),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
+        ))
+    }
+
+    @Test
+    fun `ignoring in queue urine observation`() {
+        forTestService.cleanDb()
+        queueManagerService.recalcNextOffice(false)
+        forTestService.updateOfficeStatuses()
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_104)
+        ))
+        val checkP = checkSr.first().subject!!.id!!
+        val servReqs2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
+        ))
+        val p2 = servReqs2.first().subject!!.id!!
+
+        val officeId = OFFICE_101
+
+        queueManagerService.officeIsReady(officeId)
+        queueManagerService.patientEntered(checkP, officeId)
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
+                QueueItemSimple(patientId = checkP, status = PatientQueueStatus.ON_OBSERVATION),
+                QueueItemSimple(patientId = p2)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_104, locationId = OFFICE_104),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
+        ))
+
+        //проверяемые действия
+        val diagnosis = patientService.preliminaryDiagnosticConclusion(checkP)
+        val severity = patientService.severity(checkP)
+        val observation = Helpers.createObservation(basedOnServiceRequestId = checkSr.find { it.code.code() == OBSERVATION_IN_OFFICE_101 }!!.id)
+        observationService.create(checkP, observation, diagnosis, severity)
+        queueManagerService.patientLeft(checkP, officeId)
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = p2)
+        )),QueueOfOfficeSimple(officeId = GREEN_ZONE, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = checkP)
+        ))))
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_104, locationId = OFFICE_104),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.waiting_result),
+                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
+        ))
+
+        //проводим обсл. мочи
+        observationService.create(checkP, Helpers.createObservation(basedOnServiceRequestId = checkSr.find{ it.code.code() == OBSERVATION_IN_OFFICE_104 }!!.id), diagnosis, severity)
+        forTestService.checkServiceRequestsOfPatient(checkP, listOf(
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_104, locationId = OFFICE_104, status = ServiceRequestStatus.waiting_result),
+                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101, status = ServiceRequestStatus.waiting_result),
                 ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = GREEN_ZONE)
         ))
     }

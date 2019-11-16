@@ -16,10 +16,10 @@ select resource_create('{"resourceType": "Concept", "id": "Observation_types:Hei
 
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Inspection", "display": "Осмотры", "id": "Observation_types:Inspection", "priority": "0.1"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Ultrasound", "display": "УЗИ", "id": "Observation_types:Ultrasound"}'::jsonb);
-select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Blood_analysis", "display": "Исследования крови", "id": "Observation_types:Blood_analysis", "priority": "0.9"}'::jsonb);
-select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Urine_analysis", "display": "Исследование мочи", "id": "Observation_types:Urine_analysis", "priority": "0.8"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Blood_analysis", "display": "Исследования крови", "id": "Observation_types:Blood_analysis", "priority": "0.8"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Urine_analysis", "display": "Исследование мочи", "id": "Observation_types:Urine_analysis", "priority": "0.9"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "ECG", "display": "ЭКГ", "id": "Observation_types:ECG"}'::jsonb);
-select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Endoscopy", "display": "Эндоскопия", "id": "Observation_types:Endoscopy"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Endoscopy", "display": "Эндоскопия", "id": "Observation_types:Endoscopy", "priority": "0.2"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "X-ray", "display": "Рентген", "id": "Observation_types:X-ray"}'::jsonb);
 
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": "Inspection", "code": "Clinical_impression", "display": "Обращение в скорую помощь", "id": "Observation_types:Clinical_impression"}'::jsonb);

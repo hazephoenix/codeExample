@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
+import ru.viscur.dh.datastorage.api.util.filterForQueue
 import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
 import ru.viscur.dh.fhir.model.dto.LocationMonitorNextOfficeForPatientInfoDto
 import ru.viscur.dh.fhir.model.dto.LocationMonitorQueueItemDto
@@ -54,7 +55,7 @@ class QueueManagerServiceImpl(
     override fun registerPatient(patientId: String): List<ServiceRequest> {
         val serviceRequests = calcServiceRequestExecOrders(patientId)
         deleteFromQueue(patientId)//на случай пересоздания маршрутного листа
-        addToOfficeQueue(patientId, serviceRequests.first().locationReference?.first()?.id
+        addToOfficeQueue(patientId, serviceRequests.filterForQueue().first().locationReference?.first()?.id
                 ?: throw Exception("not defined location for service request with id '${serviceRequests.first().id}'"))
         return serviceRequests
     }
@@ -450,7 +451,7 @@ class QueueManagerServiceImpl(
      */
     private fun nextOfficeId(patientId: String, prevOfficeId: String?): String? =
             if (needRecalcNextOffice()) serviceRequestsExecutionCalculator.calcNextOfficeId(patientId, prevOfficeId)
-            else serviceRequestService.active(patientId).firstOrNull()?.locationReference?.first()?.id
+            else serviceRequestService.activeForQueue(patientId).firstOrNull()?.locationReference?.first()?.id
 
     /**
      * Непройденные назначения, которые могут быть пройдены в этом кабинете

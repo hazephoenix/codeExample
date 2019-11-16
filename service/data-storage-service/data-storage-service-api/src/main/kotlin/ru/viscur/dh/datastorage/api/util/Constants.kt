@@ -1,6 +1,8 @@
 package ru.viscur.dh.datastorage.api.util
 
+import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.utils.code
 
 /**
  * Created at 07.11.2019 16:09 by SherbakovaMA
@@ -28,6 +30,8 @@ const val OFFICE_149 = "Office:149"
 const val OFFICE_129 = "Office:129"
 const val OFFICE_130 = "Office:130"
 const val OFFICE_202 = "Office:202"
+const val OFFICE_119 = "Office:119"
+const val OFFICE_120 = "Office:120"
 
 const val RED_ZONE = "Office:RedZone"
 const val YELLOW_ZONE_SECTION_1 = "Office:YellowZoneSection1"
@@ -52,6 +56,14 @@ const val BLOOD_ANALYSIS_CATEGORY = "Blood_analysis"
  * Код категории услуг по забору мочи
  */
 const val URINE_ANALYSIS_CATEGORY = "Urine_analysis"
+
+/**
+ * Типы услуг по забору мочи
+ */
+val URINE_ANALYSIS_TYPES = listOf(
+        "B03.016.006ГМУ_СП",
+        "A09.28.029ГМУ_СП"
+)
 
 /**
  * Код услуги "Первичный осмотр при регистрации обращения"

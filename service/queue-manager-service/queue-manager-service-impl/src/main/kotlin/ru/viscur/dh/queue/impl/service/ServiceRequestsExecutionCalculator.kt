@@ -57,8 +57,8 @@ class ServiceRequestsExecutionCalculator(
      * id назначения, приоритет услуги,
      * список незакрытых кабинетов, где м б оказана процедура с указанием ожидания в очереди в каждый
      */
-    private fun serviceRequestInfos(patientId: String): List<ServiceRequestExecInfo> {
-        val serviceRequests = serviceRequestService.active(patientId)
+    private fun serviceRequestInfos(patientId: String, forQueueOnly: Boolean = false): List<ServiceRequestExecInfo> {
+        val serviceRequests = if (forQueueOnly) serviceRequestService.activeForQueue(patientId) else serviceRequestService.active(patientId)
         val severity = patientService.severity(patientId)
         return serviceRequests.map { serviceRequest ->
             val serviceRequestId = serviceRequest.id
@@ -79,8 +79,8 @@ class ServiceRequestsExecutionCalculator(
         }
     }
 
-    fun calcNextOfficeId(patientId: String, prevOfficeId: String?): String? {
-        val serviceRequestExecInfos = serviceRequestInfos(patientId)
+    fun calcNextOfficeId(patientId: String, prevOfficeId: String?, forQueueOnly: Boolean = false): String? {
+        val serviceRequestExecInfos = serviceRequestInfos(patientId, forQueueOnly)
         if (serviceRequestExecInfos.isEmpty()) return null
         val nextServiceRequestInfo = nextServiceRequest(serviceRequestExecInfos, prevOfficeId)
         return nextServiceRequestInfo.locationId
