@@ -1,6 +1,7 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
+import org.springframework.transaction.annotation.Transactional
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.PatientService
@@ -30,7 +31,7 @@ class QueueServiceImpl(
         private val resourceService: ResourceService
 ) : QueueService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun queueItemsOfOffice(officeId: String): MutableList<QueueItem> {

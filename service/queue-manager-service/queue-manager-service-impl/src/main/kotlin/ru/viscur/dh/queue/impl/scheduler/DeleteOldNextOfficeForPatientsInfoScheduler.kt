@@ -13,7 +13,6 @@ import ru.viscur.dh.transaction.desc.config.annotation.Tx
  * Удаление устаревшей информации [QueueManagerService.deleteOldNextOfficeForPatientsInfo]
  */
 @Component
-@EnableScheduling
 class DeleteOldNextOfficeForPatientsInfoScheduler(
         private val queueManagerService: QueueManagerService
 ) {

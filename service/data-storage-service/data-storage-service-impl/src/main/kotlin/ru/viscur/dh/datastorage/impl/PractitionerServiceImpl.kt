@@ -18,7 +18,7 @@ class PractitionerServiceImpl(
         private val resourceService: ResourceService
 ) : PractitionerService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun all() = resourceService.all(ResourceType.Practitioner, RequestBodyForResources(filter = mapOf()))

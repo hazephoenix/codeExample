@@ -45,7 +45,6 @@ private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entity"
             )
         ]
 )
-@EnableAsync
 @EnableTransactionManagement
 @EnableConfigurationProperties
 @AutoConfigureAfter(HibernateJpaAutoConfiguration::class)

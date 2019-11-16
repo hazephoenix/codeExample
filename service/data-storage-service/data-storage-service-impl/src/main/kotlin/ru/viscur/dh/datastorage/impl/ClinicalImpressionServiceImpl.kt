@@ -22,7 +22,7 @@ class ClinicalImpressionServiceImpl(
         private val serviceRequestService: ServiceRequestService
 ) : ClinicalImpressionService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun allActive(): List<ClinicalImpression> =

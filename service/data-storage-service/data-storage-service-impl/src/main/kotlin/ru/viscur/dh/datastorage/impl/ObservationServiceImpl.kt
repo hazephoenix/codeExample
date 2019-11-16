@@ -22,7 +22,7 @@ class ObservationServiceImpl(
         private val conceptService: ConceptService
 ) : ObservationService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byPeriod(start: Date, end: Date): List<Observation> {

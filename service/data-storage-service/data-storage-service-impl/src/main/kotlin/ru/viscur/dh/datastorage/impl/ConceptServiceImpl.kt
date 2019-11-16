@@ -18,7 +18,7 @@ import javax.persistence.PersistenceContext
 @Service
 class ConceptServiceImpl(private val resourceService: ResourceService) : ConceptService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byCodeableConcept(codeableConcept: CodeableConcept): Concept {

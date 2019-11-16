@@ -27,7 +27,7 @@ class PatientServiceImpl(
         private val practitionerService: PractitionerService
 ) : PatientService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byId(id: String): Patient = resourceService.byId(ResourceType.Patient, id)

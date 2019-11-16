@@ -22,7 +22,7 @@ class LocationServiceImpl(
         private val conceptService: ConceptService
 ) : LocationService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byId(id: String): Location = resourceService.byId(ResourceType.Location, id)

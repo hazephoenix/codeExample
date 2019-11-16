@@ -15,7 +15,7 @@ import javax.persistence.Query
 @Service
 class ResourceServiceImpl : ResourceService {
 
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     @Tx(readOnly = true)
@@ -45,7 +45,7 @@ class ResourceServiceImpl : ResourceService {
         return query.fetchResourceList<T>().firstOrNull()
     }
 
-    @Tx(readOnly = true)
+    @Tx(/*readOnly = true*/)
     override fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<T>
             where T : BaseResource {
         val parts = GeneratedQueryParts(requestBody.filter, requestBody.filterLike, requestBody.orderBy)

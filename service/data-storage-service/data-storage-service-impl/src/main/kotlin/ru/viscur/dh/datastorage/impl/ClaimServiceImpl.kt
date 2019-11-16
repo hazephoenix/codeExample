@@ -9,7 +9,7 @@ import javax.persistence.*
 
 @Service
 class ClaimServiceImpl : ClaimService {
-    @PersistenceContext(name = PERSISTENCE_UNIT_NAME)
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun active(patientId: String): Claim? {

@@ -15,7 +15,6 @@ import ru.viscur.dh.transaction.desc.config.annotation.Tx
  * и вызов для них откладку приема [QueueManagerService.delayGoingToObservation]
  */
 @Component
-@EnableScheduling
 class DelayGoingToObservationScheduler(
         private val queueManagerService: QueueManagerService,
         private val patientService: PatientService
