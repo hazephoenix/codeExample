@@ -181,6 +181,73 @@ class NextOfficeForPatientsInfoTest {
     }
 
     @Test
+    fun `patient set first to another office, should be shown in info`() {
+        forTestService.cleanDb()
+        queueManagerService.recalcNextOffice(false)
+        forTestService.updateOfficeStatuses()
+        val p1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val pId1 = p1.first().subject!!.id!!
+
+        val officeId = OFFICE_101
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = pId1)
+        ), nextOfficeForPatientsInfo = listOf(
+        ))))
+
+        //проверяемые действия
+        queueManagerService.setAsFirst(pId1, OFFICE_202)
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+        ), nextOfficeForPatientsInfo = listOf(
+                NextOfficeForPatientInfoSimple(patientId = pId1, nextOfficeId = OFFICE_202)
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = pId1, status = PatientQueueStatus.IN_QUEUE)
+        ))))
+    }
+
+    @Test
+    fun `patient set first to the same office, should not be shown in info`() {
+        forTestService.cleanDb()
+        queueManagerService.recalcNextOffice(false)
+        forTestService.updateOfficeStatuses()
+        val p1 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val pId1 = p1.first().subject!!.id!!
+        val p2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val pId2 = p2.first().subject!!.id!!
+
+        val officeId = OFFICE_101
+
+        //проверка до
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = pId1),
+                QueueItemSimple(patientId = pId2)
+        ), nextOfficeForPatientsInfo = listOf(
+        ))))
+
+        //проверяемые действия
+        queueManagerService.setAsFirst(pId2, officeId)
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, items = listOf(
+                QueueItemSimple(patientId = pId2),
+                QueueItemSimple(patientId = pId1)
+        ), nextOfficeForPatientsInfo = listOf(
+        ))))
+    }
+
+    @Test
     fun `cancel service request by officeId, should be shown in info`() {
         forTestService.cleanDb()
         queueManagerService.recalcNextOffice(false)

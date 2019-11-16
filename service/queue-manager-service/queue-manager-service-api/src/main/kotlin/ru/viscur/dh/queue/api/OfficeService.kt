@@ -21,9 +21,9 @@ interface OfficeService {
 
     /**
      * Добавление пациента в очередь в кабинет
-     * @param asFirst принять как первого в очереди - на первую позицию. Иначе в зависимости от степени тяжести
+     * @param toIndex в какую позицию поставить (нумерация с 0, если первыйм = 0). Если не задано, то в зависимости от степени тяжести
      */
-    fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, asFirst: Boolean = false)
+    fun addPatientToQueue(officeId: String, patientId: String, estDuration: Int, toIndex: Int? = null)
 
     /**
      * Id первого пациента в очереди в кабинета

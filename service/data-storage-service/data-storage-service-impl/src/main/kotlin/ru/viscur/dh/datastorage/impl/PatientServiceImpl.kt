@@ -292,6 +292,17 @@ class PatientServiceImpl(
         return query.patientsToExamine()
     }
 
+    override fun withLongGoingToObservation(): List<String> {
+        val query = em.createNativeQuery("""
+            select r.id
+            from patient r
+            where (r.resource->'extension'->>'queueStatusUpdatedAt')\:\:bigint <= :criticalTime
+                and r.resource->'extension'->>'queueStatus' = '${PatientQueueStatus.GOING_TO_OBSERVATION}'
+        """)
+        query.setParameter("criticalTime", criticalTimeForDeletingNextOfficeForPatientsInfo().time)
+        return query.resultList.map { it as String }
+    }
+
     /**
      * Тип обследования у отв врача по его id
      */

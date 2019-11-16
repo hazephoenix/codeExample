@@ -103,7 +103,6 @@ class DataStorageConfig {
     @Bean(name = ["dsTxManager"])
     fun txManager(@Qualifier("dsEntityManagerFactory") dsEntityManagerFactory: EntityManagerFactory) = JpaTransactionManager(dsEntityManagerFactory)
 
-
     @Bean
     fun taskExecutor(): Executor {
         return SimpleAsyncTaskExecutor()

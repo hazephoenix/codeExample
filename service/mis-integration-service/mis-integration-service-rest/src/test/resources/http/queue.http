@@ -46,13 +46,39 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:101",
+        "reference": "Location/Office:139",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/0fa7becb-632e-4efe-9199-c456153dbef5",
+        "reference": "Patient/1f647c0c-6783-4285-9cca-ac434a4375af",
+        "type": "Patient"
+      }
+    }
+  ]
+}
+###                                                                                Поставить пациента первым в очередь в кабинет
+###
+POST http://localhost:8080/queue/office/setAsFirst
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:150",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/1f647c0c-6783-4285-9cca-ac434a4375af",
         "type": "Patient"
       }
     }
@@ -117,6 +143,17 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "reference": "Location/Office:101",
   "type": "Location"
 }
+###                                                                                Отложить прием ожидаемого пациента в кабинет
+###
+POST http://localhost:8080/queue/office/delayGoingToObservation
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/e0393e1a-1c72-4e92-90f8-e02f39bab21c",
+  "type": "Patient"
+}
+###
 ###                                                                                Убрать пациента из очереди
 ###
 DELETE http://localhost:8080/queue/patient

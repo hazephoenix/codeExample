@@ -14,7 +14,6 @@ import ru.viscur.dh.transaction.desc.config.annotation.Tx
  */
 @Component
 @EnableScheduling
-@EnableAutoConfiguration
 class DeleteOldNextOfficeForPatientsInfoScheduler(
         private val queueManagerService: QueueManagerService
 ) {

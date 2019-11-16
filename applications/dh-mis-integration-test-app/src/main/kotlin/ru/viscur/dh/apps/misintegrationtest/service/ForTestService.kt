@@ -276,20 +276,22 @@ class ForTestService {
 
     private fun itemsToStr(itemsByOffices: List<QueueOfOfficeSimple>, actQueueItems: List<QueueItem>): String {
         val actByOffices = actQueueItems.groupBy { it.location.id!! }
+        val offices = officeService.all().filter { it.id in actByOffices.map { it.key } || it.extension.nextOfficeForPatientsInfo.isNotEmpty() }
         return "\n\nexp queue:\n" +
                 itemsByOffices.joinToString("\n") { byOffice ->
                     byOffice.officeId + ":\n  " + byOffice.items.mapIndexed { index, queueItemInfo ->
-                        "$index. $queueItemInfo" }.joinToString("\n  "
+                        "$index. $queueItemInfo"
+                    }.joinToString("\n  "
                     )
                 } +
                 "\n\nactual queue:\n" +
-                actByOffices.map { (officeId, items) ->
-                    val office = locationService.byId(officeId)
+                offices.map { office ->
                     val nextOfficeForPatientsInfoStr = if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
                         "  nextOfficeForPatientsInfo:\n   " + office.extension.nextOfficeForPatientsInfo.joinToString("\n    ")
                     } else ""
-                    officeId + "\n  " +
-                            items.sortedBy { it.onum }.joinToString("\n  ") + nextOfficeForPatientsInfoStr
+                    val items = actByOffices[office.id]
+                    office.id + "\n  " +
+                            (items?.sortedBy { it.onum }?.joinToString("\n  ") ?: "") + nextOfficeForPatientsInfoStr
                 }.joinToString("\n  ") +
                 "\n\n"
     }

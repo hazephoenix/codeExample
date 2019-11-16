@@ -76,4 +76,9 @@ interface PatientService {
      * Если [practitionerId] не задан, возвращаются все
      */
     fun patientsToExamine(practitionerId: String? = null): List<PatientToExamine>
+
+    /**
+     * Id пациентов, которые долгое время имеют статус [PatientQueueStatus.GOING_TO_OBSERVATION]
+     */
+    fun withLongGoingToObservation(): List<String>
 }
