@@ -57,7 +57,7 @@ class TaskDispatcherImpl(
     private fun checkTaskTTL() {
         val notCompletedTasks = tasks.filterValues { it.status in arrayOf(TaskStatus.Await, TaskStatus.InProgress) }
         notCompletedTasks.forEach { (k, v) ->
-            if (v.addedTime + v.ttl > LocalDateTime.now()) {
+            if (LocalDateTime.now() > v.addedTime + v.ttl) {
                 tasks[k]!!.status = TaskStatus.TimedOut
             }
         }

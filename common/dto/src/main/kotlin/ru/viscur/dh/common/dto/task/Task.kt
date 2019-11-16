@@ -28,7 +28,7 @@ data class Task(
         var result: Any? = null,
         var payload: Map<String, Any>? = null,
         @JsonIgnore
-        val ttl: Duration = Duration.ofSeconds(60L),
+        val ttl: Duration = Duration.ofMinutes(2L),
         @JsonIgnore
         val addedTime: LocalDateTime = LocalDateTime.now()
 )

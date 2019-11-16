@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
@@ -21,6 +22,7 @@ import ru.viscur.dh.common.dto.task.TaskType
  * Температура теля
  */
 @Component
+@Profile("!fake-device")
 class Temperature(
         private val restTemplate: RestTemplate,
         @Value("\${paramedic.native-service.url:http://localhost:8850}")
