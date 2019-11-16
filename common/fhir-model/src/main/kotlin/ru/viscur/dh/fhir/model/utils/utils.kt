@@ -73,6 +73,11 @@ fun Timestamp.toDate(): Date = Date.from(this.toInstant())
 fun Date.plusDays(days: Int) = Date(this.time + days * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND)
 
 /**
+ * Прибавить кол-во минут
+ */
+fun Date.plusMinutes(minutes: Int) = Date(this.time + minutes * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND)
+
+/**
  * Дата в формате строки yyyy.MM.dd HH:mm:ss
  */
 fun Date?.toStringFmtWithSeconds(): String? {
@@ -143,3 +148,13 @@ fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execSt
  * Назначение является осмотром ответственного - если указан исполнитель
  */
 fun ServiceRequest.isInspectionOfResp() = !this.performer.isNullOrEmpty()
+
+/**
+ * Критичное время для удаления [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]
+ * Все записи старее этого времени должны быть удалены
+ */
+fun criticalTimeForDeletingNextOfficeForPatientsInfo(): Date {
+    //сколько минут отображается информация о последующем кабинете для пациентов
+    val minutesForShowingNextOfficeForPatients = 3
+    return now().plusMinutes(-minutesForShowingNextOfficeForPatients)
+}

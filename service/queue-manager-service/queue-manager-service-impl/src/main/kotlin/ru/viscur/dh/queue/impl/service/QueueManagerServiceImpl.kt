@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
+import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
+import ru.viscur.dh.fhir.model.dto.LocationMonitorNextOfficeForPatientInfoDto
+import ru.viscur.dh.fhir.model.dto.LocationMonitorQueueItemDto
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -14,6 +17,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.criticalTimeForDeletingNextOfficeForPatientsInfo
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -30,6 +34,7 @@ class QueueManagerServiceImpl(
         private val serviceRequestService: ServiceRequestService,
         private val observationDurationService: ObservationDurationEstimationService,
         private val serviceRequestsExecutionCalculator: ServiceRequestsExecutionCalculator,
+        private val clinicalImpressionService: ClinicalImpressionService,
         private val configService: ConfigService
 ) : QueueManagerService {
 
@@ -78,8 +83,10 @@ class QueueManagerServiceImpl(
 
     @Tx
     override fun forceSendPatientToObservation(patientId: String, officeId: String) {
+        val prevOfficeId = queueService.isPatientInOfficeQueue(patientId)
         setAsFirst(patientId, officeId)
         sendFirstToObservation(officeId)
+        prevOfficeId?.run { officeService.addToNextOfficeForPatientsInfo(prevOfficeId, patientId, officeId) }
     }
 
     @Tx
@@ -96,6 +103,8 @@ class QueueManagerServiceImpl(
         if (currentOfficeId == officeId && serviceRequestService.active(patientId, officeId).isEmpty()) {
             deleteFromQueue(patientId)
             addToQueue(patientId)
+            val nextOfficeId = queueService.isPatientInOfficeQueue(patientId)
+            nextOfficeId?.run { officeService.addToNextOfficeForPatientsInfo(officeId, patientId, nextOfficeId) }
         }
 //         todo не понятно. вроде пересчитывать даже если идет обсл-е
 //        if (currentOfficeId == officeId) {
@@ -122,7 +131,7 @@ class QueueManagerServiceImpl(
             patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId, saveCurrentStatusToHistory)
             changeOfficeStatusNotReadyToProper(officeId)
         }
-        officeService.deletePatientFromLastPatientInfo(patientId)
+        officeService.deletePatientFromNextOfficesForPatientsInfo(patientId)
     }
 
     @Tx
@@ -132,6 +141,7 @@ class QueueManagerServiceImpl(
             if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_OBSERVATION) {
                 officeService.changeStatus(officeId, LocationStatus.OBSERVATION)
                 patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_OBSERVATION, officeId)
+                officeService.deletePatientFromNextOfficesForPatientsInfo(patientId)
                 var serviceRequests = serviceRequestService.active(patientId, officeId)
                 if (serviceRequests.isEmpty()) {
                     serviceRequests = serviceRequestService.active(patientId)
@@ -150,7 +160,8 @@ class QueueManagerServiceImpl(
             patientStatusService.changeStatus(patientId, PatientQueueStatus.READY, officeId)
             changeOfficeStatusNotReadyToProper(officeId)
             addToQueue(patientId = patientId, prevOfficeId = officeId)
-            officeService.updateLastPatientInfo(officeId, patientId, queueService.isPatientInOfficeQueue(patientId))
+            val nextOfficeId = queueService.isPatientInOfficeQueue(patientId)
+            nextOfficeId?.run { officeService.addToNextOfficeForPatientsInfo(officeId, patientId, nextOfficeId) }
         }
     }
 
@@ -218,6 +229,16 @@ class QueueManagerServiceImpl(
     }
 
     @Tx
+    override fun deleteOldNextOfficeForPatientsInfo() {
+        locationService.withOldNextOfficeForPatientsInfo().forEach {
+            resourceService.update(ResourceType.Location, it.id) {
+                extension.nextOfficeForPatientsInfo =
+                        extension.nextOfficeForPatientsInfo.filter { it.fireDate.after(criticalTimeForDeletingNextOfficeForPatientsInfo()) }
+            }
+        }
+    }
+
+    @Tx
     override fun deleteQueue() {
         queueService.involvedOffices().forEach {
             officeService.changeStatus(it.id, LocationStatus.BUSY)
@@ -225,9 +246,15 @@ class QueueManagerServiceImpl(
         queueService.involvedPatients().forEach {
             patientStatusService.changeStatus(it.id, PatientQueueStatus.READY)
         }
+        resourceService.all(ResourceType.Location, RequestBodyForResources(mapOf())).forEach {
+            resourceService.update(ResourceType.Location, it.id) {
+                extension.nextOfficeForPatientsInfo = listOf()
+            }
+        }
         resourceService.deleteAll(ResourceType.QueueItem)
     }
 
+    @Tx
     override fun deleteHistory() {
         resourceService.deleteAll(ResourceType.QueueHistoryOfOffice)
         resourceService.deleteAll(ResourceType.QueueHistoryOfPatient)
@@ -237,6 +264,33 @@ class QueueManagerServiceImpl(
             Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
     override fun queueItems(): List<QueueItem> = queueService.queueItems()
+
+    override fun locationMonitor(officeId: String): LocationMonitorDto {
+        val office = locationService.byId(officeId)
+        clinicalImpressionService
+        return LocationMonitorDto(
+                officeId = officeId,
+                officeStatus = office.status.name,
+                locationType = office.type(),
+                items = queueService.queueItemsOfOffice(officeId).map { queueItem ->
+                    LocationMonitorQueueItemDto(
+                            onum = queueItem.onum!!,
+                            patientId = queueItem.subject.id!!,
+                            status = queueItem.patientQueueStatus!!.name,
+                            severity = queueItem.severity!!.name,
+                            queueNumber = queueItem.queueNumber
+                    )
+                },
+                nextOfficeForPatientsInfo = office.extension.nextOfficeForPatientsInfo.map { nextOfficeForPatientInfo ->
+                    LocationMonitorNextOfficeForPatientInfoDto(
+                            patientId = nextOfficeForPatientInfo.subject.id!!,
+                            severity = nextOfficeForPatientInfo.severity.name,
+                            queueNumber = nextOfficeForPatientInfo.queueNumber,
+                            nextOfficeId = nextOfficeForPatientInfo.nextOffice.id!!
+                    )
+                }
+        )
+    }
 
     override fun loqAndValidate(): String {
         val offices = officeService.all()
@@ -248,9 +302,11 @@ class QueueManagerServiceImpl(
             queue.forEach { queueItem ->
                 str.add("$queueItem")
             }
-            office.extension?.lastPatientInfo?.run {
-                str.add("  lastPatientInfo: " + (this.subject.reference) + ", " +
-                        (this.nextOffice?.reference ?: ""))
+            if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
+                str.add("  lastPatientInfo:\n    " +
+                        office.extension.nextOfficeForPatientsInfo.joinToString("\n    ") {
+                            it.subject.id + " (${it.severity}) to " + it.nextOffice.id
+                        })
             }
 
             //при пустой очереди кабинет не должен иметь назначенного пациента
@@ -312,9 +368,9 @@ class QueueManagerServiceImpl(
             }
         }
         //один пациент не должен отображаться в информации о посл пациенте в неск кабинетах
-        offices.mapNotNull { it.extension?.lastPatientInfo }.groupBy { it.subject.id }.forEach { (patientId, offices) ->
+        offices.map { it.extension.nextOfficeForPatientsInfo }.flatten().groupBy { it.subject.id }.forEach { (patientId, offices) ->
             if (offices.size > 1) {
-                str.add("ERROR. patient with id $patientId is in several lastPatientInfo $offices")
+                str.add("ERROR. patient with id $patientId is in several nextOfficeForPatientsInfo $offices")
             }
         }
         log.info("\n${str.joinToString("\n")}")

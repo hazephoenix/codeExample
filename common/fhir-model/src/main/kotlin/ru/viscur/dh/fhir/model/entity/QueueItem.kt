@@ -19,6 +19,7 @@ import ru.viscur.dh.fhir.model.utils.genId
  * @param subject пациент
  * @param location кабинет
  * @param estDuration предположительная продолжительность осмотра, мс
+ * @param queueNumber код в очереди
  * @param onum порядковый номер в очередь (в определенный кабинет)
  */
 class QueueItem @JsonCreator constructor(
@@ -28,9 +29,13 @@ class QueueItem @JsonCreator constructor(
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("location") val location: Reference,
         @JsonProperty("estDuration") val estDuration: Int,
+        @JsonProperty("queueNumber") val queueNumber: String,
         @JsonProperty("onum") var onum: Int? = null
 ) : BaseResource(id, identifier, resourceType) {
 
+    /**
+     * Вычисляются, не хранятся в объекте, т к меняется у пациента. Всегда читаются актуальные данные
+     */
     @JsonIgnore var severity: Severity? = null
     @JsonIgnore var patientQueueStatus: PatientQueueStatus? = null
 

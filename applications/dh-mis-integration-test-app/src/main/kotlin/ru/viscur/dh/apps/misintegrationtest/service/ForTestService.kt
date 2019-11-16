@@ -21,7 +21,6 @@ import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.integration.mis.api.ReportService
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.QueueManagerService
-import java.util.*
 import kotlin.math.abs
 
 /**
@@ -61,6 +60,8 @@ class ForTestService {
 
     companion object {
         private val defaultOfficeStatus = LocationStatus.BUSY
+
+        private var counter = 0
     }
 
     fun cleanDb() {
@@ -86,7 +87,8 @@ class ForTestService {
                         onum = index,
                         subject = referenceToPatient(patientId),
                         estDuration = item.estDuration,
-                        location = referenceToLocation(queueOfOffice.officeId)
+                        location = referenceToLocation(queueOfOffice.officeId),
+                        queueNumber = createQueueNumber(item.severity)
                 ))
             }
         }
@@ -100,6 +102,7 @@ class ForTestService {
         officeService.all().forEach {
             resourceService.update(ResourceType.Location, it.id) {
                 status = defaultOfficeStatus
+                extension.nextOfficeForPatientsInfo = listOf()
             }
         }
         queueManagerService.queueItems().groupBy { it.location.id!! }.forEach { officeId, items ->
@@ -128,7 +131,8 @@ class ForTestService {
                 onum = index,
                 subject = referenceToPatient(patientId),
                 estDuration = 5 * SECONDS_IN_MINUTE,
-                location = referenceToLocation(officeId)
+                location = referenceToLocation(officeId),
+                queueNumber = createQueueNumber(severity)
         ))
         return patientId
     }
@@ -139,7 +143,7 @@ class ForTestService {
         val patientId = resourceService.create(Helpers.createPatientResource(enp = genId(), queueStatus = queueStatus)).id
         var servRequests = servReqs?.toServiceRequests(patientId)
                 ?: run {
-                    var servRequestCode = resourceService.byId(ResourceType.Location, officeId!!).extension!!.observationType!!.first().code
+                    var servRequestCode = resourceService.byId(ResourceType.Location, officeId!!).extension.observationType!!.first().code
                     val subTypes = conceptService.byParent(ValueSetName.OBSERVATION_TYPES, servRequestCode)
                     if (subTypes.isNotEmpty()) {
                         servRequestCode = subTypes.first().code
@@ -226,6 +230,18 @@ class ForTestService {
                 assertEquals(queueItemInfo.status, patient.extension.queueStatus, "wrong patientStatus with id '$patientId'. $itemsStr")
                 assertEquals(queueItemInfo.status, foundItem.patientQueueStatus, "wrong queueItem.patientQueueStatus with id '$patientId'. $itemsStr")
             }
+            byOffice.nextOfficeForPatientsInfo?.run {
+                //количество в принципе разное
+                assertEquals(this.size, office.extension.nextOfficeForPatientsInfo.size, "wrong number of nextOfficeForPatientsInfo for '$officeId' (${office.extension.nextOfficeForPatientsInfo}). $itemsStr")
+                this.map { nextOfficeForPatientInfo ->
+                    val actNextOfficeForPatientsInfo = office.extension.nextOfficeForPatientsInfo
+                    val foundInAct = actNextOfficeForPatientsInfo.filter { it.subject.id!! == nextOfficeForPatientInfo.patientId }
+                    assertEquals(1, foundInAct.size, "not found (or found multiple items) of $nextOfficeForPatientInfo. $itemsStr")
+                    val foundItem = foundInAct.first()
+                    //проверка правильности данных в найденном
+                    assertEquals(nextOfficeForPatientInfo.nextOfficeId, foundItem.nextOffice.id!!, "wrong nextOfficeId of $nextOfficeForPatientInfo. $itemsStr")
+                }
+            }
         }
     }
 
@@ -261,10 +277,19 @@ class ForTestService {
     private fun itemsToStr(itemsByOffices: List<QueueOfOfficeSimple>, actQueueItems: List<QueueItem>): String {
         val actByOffices = actQueueItems.groupBy { it.location.id!! }
         return "\n\nexp queue:\n" +
-                itemsByOffices.joinToString("\n") { byOffice -> byOffice.officeId + ":\n  " + byOffice.items.mapIndexed { index, queueItemInfo -> "$index. $queueItemInfo" }.joinToString("\n  ") } +
+                itemsByOffices.joinToString("\n") { byOffice ->
+                    byOffice.officeId + ":\n  " + byOffice.items.mapIndexed { index, queueItemInfo ->
+                        "$index. $queueItemInfo" }.joinToString("\n  "
+                    )
+                } +
                 "\n\nactual queue:\n" +
                 actByOffices.map { (officeId, items) ->
-                    officeId + "\n  " + items.sortedBy { it.onum }.joinToString("\n  ")
+                    val office = locationService.byId(officeId)
+                    val nextOfficeForPatientsInfoStr = if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
+                        "  nextOfficeForPatientsInfo:\n   " + office.extension.nextOfficeForPatientsInfo.joinToString("\n    ")
+                    } else ""
+                    officeId + "\n  " +
+                            items.sortedBy { it.onum }.joinToString("\n  ") + nextOfficeForPatientsInfoStr
                 }.joinToString("\n  ") +
                 "\n\n"
     }
@@ -288,7 +313,7 @@ class ForTestService {
             //проверка правильности данных в найденном
             assertEquals(patientId, foundItem.patientId, "wrong patientId of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
             assertEquals(obsDurationInfo.code, foundItem.code, "wrong code of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
-            val durationDiffTiny = abs(obsDurationInfo.duration- foundItem.duration) /obsDurationInfo.duration < 0.02
+            val durationDiffTiny = abs(obsDurationInfo.duration - foundItem.duration) / obsDurationInfo.duration < 0.02
             assertTrue(durationDiffTiny, "huge duration difference of ${foundItem.fireDate.toStringFmtWithSeconds()}. $obsDurationStr")
         }
     }
@@ -297,7 +322,7 @@ class ForTestService {
         return "\n\nfor patient '$patientId'\nexp durations:\n  " +
                 exp.joinToString("\n  ") { it.toString() } +
                 "\n\nactual:\n  " +
-                act.joinToString("\n  ") {"code: " + it.code + ", duration: " + it.duration + ", patientId: " + it.patientId + ", fireDate: " + it.fireDate.toStringFmtWithSeconds() } +
+                act.joinToString("\n  ") { "code: " + it.code + ", duration: " + it.duration + ", patientId: " + it.patientId + ", fireDate: " + it.fireDate.toStringFmtWithSeconds() } +
                 "\n\n"
     }
 
@@ -320,7 +345,9 @@ class ForTestService {
         return "\n\nfor patient '$patientId'\nexp durations:\n  " +
                 exp.joinToString("\n  ") { it.toString() } +
                 "\n\nactual:\n  " +
-                act.joinToString("\n  ") {"status: " + it.status + ", officeId: " + it.officeId + ", duration: " + it.duration + ", fireDate: " + it.fireDate.toStringFmtWithSeconds() + ", patientId: " + it.patientId } +
+                act.joinToString("\n  ") { "status: " + it.status + ", officeId: " + it.officeId + ", duration: " + it.duration + ", fireDate: " + it.fireDate.toStringFmtWithSeconds() + ", patientId: " + it.patientId } +
                 "\n\n"
     }
+
+    private fun createQueueNumber(severity: Severity) = severity.display.substring(0, 1) + "00" + counter++
 }

@@ -50,10 +50,11 @@ class PatientServiceImpl(
         return enumValueOf(severityStr)
     }
 
+    override fun queueNumber(patientId: String) = clinicalImpressionService.active(patientId).extension.queueNumber
+
     override fun updateSeverity(patientId: String, severity: Severity): Boolean {
         var updated = false
         val activeClinicalImpression = clinicalImpressionService.active(patientId)
-                ?: throw Exception("not found active ClinicalImpression for patient with id '$patientId'")
         resourceService.update(ResourceType.ClinicalImpression, activeClinicalImpression.id) {
             if (extension.severity.name != severity.name) {
                 extension.severity = severity
@@ -153,12 +154,16 @@ class PatientServiceImpl(
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
         var patient = bundle.resources(ResourceType.Patient).first()
-        val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.toString() }?.value
+        val queueCode = patient.identifier?.find { it.type.code() == IdentifierType.QUEUE_CODE.name }?.value
+                ?: throw Exception("Not defined QUEUE_CODE identifier")
+        //код очереди не храним в пациенте, перекладываем в обращение
+        val identifiersWithoutQueueCode = patient.identifier?.filter { it.type.code() != IdentifierType.QUEUE_CODE.name }
+        val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.name }?.value
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем
         patient = patientByEnp?.let { byEnp ->
             resourceService.update(ResourceType.Patient, byEnp.id) {
-                identifier = patient.identifier
+                identifier = identifiersWithoutQueueCode
                 name = patient.name
                 birthDate = patient.birthDate
                 gender = patient.gender
@@ -168,6 +173,7 @@ class PatientServiceImpl(
         } ?: let {
             resourceService.create(patient.apply {
                 id = genId()
+                identifier = identifiersWithoutQueueCode
                 extension.queueStatusUpdatedAt = now()
                 extension.queueStatus = PatientQueueStatus.READY
             })
@@ -254,7 +260,10 @@ class PatientServiceImpl(
                 assessor = responsiblePractitionerRef, // ответственный врач
                 summary = "Заключение: ${diagnosticReport.conclusion}",
                 supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) },
-                extension = ClinicalImpressionExtension(severity = enumValueOf(severity))
+                extension = ClinicalImpressionExtension(
+                        severity = enumValueOf(severity),
+                        queueNumber = queueCode
+                )
         ).let { resourceService.create(it) }
         inspectionOnReceptionStart?.run {
             observationDurationService.saveToHistory(

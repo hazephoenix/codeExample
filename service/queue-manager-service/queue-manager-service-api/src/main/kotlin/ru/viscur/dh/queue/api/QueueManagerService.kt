@@ -1,5 +1,6 @@
 package ru.viscur.dh.queue.api
 
+import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -123,6 +124,11 @@ interface QueueManagerService {
     fun officeIsClosed(officeId: String)
 
     /**
+     * Удалить устаревшие [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]
+     */
+    fun deleteOldNextOfficeForPatientsInfo()
+
+    /**
      * Удалить всю очередь: из базы и из системы
      * и пациентов, и маршрутные листы
      */
@@ -142,6 +148,11 @@ interface QueueManagerService {
      * Все [QueueItem] - все элементы очередей для всех кабинетов
      */
     fun queueItems(): List<QueueItem>
+
+    /**
+     * Информация для монитора для отображения очереди/приема в кабинет/зоне
+     */
+    fun locationMonitor(officeId: String): LocationMonitorDto
 
     /**
      * Отобразить в логах очередь и провалидировать

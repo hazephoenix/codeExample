@@ -41,12 +41,12 @@ interface OfficeService {
     fun deletePatientFromQueue(officeId: String, patientId: String)
 
     /**
-     * Удаление пациента из информации о последнем пациенте (если он фигурирует в такой информации в каком-либо кабинете)
+     * Удаление пациента из информации о последующем кабинете пациента (если он фигурирует в такой информации в каком-либо кабинете)
      */
-    fun deletePatientFromLastPatientInfo(patientId: String)
+    fun deletePatientFromNextOfficesForPatientsInfo(patientId: String)
 
     /**
-     * Обновление информации о последнем пациенте у кабинета
+     * Добавление в информацию о последующих кабинетов для пациентов у кабинета
      */
-    fun updateLastPatientInfo(officeId: String, patientId: String, nextOfficeId: String?)
+    fun addToNextOfficeForPatientsInfo(officeId: String, patientId: String, nextOfficeId: String)
 }

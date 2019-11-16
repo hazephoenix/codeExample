@@ -14,9 +14,16 @@ interface ClinicalImpressionService {
     fun allActive(): List<ClinicalImpression>
 
     /**
-     * Активное обращение пациента
+     * Есть ли активное обращение
+     * Если есть, то возвращается найденное
      */
-    fun active(patientId: String): ClinicalImpression?
+    fun hasActive(patientId: String): ClinicalImpression?
+
+    /**
+     * Активное обращение пациента
+     * Падение, если не найдено
+     */
+    fun active(patientId: String): ClinicalImpression
 
     /**
      * По id назначения

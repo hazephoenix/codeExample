@@ -27,7 +27,7 @@ class ClinicalImpressionServiceImpl(
     override fun allActive(): List<ClinicalImpression> =
             resourceService.all(ResourceType.ClinicalImpression, RequestBodyForResources(filter = mapOf("status" to ClinicalImpressionStatus.active.name)))
 
-    override fun active(patientId: String): ClinicalImpression? {
+    override fun hasActive(patientId: String): ClinicalImpression? {
         val query = em.createNativeQuery("""
                 select ci.resource
                 from clinicalImpression ci
@@ -37,6 +37,9 @@ class ClinicalImpressionServiceImpl(
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResource()
     }
+
+    override fun active(patientId: String): ClinicalImpression =
+            hasActive(patientId) ?: throw Error("No active ClinicalImpression for patient with id '$patientId' found")
 
     override fun byServiceRequest(serviceRequestId: String): ClinicalImpression {
         val query = em.createNativeQuery("""
@@ -56,7 +59,7 @@ class ClinicalImpressionServiceImpl(
     }
 
     override fun cancelActive(patientId: String) {
-        active(patientId)?.run {
+        hasActive(patientId)?.run {
             resourceService.update(ResourceType.ClinicalImpression, id) {
                 status = ClinicalImpressionStatus.cancelled
             }
@@ -115,7 +118,7 @@ class ClinicalImpressionServiceImpl(
 
                 supportingInfo += refs
             }
-        } ?: throw Error("Error. No active ClinicalImpression for patient with id $patientId found")
+        }
     }
 
     @Tx
