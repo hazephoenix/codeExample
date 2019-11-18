@@ -16,7 +16,7 @@ import ru.viscur.dh.fhir.model.utils.*
  *
  * Проверка сохранения продолжительности выполнения услуги
  */
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class ServiceRequestExecDurationTest {
 
     @Test

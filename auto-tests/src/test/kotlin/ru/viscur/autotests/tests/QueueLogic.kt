@@ -20,7 +20,7 @@ import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class QueueLogic {
 
     companion object {

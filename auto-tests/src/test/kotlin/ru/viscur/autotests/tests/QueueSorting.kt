@@ -19,7 +19,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.utils.*
 
-//@Disabled
+@Disabled("Debug purposes only")
 class QueueSorting {
 
     companion object {

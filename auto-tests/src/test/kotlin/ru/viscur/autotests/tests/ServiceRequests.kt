@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class ServiceRequests {
 
     companion object {
