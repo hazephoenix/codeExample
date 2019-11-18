@@ -13,5 +13,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 class CodeMapTargetCode @JsonCreator constructor(
         @JsonProperty("code") val code: String,
-        @JsonProperty("condition") val condition: List<Coding> = listOf()
+        @JsonProperty("condition") val condition: List<Coding>? = listOf()
 )

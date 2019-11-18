@@ -63,6 +63,7 @@ class DurationControlTest {
         durationEstimationService.deleteAllHistory()
         queueManagerService.recalcNextOffice(false)
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val servReqsFromRegister = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),

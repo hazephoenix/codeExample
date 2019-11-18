@@ -4,6 +4,7 @@ import org.springframework.stereotype.*
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.Concept
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
@@ -17,7 +18,7 @@ import javax.persistence.PersistenceContext
 @Service
 class ConceptServiceImpl(private val resourceService: ResourceService) : ConceptService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byCodeableConcept(codeableConcept: CodeableConcept): Concept {

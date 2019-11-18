@@ -70,6 +70,52 @@ class ForceSendPatientToObservationTest {
     }
 
     @Test
+    fun `in queue, on observation, force to another offce`() {
+        forTestService.cleanDb()
+        var i = 0
+        val officeId = OFFICE_130
+        val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
+        val inQue1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
+        val inQue2 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = IN_QUEUE, index = i++)
+        forTestService.updateOfficeStatuses()
+
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                QueueItemSimple(patientId = checkP, status = GOING_TO_OBSERVATION),
+                QueueItemSimple(patientId = inQue1, status = IN_QUEUE),
+                QueueItemSimple(patientId = inQue2, status = IN_QUEUE)
+        ))))
+
+        queueManagerService.forceSendPatientToObservation(checkP, OFFICE_202)
+
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                QueueItemSimple(patientId = inQue1, status = IN_QUEUE),
+                QueueItemSimple(patientId = inQue2, status = IN_QUEUE)
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                QueueItemSimple(patientId = checkP, status = GOING_TO_OBSERVATION)
+        ))))
+    }
+
+    @Test
+    fun `in queue, he is single, on observation, force to another offce`() {
+        forTestService.cleanDb()
+        var i = 0
+        val officeId = OFFICE_130
+        val checkP = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
+        forTestService.updateOfficeStatuses()
+
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                QueueItemSimple(patientId = checkP, status = GOING_TO_OBSERVATION)
+        ))))
+
+        queueManagerService.forceSendPatientToObservation(checkP, OFFICE_202)
+
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                QueueItemSimple(patientId = checkP, status = GOING_TO_OBSERVATION)
+        ))))
+    }
+
+    @Test
     fun `in another queue`() {
         forTestService.cleanDb()
         var i = 0

@@ -24,7 +24,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resource": {
         "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
         "resourceType": "Observation",
-        "status": "registered",
+        "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
         "code": {
           "coding": [
@@ -51,7 +51,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resource": {
         "id": "ignored",
         "resourceType": "Observation",
-        "status": "registered",
+        "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
         "code": {
           "coding": [
@@ -78,12 +78,12 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resource": {
         "id": "ignored",
         "resourceType": "Observation",
-        "status": "registered",
+        "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
         "code": {
           "coding": [
             {
-              "code": "Degree_of_saturation_of_blood_with_oxygen",
+              "code": "Blood_oxygen_saturation",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -105,7 +105,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resource": {
         "id": "d80684b9-d4e2-4b10-b40a-020b8938367d",
         "resourceType": "Observation",
-        "status": "registered",
+        "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
         "code": {
           "coding": [
@@ -132,7 +132,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resource": {
         "id": "ignored",
         "resourceType": "Observation",
-        "status": "registered",
+        "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
         "code": {
           "coding": [
@@ -339,7 +339,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "Degree_of_saturation_of_blood_with_oxygen",
+              "code": "Blood_oxygen_saturation",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -557,7 +557,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "ignored",
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -608,7 +608,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "ignored",
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74u",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -635,14 +635,14 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "ignored",
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74o",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
         "code": {
           "coding": [
             {
-              "code": "Degree_of_saturation_of_blood_with_oxygen",
+              "code": "Blood_oxygen_saturation",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -662,7 +662,36 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "ignored",
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74p",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae790",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -689,9 +718,9 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "ignored",
+        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae789",
         "resourceType": "Observation",
-        "status": "registered",
+        "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
         "code": {
           "coding": [
@@ -786,7 +815,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             }
           },
           {
-            "value": "7878 11111",
+            "value": "7878 11112",
             "type": {
               "coding": [
                 {
@@ -810,11 +839,11 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "use": "official"
           },
           {
-            "value": "7878 77521487",
+            "value": "З-012",
             "type": {
               "coding": [
                 {
-                  "code": "BRACELET",
+                  "code": "QUEUE_CODE",
                   "system": "ValueSet/Identifier_types"
                 }
               ]
@@ -923,7 +952,8 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             {
               "valueCoding": {
                 "code": "RED",
-                "system": "ValueSet/Sorting_result"
+                "display": "Красный",
+                "system": "ValueSet/Severity"
               }
             }
           ]

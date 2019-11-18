@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
@@ -21,6 +22,7 @@ import ru.viscur.dh.common.dto.task.TaskType
  * Ростомер
  */
 @Component
+@Profile("!fake-device")
 class Height(
         private val restTemplate: RestTemplate,
         @Value("\${paramedic.tves.url:http://localhost:1221/tves}")

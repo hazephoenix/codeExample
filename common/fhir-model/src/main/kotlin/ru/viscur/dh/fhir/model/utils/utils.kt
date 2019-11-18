@@ -4,7 +4,6 @@ import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
-import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
@@ -71,6 +70,16 @@ fun Timestamp.toDate(): Date = Date.from(this.toInstant())
  * Прибавить кол-во дней
  */
 fun Date.plusDays(days: Int) = Date(this.time + days * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND)
+
+/**
+ * Прибавить кол-во минут
+ */
+fun Date.plusMinutes(minutes: Int) = Date(this.time + minutes * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND)
+
+/**
+ * Прибавить кол-во секунд
+ */
+fun Date.plusSeconds(seconds: Int) = Date(this.time + seconds * MILLISECONDS_IN_SECOND)
 
 /**
  * Дата в формате строки yyyy.MM.dd HH:mm:ss
@@ -143,3 +152,22 @@ fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execSt
  * Назначение является осмотром ответственного - если указан исполнитель
  */
 fun ServiceRequest.isInspectionOfResp() = !this.performer.isNullOrEmpty()
+
+/**
+ * Критичное время для удаления [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]
+ * Все записи старее этого времени должны быть удалены
+ */
+fun criticalTimeForDeletingNextOfficeForPatientsInfo(): Date {
+    //сколько минут отображается информация о последующем кабинете для пациентов
+    val minutesForShowingNextOfficeForPatients = 3
+    return now().plusMinutes(-minutesForShowingNextOfficeForPatients)
+}
+
+/**
+ * Критичное время для того, чтобы отложить прием пациента, который долго находится в статусе [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.GOING_TO_OBSERVATION]
+ */
+fun criticalTimeForDelayGoingToObservation(): Date {
+    //сколько секунд ожидаем пациента со статусом [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.GOING_TO_OBSERVATION]
+    val secondsToWaitGoingToObservationPatient = 30
+    return now().plusSeconds(-secondsToWaitGoingToObservationPatient)
+}

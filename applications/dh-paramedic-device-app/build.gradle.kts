@@ -9,6 +9,9 @@ dependencies {
     implementation(project(":common:dto"))
     implementation(fileTree("libs"))
     implementation("org.usb4java:usb4java:1.3.0")
+    implementation("org.apache.xmlgraphics:batik:1.12")
+    implementation("org.apache.xmlgraphics:batik-transcoder:1.12")
+    implementation("org.apache.xmlgraphics:batik-codec:1.12")
 
     testCompile("junit:junit:4.13-rc-1")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

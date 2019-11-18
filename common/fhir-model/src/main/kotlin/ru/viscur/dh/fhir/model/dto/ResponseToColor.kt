@@ -83,7 +83,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.RED,
-                ValueSetName.HEART_RATE_PER_MINUTE.id,
+                ObservationType.HEART_RATE.id,
                 null,
                 "частота сердечных сокращений критична",
                 null,
@@ -91,7 +91,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.RED,
-                ValueSetName.HEART_RATE_PER_MINUTE.id,
+                ObservationType.HEART_RATE.id,
                 null,
                 "частота сердечных сокращений критична",
                 40.0,
@@ -99,7 +99,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.YELLOW,
-                ValueSetName.HEART_RATE_PER_MINUTE.id,
+                ObservationType.HEART_RATE.id,
                 null,
                 "частота сердечных сокращений повышена",
                 120.0,
@@ -107,7 +107,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.YELLOW,
-                ValueSetName.HEART_RATE_PER_MINUTE.id,
+                ObservationType.HEART_RATE.id,
                 null,
                 "частота сердечных сокращений повышена",
                 40.0,
@@ -115,7 +115,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.GREEN,
-                ValueSetName.HEART_RATE_PER_MINUTE.id,
+                ObservationType.HEART_RATE.id,
                 null,
                 "частота сердечных сокращений в норме",
                 51.0,
@@ -123,7 +123,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.RED,
-                ValueSetName.BODY_TEMPERATURE.id,
+                ObservationType.BODY_TEMPERATURE.id,
                 null,
                 "высокая температура тела",
                 null,
@@ -131,7 +131,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.RED,
-                ValueSetName.BODY_TEMPERATURE.id,
+                ObservationType.BODY_TEMPERATURE.id,
                 null,
                 "низкая температура тела",
                 35.1,
@@ -139,7 +139,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.YELLOW,
-                ValueSetName.BODY_TEMPERATURE.id,
+                ObservationType.BODY_TEMPERATURE.id,
                 null,
                 "температура тела повышена",
                 38.5,
@@ -147,7 +147,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.GREEN,
-                ValueSetName.BODY_TEMPERATURE.id,
+                ObservationType.BODY_TEMPERATURE.id,
                 null,
                 "температура тела приемлема",
                 35.1,
@@ -155,7 +155,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.RED,
-                ValueSetName.BLOOD_PRESSURE_UPPER_LIMIT.id,
+                ObservationType.BLOOD_PRESSURE_UPPER_LIMIT.id,
                 null,
                 "пониженное давление",
                 90.0,
@@ -163,7 +163,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.GREEN,
-                ValueSetName.BLOOD_PRESSURE_UPPER_LIMIT.id,
+                ObservationType.BLOOD_PRESSURE_UPPER_LIMIT.id,
                 null,
                 "давление в норме",
                 null,
@@ -172,7 +172,7 @@ val responseToColor = listOf(
         // пограничное значение
         ResponseToColor(
                 Severity.GREEN,
-                ValueSetName.BLOOD_PRESSURE_UPPER_LIMIT.id,
+                ObservationType.BLOOD_PRESSURE_UPPER_LIMIT.id,
                 null,
                 "давление в норме",
                 90.0,
@@ -180,7 +180,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.RED,
-                ValueSetName.BREATHING_RATE.id,
+                ObservationType.BREATHING_RATE.id,
                 null,
                 "слишком частое дыхание",
                 null,
@@ -188,7 +188,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.YELLOW,
-                ValueSetName.BREATHING_RATE.id,
+                ObservationType.BREATHING_RATE.id,
                 null,
                 "учащенное дыхание",
                 25.0,
@@ -196,7 +196,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.GREEN,
-                ValueSetName.BREATHING_RATE.id,
+                ObservationType.BREATHING_RATE.id,
                 null,
                 "частота дыхания в норме",
                 25.0,
@@ -204,7 +204,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.RED,
-                ValueSetName.BLOOD_OXYGENATION_LEVEL.id,
+                ObservationType.BLOOD_OXYGEN_SATURATION.id,
                 null,
                 "уровень оксенизации крови низкий",
                 90.0,
@@ -212,7 +212,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.YELLOW,
-                ValueSetName.BLOOD_OXYGENATION_LEVEL.id,
+                ObservationType.BLOOD_OXYGEN_SATURATION.id,
                 null,
                 "уровень оксенизации крови понижен",
                 90.0,
@@ -220,7 +220,7 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.GREEN,
-                ValueSetName.BLOOD_OXYGENATION_LEVEL.id,
+                ObservationType.BLOOD_OXYGEN_SATURATION.id,
                 null,
                 "уровень оксенизации крови приемлемый",
                 null,

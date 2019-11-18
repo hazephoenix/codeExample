@@ -21,9 +21,5 @@ enum class PatientQueueStatus {
     /**
      * На осмотре в кабинете
      */
-    ON_OBSERVATION,
-    /**
-     * Закончил все обследования в маршрутном листе
-     */
-    FINISHED
+    ON_OBSERVATION
 }

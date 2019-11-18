@@ -4,6 +4,7 @@ import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.BLOOD_ANALYSIS_CATEGORY
 import ru.viscur.dh.datastorage.api.util.URINE_ANALYSIS_CATEGORY
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
@@ -21,7 +22,7 @@ class ObservationServiceImpl(
         private val conceptService: ConceptService
 ) : ObservationService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byPeriod(start: Date, end: Date): List<Observation> {
@@ -103,19 +104,20 @@ class ObservationServiceImpl(
             }
         } ?: throw Exception("not defined serviceRequestId in basedOn of observation")
         //если это кровь, то необходимо автоматом сделать прием мочи
-        val observationTypeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, observation.code.code())
-        if (observationTypeConcept.parentCode == BLOOD_ANALYSIS_CATEGORY) {
-            val urineServiceRequests = serviceRequestService.activeByObservationCategory(patientId, URINE_ANALYSIS_CATEGORY)
-            urineServiceRequests.forEach {
-                create(patientId, Observation(
-                        code = it.code,
-                        subject = observation.subject,
-                        performer = listOf(),
-                        basedOn = Reference(it),
-                        issued = now()
-                ), diagnosis, severity)
-            }
-        }
+        //todo пред. версия. если не вернемся к ней, можно удалить
+//        val observationTypeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, observation.code.code())
+//        if (observationTypeConcept.parentCode == BLOOD_ANALYSIS_CATEGORY) {
+//            val urineServiceRequests = serviceRequestService.activeByObservationCategory(patientId, URINE_ANALYSIS_CATEGORY)
+//            urineServiceRequests.forEach {
+//                create(patientId, Observation(
+//                        code = it.code,
+//                        subject = observation.subject,
+//                        performer = listOf(),
+//                        basedOn = Reference(it),
+//                        issued = now()
+//                ), diagnosis, severity)
+//            }
+//        }
         updateRelated(patientId, observation)
         return resourceService.create(observation)
     }

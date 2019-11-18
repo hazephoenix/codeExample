@@ -2,7 +2,6 @@ package ru.viscur.dh.apps.misintegrationtest.util
 
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.utils.SECONDS_IN_MINUTE
-import java.util.*
 
 /**
  * Created at 08.11.2019 11:39 by SherbakovaMA
@@ -25,10 +24,11 @@ open class BaseTestCase(
 class QueueOfOfficeSimple(
         val officeId: String,
         val items: List<QueueItemSimple>,
-        val officeStatus: LocationStatus = LocationStatus.BUSY
+        val officeStatus: LocationStatus = LocationStatus.BUSY,
+        val nextOfficeForPatientsInfo: List<NextOfficeForPatientInfoSimple>? = null
 ) {
     override fun toString(): String {
-        return "QueueOfOfficeSimple(officeId='$officeId', items=$items)"
+        return "QueueOfOfficeSimple(officeId='$officeId', items=$items, nextOfficeForPatientsInfo=$nextOfficeForPatientsInfo)"
     }
 }
 
@@ -42,6 +42,11 @@ class QueueItemSimple(
         return "QueueItemSimple(status=$status, severity=$severity, estDuration=$estDuration, patientId=$patientId)"
     }
 }
+
+data class NextOfficeForPatientInfoSimple(
+        val patientId: String,
+        val nextOfficeId: String
+)
 
 class CarePlanSimple(
         val severity: Severity,

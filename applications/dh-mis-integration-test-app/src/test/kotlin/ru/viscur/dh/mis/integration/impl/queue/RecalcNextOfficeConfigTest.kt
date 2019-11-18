@@ -87,7 +87,9 @@ class RecalcNextOfficeConfigTest {
     @MethodSource("casesProvider")
     fun test(case: TestCase) {
         forTestService.cleanDb()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val patientId = forTestService.prepareDb(case)
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
         queueManagerService.recalcNextOffice(case.recalcNextOffice)
         queueManagerService.addToQueue(patientId)

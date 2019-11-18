@@ -2,6 +2,7 @@ package ru.viscur.dh.integration.mis.rest
 
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.type.*
@@ -16,11 +17,11 @@ import ru.viscur.dh.integration.mis.rest.dto.ServiceRequestPredictBody
 @RequestMapping("/reception")
 class ReceptionController(
         private val patientService: PatientService,
-        private val receptionService: ReceptionService
+        private val receptionService: ReceptionService,
+        private val diagnosisPredictor: DiagnosisPredictor
 ) {
     companion object {
         val patientClassifier = PatientClassifier()
-        val diagnosisPredictor = DiagnosisPredictor()
     }
 
     /**
@@ -33,7 +34,7 @@ class ReceptionController(
      * Определение предв. диагноза
      */
     @PostMapping("/diagnostic")
-    fun predictDiagnosis(@RequestBody bundle: Bundle) = diagnosisPredictor.predict()
+    fun predictDiagnosis(@RequestBody bundle: Bundle) = diagnosisPredictor.predict(bundle)
 
     /**
      * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ TODO

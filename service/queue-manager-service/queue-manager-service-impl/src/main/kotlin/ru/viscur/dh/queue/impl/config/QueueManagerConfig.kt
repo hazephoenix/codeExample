@@ -2,6 +2,7 @@ package ru.viscur.dh.queue.impl.config
 
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
+import org.springframework.scheduling.annotation.EnableScheduling
 
 private const val PROPERTIES_PREFIX = "ru.viscur.dh.queue-manager-service"
 
@@ -28,6 +30,8 @@ private const val ENTITY_PACKAGE = "$PERSISTENCE_PACKAGE.model"
  */
 @Configuration
 @ComponentScan(BASE_PACKAGE)
+@EnableScheduling
+@AutoConfigureAfter(name = ["ru.viscur.dh.datastorage.impl.config.DataStorageConfig"])
 class QueueManagerConfig {
 
 

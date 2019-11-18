@@ -16,6 +16,8 @@ class Helpers {
 
     companion object {
 
+        private var counter = 0
+
         /**
          * id фельдшера
          */
@@ -88,8 +90,8 @@ class Helpers {
                                 type = IdentifierType.SNILS
                         ),
                         Identifier(
-                                value = "7878 77521487",//номер
-                                type = IdentifierType.BRACELET
+                                value = "З-018",//номер
+                                type = IdentifierType.QUEUE_CODE
                         )
                 ),
                 name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван", "Алексеевич"))),
@@ -260,7 +262,10 @@ class Helpers {
                 assessor = referenceToPractitioner(surgeonId), // ответственный врач
                 summary = "Заключение: направлен на обследования по маршрутному листу",
                 supportingInfo = supportingInfo,
-                extension = ClinicalImpressionExtension(severity = severity)
+                extension = ClinicalImpressionExtension(
+                        severity = severity,
+                        queueNumber = severity.display.substring(0, 1) + "00" + counter++
+                )
         )
     }
 }

@@ -1,9 +1,10 @@
 package ru.viscur.dh.datastorage.impl
 
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.INSPECTION_ON_RECEPTION
 import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_LINK_ID_SEVERITY
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
@@ -11,9 +12,7 @@ import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.*
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
-import javax.persistence.Query
+import javax.persistence.*
 
 /**
  * Created at 15.10.2019 11:52 by SherbakovaMA
@@ -28,7 +27,7 @@ class PatientServiceImpl(
         private val practitionerService: PractitionerService
 ) : PatientService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byId(id: String): Patient = resourceService.byId(ResourceType.Patient, id)
@@ -50,10 +49,11 @@ class PatientServiceImpl(
         return enumValueOf(severityStr)
     }
 
+    override fun queueNumber(patientId: String) = clinicalImpressionService.active(patientId).extension.queueNumber
+
     override fun updateSeverity(patientId: String, severity: Severity): Boolean {
         var updated = false
         val activeClinicalImpression = clinicalImpressionService.active(patientId)
-                ?: throw Exception("not found active ClinicalImpression for patient with id '$patientId'")
         resourceService.update(ResourceType.ClinicalImpression, activeClinicalImpression.id) {
             if (extension.severity.name != severity.name) {
                 extension.severity = severity
@@ -153,12 +153,16 @@ class PatientServiceImpl(
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
         var patient = bundle.resources(ResourceType.Patient).first()
-        val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.toString() }?.value
+        val queueCode = patient.identifier?.find { it.type.code() == IdentifierType.QUEUE_CODE.name }?.value
+                ?: throw Exception("Not defined QUEUE_CODE identifier")
+        //код очереди не храним в пациенте, перекладываем в обращение
+        val identifiersWithoutQueueCode = patient.identifier?.filter { it.type.code() != IdentifierType.QUEUE_CODE.name }
+        val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.name }?.value
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем
         patient = patientByEnp?.let { byEnp ->
             resourceService.update(ResourceType.Patient, byEnp.id) {
-                identifier = patient.identifier
+                identifier = identifiersWithoutQueueCode
                 name = patient.name
                 birthDate = patient.birthDate
                 gender = patient.gender
@@ -168,6 +172,7 @@ class PatientServiceImpl(
         } ?: let {
             resourceService.create(patient.apply {
                 id = genId()
+                identifier = identifiersWithoutQueueCode
                 extension.queueStatusUpdatedAt = now()
                 extension.queueStatus = PatientQueueStatus.READY
             })
@@ -254,7 +259,10 @@ class PatientServiceImpl(
                 assessor = responsiblePractitionerRef, // ответственный врач
                 summary = "Заключение: ${diagnosticReport.conclusion}",
                 supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) },
-                extension = ClinicalImpressionExtension(severity = enumValueOf(severity))
+                extension = ClinicalImpressionExtension(
+                        severity = enumValueOf(severity),
+                        queueNumber = queueCode
+                )
         ).let { resourceService.create(it) }
         inspectionOnReceptionStart?.run {
             observationDurationService.saveToHistory(
@@ -281,6 +289,17 @@ class PatientServiceImpl(
         val query = em.createNativeQuery(queryStr)
         query.setParameters(params)
         return query.patientsToExamine()
+    }
+
+    override fun withLongGoingToObservation(): List<String> {
+        val query = em.createNativeQuery("""
+            select r.id
+            from patient r
+            where (r.resource->'extension'->>'queueStatusUpdatedAt')\:\:bigint <= :criticalTime
+                and r.resource->'extension'->>'queueStatus' = '${PatientQueueStatus.GOING_TO_OBSERVATION}'
+        """)
+        query.setParameter("criticalTime", criticalTimeForDeletingNextOfficeForPatientsInfo().time)
+        return query.resultList.map { it as String }
     }
 
     /**

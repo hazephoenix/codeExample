@@ -3,6 +3,7 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.Reference
@@ -21,13 +22,13 @@ class ClinicalImpressionServiceImpl(
         private val serviceRequestService: ServiceRequestService
 ) : ClinicalImpressionService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun allActive(): List<ClinicalImpression> =
             resourceService.all(ResourceType.ClinicalImpression, RequestBodyForResources(filter = mapOf("status" to ClinicalImpressionStatus.active.name)))
 
-    override fun active(patientId: String): ClinicalImpression? {
+    override fun hasActive(patientId: String): ClinicalImpression? {
         val query = em.createNativeQuery("""
                 select ci.resource
                 from clinicalImpression ci
@@ -37,6 +38,9 @@ class ClinicalImpressionServiceImpl(
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResource()
     }
+
+    override fun active(patientId: String): ClinicalImpression =
+            hasActive(patientId) ?: throw Error("No active ClinicalImpression for patient with id '$patientId' found")
 
     override fun byServiceRequest(serviceRequestId: String): ClinicalImpression {
         val query = em.createNativeQuery("""
@@ -56,7 +60,7 @@ class ClinicalImpressionServiceImpl(
     }
 
     override fun cancelActive(patientId: String) {
-        active(patientId)?.run {
+        hasActive(patientId)?.run {
             resourceService.update(ResourceType.ClinicalImpression, id) {
                 status = ClinicalImpressionStatus.cancelled
             }
@@ -115,7 +119,7 @@ class ClinicalImpressionServiceImpl(
 
                 supportingInfo += refs
             }
-        } ?: throw Error("Error. No active ClinicalImpression for patient with id $patientId found")
+        }
     }
 
     @Tx

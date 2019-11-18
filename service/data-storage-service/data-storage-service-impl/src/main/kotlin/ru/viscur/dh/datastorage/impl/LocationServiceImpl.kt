@@ -4,9 +4,11 @@ import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.LocationService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.utils.criticalTimeForDeletingNextOfficeForPatientsInfo
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -20,18 +22,32 @@ class LocationServiceImpl(
         private val conceptService: ConceptService
 ) : LocationService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byId(id: String): Location = resourceService.byId(ResourceType.Location, id)
 
-    override fun withPatientInLastPatientInfo(patientId: String): List<Location> {
+    override fun withPatientInNextOfficeForPatientsInfo(patientId: String): List<Location> {
         val query = em.createNativeQuery("""
-            select r.resource
-            from location r
-            where r.resource->'extension'->'lastPatientInfo'->'subject'->>'reference'= :patientRef
+            select resource
+            from
+                (select jsonb_array_elements(r.resource->'extension' ->'nextOfficeForPatientsInfo') as nextOffice, r.resource as resource
+                 from location r) nextOfficeT
+            where nextOffice->'subject'->>'reference' = :patientRef
             """)
         query.setParameter("patientRef", "Patient/$patientId")
+        return query.fetchResourceList()
+    }
+
+    override fun withOldNextOfficeForPatientsInfo(): List<Location> {
+        val query = em.createNativeQuery("""
+            select resource
+                from
+            (select jsonb_array_elements(r.resource->'extension' ->'nextOfficeForPatientsInfo') as nextOffice, r.resource as resource
+            from location r) nextOfficeT
+            where (nextOfficeT.nextOffice->>'fireDate')\:\:bigint <= :criticalTime
+            """)
+        query.setParameter("criticalTime", criticalTimeForDeletingNextOfficeForPatientsInfo().time)
         return query.fetchResourceList()
     }
 

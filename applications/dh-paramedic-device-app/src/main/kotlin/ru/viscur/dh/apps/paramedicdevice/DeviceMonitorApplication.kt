@@ -1,5 +1,7 @@
 package ru.viscur.dh.apps.paramedicdevice
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.ApplicationEventPublisher
@@ -21,12 +23,21 @@ class DeviceMonitorApplication(
         private val jmsTemplate: JmsTemplate
 ) {
 
+    private val log: Logger = LoggerFactory.getLogger(DeviceMonitorApplication::class.java)
+
     /**
      * Слушаем запросы на выполнение задач
      */
     @JmsListener(destination = "paramedic-requested-tasks")
     fun jmsListener(task: Task) {
+        if (log.isDebugEnabled) {
+            log.debug("Requested task ...")
+            log.debug("$task")
+        }
         if (task.desktopId == uuid.uid) {
+            if (log.isDebugEnabled) {
+                log.debug("Task for me! Nice! Let's do it!")
+            }
             publisher.publishEvent(TaskRequested(task))
         }
     }

@@ -7,6 +7,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import ru.viscur.dh.common.dto.events.TaskComplete
@@ -23,6 +24,7 @@ import javax.annotation.PostConstruct
  * Печать браслетов
  */
 @Component
+@Profile("!fake-device")
 class WristbandPrinter(
         private val publisher: ApplicationEventPublisher,
         @Value("\${wristband.red:RED}")
@@ -52,6 +54,10 @@ class WristbandPrinter(
     fun listener(event: TaskRequested) {
         val task = event.task
         if (task.type == TaskType.Wristband) {
+            if (log.isDebugEnabled) {
+                log.debug("Take request to print wristband!")
+                log.debug("$task")
+            }
             publisher.publishEvent(TaskStarted(task))
             printWristband(task)
         }

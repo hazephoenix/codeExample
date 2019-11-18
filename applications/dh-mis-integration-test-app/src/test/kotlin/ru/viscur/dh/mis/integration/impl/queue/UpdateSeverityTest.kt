@@ -247,6 +247,7 @@ class UpdateSeverityTest {
     fun testZoneGreenToYellowWithoutQueue() {
         forTestService.cleanDb()
         forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
         val servReqsFromRegister = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)

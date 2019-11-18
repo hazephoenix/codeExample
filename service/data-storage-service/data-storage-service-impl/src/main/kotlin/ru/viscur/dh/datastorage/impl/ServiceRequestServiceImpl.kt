@@ -2,6 +2,8 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.filterForQueue
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -14,7 +16,7 @@ class ServiceRequestServiceImpl(
         private val carePlanService: CarePlanService
 ) : ServiceRequestService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun all(patientId: String): List<ServiceRequest> {
@@ -134,6 +136,9 @@ class ServiceRequestServiceImpl(
         query.setParameter("patientRef", "Patient/$patientId")
         return query.fetchResourceList()
     }
+
+    override fun activeForQueue(patientId: String, officeId: String?): List<ServiceRequest> =
+            (officeId?.run { active(patientId, officeId) } ?: run { active(patientId) }).filterForQueue()
 
     @Tx
     override fun add(patientId: String, serviceRequestList: List<ServiceRequest>): CarePlan {
