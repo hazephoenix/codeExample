@@ -1,7 +1,6 @@
 package ru.viscur.autotests.restApi
 
 import io.restassured.RestAssured
-import ru.viscur.autotests.dto.DefaultDurationInfo
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
 import ru.viscur.dh.fhir.model.entity.*
@@ -62,6 +61,12 @@ class QueRequests {
                 Helpers.createRequestSpec(patientAndOfficeRef).`when`().
                         post(Endpoints.SET_PATIENT_FIRST).
                         then().statusCode(200)
+
+        fun delayPatient(patientRef: Reference) =
+                Helpers.createRequestSpec(patientRef).`when`().
+                        post(Endpoints.DELAY_PATIENT).
+                        then().statusCode(200)
+
         //office
         fun officeIsReady(officeRef: Reference) =
                 Helpers.createRequestSpec(officeRef).`when`().
@@ -100,8 +105,8 @@ class QueRequests {
                         post(Endpoints.PATIENT_LEFT).
                         then().statusCode(200)
 
-        fun cancelEntering(officeRef: Reference) =
-                Helpers.createRequestSpec(officeRef).log().all().`when`().
+        fun cancelEntering(patientRef: Reference) =
+                Helpers.createRequestSpec(patientRef).log().all().`when`().
                         post(Endpoints.CANCEL_ENTERING).
                         then().statusCode(200).extract().response()
 

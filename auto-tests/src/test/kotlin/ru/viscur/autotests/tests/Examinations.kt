@@ -13,7 +13,7 @@ import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class Examinations {
 
     companion object {

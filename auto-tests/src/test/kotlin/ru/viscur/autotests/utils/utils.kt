@@ -35,7 +35,7 @@ fun checkQueueItems(itemsByOffices: List<QueueItemsOfOffice>) {
             val actPatient = QueRequests.resource(ResourceType.Patient, queueItemInfo.patientId)
             Assertions.assertEquals(queueItemInfo.status, actPatient.extension.queueStatus, "wrong status of patient with id ${queueItemInfo.patientId}. $itemsStr")
             //правильность статуса кабинета в зависимости от статуса первого пациента в очереди
-            if (index == 0) {
+            /*if (index == 0) {
                 val actOffice = QueRequests.resource(ResourceType.Location, officeId)
                 val expPatientStatus = when (actOffice.status) {
                     LocationStatus.CLOSED, LocationStatus.BUSY -> PatientQueueStatus.IN_QUEUE
@@ -45,7 +45,7 @@ fun checkQueueItems(itemsByOffices: List<QueueItemsOfOffice>) {
                 }
                 Assertions.assertEquals(expPatientStatus, actPatient.extension.queueStatus,
                         "not proper status of office ${actOffice.id} ($expPatientStatus) to first patient in queue status: ${actPatient.extension.queueStatus}")
-            }
+            }*/
         }
     }
 }

@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class ServiceRequests {
 
     companion object {
@@ -93,7 +93,7 @@ class ServiceRequests {
                 ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone),
                 ServiceRequestInfo(code = observation1Office101, locationId = office101)
         ))
-        //отмена Service request и проверка, что отменен
+        //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelServiceRequest(serviceRequestId)
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = "СтХир", locationId = redZone),
@@ -118,7 +118,7 @@ class ServiceRequests {
                 status = ObservationStatus.registered
         )
         QueRequests.createObservation(observation)
-        //отмена Service request и проверка, что отменен
+        //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelServiceRequest(serviceRequest.id)
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(observationOfSurgeonCode, locationId = redZone),
@@ -142,9 +142,8 @@ class ServiceRequests {
                 ServiceRequestInfo(code = observation2Office101, locationId = office101),
                 ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone)
         ))
-
+        //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelOfficeServiceRequests(patientId, office101)
-
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = observation1Office101, locationId = office101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestInfo(code = observation2Office101, locationId = office101, status = ServiceRequestStatus.cancelled),
@@ -187,6 +186,7 @@ class ServiceRequests {
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         QueRequests.invitePatientToOffice(createListResource(patientId, office140))
         val allActServRequest = QueRequests.patientEntered(createListResource(patientId, office140))
+        //проверка, что в офисе, в который не назначены  Service Request получаем список всех Service Request пациента
         assertEquals(4, allActServRequest.size, "wrong service requests for patient $patientId")
     }
 }
