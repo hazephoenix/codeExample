@@ -13,7 +13,7 @@ import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class Examinations {
 
     companion object {
@@ -90,6 +90,7 @@ class Examinations {
                 BundleEntry(diagnosticReportOfResp),
                 BundleEntry(encounter)
         ))
+        //завершение обращения с активным Service Request и проверка, что он больше не активный
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         checkServiceRequestsOfPatient(patientId, listOf())
     }

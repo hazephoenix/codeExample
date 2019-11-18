@@ -20,7 +20,7 @@ import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class QueueLogic {
 
     companion object {
@@ -47,7 +47,7 @@ class QueueLogic {
 
 
 
-    @Test
+@Test
     fun deleteMiddlePositionPatientInQue() {
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
@@ -234,7 +234,7 @@ class QueueLogic {
                 ))
         ))
         //отмена входа пациента, пациент должен вернуться первым в очередь
-        QueRequests.cancelEntering(referenceToLocation(office101))
+        QueRequests.cancelEntering(referenceToPatient(patientId1))
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
@@ -310,68 +310,84 @@ class QueueLogic {
     }
 
     @Test
-    fun closingCabinet() {
+    fun closingCabinetGoingToObservation() {
         val observation101Office = "B03.016.002ГМУ_СП"
-        val observation116Office = "A04.16.001"
-        QueRequests.officeIsBusy(referenceToLocation(office101))
+        QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation101Office),
                 Helpers.createServiceRequestResource(observation101Office)
         )
         val bundleRed1 = bundle("1111", "RED", servRequests)
         val bundleRed2 = bundle("1112", "RED", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
+        //пациент going to observation
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+
         QueRequests.officeIsClosed(referenceToLocation(office101))
-        checkQueueItems(listOf())
-    }
-
-    @Test
-    fun GettingInAnotherQueueIfCabinetIsClosed() {
-        //не работает
-        val observation116Office = "A04.16.001"
-        val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation116Office)
-        )
-
-        val bundleRed1 = bundle("1111", "RED", servRequests)
-        QueRequests.officeIsBusy(referenceToLocation(office116))
-        QueRequests.officeIsBusy(referenceToLocation(office117))
-        val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
-        //пациент стоит в 116
+        //ничего не происходит, кабинет можно закрыть только со статусов BUSY, READY
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office116, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-        //офис закрыт, пациент должен быть перенаправлен в 117
-        QueRequests.officeIsClosed(referenceToLocation(office116))
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office117, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
     }
 
     @Test
-    fun queueDisbandmentWithAnotherServiceRequest() {
+    fun closingCabinetInQueue() {
+        val observation101Office = "B03.016.002ГМУ_СП"
         QueRequests.officeIsBusy(referenceToLocation(office101))
-        val servReq1 = listOf(
-                Helpers.createServiceRequestResource(observCode),
-                Helpers.createServiceRequestResource(observCode)
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observation101Office)
         )
-        val bundleRed1 = bundle("1111", "RED", servReq1)
-        val bundleRed2 = bundle("1112", "RED", servReq1)
+        val bundleRed1 = bundle("1111", "RED", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
-        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
+        //пациент in queue
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+
         QueRequests.officeIsClosed(referenceToLocation(office101))
+        //кабинет закрыт, очередь расформирована
         checkQueueItems(listOf())
     }
 
+    @Test
+    fun closingCabinetOnObservation() {
+        val observation101Office = "B03.016.002ГМУ_СП"
+        QueRequests.officeIsReady(referenceToLocation(office101))
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observation101Office)
+        )
+        val bundleRed1 = bundle("1111", "RED", servRequests)
+        val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
+        QueRequests.patientEntered(Helpers.createListResource(patientId, office101))
+        QueRequests.officeIsClosed(referenceToLocation(office101))
+        //пациент ON_OBSERVATION
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                ))
+        ))
+
+        QueRequests.officeIsClosed(referenceToLocation(office101))
+        //ничего не происходит, кабинет можно закрыть только со статусов BUSY, READY
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                ))
+        ))
+    }
 
     @Test
     fun gettingInCorrectQueueAfterFinishingObservation() {
-        //Todo доделать, должен работать при включенном переопределении очереди
         val observationCode1 = "B03.016.002ГМУ_СП"
         val observationCode2 = "A04.16.001"
         val servRequests1 = listOf(
@@ -391,6 +407,7 @@ class QueueLogic {
         val responsePatient1 = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
         val patientId1 = patientIdFromServiceRequests(responsePatient1)
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        QueRequests.setQueueResortingConfig(true)
         QueRequests.patientEntered(createListResource(patientId1, office101))
         val obs = Helpers.createObservation(
                 code = observationCode1,
@@ -408,10 +425,11 @@ class QueueLogic {
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
+        QueRequests.setQueueResortingConfig(false)
     }
 
     @Test
-    fun settingPatientAsFirst () {
+    fun settingPatientInQueueAsFirst () {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observCode)
@@ -434,6 +452,7 @@ class QueueLogic {
         ))
     }
 
+
     @Test
     fun twoPatientsGoingToObservation() {
         QueRequests.officeIsReady(referenceToLocation(office101))
@@ -444,7 +463,14 @@ class QueueLogic {
         val bundle2 = bundle("1112", "YELLOW", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
-        QueRequests.inviteNextPatientToOffice(Helpers.createListResource(patientId2, office101))
+
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office101, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
+                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+        QueRequests.inviteNextPatientToOffice(referenceToLocation(office101))
 
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(

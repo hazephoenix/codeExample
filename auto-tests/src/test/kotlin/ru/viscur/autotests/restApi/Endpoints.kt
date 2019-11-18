@@ -8,6 +8,9 @@ class Endpoints {
         //Patient
         const val CREATE_PATIENT: String = "$BASE_URI/reception/patient"
         //Queue
+        const val CLINICAL_IMPESSION_DURATION = "$BASE_URI/clinicalImpressionDuration"
+        const val RECALC_CLINICAL_IMPESSION_DURATION = "$BASE_URI/clinicalImpressionDuration/autoRecalc"
+        const val RECALC_QUEUE_CONFIG = "$BASE_URI/queue/recalcNextOffice"
         const val QUE_INFO: String = "$BASE_URI/queue/info"
         const val QUE_ADD_PATIENT: String = "$BASE_URI/queue/patient/addToQueue"
         const val QUE_DELETE_PATIENT: String = "$BASE_URI/queue/patient"
@@ -37,6 +40,10 @@ class Endpoints {
         const val CANCEL_EXAMINATION: String = "$BASE_URI/examination/cancel"
         //service request
         const val PATIENT_SERVICE_REQUESTS: String = "$BASE_URI/examination/serviceRequests"
-        const val CANCEL_SERVICER_REQUEST: String = "$BASE_URI/examination/serviceRequests/cancel"
+        const val CANCEL_SERVICE_REQUEST: String = "$BASE_URI/examination/serviceRequests/cancelById"
+        const val CANCEL_OFFICE_SERVICE_REQUEST: String = "$BASE_URI/examination/serviceRequests/cancel"
+        //reports and duration
+        const val DEFAULT_DURATION: String = "$BASE_URI/clinicalImpressionDuration/default"
+
     }
 }

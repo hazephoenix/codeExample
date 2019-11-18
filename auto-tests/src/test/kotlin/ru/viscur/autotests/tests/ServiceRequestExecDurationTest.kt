@@ -16,7 +16,7 @@ import ru.viscur.dh.fhir.model.utils.*
  *
  * Проверка сохранения продолжительности выполнения услуги
  */
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class ServiceRequestExecDurationTest {
 
     @Test
@@ -30,11 +30,11 @@ class ServiceRequestExecDurationTest {
                 Helpers.createServiceRequestResource(observationOfBloodCode)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-        val office139Id = "Office:139"
+        val redZone = "Office:RedZone"
         val office101Id = "Office:101"
 
         QueRequests.officeIsBusy(referenceToLocation(office101Id))
-        QueRequests.officeIsBusy(referenceToLocation(office139Id))
+        QueRequests.officeIsBusy(referenceToLocation(redZone))
 
         //регистрация пациента
         val responseBundle = QueRequests.createPatient(bundle)
@@ -61,7 +61,7 @@ class ServiceRequestExecDurationTest {
 
         //проверка, что услуга сохранилась длительностью 3 сек
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id),
+                ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone),
                 ServiceRequestInfo(code = observationOfBloodCode, locationId = office101Id, status = ServiceRequestStatus.waiting_result, execDuration = 3)
         ))
     }

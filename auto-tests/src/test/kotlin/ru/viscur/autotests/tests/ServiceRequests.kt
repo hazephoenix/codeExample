@@ -21,7 +21,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class ServiceRequests {
 
     companion object {
@@ -103,11 +103,6 @@ class ServiceRequests {
 
     @Test
     fun WaitingResultServiceRequestCancellingById () {
-        // "timestamp": "2019-11-15T03:47:15.502+0000",
-        //    "status": 400,
-        //    "error": "Bad Request",
-        //    "message": "Required String parameter 'patientId' is not present",
-        //    "path": "/examination/serviceRequests/cancel"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -126,13 +121,13 @@ class ServiceRequests {
         //отмена Service request и проверка, что отменен
         QueRequests.cancelServiceRequest(serviceRequest.id)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(observationOfSurgeonCode, locationId = office139),
+                ServiceRequestInfo(observationOfSurgeonCode, locationId = redZone),
                 ServiceRequestInfo(observation1Office101, locationId = office101, status = ServiceRequestStatus.cancelled)
         ))
     }
 
     @Test
-    fun ServiceRequestInOfficeCancelling () {
+    fun ServiceRequestByOfficeCancelling () {
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101),
                 Helpers.createServiceRequestResource(observation2Office101)
@@ -193,6 +188,5 @@ class ServiceRequests {
         QueRequests.invitePatientToOffice(createListResource(patientId, office140))
         val allActServRequest = QueRequests.patientEntered(createListResource(patientId, office140))
         assertEquals(4, allActServRequest.size, "wrong service requests for patient $patientId")
-
     }
 }
