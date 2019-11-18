@@ -24,19 +24,32 @@ class DiagnosisPredictorImpl(
         private val codeMapService: CodeMapService,
         private val conceptService: ConceptService
 ): DiagnosisPredictor {
-    override fun predict(bundle: Bundle): PredictDiagnosisResponse {
+    /**
+     * Минимальная вероятность диагноза (значение обговаривалось с врачами)
+     */
+    private val minimalProbability = 0.95
+
+    override fun predict(bundle: Bundle, take: Int): PredictDiagnosisResponse {
         val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse).first()
-        val complaints = questionnaireResponse.item.find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }?.answer?.mapNotNull { it.valueString }
+        val complaints = questionnaireResponse.item
+                .find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }
+                ?.answer?.mapNotNull { it.valueString }
                 ?: throw Exception("Could not predict diagnosis: no complaints provided")
+
         val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS.id, complaints)
-        // TODO: diagnosis probability
-        val take = 10
+        if (complaintCodes.isEmpty()) throw Error("Complaint codes not found")
+
         val diagnosisCodes = codeMapService.icdByAllComplaints(complaintCodes,take)
                 .map { PredictedDiagnosis(code = it, system = "ValueSet/${ValueSetName.ICD_10}", probability = 1.0) }
         if (diagnosisCodes.size < take) {
             val moreDiagnosisCodes = codeMapService.icdByAnyComplaints(complaintCodes, take - diagnosisCodes.size)
-                    .map { PredictedDiagnosis(code = it, system = "ValueSet/${ValueSetName.ICD_10}", probability = 0.5) }
-            PredictDiagnosisResponse(diagnosisCodes + moreDiagnosisCodes)
+                    .mapNotNull {
+                        PredictedDiagnosis(
+                                code = it!!.diagnosisCode,
+                                system = "ValueSet/${ValueSetName.ICD_10}",
+                                probability = it.complaintCodeCount.toDouble()/complaintCodes.size.toDouble())
+                    }
+            return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes).filter { it.probability > minimalProbability })
         }
         return PredictDiagnosisResponse(diagnosisCodes)
     }
@@ -56,7 +69,7 @@ class DiagnosisPredictorImpl(
     override fun saveTrainingSample(diagnosticReport: DiagnosticReport) {
         Reference(diagnosticReport.subject.reference).id?.let { patientId ->
             patientService.byId(patientId).let { patient ->
-                clinicalImpressionService.active(patientId)?.let { clinicalImpression ->
+                clinicalImpressionService.active(patientId).let { clinicalImpression ->
                     val observations = clinicalImpression.supportingInfo
                             .filter { it.type == ResourceType.ResourceTypeId.Observation }
                             .map { resourceService.byId(ResourceType.Observation, it.id!!) }
@@ -64,9 +77,10 @@ class DiagnosisPredictorImpl(
                     val questionnaireResponse = clinicalImpression.supportingInfo
                             .filter { it.type == ResourceType.ResourceTypeId.QuestionnaireResponse }
                             .map { resourceService.byId(ResourceType.QuestionnaireResponse, it.id!!) }
-                            .find { it.questionnaire == "Questionnaire/Severity_criteria" } // todo путаница в названиях с paramedic-qa-form
+                            .find { it.questionnaire == "Questionnaire/Severity_criteria" }
 
-                    val complaints = questionnaireResponse?.item?.find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }
+                    val complaints = questionnaireResponse?.item
+                            ?.find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }
                             ?.answer?.mapNotNull { it.valueString }
                             ?: throw Exception("Could not predict diagnosis: no complaints provided")
 
@@ -83,7 +97,7 @@ class DiagnosisPredictorImpl(
                         // обновить code map с новыми жалобами
                         codeMapService.codeMap(ValueSetName.ICD_10, ValueSetName.COMPLAINTS, diagnosisCode).let {
                             resourceService.update(ResourceType.CodeMap, it.id) {
-                                this.targetCode += resultComplaints
+                                this.targetCode = targetCode.union(resultComplaints).toList()
                             }
                         }
                     }

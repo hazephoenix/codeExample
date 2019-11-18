@@ -7,4 +7,4 @@ select resource_create('{"resourceType": "Concept", "id": "Complaints:Violent_pa
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Fever", "code": "Fever", "system": "ValueSet/Complaints", "display": "Лихорадка",
   "alternatives": ["лихорадка", "лихорадит"]}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Debility", "code": "Debility", "system": "ValueSet/Complaints", "display": "Слабость",
-  "alternatives": ["слабость", "недомогаение", "усталость"]}'::jsonb);
+  "alternatives": ["слабость", "недомогание", "усталость"]}'::jsonb);
