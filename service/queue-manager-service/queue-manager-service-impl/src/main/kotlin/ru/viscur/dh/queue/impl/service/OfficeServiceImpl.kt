@@ -15,6 +15,7 @@ import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.*
+import ru.viscur.dh.queue.api.LocationMonitorInformService
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
@@ -24,7 +25,8 @@ class OfficeServiceImpl(
         private val locationService: LocationService,
         private val patientService: PatientService,
         private val resourceService: ResourceService,
-        private val queueService: QueueService
+        private val queueService: QueueService,
+        private val locationMonitorInformService: LocationMonitorInformService
 ) : OfficeService {
 
     override fun all() = resourceService.all(ResourceType.Location, RequestBodyForResources(
@@ -47,6 +49,7 @@ class OfficeServiceImpl(
             status = newStatus
             extension = extension.apply { statusUpdatedAt = now }
         }
+        locationMonitorInformService.queueChanged(listOf(officeId))
     }
 
     @Tx
@@ -106,9 +109,11 @@ class OfficeServiceImpl(
     @Tx
     override fun deletePatientFromNextOfficesForPatientsInfo(patientId: String) {
         locationService.withPatientInNextOfficeForPatientsInfo(patientId).forEach {
-            resourceService.update(ResourceType.Location, it.id) {
+            val officeId = it.id
+            resourceService.update(ResourceType.Location, officeId) {
                 extension.nextOfficeForPatientsInfo = extension.nextOfficeForPatientsInfo.filterNot { it.subject.id!! == patientId }
             }
+            locationMonitorInformService.queueChanged(listOf(officeId))
         }
     }
 
@@ -123,6 +128,7 @@ class OfficeServiceImpl(
             )
             extension.nextOfficeForPatientsInfo = extension.nextOfficeForPatientsInfo + newNextOfficeForPatientInfo
         }
+        locationMonitorInformService.queueChanged(listOf(officeId))
     }
 
     @Tx

@@ -1,4 +1,4 @@
-drop table if exists QueueHistoryOfOffice;
+drop table if exists QueueHistoryOfOffice cascade;
 create table QueueHistoryOfOffice
 (
 	id text not null
@@ -12,7 +12,7 @@ create table QueueHistoryOfOffice
 );
 alter table QueueHistoryOfOffice owner to ${owner};
 
-drop table if exists QueueHistoryOfOffice_history;
+drop table if exists QueueHistoryOfOffice_history cascade;
 create table QueueHistoryOfOffice_history
 (
 	id text not null,
@@ -26,7 +26,7 @@ create table QueueHistoryOfOffice_history
 );
 alter table QueueHistoryOfOffice_history owner to ${owner};
 
-drop table if exists QueueHistoryOfPatient;
+drop table if exists QueueHistoryOfPatient cascade;
 create table QueueHistoryOfPatient
 (
 	id text not null
@@ -40,7 +40,7 @@ create table QueueHistoryOfPatient
 );
 alter table QueueHistoryOfPatient owner to ${owner};
 
-drop table if exists QueueHistoryOfPatient_history;
+drop table if exists QueueHistoryOfPatient_history cascade;
 create table QueueHistoryOfPatient_history
 (
 	id text not null,
@@ -54,7 +54,7 @@ create table QueueHistoryOfPatient_history
 );
 alter table QueueHistoryOfPatient_history owner to ${owner};
 
-drop table if exists QueueItem;
+drop table if exists QueueItem cascade;
 create table QueueItem
 (
 	id text not null
@@ -68,7 +68,7 @@ create table QueueItem
 );
 alter table QueueItem owner to ${owner};
 
-drop table if exists QueueItem_history;
+drop table if exists QueueItem_history cascade;
 create table QueueItem_history
 (
 	id text not null,
@@ -82,7 +82,7 @@ create table QueueItem_history
 );
 alter table QueueItem_history owner to ${owner};
 
-drop table if exists CodeMap;
+drop table if exists CodeMap cascade;
 create table CodeMap
 (
 	id text not null
@@ -96,7 +96,7 @@ create table CodeMap
 );
 alter table CodeMap owner to ${owner};
 
-drop table if exists CodeMap_history;
+drop table if exists CodeMap_history cascade;
 create table CodeMap_history
 (
 	id text not null,

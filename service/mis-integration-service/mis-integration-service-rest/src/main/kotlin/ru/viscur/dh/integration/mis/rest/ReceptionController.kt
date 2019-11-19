@@ -34,7 +34,7 @@ class ReceptionController(
      * Определение предв. диагноза
      */
     @PostMapping("/diagnostic")
-    fun predictDiagnosis(@RequestBody bundle: Bundle) = diagnosisPredictor.predict(bundle)
+    fun predictDiagnosis(@RequestBody bundle: Bundle, @RequestParam take: Int) = diagnosisPredictor.predict(bundle, take)
 
     /**
      * Определение предположительного списка услуг для маршрутного листа по диагнозу МКБ TODO

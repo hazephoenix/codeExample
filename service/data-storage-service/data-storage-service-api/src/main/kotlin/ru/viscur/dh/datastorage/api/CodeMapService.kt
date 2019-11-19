@@ -1,6 +1,7 @@
 package ru.viscur.dh.datastorage.api
 
-import ru.viscur.dh.fhir.model.entity.CodeMap
+import ru.viscur.dh.datastorage.api.response.*
+import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
 /**
@@ -79,9 +80,9 @@ interface CodeMapService {
      * @param complaints Список кодов жалоб, найденных в справочнике и соответсвующих тем,
      *  что ввел фельдшер
      * @param take Сколько подходящих записей необходимо найти
-     * @return List<String> Список кодов МКБ, подходящих по списку жалоб
+     * @return Список кодов МКБ, подходящих по списку жалоб, и число вхождений искомых жалоб
      */
-    fun icdByAnyComplaints(complaints: List<String>, take: Int): List<String>
+    fun icdByAnyComplaints(complaints: List<String>, take: Int): List<ComplaintOccurrence?>
 
     /**
      * По коду специальности ответственного врача [ValueSetName.PRACTITIONER_QUALIFICATIONS] код выполняемой услуги из [ValueSetName.OBSERVATION_TYPES]
