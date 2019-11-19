@@ -3,8 +3,10 @@ package ru.viscur.autotests.tests.queue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.*
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
+import ru.viscur.autotests.dto.QueueReportInfo
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.tests.Observations
@@ -19,7 +21,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.utils.*
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class QueueSorting {
 
     companion object {

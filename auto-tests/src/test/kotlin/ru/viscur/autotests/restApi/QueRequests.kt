@@ -1,6 +1,8 @@
 package ru.viscur.autotests.restApi
 
 import io.restassured.RestAssured
+import ru.viscur.autotests.dto.PractitionerWorkloadInfo
+import ru.viscur.autotests.dto.QueueReportInfo
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
 import ru.viscur.dh.fhir.model.entity.*
@@ -31,10 +33,6 @@ class QueRequests {
                 Helpers.createRequestSpecWithoutBody().`when`().
                         get(Endpoints.RECALC_QUEUE_CONFIG).
                         then().statusCode(200)
-
-        fun getQueInfo() : String  = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
-                `when`().get(Endpoints.QUE_INFO).
-                then().statusCode(200).extract().body().asString()
 
         fun deleteQue() = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
                 `when`().delete(Endpoints.QUE_DELETE_ALL).then().statusCode(200)
@@ -189,7 +187,7 @@ class QueRequests {
         fun getSeverity(bundle: Bundle) =
                 Helpers.createRequestSpec(bundle).
                         `when`().log().all().post(Endpoints.GET_SEVERITY).
-                        then().log().all().statusCode(200).extract().response()
+                        then().log().all().statusCode(200)
 
         //examination
         fun completeExamination(bundle : Bundle) =
@@ -214,6 +212,32 @@ class QueRequests {
                 Helpers.createRequestSpecWithoutBody().`when`().
                         get(Endpoints.CLINICAL_IMPESSION_DURATION).
                         then().statusCode(200)
+
+        fun getQueueReport() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.REPORT_QUEUE).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<QueueReportInfo>::class.java)
+
+        fun getOfficeQueueReport(officeId: String) =
+                Helpers.createRequestWithQuery(mapOf("officeId" to officeId)).`when`().
+                        get(Endpoints.REPORT_QUEUE).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<QueueReportInfo>::class.java)
+
+        fun getAllPractitionersWorkload() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.PRACTITIONER_WORKLOAD).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<PractitionerWorkloadInfo>::class.java)
+
+        fun getPractitionersWorkloadById(practitionerId: String) =
+                Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId)).`when`().
+                        get(Endpoints.REPORT_QUEUE).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<PractitionerWorkloadInfo>::class.java)
+
+
     }
 }
 

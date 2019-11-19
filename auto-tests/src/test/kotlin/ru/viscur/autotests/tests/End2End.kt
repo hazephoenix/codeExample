@@ -11,7 +11,7 @@ import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
 import javax.management.Query
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class End2End {
 
     companion object {
@@ -160,12 +160,12 @@ class End2End {
                 BundleEntry(diagnosticReportOfResp),
                 BundleEntry(encounter)
         ))
-        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+        /*val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         //проверка, что маршрутный лист пациента завершен и он удален из системы очередь
         Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status of ClinicalImpression")
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
-        checkObservationsOfPatient(patientId, listOf())
+        checkObservationsOfPatient(patientId, listOf())*/
     }
 
 }

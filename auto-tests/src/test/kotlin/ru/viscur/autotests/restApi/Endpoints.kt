@@ -11,7 +11,6 @@ class Endpoints {
         const val CLINICAL_IMPESSION_DURATION = "$BASE_URI/clinicalImpressionDuration"
         const val RECALC_CLINICAL_IMPESSION_DURATION = "$BASE_URI/clinicalImpressionDuration/autoRecalc"
         const val RECALC_QUEUE_CONFIG = "$BASE_URI/queue/recalcNextOffice"
-        const val QUE_INFO: String = "$BASE_URI/queue/info"
         const val QUE_ADD_PATIENT: String = "$BASE_URI/queue/patient/addToQueue"
         const val QUE_DELETE_PATIENT: String = "$BASE_URI/queue/patient"
         const val QUE_DELETE_ALL: String = "$BASE_URI/queue"
@@ -50,5 +49,7 @@ class Endpoints {
         const val GET_SEVERITY: String = "$BASE_URI/reception/severity"
         //reports and duration
         const val DEFAULT_DURATION: String = "$BASE_URI/clinicalImpressionDuration/default"
+        const val REPORT_QUEUE: String = "$BASE_URI/report/queue"
+        const val PRACTITIONER_WORKLOAD = "$BASE_URI/report/workload"
     }
 }
