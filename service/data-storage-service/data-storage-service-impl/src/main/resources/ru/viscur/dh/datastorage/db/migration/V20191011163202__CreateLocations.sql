@@ -207,9 +207,7 @@ select resource_create(('{
   "address": {"use": "work", "type": "physical", "text": "2 этаж"},
   "identifier": [{"value": "120", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
   "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
-  "extension": {"observationType": [
-      {"code": "X-ray", "system": "ValueSet/Observation_types"}
-  ],
+  "extension": {
     "nextOfficeForPatientsInfo": [],
     "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
   }
