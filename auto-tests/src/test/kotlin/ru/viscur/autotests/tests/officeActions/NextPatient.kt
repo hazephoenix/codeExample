@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests.officeActions
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
@@ -13,7 +14,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class NextPatient {
 
     companion object {

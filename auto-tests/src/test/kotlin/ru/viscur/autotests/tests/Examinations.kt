@@ -13,11 +13,10 @@ import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class Examinations {
 
     companion object {
-        val office139 = "Office:139"
         val office101 = "Office:101"
         val redZone = "Office:RedZone"
         val observationOfSurgeonCode = "СтХир"
@@ -31,6 +30,7 @@ class Examinations {
 
     @Test
     fun addingExamination() {
+        //создание пациента
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode)
         )
@@ -42,21 +42,24 @@ class Examinations {
                 valueString = "состояние удовлетворительное",
                 practitionerId = serviceRequest.performer?.first()?.id!!,
                 basedOnServiceRequestId = serviceRequest.id,
-                status = ObservationStatus.final
+                status = ObservationStatus.final,
+                patientId = patientId
         )
-        //завершаем обращение пациента отвественным и проверяем отсутствие Service Requests, Observation
+        //завершение обращение пациента отвественным
         val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
                 diagnosisCode = "A00.0",
                 practitionerId = Helpers.surgeonId,
-                status = DiagnosticReportStatus.final
+                status = DiagnosticReportStatus.final,
+                patientId = patientId
         )
-        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму")
+        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму", patientId = patientId)
         val bundleForExamination = Bundle(entry = listOf(
                 BundleEntry(obsOfRespPract),
                 BundleEntry(diagnosticReportOfResp),
                 BundleEntry(encounter)
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+        //проверка отсутствия Service Requests, Observation
         Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
         checkServiceRequestsOfPatient(patientId, listOf())
         checkObservationsOfPatient(patientId, listOf())
@@ -64,6 +67,7 @@ class Examinations {
 
     @Test
     fun addingExaminationWithActiveObservation() {
+        //создание пациента
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),
                 Helpers.createServiceRequestResource(observation1)
@@ -72,39 +76,43 @@ class Examinations {
         val responseBundle = QueRequests.createPatient(bundle)
         val serviceRequest = responseBundle.resources(ResourceType.ServiceRequest).first()
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
-
+        //завершение обращения с активным Service Request
         val obsOfRespPract = Helpers.createObservation(code = serviceRequest.code.code(),
                 valueString = "состояние удовлетворительное",
                 practitionerId = Helpers.surgeonId,
                 basedOnServiceRequestId = serviceRequest.id,
-                status = ObservationStatus.final
+                status = ObservationStatus.final,
+                patientId = patientId
         )
         val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
                 diagnosisCode = "A00.0",
                 practitionerId = Helpers.surgeonId,
-                status = DiagnosticReportStatus.final
+                status = DiagnosticReportStatus.final,
+                patientId = patientId
         )
-        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму")
+        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму", patientId = patientId)
         val bundleForExamination = Bundle(entry = listOf(
                 BundleEntry(obsOfRespPract),
                 BundleEntry(diagnosticReportOfResp),
                 BundleEntry(encounter)
         ))
-        //завершение обращения с активным Service Request и проверка, что он больше не активный
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+        //проверка, что обращение завершено и больше нет активных ServiceRequests
         checkServiceRequestsOfPatient(patientId, listOf())
     }
 
     @Test
     fun cancelingClinicalImpression() {
+        //создание пациента
         val observation = "B03.016.002ГМУ_СП"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),
                 Helpers.createServiceRequestResource(observation)
         )
-        val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
+        val bundle = Helpers.bundle("7879", "RED", servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
+        //проверка наличия активных Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
                         code = observationOfSurgeonCode,
@@ -117,8 +125,9 @@ class Examinations {
                         status = ServiceRequestStatus.active
                 )
         ))
-        //отмена обращения и проверка что у пациента больше нет ServiceRequest
+        //отмена обращения
         QueRequests.cancelExamination(patientId)
+        //проверка, что обращение отменено и больше нет активных Service Request
         checkServiceRequestsOfPatient(patientId, listOf())
     }
 

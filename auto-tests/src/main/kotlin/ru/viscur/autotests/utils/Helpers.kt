@@ -41,6 +41,12 @@ class Helpers {
         fun createRequestSpecWithoutBody(): RequestSpecification =
                 RestAssured.given().header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
 
+        fun createRequestWithQuery(paramsMap: Map <String, Any>): RequestSpecification =
+                RestAssured.given().queryParams(paramsMap).header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
+
+        fun createRequestWithQueryAndBody(body: Any, paramsMap: Map <String, Any>): RequestSpecification =
+                RestAssured.given().queryParams(paramsMap).body(body).header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
+
         //создание bundle для пациента
         fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>): Bundle {
             val patient = createPatientResource(enp = enp)
@@ -61,6 +67,16 @@ class Helpers {
                     BundleEntry(questionnaireResponseSeverityCriteria)
             ) + servRequests.map { BundleEntry(it) })
             return bundle
+        }
+
+        fun bundleForDiagnosis(severity: String): Bundle {
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
+            val bundle = Bundle(entry = listOf(
+                    BundleEntry(bodyWeight),
+                    BundleEntry(questionnaireResponseSeverityCriteria)
+            ))
+                    return bundle
         }
 
         //создание ресурсов

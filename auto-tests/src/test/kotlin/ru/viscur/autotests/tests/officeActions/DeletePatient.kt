@@ -2,6 +2,7 @@ package ru.viscur.autotests.tests.officeActions
 
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
@@ -16,7 +17,7 @@ import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.referenceToPatient
 import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class DeletePatient {
 
     companion object {
@@ -175,7 +176,5 @@ class DeletePatient {
                 ))
         ))
     }
-
-
 
 }

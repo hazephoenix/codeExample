@@ -20,12 +20,9 @@ class Observations {
 
     companion object {
         val office101 = "Office:101"
-        val office104 = "Office:104"
-        val office139 = "Office:139"
         val redZone = "Office:RedZone"
         val observationCode = "B03.016.002ГМУ_СП"
         val observationCode2 = "СтХир"
-        val observationCode3 = "A04.16.001"
     }
 
     @BeforeEach
@@ -35,16 +32,14 @@ class Observations {
 
     @Test
     fun addingObservation() {
+        //создание пациента
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationCode)
         )
         val bundle1 = Helpers.bundle("1122", "RED", servRequests)
-
-        //создание пациента
         val actServRequests = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
         val patientId = patientIdFromServiceRequests(actServRequests)
         val servRequstId = actServRequests.first().id
-
         //создание Observation со статусом registered
         val obs = Helpers.createObservation(
                 code = observationCode,
@@ -53,7 +48,6 @@ class Observations {
                 valueString = "good quality of blood"
         )
         QueRequests.createObservation(obs)
-
         //проверка созданного Observation
         checkObservationsOfPatient(patientId, listOf(
                 ObservationInfo(
@@ -63,7 +57,6 @@ class Observations {
                         valueStr = "good quality of blood"
                 )
         ))
-
         //проверка изменения статуса в Service Requests пациента
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
@@ -81,16 +74,14 @@ class Observations {
 
     @Test
     fun updatingObservation() {
+        //создание пациента
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationCode)
         )
         val bundle1 = Helpers.bundle("1122", "RED", servRequests)
-
-        //создание пациента
         val actServRequests = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
         val patientId = patientIdFromServiceRequests(actServRequests)
         val servRequstId = actServRequests.first().id
-
         //создание Observation со статусом registered
         val obs = Helpers.createObservation(
                 code = observationCode,
@@ -98,7 +89,6 @@ class Observations {
                 basedOnServiceRequestId = servRequstId
         )
         val actObs = QueRequests.createObservation(obs)
-
         //обновление Observation - статус final, заполнено значение valueString
         val updatedObs = Helpers.createObservation(
                 code = observationCode,
@@ -107,7 +97,6 @@ class Observations {
                 id = actObs.id,
                 valueString = "quality of blood is good")
         QueRequests.updateObservation(updatedObs)
-
         //проверка обновленного Observation
         checkObservationsOfPatient(patientId, listOf(
                 ObservationInfo(
@@ -115,7 +104,6 @@ class Observations {
                         code = observationCode,
                         status = ObservationStatus.final,
                         valueStr = "quality of blood is good")))
-
         //проверка изменения статуса в Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(

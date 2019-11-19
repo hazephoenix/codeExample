@@ -12,12 +12,12 @@ class QueRequests {
     companion object {
 
         //queue
-        fun setQueueResortingConfig(boolean: Boolean) =
-                Helpers.createRequestWithQuery(mapOf("value" to boolean)).`when`().
+        fun setQueueResortingConfig(value: Boolean) =
+                Helpers.createRequestWithQuery(mapOf("value" to value)).`when`().
                         post(Endpoints.RECALC_QUEUE_CONFIG).
                         then().statusCode(200)
 
-        fun setRecalcDurationConfig(severity: String, value: String) =
+        fun setRecalcDurationConfig(severity: String, value: Boolean) =
                 Helpers.createRequestWithQuery(mapOf("severity" to severity,"value" to value )).`when`().
                         post(Endpoints.RECALC_CLINICAL_IMPESSION_DURATION).
                         then().statusCode(200)
@@ -65,6 +65,11 @@ class QueRequests {
         fun delayPatient(patientRef: Reference) =
                 Helpers.createRequestSpec(patientRef).`when`().
                         post(Endpoints.DELAY_PATIENT).
+                        then().statusCode(200)
+
+        fun changeSeverity(patientId: String, severity: String) =
+                Helpers.createRequestWithQuery(mapOf("patientId" to patientId, "severity" to severity)).`when`().
+                        post(Endpoints.CHANGE_SEVERITY).
                         then().statusCode(200)
 
         //office
@@ -175,6 +180,16 @@ class QueRequests {
                 Helpers.createRequestWithQuery(mapOf("patientId" to patientId, "officeId" to officeId)).
                         `when`().log().all().post(Endpoints.CANCEL_OFFICE_SERVICE_REQUEST).
                         then().statusCode(200)
+
+        fun getDiagnosis(bundle: Bundle, diagnosisCount: String) =
+                Helpers.createRequestWithQueryAndBody(bundle, mapOf("take" to diagnosisCount)).
+                        `when`().log().all().post(Endpoints.GET_DIAGNOSIS).
+                        then().log().all().statusCode(200).extract().response()
+
+        fun getSeverity(bundle: Bundle) =
+                Helpers.createRequestSpec(bundle).
+                        `when`().log().all().post(Endpoints.GET_SEVERITY).
+                        then().log().all().statusCode(200).extract().response()
 
         //examination
         fun completeExamination(bundle : Bundle) =

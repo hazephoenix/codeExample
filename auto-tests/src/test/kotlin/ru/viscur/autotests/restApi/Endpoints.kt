@@ -18,7 +18,7 @@ class Endpoints {
         const val QUE_ITEMS: String = "$BASE_URI/queue/queueItems"
         const val SET_PATIENT_FIRST = "$BASE_URI/queue/office/setAsFirst"
         const val DELAY_PATIENT = "$BASE_URI/queue/office/delayGoingToObservation"
-
+        const val CHANGE_SEVERITY = "$BASE_URI/examination/severity"
         //office
         const val OFFICE_INVITE: String = "$BASE_URI/queue/office/forceSendPatientToObservation"
         const val OFFICE_QUE: String = "$BASE_URI/queue"
@@ -44,8 +44,11 @@ class Endpoints {
         const val PATIENT_SERVICE_REQUESTS: String = "$BASE_URI/examination/serviceRequests"
         const val CANCEL_SERVICE_REQUEST: String = "$BASE_URI/examination/serviceRequests/cancelById"
         const val CANCEL_OFFICE_SERVICE_REQUEST: String = "$BASE_URI/examination/serviceRequests/cancel"
+        //diagnosis
+        const val GET_DIAGNOSIS: String = "$BASE_URI/reception/diagnostic"
+        //severity
+        const val GET_SEVERITY: String = "$BASE_URI/reception/severity"
         //reports and duration
         const val DEFAULT_DURATION: String = "$BASE_URI/clinicalImpressionDuration/default"
-
     }
 }
