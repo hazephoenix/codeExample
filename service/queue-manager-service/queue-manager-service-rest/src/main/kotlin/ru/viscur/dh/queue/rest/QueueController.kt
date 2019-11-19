@@ -107,9 +107,6 @@ class QueueController(private val queueManagerService: QueueManagerService) {
     @GetMapping("/queueItems")
     fun queueItems() = queueManagerService.queueItems()
 
-    @GetMapping("/locationMonitor")
-    fun locationMonitor(@RequestParam officeId: String) = queueManagerService.locationMonitor(officeId)
-
     @GetMapping("/info")
     fun queueInfo() = queueManagerService.loqAndValidate()
 

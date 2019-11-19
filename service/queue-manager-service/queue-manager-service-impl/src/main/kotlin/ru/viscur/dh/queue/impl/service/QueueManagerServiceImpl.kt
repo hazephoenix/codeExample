@@ -6,9 +6,6 @@ import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
 import ru.viscur.dh.datastorage.api.util.filterForQueue
-import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
-import ru.viscur.dh.fhir.model.dto.LocationMonitorNextOfficeForPatientInfoDto
-import ru.viscur.dh.fhir.model.dto.LocationMonitorQueueItemDto
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -20,6 +17,7 @@ import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.criticalTimeForDelayGoingToObservation
 import ru.viscur.dh.fhir.model.utils.criticalTimeForDeletingNextOfficeForPatientsInfo
+import ru.viscur.dh.queue.api.LocationMonitorInformService
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -36,8 +34,8 @@ class QueueManagerServiceImpl(
         private val serviceRequestService: ServiceRequestService,
         private val observationDurationService: ObservationDurationEstimationService,
         private val serviceRequestsExecutionCalculator: ServiceRequestsExecutionCalculator,
-        private val clinicalImpressionService: ClinicalImpressionService,
-        private val configService: ConfigService
+        private val configService: ConfigService,
+        private val locationMonitorInformService: LocationMonitorInformService
 ) : QueueManagerService {
 
     companion object {
@@ -80,6 +78,7 @@ class QueueManagerServiceImpl(
     override fun addToOfficeQueue(patientId: String, officeId: String) {
         officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId))
         patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
+        locationMonitorInformService.queueChanged(listOf(officeId))
         checkEntryToOffice(officeId)
     }
 
@@ -96,6 +95,7 @@ class QueueManagerServiceImpl(
         deleteFromQueue(patientId)
         officeService.addPatientToQueue(officeId, patientId, estDuration(officeId, patientId), toIndex = 0)
         patientStatusService.changeStatus(patientId, PatientQueueStatus.IN_QUEUE)
+        locationMonitorInformService.queueChanged(listOf(officeId))
         checkEntryToOffice(officeId)
         if (prevOfficeId != null && prevOfficeId != officeId) {
             officeService.addToNextOfficeForPatientsInfo(prevOfficeId, patientId, officeId)
@@ -161,8 +161,8 @@ class QueueManagerServiceImpl(
         if (queueService.isPatientInOfficeQueue(patientId) == officeId) {
             val patient = patientService.byId(patientId)
             if (patient.extension.queueStatus == PatientQueueStatus.GOING_TO_OBSERVATION) {
-                officeService.changeStatus(officeId, LocationStatus.OBSERVATION)
                 patientStatusService.changeStatus(patientId, PatientQueueStatus.ON_OBSERVATION, officeId)
+                officeService.changeStatus(officeId, LocationStatus.OBSERVATION)
                 officeService.deletePatientFromNextOfficesForPatientsInfo(patientId)
                 return activeServiceRequestInOffice(patientId, officeId)
             }
@@ -249,10 +249,12 @@ class QueueManagerServiceImpl(
     @Tx
     override fun deleteOldNextOfficeForPatientsInfo() {
         locationService.withOldNextOfficeForPatientsInfo().forEach {
-            resourceService.update(ResourceType.Location, it.id) {
+            val officeId = it.id
+            resourceService.update(ResourceType.Location, officeId) {
                 extension.nextOfficeForPatientsInfo =
                         extension.nextOfficeForPatientsInfo.filter { it.fireDate.after(criticalTimeForDeletingNextOfficeForPatientsInfo()) }
             }
+            locationMonitorInformService.queueChanged(listOf(officeId))
         }
     }
 
@@ -264,12 +266,14 @@ class QueueManagerServiceImpl(
         queueService.involvedPatients().forEach {
             patientStatusService.changeStatus(it.id, PatientQueueStatus.READY)
         }
-        resourceService.all(ResourceType.Location, RequestBodyForResources(mapOf())).forEach {
+        val allLocations = resourceService.all(ResourceType.Location, RequestBodyForResources(mapOf()))
+        allLocations.forEach {
             resourceService.update(ResourceType.Location, it.id) {
                 extension.nextOfficeForPatientsInfo = listOf()
             }
         }
         resourceService.deleteAll(ResourceType.QueueItem)
+        locationMonitorInformService.queueChanged(allLocations.map { it.id })
     }
 
     @Tx
@@ -282,33 +286,6 @@ class QueueManagerServiceImpl(
             Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
     override fun queueItems(): List<QueueItem> = queueService.queueItems()
-
-    override fun locationMonitor(officeId: String): LocationMonitorDto {
-        val office = locationService.byId(officeId)
-        clinicalImpressionService
-        return LocationMonitorDto(
-                officeId = officeId,
-                officeStatus = office.status.name,
-                locationType = office.type(),
-                items = queueService.queueItemsOfOffice(officeId).map { queueItem ->
-                    LocationMonitorQueueItemDto(
-                            onum = queueItem.onum!!,
-                            patientId = queueItem.subject.id!!,
-                            status = queueItem.patientQueueStatus!!.name,
-                            severity = queueItem.severity!!.name,
-                            queueNumber = queueItem.queueNumber
-                    )
-                },
-                nextOfficeForPatientsInfo = office.extension.nextOfficeForPatientsInfo.map { nextOfficeForPatientInfo ->
-                    LocationMonitorNextOfficeForPatientInfoDto(
-                            patientId = nextOfficeForPatientInfo.subject.id!!,
-                            severity = nextOfficeForPatientInfo.severity.name,
-                            queueNumber = nextOfficeForPatientInfo.queueNumber,
-                            nextOfficeId = nextOfficeForPatientInfo.nextOffice.id!!
-                    )
-                }
-        )
-    }
 
     override fun loqAndValidate(): String {
         val offices = officeService.all()
@@ -440,7 +417,6 @@ class QueueManagerServiceImpl(
         patientId?.run {
             patientStatusService.changeStatus(patientId, PatientQueueStatus.GOING_TO_OBSERVATION, officeId)
             changeOfficeStatusNotReadyToProper(officeId)
-            //todo уведомить о необходимоси пройти в кабинет
         }
     }
 
