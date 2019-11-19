@@ -130,7 +130,7 @@ class ReportServiceImpl(
             }
             return practitionerIdsInOffice.map {
                 val practitionerInOffice = practitionerService.byId(it)
-                queueInOfficeDto.apply {
+                queueInOfficeDto.copy().apply {
                     practitioner = PractitionerDto(
                             practitionerId = practitionerInOffice.id,
                             name = practitionerInOffice.name.first().text
