@@ -80,9 +80,16 @@ class ForTestService {
 
     fun prepareDb(case: BaseTestCase): String {
         //все для очереди
+        prepareQueue(case)
+        updateOfficeStatuses()
+        //все для маршрутного листа пациента
+        return createPatient(severity = case.carePlan.severity, servReqs = case.carePlan.servReqs)
+    }
+
+    fun prepareQueue(case: BaseTestCase) {
         case.queue.forEach { queueOfOffice ->
             queueOfOffice.items.forEachIndexed { index, item ->
-                val patientId = createPatient(severity = item.severity!!, officeId = queueOfOffice.officeId, queueStatus = item.status!!)
+                val patientId = createPatient(severity = item.severity, officeId = queueOfOffice.officeId, queueStatus = item.status)
                 resourceService.create(QueueItem(
                         onum = index,
                         subject = referenceToPatient(patientId),
@@ -92,9 +99,6 @@ class ForTestService {
                 ))
             }
         }
-        updateOfficeStatuses()
-        //все для маршрутного листа пациента
-        return createPatient(severity = case.carePlan.severity, servReqs = case.carePlan.servReqs)
     }
 
     fun updateOfficeStatuses() {
@@ -249,28 +253,29 @@ class ForTestService {
      * Проверка правильности назначений определенного пациента
      * (не полная проверка назначений всех пациентов, а только в разрезе одного пациента)
      */
-    fun checkServiceRequestsOfPatient(patientId: String, servReqInfos: List<ServiceRequestSimple>) {
+    fun checkServiceRequestsOfPatient(patientId: String, servReqInfos: List<ServiceRequestSimple>, desc: String? = null) {
         val actServRequests = serviceRequestService.all(patientId)
-        checkServiceRequests(patientId, servReqInfos, actServRequests)
+        checkServiceRequests(patientId, servReqInfos, actServRequests, desc)
     }
 
     /**
      * Сравнивает 2 списка назначений: [servReqInfos] ожидаемый и [actServRequests] текущий
      * пациента [patientId]
      */
-    fun checkServiceRequests(patientId: String, servReqInfos: List<ServiceRequestSimple>, actServRequests: List<ServiceRequest>) {
+    fun checkServiceRequests(patientId: String, servReqInfos: List<ServiceRequestSimple>, actServRequests: List<ServiceRequest>, desc: String? = null) {
+        val descStr = desc?.let { "$it. " } ?: ""
         val servReqsStr = servReqsToString(patientId, servReqInfos, actServRequests)
         //количество в принципе разное
-        assertEquals(servReqInfos.size, actServRequests.size, "wrong number of servRequests. $servReqsStr")
+        assertEquals(servReqInfos.size, actServRequests.size, "${descStr}wrong number of servRequests. $servReqsStr")
         servReqInfos.forEachIndexed { index, servReqInfo ->
             val foundInAct = actServRequests.filter { it.code.code() == servReqInfo.code }
-            assertEquals(1, foundInAct.size, "not found (or found multiple items) with code '${servReqInfo.code}' of $servReqInfo. $servReqsStr")
+            assertEquals(1, foundInAct.size, "${descStr}not found (or found multiple items) with code '${servReqInfo.code}' of $servReqInfo. $servReqsStr")
             val foundItem = foundInAct.first()
             //проверка правильности данных в найденном
-            assertEquals(patientId, foundItem.subject?.id, "wrong patientId of $servReqInfo. $servReqsStr")
-            assertEquals(servReqInfo.status, foundItem.status, "wrong status of $servReqInfo. $servReqsStr")
-            servReqInfo.locationId?.run { assertEquals(servReqInfo.locationId, foundItem.locationReference?.first()?.id, "wrong locationId of $servReqInfo. $servReqsStr") }
-            assertEquals(index, foundItem.extension?.executionOrder, "wrong executionOrder of $servReqInfo. $servReqsStr")
+            assertEquals(patientId, foundItem.subject?.id, "${descStr}wrong patientId of $servReqInfo. $servReqsStr")
+            assertEquals(servReqInfo.status, foundItem.status, "${descStr}wrong status of $servReqInfo. $servReqsStr")
+            servReqInfo.locationId?.run { assertEquals(servReqInfo.locationId, foundItem.locationReference?.first()?.id, "${descStr}wrong locationId of $servReqInfo. $servReqsStr") }
+            assertEquals(index, foundItem.extension?.executionOrder, "${descStr}wrong executionOrder of $servReqInfo. $servReqsStr")
         }
     }
 

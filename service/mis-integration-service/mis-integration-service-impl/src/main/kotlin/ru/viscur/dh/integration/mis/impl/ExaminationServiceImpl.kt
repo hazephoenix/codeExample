@@ -62,12 +62,11 @@ class ExaminationServiceImpl(
         queueManagerService.patientLeftByPatientId(patientId)
         //удалить из очереди (если пациент со статусом В очереди)
         queueManagerService.deleteFromQueue(patientId)
-        // сохранить данные для предположения диагноза перед завершением обращения
-        val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport).firstOrNull()
-                ?: throw Error("No DiagnosticReport provided")
-        diagnosisPredictor.saveTrainingSample(diagnosticReport)
         //завершить обращение и связанное
         val clinicalImpression = clinicalImpressionService.completeRelated(patientId, bundle)
+        // сохранить данные для предположения диагноза перед завершением обращения
+        val finalDiagnosticReport = patientService.finalDiagnosticReport(patientId)
+        diagnosisPredictor.saveTrainingSample(finalDiagnosticReport)
         //сохранить в историю продолжительность обработки обращения пациента
         observationDurationService.saveToHistory(patientId, CLINICAL_IMPRESSION, diagnosis, severity, clinicalImpression.date, now())
         return clinicalImpressionService.complete(clinicalImpression)

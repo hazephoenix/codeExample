@@ -42,6 +42,22 @@ select resource_create(('{
 
 select resource_create(('{
   "resourceType": "Location",
+  "id": "Office:128",
+  "name": "Перевязочный кабинет",
+  "status": "BUSY",
+  "address": {"use": "work", "type": "physical", "text": "1 этаж"},
+  "identifier": [{"value": "128", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
+  "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
+  "extension": {"observationType": [
+      {"code": "Перевязка", "system": "ValueSet/Observation_types"}
+  ],
+    "nextOfficeForPatientsInfo": [],
+    "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
+  }
+}')::jsonb);
+
+select resource_create(('{
+  "resourceType": "Location",
   "id": "Office:101",
   "name": "Процедурный кабинет",
   "status": "BUSY",
@@ -49,12 +65,7 @@ select resource_create(('{
   "identifier": [{"value": "101", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
   "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
   "extension": {"observationType": [
-      {"code": "B03.016.004ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "A09.05.036.001ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "A09.20.003ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "A09.05.049.01ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "B03.016.002ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "B03.016.004ГМУ_СП_ТК", "system": "ValueSet/Observation_types"}
+      {"code": "Blood_analysis", "system": "ValueSet/Observation_types"}
   ],
     "nextOfficeForPatientsInfo": [],
     "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
@@ -69,8 +80,7 @@ select resource_create(('{
   "identifier": [{"value": "104", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
   "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
   "extension": {"observationType": [
-      {"code": "B03.016.006ГМУ_СП", "system": "ValueSet/Observation_types"},
-      {"code": "A09.28.029ГМУ_СП", "system": "ValueSet/Observation_types"}
+      {"code": "Urine_analysis", "system": "ValueSet/Observation_types"}
   ],
     "nextOfficeForPatientsInfo": [],
     "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
@@ -133,7 +143,9 @@ select resource_create(('{
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "149", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
   "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
-  "extension": {
+  "extension": {"observationType": [
+      {"code": "Bronchoscopy", "system": "ValueSet/Observation_types"}
+  ],
     "nextOfficeForPatientsInfo": [],
     "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
   }
@@ -147,7 +159,9 @@ select resource_create(('{
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "150", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
   "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
-  "extension": {
+  "extension": {"observationType": [
+      {"code": "Colonoscopy", "system": "ValueSet/Observation_types"}
+  ],
     "nextOfficeForPatientsInfo": [],
     "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
   }
@@ -161,7 +175,9 @@ select resource_create(('{
   "address": {"use": "work", "type": "physical", "text": "1 этаж"},
   "identifier": [{"value": "151", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
   "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
-  "extension": {
+  "extension": {"observationType": [
+      {"code": "Gastroscopy", "system": "ValueSet/Observation_types"}
+  ],
     "nextOfficeForPatientsInfo": [],
     "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
   }
@@ -207,7 +223,9 @@ select resource_create(('{
   "address": {"use": "work", "type": "physical", "text": "2 этаж"},
   "identifier": [{"value": "120", "type": {"coding": [{"code": "OFFICE_NUMBER", "system": "ValueSet/Identifier_types", "display": "Номер кабинета"}]}}],
   "type": [{"coding": [{"code": "Diagnostic", "system": "ValueSet/Location_types"}]}],
-  "extension": {
+  "extension": {"observationType": [
+      {"code": "Computer_tomography", "system": "ValueSet/Observation_types"}
+  ],
     "nextOfficeForPatientsInfo": [],
     "statusUpdatedAt": "' || extract(epoch from CURRENT_TIMESTAMP)::bigint || '"
   }

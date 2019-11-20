@@ -9,25 +9,6 @@ import ru.viscur.dh.datastorage.api.util.*
  */
 class DistanceCoefBetweenOfficesCalculator {
     companion object {
-
-
-        val GROUP_1 = listOf(
-                RECEPTION,
-                RED_ZONE,
-                YELLOW_ZONE_SECTION_1,
-                YELLOW_ZONE_SECTION_2,
-                YELLOW_ZONE_SECTION_3,
-                YELLOW_ZONE_SECTION_4,
-                YELLOW_ZONE_SECTION_5,
-                YELLOW_ZONE_SECTION_6,
-                GREEN_ZONE
-        )
-        val GROUP_2 = listOf(OFFICE_101, OFFICE_104)
-        val GROUP_3 = listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130)
-        val GROUP_4 = listOf(OFFICE_150, OFFICE_151, OFFICE_149)
-        val GROUP_5 = listOf(OFFICE_116, OFFICE_117)
-        val GROUP_6 = listOf(OFFICE_202)
-        val GROUP_7 = listOf(OFFICE_120, OFFICE_120)
         private val coefs = listOf(
                 DistanceCoef(GROUP_1, GROUP_2, 0.1),
                 DistanceCoef(GROUP_1, GROUP_3, 0.2),

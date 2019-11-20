@@ -16,3 +16,9 @@ import ru.viscur.dh.fhir.model.utils.code
 fun List<ServiceRequest>.filterForQueue(): List<ServiceRequest> {
     return this.filter { it.code.code() !in URINE_ANALYSIS_TYPES }
 }
+
+/**
+ * Все id кабинетов/мест в группе/секторе указанного кабинета/места
+ */
+fun allLocationIdsInGroup(locationId: String) = LOCATION_GROUPS.find { it.contains(locationId) }?:
+        throw Exception("not found location group for location with id '$locationId'")

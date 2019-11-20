@@ -2,7 +2,9 @@ package ru.viscur.dh.queue.impl.service
 
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
 import ru.viscur.dh.datastorage.api.util.RECEPTION
+import ru.viscur.dh.datastorage.api.util.allLocationIdsInGroup
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -26,6 +28,7 @@ class ServiceRequestsExecutionCalculator(
         private val locationService: LocationService,
         private val queueService: QueueService,
         private val resourceService: ResourceService,
+        private val configService: ConfigService,
         private val serviceRequestService: ServiceRequestService
 ) {
 
@@ -82,7 +85,7 @@ class ServiceRequestsExecutionCalculator(
     fun calcNextOfficeId(patientId: String, prevOfficeId: String?, forQueueOnly: Boolean = false): String? {
         val serviceRequestExecInfos = serviceRequestInfos(patientId, forQueueOnly)
         if (serviceRequestExecInfos.isEmpty()) return null
-        val nextServiceRequestInfo = nextServiceRequest(serviceRequestExecInfos, prevOfficeId)
+        val nextServiceRequestInfo = nextServiceRequestWithRecalcOn(serviceRequestExecInfos, prevOfficeId ?: RECEPTION)
         return nextServiceRequestInfo.locationId
     }
 
@@ -104,47 +107,181 @@ class ServiceRequestsExecutionCalculator(
      * Однозначно определяет в каком кабинете нужно провести назначение, упорядочивает список назначений
      */
     private fun calcLocationAndOrder(initServiceRequests: List<ServiceRequestExecInfo>, prevOfficeId: String? = null): List<ServiceRequestExecLocationInfo> {
+        return if (needRecalcNextOffice()) {
+            calcLocationAndOrderWithRecalcOn(initServiceRequests, prevOfficeId ?: RECEPTION)
+        } else {
+            calcLocationAndOrderWithRecalcOff(initServiceRequests, prevOfficeId ?: RECEPTION)
+        }
+    }
+
+    /**
+     * Однозначно определяет в каком кабинете нужно провести назначение, упорядочивает список назначений
+     * Случай, если включена настройка [RECALC_NEXT_OFFICE_CONFIG_CODE]
+     */
+    private fun calcLocationAndOrderWithRecalcOn(initServiceRequests: List<ServiceRequestExecInfo>, prevOfficeId: String): List<ServiceRequestExecLocationInfo> {
         var initSr = initServiceRequests
         val result = mutableListOf<ServiceRequestExecLocationInfo>()
         var prevOfficeIdIntr = prevOfficeId
         while (initSr.isNotEmpty()) {
-            val nextServiceRequestInfo = nextServiceRequest(initSr, prevOfficeIdIntr)
-            result.add(nextServiceRequestInfo)
-            initSr = initSr.filterNot { it.serviceRequestId == nextServiceRequestInfo.serviceRequestId }
-            prevOfficeIdIntr = nextServiceRequestInfo.locationId
+            val nextServiceRequestInfo = nextServiceRequestWithRecalcOn(initSr, prevOfficeIdIntr)
+            //сразу все назначения в кабинете, который определился как следующий
+            val nextOfficeId = nextServiceRequestInfo.locationId
+            val servReqsInNextOffice = initSr.flatMap { it.locationInfos }.filter { nextOfficeId == it.locationId }.sortedBy { it.code }
+            result.addAll(servReqsInNextOffice)
+            initSr = initSr.filterNot { it.serviceRequestId in servReqsInNextOffice.map { it.serviceRequestId } }
+            prevOfficeIdIntr = nextOfficeId
         }
         return result
     }
 
-    private fun nextServiceRequest(initSr: List<ServiceRequestExecInfo>, prevOfficeId: String?): ServiceRequestExecLocationInfo {
-        val maxPriority = initSr.map { it.priority }.max()!!
-        val srWithMaxPriority = initSr.filter { it.priority == maxPriority }
-        val locationInfos = srWithMaxPriority.flatMap { it.locationInfos }
-        if (locationInfos.size == 1) {
-            return locationInfos.first()
+    /**
+     * Определение следующего назначения/кабинета при включенной настройке [RECALC_NEXT_OFFICE_CONFIG_CODE]
+     */
+    private fun nextServiceRequestWithRecalcOn(initSr: List<ServiceRequestExecInfo>, prevOfficeId: String): ServiceRequestExecLocationInfo {
+        //если с максимальным приоритетом сделали фильтр по услугам и определился один кабинет
+        val locationsWithMaxPriority = initSr.filterWithMaxPriority()
+        if (locationsWithMaxPriority.distinctLocationSize() == 1) {
+            return locationsWithMaxPriority.first()
         }
-        val minEstWaiting = locationInfos.map { it.estWaiting }.min()!!
-        //находим все кабинеты с предположительным ожиданием в разбросе 15% от минимального
-        //из них находим минимальный по коэф. дальности от предыд. местоположения
-        val levelOfMinEstWaiting = minEstWaiting * 1.15
-        val locationsWithMinLevelOfEstWaiting = locationInfos.filter { it.estWaiting <= levelOfMinEstWaiting }
-        if (locationsWithMinLevelOfEstWaiting.size == 1) {
-            return locationsWithMinLevelOfEstWaiting.first()
+        //пытаемся найти один с минимальным временем * коэф. дальности
+        val locationsWithEstDurationToDistanceCoef = locationsWithMaxPriority.map {
+            val distanceCoef = DistanceCoefBetweenOfficesCalculator().calculate(prevOfficeId, it.locationId)
+            Pair(it.estWaiting * distanceCoef, it)
+        }
+        val locationsWithMinValue = locationsWithEstDurationToDistanceCoef.filterWithMinFirstValue()
+        if (locationsWithMinValue.distinctLocationSize() == 1) {
+            return locationsWithMinValue.first()
+        }
+        //оцениваем полную "продолжительность" очереди. если и по такому критерию несколько, то берем первый в алфавитном порядке id кабинета
+        return withMinEstWaitingTotal(locationsWithMinValue)
+    }
+
+    /**
+     * Однозначно определяет в каком кабинете нужно провести назначение, упорядочивает список назначений
+     * Случай, если выключена настройка [RECALC_NEXT_OFFICE_CONFIG_CODE]
+     */
+    private fun calcLocationAndOrderWithRecalcOff(initServiceRequests: List<ServiceRequestExecInfo>, prevOfficeId: String): List<ServiceRequestExecLocationInfo> {
+        var initSr = initServiceRequests
+        val result = mutableListOf<ServiceRequestExecLocationInfo>()
+        var prevOfficeIdIntr = prevOfficeId
+        while (initSr.isNotEmpty()) {
+            val nextServiceRequestInfos = nextServiceRequestsWithRecalcOff(initSr, prevOfficeIdIntr)
+            result.addAll(nextServiceRequestInfos)
+            initSr = initSr.filterNot { it.serviceRequestId in nextServiceRequestInfos.map { it.serviceRequestId } }
+            prevOfficeIdIntr = nextServiceRequestInfos.last().locationId
+        }
+        return result
+    }
+
+    /**
+     * Определение следующих назначения/кабинета при выключенной настройке [RECALC_NEXT_OFFICE_CONFIG_CODE]
+     * Если с макс приоритетом определился один кабинет, возвращаем все назначения в этом кабинете
+     * Иначе назначения с одинаковым приоритетом упорядочиваются с помощью [calcLocationAndOrderWithRecalcOffForSamePriority]
+     */
+    private fun nextServiceRequestsWithRecalcOff(initSr: List<ServiceRequestExecInfo>, prevOfficeId: String): List<ServiceRequestExecLocationInfo> {
+        val locationInfos = initSr.filterWithMaxPriority()
+        if (locationInfos.distinctLocationSize() == 1) {
+            return initSr.flatMap { it.locationInfos }.filter { locationInfos.first().locationId == it.locationId }.sortedBy { it.code }
+        }
+        return calcLocationAndOrderWithRecalcOffForSamePriority(initServiceRequests = locationInfos, prevOfficeId = prevOfficeId, iterationNumber = 0)
+    }
+
+    /**
+     * Определение кабинетов и порядка для назначений с одним приоритетом
+     * Функция итерационно обрабатывает входной список [initServiceRequests] в [result] до тех пор, пока все не переложит
+     */
+    private fun calcLocationAndOrderWithRecalcOffForSamePriority(initServiceRequests: List<ServiceRequestExecLocationInfo>, result: MutableList<ServiceRequestExecLocationInfo> = mutableListOf(), prevOfficeId: String, iterationNumber: Int): List<ServiceRequestExecLocationInfo> {
+        val nextServiceRequestInfo = if (iterationNumber == 0) {
+            //если рассматриваем первый кабинет в списке равнозначных по приоритету услуг
+            //смотрим с мин. временем ожидания -> если несколько, то с мин коэф дальности -> если неск, то по общей очереди или по алфавиту
+            nextWithRecalcOffForFirstIteration(initServiceRequests, prevOfficeId)
+        } else {
+            //если второй или последующий
+            val locationIdsInGroup = allLocationIdsInGroup(prevOfficeId)
+            val servReqsInLocationGroup = initServiceRequests.filter { it.locationId in locationIdsInGroup }
+            if (servReqsInLocationGroup.isNotEmpty()) {
+                //смотрим есть ли назначения в том же секторе/группе кабинетов - их проходим
+                nextWithRecalcOffForNotFirstIterationForSameLocationGroup(servReqsInLocationGroup)
+            } else {
+                //если нет в той же группе то смотрим с мин дальностью -> если неск. то с мин временем -> если неск, то по общей очереди или по алфавиту
+                nextWithRecalcOffForNotFirstIterationForOtherLocationGroup(initServiceRequests, prevOfficeId)
+            }
+        }
+        //определили след. кабинет => перекладываем все назначения в этом кабинете из initServiceRequests в result
+        var initSr = initServiceRequests
+        val nextOfficeId = nextServiceRequestInfo.locationId
+        val servReqsInNextOffice = initSr.filter { nextOfficeId == it.locationId }.sortedBy { it.code }
+        result.addAll(servReqsInNextOffice)
+        initSr = initSr.filterNot { it.serviceRequestId in servReqsInNextOffice.map { it.serviceRequestId } }
+
+        //если исходный список пуст - все распределили. иначе делаем еще итерацию, но уже этот кабинет как предыдущий
+        if (initSr.isEmpty()) return result
+        return calcLocationAndOrderWithRecalcOffForSamePriority(initSr, result, nextOfficeId, iterationNumber + 1)
+    }
+
+    /**
+     * Определение след. кабинета при выключенной настройке [RECALC_NEXT_OFFICE_CONFIG_CODE]
+     * и первой итерации при определении порядка для равнозначных по приоритету услуг/кабинетов
+     */
+    private fun nextWithRecalcOffForFirstIteration(initServiceRequests: List<ServiceRequestExecLocationInfo>, prevOfficeId: String): ServiceRequestExecLocationInfo {
+        val locationsWithMinEstWaiting = initServiceRequests.filterWithMinEstWaiting()
+        if (locationsWithMinEstWaiting.distinctLocationSize() == 1) {
+            return locationsWithMinEstWaiting.first()
         }
         //пытаемся найти один с минимальным коэф. дальности
-        val locationsWithDistanceCoef = locationsWithMinLevelOfEstWaiting.map {
+        val locationsWithDistanceCoef = locationsWithMinEstWaiting.map {
+            Pair(DistanceCoefBetweenOfficesCalculator().calculate(prevOfficeId ?: RECEPTION, it.locationId), it)
+        }
+        val locationsWithMinDistanceCoef = locationsWithDistanceCoef.filterWithMinFirstValue()
+        if (locationsWithMinDistanceCoef.distinctLocationSize() == 1) {
+            return locationsWithMinDistanceCoef.first()
+        }
+        return withMinEstWaitingTotal(locationsWithMinDistanceCoef)
+    }
+
+    /**
+     * Определение след. кабинета при выключенной настройке [RECALC_NEXT_OFFICE_CONFIG_CODE]
+     * и НЕ первой итерации при определении порядка для равнозначных по приоритету услуг/кабинетов
+     * для назначений в одном секторе/группы кабинетов
+     */
+    private fun nextWithRecalcOffForNotFirstIterationForSameLocationGroup(initServiceRequests: List<ServiceRequestExecLocationInfo>): ServiceRequestExecLocationInfo {
+        //пытаемся найти с мин. временем ожидания в очереди
+        val locationsWithMinEstWaiting = initServiceRequests.filterWithMinEstWaiting()
+        if (locationsWithMinEstWaiting.distinctLocationSize() == 1) {
+            return locationsWithMinEstWaiting.first()
+        }
+        //смотрим на общую продолжительность очереди или берем первый по алфавиту
+        return withMinEstWaitingTotal(locationsWithMinEstWaiting)
+    }
+
+    /**
+     * Определение след. кабинета при выключенной настройке [RECALC_NEXT_OFFICE_CONFIG_CODE]
+     * и НЕ первой итерации при определении порядка для равнозначных по приоритету услуг/кабинетов
+     * для назначений в другом секторе/группы кабинетов
+     */
+    private fun nextWithRecalcOffForNotFirstIterationForOtherLocationGroup(initServiceRequests: List<ServiceRequestExecLocationInfo>, prevOfficeId: String): ServiceRequestExecLocationInfo {
+        //пытаемся найти один с минимальным коэф. дальности
+        val locationsWithDistanceCoef = initServiceRequests.map {
             Pair(DistanceCoefBetweenOfficesCalculator().calculate(prevOfficeId ?: RECEPTION, it.locationId), it)
         }
         val minDistanceCoef = locationsWithDistanceCoef.map { it.first }.min()
         val locationsWithMinDistanceCoef = locationsWithDistanceCoef.filter { it.first == minDistanceCoef }.map { it.second }
-        if (locationsWithMinDistanceCoef.size == 1) {
+        if (locationsWithMinDistanceCoef.distinctLocationSize() == 1) {
             return locationsWithMinDistanceCoef.first()
         }
+        //если неск. то с мин. временем ожидания
+        val locationsWithMinEstWaiting = locationsWithMinDistanceCoef.filterWithMinEstWaiting()
+        if (locationsWithMinEstWaiting.distinctLocationSize() == 1) {
+            return locationsWithMinEstWaiting.first()
+        }
+        //смотрим на общую продолжительность очереди или берем первый по алфавиту
+        return withMinEstWaitingTotal(locationsWithMinDistanceCoef)
+    }
+
+    private fun withMinEstWaitingTotal(initSr: List<ServiceRequestExecLocationInfo>): ServiceRequestExecLocationInfo {
         //оцениваем полную "продолжительность" очереди. если и по такому критерию несколько, то берем первый в алфавитном порядке id кабинета
-        val locationsWithEstWaitingTotal = locationsWithMinDistanceCoef.map { Pair(estWaitingInQueueWithType(it.locationId), it) }
-        val minEstWaitingTotal = locationsWithEstWaitingTotal.map { it.first }.min()
-        val locationsWithMinEstWaitingTotal = locationsWithEstWaitingTotal.filter { it.first == minEstWaitingTotal }.map { it.second }
-        return locationsWithMinEstWaitingTotal.sortedWith(compareBy({ it.locationId }, { it.code })).first()
+        val locationsWithEstWaitingTotal = initSr.map { Pair(estWaitingInQueueWithType(it.locationId), it) }
+        return locationsWithEstWaitingTotal.sortedWith(compareBy({ it.first }, { it.second.locationId }, { it.second.code })).first().second
     }
 
     /**
@@ -178,6 +315,8 @@ class ServiceRequestsExecutionCalculator(
         return observationCategory.priority ?: 0.5
     }
 
+    private fun needRecalcNextOffice() = configService.readBool(RECALC_NEXT_OFFICE_CONFIG_CODE)
+
     /**
      * Информация о назначении
      * @param serviceRequestId id назначения
@@ -203,4 +342,21 @@ class ServiceRequestsExecutionCalculator(
             val locationId: String,
             val estWaiting: Int
     )
+
+    private fun List<ServiceRequestExecLocationInfo>.distinctLocationSize() = this.map { it.locationId }.distinct().size
+
+    private fun List<Pair<Double, ServiceRequestExecLocationInfo>>.filterWithMinFirstValue(): List<ServiceRequestExecLocationInfo>{
+        val minValue = this.map { it.first }.min()
+        return this.filter { it.first == minValue }.map { it.second }
+    }
+
+    private fun List<ServiceRequestExecLocationInfo>.filterWithMinEstWaiting(): List<ServiceRequestExecLocationInfo>{
+        val minEstWaiting = this.map { it.estWaiting }.min()!!
+        return this.filter { it.estWaiting == minEstWaiting }
+    }
+
+    private fun List<ServiceRequestExecInfo>.filterWithMaxPriority(): List<ServiceRequestExecLocationInfo>{
+        val maxPriority = this.map { it.priority }.max()!!
+        return this.filter { it.priority == maxPriority }.flatMap { it.locationInfos }
+    }
 }

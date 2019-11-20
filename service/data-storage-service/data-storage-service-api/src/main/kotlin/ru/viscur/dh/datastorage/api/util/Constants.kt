@@ -42,6 +42,34 @@ const val YELLOW_ZONE_SECTION_5 = "Office:YellowZoneSection5"
 const val YELLOW_ZONE_SECTION_6 = "Office:YellowZoneSection6"
 const val GREEN_ZONE = "Office:GreenZone"
 
+val GROUP_1 = listOf(
+        RECEPTION,
+        RED_ZONE,
+        YELLOW_ZONE_SECTION_1,
+        YELLOW_ZONE_SECTION_2,
+        YELLOW_ZONE_SECTION_3,
+        YELLOW_ZONE_SECTION_4,
+        YELLOW_ZONE_SECTION_5,
+        YELLOW_ZONE_SECTION_6,
+        GREEN_ZONE
+)
+val GROUP_2 = listOf(OFFICE_101, OFFICE_104)
+val GROUP_3 = listOf(OFFICE_140, OFFICE_139, OFFICE_129, OFFICE_130)
+val GROUP_4 = listOf(OFFICE_150, OFFICE_151, OFFICE_149)
+val GROUP_5 = listOf(OFFICE_116, OFFICE_117)
+val GROUP_6 = listOf(OFFICE_202)
+val GROUP_7 = listOf(OFFICE_119, OFFICE_120)
+
+val LOCATION_GROUPS = listOf(
+        GROUP_1,
+        GROUP_2,
+        GROUP_3,
+        GROUP_4,
+        GROUP_5,
+        GROUP_6,
+        GROUP_7
+)
+
 /**
  * Код настройки Пересчитывать следующий кабинет в очереди
  */
@@ -61,8 +89,8 @@ const val URINE_ANALYSIS_CATEGORY = "Urine_analysis"
  * Типы услуг по забору мочи
  */
 val URINE_ANALYSIS_TYPES = listOf(
-        "B03.016.006ГМУ_СП",
-        "A09.28.029ГМУ_СП"
+        "B03.016.006",
+        "A09.28.029"
 )
 
 /**

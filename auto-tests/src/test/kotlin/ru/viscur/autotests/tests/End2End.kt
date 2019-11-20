@@ -157,7 +157,7 @@ class End2End {
 
         val additionalServiceRequests = listOf(
                 Helpers.createServiceRequestResource("A04.16.001", patientId),
-                Helpers.createServiceRequestResource("B03.016.006ГМУ_СП", patientId)
+                Helpers.createServiceRequestResource("B03.016.006", patientId)
         )
 
         val bundleForExamin = Bundle(
@@ -176,7 +176,7 @@ class End2End {
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = "СтХир", locationId = office139),
                 ServiceRequestInfo(code = "A04.16.001", locationId = office116),
-                ServiceRequestInfo(code = "B03.016.006ГМУ_СП", locationId = office104)
+                ServiceRequestInfo(code = "B03.016.006", locationId = office104)
         ))
         checkObservationsOfPatient(patientId, listOf())
     }
@@ -186,8 +186,8 @@ class End2End {
     fun fullPositiveE2ePatient() {
         QueRequests.deleteQue()
         val patientServiceRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
-                Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
+                Helpers.createServiceRequestResource("A09.05.010"),
+                Helpers.createServiceRequestResource("A09.20.003"),
                 Helpers.createServiceRequestResource("A04.16.001")
         )
         val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
@@ -201,8 +201,8 @@ class End2End {
     fun fullPositiveE2ePatient2() {
         QueRequests.deleteQue()
         val patientServiceRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.004ГМУ_СП"),
-                Helpers.createServiceRequestResource("A09.20.003ГМУ_СП"),
+                Helpers.createServiceRequestResource("A09.05.010"),
+                Helpers.createServiceRequestResource("A09.20.003"),
                 Helpers.createServiceRequestResource("A04.16.001")
         )
         val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)

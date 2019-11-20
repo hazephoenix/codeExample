@@ -42,7 +42,7 @@ class QueueLogic {
                 ),
                 code = CodeableConcept(
                         systemId = "ValueSet/Observation_types",
-                        code = "B03.016.002ГМУ_СП"
+                        code = "B03.016.002"
                 ),
                 subject = Reference(
                         resourceType = ResourceType.ResourceTypeId.Patient, id = "c1d7e69a-3845-4a55-9c89-548d3a5c0114"
@@ -121,7 +121,7 @@ class QueueLogic {
         QueRequests.deleteQue()
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.002ГМУ_СП"),
+                Helpers.createServiceRequestResource("B03.016.002"),
                 Helpers.createServiceRequestResource("СтХир")
         )
         val bundle1 = Helpers.bundle("1120", "GREEN", servRequests)

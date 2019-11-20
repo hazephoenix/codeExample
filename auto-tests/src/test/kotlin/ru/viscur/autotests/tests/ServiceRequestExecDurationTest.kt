@@ -24,7 +24,7 @@ class ServiceRequestExecDurationTest {
 
         QueRequests.deleteQue()
         val observationOfSurgeonCode = "СтХир"
-        val observationOfBloodCode = "B03.016.004ГМУ_СП"
+        val observationOfBloodCode = "A09.05.010"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),
                 Helpers.createServiceRequestResource(observationOfBloodCode)
