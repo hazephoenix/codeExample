@@ -27,8 +27,7 @@ class End2End {
     }
 
     @Test
-    @Order(1)
-    fun patientServiceRequestAdding() {
+    fun patientServiceRequestAddingCycle() {
         val servRequests = listOf(
                 Helpers.createServiceRequestResource("СтХир")
         )
@@ -67,7 +66,7 @@ class End2End {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val updatedCarePlan = QueRequests.addServiceRequests(bundleForExamin)
 
-        //в CarePlan должны быть добавленные ServiceRequests и осмотр ответственного, пациент должен встать в очередь в другой кабинет
+        //проверка, что в CarePlan добавлен ServiceRequest, пациент должен снова встать в очередь в другой кабинет
         assertEquals(2, updatedCarePlan.activity.size, "wrong care plan activities")
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
@@ -82,8 +81,7 @@ class End2End {
     }
 
     @Test
-    @Order(1)
-    fun patientObservationFullCicle() {
+    fun patientObservationsFullCycle() {
         //создание пациента с 3 разными по приоритету обследованиями
         val observation101Office = "B03.016.004ГМУ_СП"
         val observation116Office = "A04.16.001"
@@ -160,12 +158,11 @@ class End2End {
                 BundleEntry(diagnosticReportOfResp),
                 BundleEntry(encounter)
         ))
-        /*val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
         //проверка, что маршрутный лист пациента завершен и он удален из системы очередь
         Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status of ClinicalImpression")
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
-        checkObservationsOfPatient(patientId, listOf())*/
+        checkObservationsOfPatient(patientId, listOf())
     }
-
 }

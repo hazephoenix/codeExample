@@ -1,15 +1,11 @@
-package ru.viscur.autotests.tests.queue
+package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
-import ru.viscur.autotests.dto.QueueReportInfo
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Observations
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.checkQueueItems
@@ -36,7 +32,6 @@ class QueueSorting {
         val observationOfSurgeonCode = "СтХир"
         val observation1Office101 = "B03.016.002ГМУ_СП"
         val observation2Office101 = "A09.20.003ГМУ_СП"
-        val observation1Office116 = "A04.16.001"
     }
 
     @BeforeEach
@@ -255,7 +250,7 @@ class QueueSorting {
     }
 
     @Test
-    fun sortingInLessWaitingDurationOffice() {
+    fun lessWaitingDurationSorting() {
         val servReq1 = Helpers.createServiceRequestResource("A04.16.001")
         val bundle1 = bundle("1111", "RED", listOf(servReq1))
         val servReq2 = Helpers.createServiceRequestResource("A04.16.001")
@@ -277,7 +272,7 @@ class QueueSorting {
     }
 
     @Test
-    fun sortingInOfficeWithLessQueueCount() {
+    fun lessQueueCountOfficeSorting() {
         val servRequest = listOf(Helpers.createServiceRequestResource("A04.16.001"))
         val bundleRed1 = bundle("1111", "RED", servRequest)
         val bundleRed2 = bundle("1112", "RED", servRequest)
@@ -334,37 +329,7 @@ class QueueSorting {
         ))
     }
 
-
     @Test
-    fun sortingInAnotherQueueIfCabinetIsClosed() {
-        val observation116Office = "A04.16.001"
-        val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation116Office)
-        )
-
-        val bundleRed1 = bundle("1111", "RED", servRequests)
-        QueRequests.officeIsBusy(referenceToLocation(office116))
-        QueRequests.officeIsBusy(referenceToLocation(office117))
-        val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
-        //пациент стоит в 116
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office116, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-        //офис закрыт, пациент должен быть перенаправлен в 117 при включенной настройке перерасчета очереди
-        QueRequests.setQueueResortingConfig(true)
-        QueRequests.officeIsClosed(referenceToLocation(office116))
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office117, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-        QueRequests.setQueueResortingConfig(false)
-
-    }
-
- @Test
     fun sortingAfterCancellingServiceRequestsInOffice() {
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101),
@@ -405,7 +370,7 @@ class QueueSorting {
     }
 
     @Test
-    fun patientShouldBeSentInNextOfficeAfterAddingObservation() {
+    fun sortingAfterAddingObservation() {
         val observationCode = "B03.016.002ГМУ_СП"
         val observationCode2 = "A04.16.001"
         val servRequests = listOf(
@@ -438,7 +403,7 @@ class QueueSorting {
     }
 
     @Test
-    fun patientShouldBeSentInNextOfficeAfterCancellingServiceRequest() {
+    fun sortingAfterCancellingServiceRequest() {
         val observationCode1 = "B03.016.002ГМУ_СП"
         val observationCode2 = "A04.16.001"
         val servRequests = listOf(
@@ -465,7 +430,7 @@ class QueueSorting {
     }
 
     @Test
-    fun gettingInCorrectQueueAfterFinishingObservation() {
+    fun recalcSortingFinishedObservation() {
         val observationCode1 = "B03.016.002ГМУ_СП"
         val observationCode2 = "A04.16.001"
         val servRequests1 = listOf(
@@ -500,6 +465,34 @@ class QueueSorting {
                 )),
                 QueueItemsOfOffice(office116, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+        QueRequests.setQueueResortingConfig(false)
+    }
+
+    @Test
+    fun recalcSortingCabinetIsClosed() {
+        val observation116Office = "A04.16.001"
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observation116Office)
+        )
+
+        val bundleRed1 = bundle("1111", "RED", servRequests)
+        QueRequests.officeIsBusy(referenceToLocation(office116))
+        QueRequests.officeIsBusy(referenceToLocation(office117))
+        val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
+        //пациент стоит в 116
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office116, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
+                ))
+        ))
+        //офис закрыт, пациент должен быть перенаправлен в 117 при включенной настройке перерасчета очереди
+        QueRequests.setQueueResortingConfig(true)
+        QueRequests.officeIsClosed(referenceToLocation(office116))
+        checkQueueItems(listOf(
+                QueueItemsOfOffice(office117, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
         QueRequests.setQueueResortingConfig(false)

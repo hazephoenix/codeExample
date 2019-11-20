@@ -1,4 +1,4 @@
-package ru.viscur.autotests.tests
+package ru.viscur.autotests.tests.serviceRequests
 
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -9,6 +9,7 @@ import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.tests.Observations
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.Helpers.Companion.createListResource
 import ru.viscur.autotests.utils.checkQueueItems
@@ -169,8 +170,8 @@ class ServiceRequests {
         val servRequestsInOffice = QueRequests.patientEntered(Helpers.createListResource(patientId, Observations.office101))
         //проверка, что в кабинете соответствующие Service Requests
         assertEquals(2, servRequestsInOffice.size, "wrong number of service requests in $office101")
-        assertEquals(observation1Office101, servRequestsInOffice.find{it.code.code() == observation1Office101}?.code!!.code() , "wrong service request in office")
-        assertEquals(observation2Office101, servRequestsInOffice.find{it.code.code() == observation2Office101}?.code!!.code(), "wrong service request in office")
+        assertEquals(observation1Office101, servRequestsInOffice.find{it.code.code() == observation1Office101 }?.code!!.code() , "wrong service request in office")
+        assertEquals(observation2Office101, servRequestsInOffice.find{it.code.code() == observation2Office101 }?.code!!.code(), "wrong service request in office")
     }
 
     @Test

@@ -22,5 +22,4 @@ class Predictions {
         severityResponse.
                 assertThat().body("severity.code", equalTo("GREEN"))
     }
-
 }

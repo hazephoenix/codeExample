@@ -1,4 +1,4 @@
-package ru.viscur.autotests.tests
+package ru.viscur.autotests.tests.serviceRequests
 
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

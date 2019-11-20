@@ -130,5 +130,4 @@ class Examinations {
         //проверка, что обращение отменено и больше нет активных Service Request
         checkServiceRequestsOfPatient(patientId, listOf())
     }
-
 }
