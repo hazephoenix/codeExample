@@ -1,6 +1,8 @@
 package ru.viscur.autotests.restApi
 
 import io.restassured.RestAssured
+import ru.viscur.autotests.dto.ClinicalImpressionDurationInfo
+import ru.viscur.autotests.dto.DefaultDurationInfo
 import ru.viscur.autotests.dto.PractitionerWorkloadInfo
 import ru.viscur.autotests.dto.QueueReportInfo
 import ru.viscur.autotests.utils.Helpers
@@ -210,8 +212,13 @@ class QueRequests {
         //duration and reports
         fun getDefaultDuration() =
                 Helpers.createRequestSpecWithoutBody().`when`().
-                        get(Endpoints.CLINICAL_IMPESSION_DURATION).
-                        then().statusCode(200)
+                        get(Endpoints.GET_DEFAULT_DURATION).
+                        then().statusCode(200).extract().`as`(Array<DefaultDurationInfo>::class.java)
+
+        fun setDefaultDuration(severity: String, duration: Int) =
+                Helpers.createRequestWithQuery(mapOf("severity" to severity, "duration" to duration)).`when`().
+                        post(Endpoints.SET_DEFAULT_DURATION).
+                        then().log().all().statusCode(200)
 
         fun getQueueReport() =
                 Helpers.createRequestSpecWithoutBody().`when`().
@@ -236,6 +243,11 @@ class QueRequests {
                         get(Endpoints.REPORT_QUEUE).
                         then().statusCode(200).
                         extract().response().`as`(Array<PractitionerWorkloadInfo>::class.java)
+
+        fun getPatientsClinicalImpressionDuration() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.PATIENTS_CLINICAL_IMPESSION_DURATION).
+                        then().statusCode(200).extract().`as`(Array<ClinicalImpressionDurationInfo>::class.java)
 
 
     }
