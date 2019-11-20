@@ -34,7 +34,7 @@ class QueueOfOfficeSimple(
 
 class QueueItemSimple(
         val status: PatientQueueStatus = PatientQueueStatus.IN_QUEUE,
-        val severity: Severity? = null,
+        val severity: Severity = Severity.GREEN,
         val estDuration: Int = 10 * SECONDS_IN_MINUTE,
         val patientId: String? = null
 ) {
@@ -49,7 +49,7 @@ data class NextOfficeForPatientInfoSimple(
 )
 
 class CarePlanSimple(
-        val severity: Severity,
+        val severity: Severity = Severity.GREEN,
         val servReqs: List<ServiceRequestSimple>
 )
 

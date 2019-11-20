@@ -67,7 +67,7 @@ class DiagnosisPredictorImpl(
      *
      */
     override fun saveTrainingSample(diagnosticReport: DiagnosticReport) {
-        Reference(diagnosticReport.subject.reference).id?.let { patientId ->
+        diagnosticReport.subject.id?.let { patientId ->
             patientService.byId(patientId).let { patient ->
                 clinicalImpressionService.active(patientId).let { clinicalImpression ->
                     val observations = clinicalImpression.supportingInfo

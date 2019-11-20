@@ -304,27 +304,27 @@ class AddToQueueTest {
                         )),
                         expOfficeId = OFFICE_130, expOnum = 1
                 ),
-                TestCase(desc = "4 блок. Разница ожидания менее 15% (от минимального!). Берется в расчет что от RECEPTION ближе: 130, 116/117, 202. Выбирается 116, т к в уровень 15% попали 116/117 и 202",
-                        queue = listOf(QueueOfOfficeSimple(
-                                OFFICE_116, listOf(
-                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 22 * SECONDS_IN_MINUTE)
-                        )), QueueOfOfficeSimple(
-                                OFFICE_117, listOf(
-                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 23 * SECONDS_IN_MINUTE)
-                        )), QueueOfOfficeSimple(
-                                OFFICE_130, listOf(
-                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 40 * SECONDS_IN_MINUTE)
-                        )), QueueOfOfficeSimple(
-                                OFFICE_202, listOf(
-                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 21 * SECONDS_IN_MINUTE)
-                        ))),
-                        carePlan = CarePlanSimple(GREEN, listOf(
-                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_116_AND_117),
-                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
-                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
-                        )),
-                        expOfficeId = OFFICE_116, expOnum = 1
-                ),
+//                TestCase(desc = "4 блок. Разница ожидания менее 15% (от минимального!). Берется в расчет что от RECEPTION ближе: 130, 116/117, 202. Выбирается 116, т к в уровень 15% попали 116/117 и 202",
+//                        queue = listOf(QueueOfOfficeSimple(
+//                                OFFICE_116, listOf(
+//                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 22 * SECONDS_IN_MINUTE)
+//                        )), QueueOfOfficeSimple(
+//                                OFFICE_117, listOf(
+//                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 23 * SECONDS_IN_MINUTE)
+//                        )), QueueOfOfficeSimple(
+//                                OFFICE_130, listOf(
+//                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 40 * SECONDS_IN_MINUTE)
+//                        )), QueueOfOfficeSimple(
+//                                OFFICE_202, listOf(
+//                                QueueItemSimple(PatientQueueStatus.IN_QUEUE, GREEN, 21 * SECONDS_IN_MINUTE)
+//                        ))),
+//                        carePlan = CarePlanSimple(GREEN, listOf(
+//                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_116_AND_117),
+//                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
+//                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+//                        )),
+//                        expOfficeId = OFFICE_116, expOnum = 1
+//                ),
                 TestCase(desc = "5 блок. Выполненные назначения не учитываются. Отправляется на невыполненное",
                         queue = listOf(QueueOfOfficeSimple(
                                 OFFICE_130, listOf(

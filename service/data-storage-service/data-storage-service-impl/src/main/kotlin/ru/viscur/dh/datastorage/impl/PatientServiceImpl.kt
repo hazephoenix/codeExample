@@ -72,7 +72,7 @@ class PatientServiceImpl(
         val query = em.createNativeQuery("""
             select r.resource
             from diagnosticReport r
-            where r.resource ->> 'status' = 'preliminary'
+            where r.resource ->> 'status' = '${DiagnosticReportStatus.preliminary}'
               and 'DiagnosticReport/' || r.id in (
                 select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
                 from clinicalImpression ci
@@ -82,6 +82,22 @@ class PatientServiceImpl(
         query.setParameter("patientRef", "Patient/$patientId")
         val diagnosticReport = query.fetchResource<DiagnosticReport>()
         return diagnosticReport?.conclusionCode?.first()?.code()
+    }
+
+    override fun finalDiagnosticReport(patientId: String): DiagnosticReport {
+        val query = em.createNativeQuery("""
+            select r.resource
+            from diagnosticReport r
+            where r.resource ->> 'status' = '${DiagnosticReportStatus.final}'
+              and 'DiagnosticReport/' || r.id in (
+                select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                from clinicalImpression ci
+                where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                  and ci.resource ->> 'status' = 'active'
+            )""")
+        query.setParameter("patientRef", "Patient/$patientId")
+        return query.fetchResource()
+                ?: throw Exception("not found final DiagnosticReport for patient with id '$patientId'")
     }
 
     override fun predictServiceRequests(diagnosis: String, gender: String, complaints: List<String>): Bundle {

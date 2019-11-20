@@ -92,7 +92,7 @@ class ClinicalImpressionServiceImpl(
      */
     @Tx
     override fun completeRelated(patientId: String, bundle: Bundle): ClinicalImpression {
-        return active(patientId)?.let { clinicalImpression ->
+        return active(patientId).let { clinicalImpression ->
             resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
                 val refToPatient = referenceToPatient(patientId)
                 val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport).first()

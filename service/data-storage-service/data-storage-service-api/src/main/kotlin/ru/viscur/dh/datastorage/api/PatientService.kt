@@ -52,6 +52,12 @@ interface PatientService {
     fun preliminaryDiagnosticConclusion(patientId: String): String?
 
     /**
+     * Окончательный диагноз
+     * Если не найден - падение
+     */
+    fun finalDiagnosticReport(patientId: String): DiagnosticReport
+
+    /**
      * Определение по диагнозу МКБ, полу пациента и жалобам:
      * - предположительного списка услуг для маршрутного листа
      * - отв врача (указан в одной из услуги)
