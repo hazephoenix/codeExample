@@ -1,10 +1,7 @@
 package ru.viscur.autotests.restApi
 
 import io.restassured.RestAssured
-import ru.viscur.autotests.dto.ClinicalImpressionDurationInfo
-import ru.viscur.autotests.dto.DefaultDurationInfo
-import ru.viscur.autotests.dto.PractitionerWorkloadInfo
-import ru.viscur.autotests.dto.QueueReportInfo
+import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
 import ru.viscur.dh.fhir.model.entity.*
@@ -184,7 +181,7 @@ class QueRequests {
         fun getDiagnosis(bundle: Bundle, diagnosisCount: String) =
                 Helpers.createRequestWithQueryAndBody(bundle, mapOf("take" to diagnosisCount)).
                         `when`().log().all().post(Endpoints.GET_DIAGNOSIS).
-                        then().log().all().statusCode(200).extract().response()
+                        then().log().all().statusCode(200).extract().response().`as`(DiagnosesListInfo::class.java)
 
         fun getSeverity(bundle: Bundle) =
                 Helpers.createRequestSpec(bundle).

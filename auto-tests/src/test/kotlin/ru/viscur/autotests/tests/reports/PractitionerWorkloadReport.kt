@@ -2,6 +2,7 @@ package ru.viscur.autotests.tests.reports
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
@@ -14,13 +15,13 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class PractitionerWorkloadReport {
 
     companion object {
         val office101 = "Office:101"
         val office116 = "Office:116"
-        val observationOffice101 = "B03.016.002ГМУ_СП"
+        val observationOffice101 = "B03.016.002"
         val observationOffice116 = "A04.16.001"
         val pratitioner101Office = "фельдшер_Колосова"
     }
@@ -91,7 +92,7 @@ class PractitionerWorkloadReport {
         ))
         //получение отчета о нагрузке на конкретного practitioner
         val queueItems = QueRequests.getPractitionersWorkloadById(pratitioner101Office)
-        val queueItemForPractitioner101Office = queueItems.first()!!
+        val queueItemForPractitioner101Office = queueItems.first()
         //проверка отчета по состоянию очереди для practitioner
         Assertions.assertEquals(1, queueItems.size, "wrong office number in report")
         Assertions.assertEquals(office101, queueItemForPractitioner101Office.officeId, "wrong office id in report")

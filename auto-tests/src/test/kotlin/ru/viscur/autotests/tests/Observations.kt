@@ -21,7 +21,7 @@ class Observations {
     companion object {
         val office101 = "Office:101"
         val redZone = "Office:RedZone"
-        val observationCode = "B03.016.002ГМУ_СП"
+        val observationCode = "B03.016.002"
         val observationCode2 = "СтХир"
     }
 

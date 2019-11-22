@@ -104,7 +104,7 @@ class Examinations {
     @Test
     fun cancelingClinicalImpression() {
         //создание пациента
-        val observation = "B03.016.002ГМУ_СП"
+        val observation = "B03.016.002"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),
                 Helpers.createServiceRequestResource(observation)

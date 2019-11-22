@@ -11,7 +11,7 @@ import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.*
 import javax.management.Query
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class End2End {
 
     companion object {
@@ -58,7 +58,7 @@ class End2End {
 
         //добавление ответственным дополнительного Service Request
         val additionalServiceRequests = listOf(
-                Helpers.createServiceRequestResource("B03.016.002ГМУ_СП", patientId)
+                Helpers.createServiceRequestResource("B03.016.002", patientId)
         )
         val bundleForExamin = Bundle(
                 entry = additionalServiceRequests.map { BundleEntry(it) }
@@ -75,7 +75,7 @@ class End2End {
         ))
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = "СтХир", locationId = redZone),
-                ServiceRequestInfo(code = "B03.016.002ГМУ_СП", locationId = office101)
+                ServiceRequestInfo(code = "B03.016.002", locationId = office101)
         ))
         checkObservationsOfPatient(patientId, listOf())
     }
@@ -83,7 +83,7 @@ class End2End {
     @Test
     fun patientObservationsFullCycle() {
         //создание пациента с 3 разными по приоритету обследованиями
-        val observation101Office = "B03.016.004ГМУ_СП"
+        val observation101Office = "B03.016.002"
         val observation116Office = "A04.16.001"
         val observationOfResp = "СтХир"
 

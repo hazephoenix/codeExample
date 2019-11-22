@@ -20,7 +20,7 @@ class PatientLeft {
 
     companion object {
         val office101 = "Office:101"
-        val observation1Office101 = "B03.016.002ГМУ_СП"
+        val observation1Office101 = "B03.016.002"
     }
 
     @BeforeEach
@@ -87,5 +87,4 @@ class PatientLeft {
                 ))
         ))
     }
-
 }

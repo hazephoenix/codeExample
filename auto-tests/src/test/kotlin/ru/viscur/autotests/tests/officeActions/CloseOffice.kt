@@ -19,7 +19,7 @@ class CloseOffice {
 
     companion object {
         val office101 = "Office:101"
-        val observation1Office101 = "B03.016.002ГМУ_СП"
+        val observation101Office = "B03.016.002"
     }
 
     @BeforeEach
@@ -28,7 +28,6 @@ class CloseOffice {
     }
     @Test
     fun closingOfficeGoingToObservation() {
-        val observation101Office = "B03.016.002ГМУ_СП"
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office)
@@ -58,7 +57,6 @@ class CloseOffice {
 
     @Test
     fun closingOfficeInQueue() {
-        val observation101Office = "B03.016.002ГМУ_СП"
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office)
@@ -80,7 +78,6 @@ class CloseOffice {
 
     @Test
     fun closingOfficeOnObservation() {
-        val observation101Office = "B03.016.002ГМУ_СП"
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office)

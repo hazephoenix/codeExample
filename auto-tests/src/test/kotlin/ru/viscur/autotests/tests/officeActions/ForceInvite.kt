@@ -22,7 +22,7 @@ class ForceInvite {
 
         val office101 = "Office:101"
         val office139 = "Office:139"
-        val observation1Office101 = "B03.016.002ГМУ_СП"
+        val observation1Office101 = "B03.016.002"
     }
 
     @BeforeEach

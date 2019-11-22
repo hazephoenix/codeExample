@@ -27,7 +27,7 @@ class DeletePatient {
         val office139 = "Office:139"
         val office104 = "Office:104"
 
-        val observCode = "B03.016.002ГМУ_СП"
+        val observCode = "B03.016.002"
     }
 
     @BeforeEach
@@ -176,5 +176,4 @@ class DeletePatient {
                 ))
         ))
     }
-
 }

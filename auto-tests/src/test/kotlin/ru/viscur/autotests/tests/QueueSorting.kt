@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
@@ -17,25 +18,26 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.utils.*
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class QueueSorting {
 
     companion object {
         val office116 = "Office:116"
         val office117 = "Office:117"
         val office101 = "Office:101"
-        val office130 = "Office:130"
         val office119 = "Office:119"
+        val office202 = "Office:202"
+        val office149 = "Office:149"
         val redZone = "Office:RedZone"
 
-        val observCode = "B03.016.002ГМУ_СП"
         val observationOfSurgeonCode = "СтХир"
-        val observation1Office101 = "B03.016.002ГМУ_СП"
-        val observation2Office101 = "A09.20.003ГМУ_СП"
+        val observation1Office101 = "B03.016.002"
+        val observation2Office101 = "A09.20.003"
     }
 
     @BeforeEach
     fun init() {
+        QueRequests.setQueueResortingConfig(false)
         QueRequests.deleteQue()
     }
 
@@ -43,7 +45,7 @@ class QueueSorting {
     fun GreenYellowSorting() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "GREEN", servRequests)
         val bundle2 = bundle("1121", "YELLOW", servRequests)
@@ -62,7 +64,7 @@ class QueueSorting {
     fun YellowRedSorting() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1121", "YELLOW", servRequests)
         val bundle2 = bundle("1122", "RED", servRequests)
@@ -81,7 +83,7 @@ class QueueSorting {
     fun GreenRedSorting() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "GREEN", servRequests)
         val bundle2 = bundle("1122", "RED", servRequests)
@@ -100,7 +102,7 @@ class QueueSorting {
     fun GreenGreenSorting() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "GREEN", servRequests)
         val bundle2 = bundle("1122", "GREEN", servRequests)
@@ -119,7 +121,7 @@ class QueueSorting {
     fun YellowYellowSorting() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "YELLOW", servRequests)
         val bundle2 = bundle("1122", "YELLOW", servRequests)
@@ -138,7 +140,7 @@ class QueueSorting {
     fun RedRedSorting() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "RED", servRequests)
         val bundle2 = bundle("1122", "RED", servRequests)
@@ -157,7 +159,7 @@ class QueueSorting {
     fun GreenYellowRedSorting() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "GREEN", servRequests)
         val bundle2 = bundle("1121", "YELLOW", servRequests)
@@ -179,7 +181,7 @@ class QueueSorting {
     fun sortingWithGoingToObservation() {
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "GREEN", servRequests)
         val bundle2 = bundle("1122", "YELLOW", servRequests)
@@ -201,7 +203,7 @@ class QueueSorting {
     fun sortingWithOnObservation() {
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1120", "GREEN", servRequests)
         val bundle2 = bundle("1122", "YELLOW", servRequests)
@@ -222,29 +224,29 @@ class QueueSorting {
 
     @Test
     fun samePriorityOfficeSorting() {
-        val observationOffice130 = "A05.10.002"
-        val observationOffice119 = "A06.28.002"
+        val observationOffice149 = "A03.09.001"
+        val observationOffice202 = "A06.04.004"
         val servRequests1 = listOf(
-                Helpers.createServiceRequestResource(observationOffice119)
+                Helpers.createServiceRequestResource(observationOffice149)
         )
         val servRequests2 = listOf(
-                Helpers.createServiceRequestResource(observationOffice130),
-                Helpers.createServiceRequestResource(observationOffice119)
+                Helpers.createServiceRequestResource(observationOffice149),
+                Helpers.createServiceRequestResource(observationOffice202)
         )
         val bundle1 = Helpers.bundle("1122", "RED", servRequests1)
         val bundle2 = Helpers.bundle("1123", "RED", servRequests2)
-        QueRequests.officeIsBusy(referenceToLocation(office130))
-        QueRequests.officeIsBusy(referenceToLocation(office119))
-        //2 пациента, одному только в 119, второму в 119 и 130, приоритеты одинаковые у кабинетов
+        QueRequests.officeIsBusy(referenceToLocation(office149))
+        QueRequests.officeIsBusy(referenceToLocation(office202))
+        //2 пациента, одному только в 149, второму в 202 и 149, приоритеты одинаковые у кабинетов
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
-        //первый пациент должен попасть в 119, второй тоже в 119, но 119 занят очередь направляет в 202(такой же приоритет)
+        //первый пациент должен попасть в 149, второй тоже в 149, но 149 занят очередь направляет в 202(такой же приоритет)
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office119, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
-                )),
-                QueueItemsOfOffice(office130, listOf(
+                QueueItemsOfOffice(office202, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+                )),
+                QueueItemsOfOffice(office149, listOf(
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
     }
@@ -309,7 +311,7 @@ class QueueSorting {
     fun sortingWhenQueueCorrected() {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1111", "GREEN", servRequests)
         val bundle2 = bundle("1112", "YELLOW", servRequests)
@@ -355,7 +357,7 @@ class QueueSorting {
         ))
 
         QueRequests.cancelOfficeServiceRequests(patientId, office101)
-        //после удаления Service Requests в 101м пациента должно убрать из очереди
+        //после удаления Service Requests в 101м пациента должно убрать из очереди в него
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = observation1Office101, locationId = office101, status = ServiceRequestStatus.cancelled),
                 ServiceRequestInfo(code = observation2Office101, locationId = office101, status = ServiceRequestStatus.cancelled),
@@ -371,7 +373,7 @@ class QueueSorting {
 
     @Test
     fun sortingAfterAddingObservation() {
-        val observationCode = "B03.016.002ГМУ_СП"
+        val observationCode = "B03.016.002"
         val observationCode2 = "A04.16.001"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationCode),
@@ -404,7 +406,7 @@ class QueueSorting {
 
     @Test
     fun sortingAfterCancellingServiceRequest() {
-        val observationCode1 = "B03.016.002ГМУ_СП"
+        val observationCode1 = "B03.016.002"
         val observationCode2 = "A04.16.001"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationCode1),
@@ -431,7 +433,7 @@ class QueueSorting {
 
     @Test
     fun recalcSortingFinishedObservation() {
-        val observationCode1 = "B03.016.002ГМУ_СП"
+        val observationCode1 = "B03.016.002"
         val observationCode2 = "A04.16.001"
         val servRequests1 = listOf(
                 Helpers.createServiceRequestResource(observationCode1),

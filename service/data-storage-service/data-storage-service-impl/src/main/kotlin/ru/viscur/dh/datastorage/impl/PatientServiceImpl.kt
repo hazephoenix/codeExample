@@ -336,7 +336,7 @@ class PatientServiceImpl(
                             patientId = it[1] as String,
                             severity = it[2] as String,
                             carePlanStatus = enumValueOf(it[3] as String),
-                            queueOfficeId = it[4] as String,
+                            queueOfficeId = it[4] as String?,
                             patient = it[5].toResourceEntity()!!
                     )
                 }

@@ -31,10 +31,10 @@ class ServiceRequests {
         val office140 = "Office:140"
         val redZone = "Office:RedZone"
         val observationOfSurgeonCode = "СтХир"
-        val observation1Office101 = "B03.016.002ГМУ_СП"
-        val observation2Office101 = "A09.20.003ГМУ_СП"
+        val observation1Office101 = "B03.016.002"
+        val observation2Office101 = "A09.20.003"
         val observation1Office116 = "A04.16.001"
-        val observationUrineOffice104 = "A09.28.029ГМУ_СП"
+        val observationUrineOffice104 = "A09.28.029"
     }
 
     @BeforeEach
