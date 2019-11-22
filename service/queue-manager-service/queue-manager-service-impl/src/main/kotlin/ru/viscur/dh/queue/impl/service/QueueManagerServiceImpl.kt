@@ -301,7 +301,7 @@ class QueueManagerServiceImpl(
                 str.add("$queueItem")
             }
             if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
-                str.add("  lastPatientInfo:")
+                str.add("  nextOfficeForPatientsInfo:")
                 office.extension.nextOfficeForPatientsInfo.forEach {
                     str.add("    " + it.subject.id + " (${it.severity}) to " + it.nextOffice.id)
                 }

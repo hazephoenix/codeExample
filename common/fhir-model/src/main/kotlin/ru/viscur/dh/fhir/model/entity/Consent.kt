@@ -18,7 +18,7 @@ import java.util.*
  *
  * @param category категория
  * @param status статус
- * @param dateTime дата
+ * @param dateTime дата-время подписания
  * @param patient пациент, ссылка на [Patient]
  * @param performer мед. работник, ссылка на [Practitioner]
  * @param organization организация (или несколько), ссылка на [Organization]

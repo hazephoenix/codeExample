@@ -1,5 +1,6 @@
 package ru.viscur.dh.mis.integration.impl.reception
 
+import jdk.nashorn.internal.ir.annotations.Ignore
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -21,7 +22,8 @@ import ru.viscur.dh.fhir.model.valueSets.ValueSetName
         classes = [MisIntegrationTestConfig::class]
 )
 @EnableAutoConfiguration
-@Disabled("Debug purposes only. Test checks more than 10000 diagnosis - more than 15 minutes")
+//"Debug purposes only. Test checks more than 10000 diagnosis - more than 15 minutes"
+@Ignore
 class ResponsibleQualificationsPredictorForAllDiagnosisTest {
 
     @Autowired

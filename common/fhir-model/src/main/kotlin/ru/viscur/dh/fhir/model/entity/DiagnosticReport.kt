@@ -33,6 +33,5 @@ class DiagnosticReport @JsonCreator constructor(
         @JsonProperty("conclusion") val conclusion: String? = null,
         @JsonProperty("conclusionCode") val conclusionCode: List<CodeableConcept>,
         @JsonProperty("issued") val issued: Date,
-//        @JsonProperty("result") val result: List<Reference>,
         @JsonProperty("status") val status: DiagnosticReportStatus = DiagnosticReportStatus.preliminary
 ) : BaseResource(id, identifier, resourceType)

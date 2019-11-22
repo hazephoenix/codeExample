@@ -18,15 +18,14 @@ import java.util.*
  * Включает направления на различные обследования, по сути, это маршрутный лист пациента
  * [info](http://fhir-ru.github.io/careplan.html)
  *
- * @param status статус,
- * @param intent цель,
+ * @param status статус, [CarePlanStatus]
+ * @param intent цель, [CarePlanIntent]
  * @param created дата-время создания
  * @param title заголовок
  * @param subject пациент, ссылка на [Patient]
  * @param author ответственный, ссылка на [Practitioner]
  * @param contributor кто составил план, ссылка на [Practitioner]
- * @param encounter обслуживание, в рамках которого сделан план, ссылка на [Encounter]
- * @param activity список назначений
+ * @param activity список назначений, [CarePlanActivity]
  */
 class CarePlan @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
@@ -39,6 +38,5 @@ class CarePlan @JsonCreator constructor(
         @JsonProperty("subject") val subject: Reference,
         @JsonProperty("author") val author: Reference,
         @JsonProperty("contributor") val contributor: Reference,
-        @JsonProperty("encounter") val encounter: Reference? = null,
         @JsonProperty("activity") var activity: List<CarePlanActivity>
 ) : BaseResource(id, identifier, resourceType)
