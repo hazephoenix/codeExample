@@ -18,12 +18,11 @@ import ru.viscur.dh.fhir.model.valueSets.ValueSetName
  *
  * Тест, что для ЛЮБОГО диагноза найдется "ответственная" специальность (или неск-ко)
  */
-@SpringBootTest(
-        classes = [MisIntegrationTestConfig::class]
-)
-@EnableAutoConfiguration
-//"Debug purposes only. Test checks more than 10000 diagnosis - more than 15 minutes"
-@Ignore
+//@SpringBootTest(
+//        classes = [MisIntegrationTestConfig::class]
+//)
+//@EnableAutoConfiguration
+@Disabled("Debug purposes only. Test checks more than 10000 diagnosis - more than 15 minutes")
 class ResponsibleQualificationsPredictorForAllDiagnosisTest {
 
     @Autowired
