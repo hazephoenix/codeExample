@@ -1,6 +1,5 @@
 package ru.viscur.dh.mis.integration.impl.reception
 
-import jdk.nashorn.internal.ir.annotations.Ignore
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -31,7 +30,7 @@ class ResponsibleQualificationsPredictorForAllDiagnosisTest {
     @Autowired
     lateinit var conceptService: ConceptService
 
-    @Test
+//    @Test
     fun test() {
         val withoutResult = conceptService.allInLastLevel(ValueSetName.ICD_10).map { code ->
             val withoutResult = mutableListOf<String>()
