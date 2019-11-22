@@ -35,6 +35,11 @@ interface ConceptService {
     fun byParent(valueSet: ValueSetName, parentCode: String? = null): List<Concept>
 
     /**
+     * Все коды последнего уровня (не имеющие дочерних элементов)
+     */
+    fun allInLastLevel(valueSet: ValueSetName): List<String>
+
+    /**
      * Поиск концепта по совпадениям в [Concept.alternatives]
      * Пример:
      * В [realAlternatives] м б "Выраженная СИЛЬНАЯ боль по утрам"

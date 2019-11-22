@@ -24,6 +24,7 @@ const val OBSERVATION_IN_OFFICE_120 = "А06.23.004"
 const val OBSERVATION_IN_OFFICE_149 = "A03.09.001"
 const val OBSERVATION_IN_OFFICE_150 = "A03.18.001"
 const val OBSERVATION2_IN_OFFICE_150 = "A03.19.002"
+const val OBSERVATION_IN_OFFICE_151 = "A03.16.001"
 
 /**
  * Услуга осмотра хирурга

@@ -27,11 +27,11 @@ enum class Severity(
     /**
      * Красный - тяжелая степень тяжести, реанимационный
      */
-    RED("Красный", RED_ZONE_TYPE.code, AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_RED.code, 7),
+    RED("Красный", RED_ZONE_TYPE.code, AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_RED.code, 3),
     /**
      * Желтый - средней степени тяжести
      */
-    YELLOW("Желтый", YELLOW_ZONE_TYPE.code, AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_YELLOW.code, 3),
+    YELLOW("Желтый", YELLOW_ZONE_TYPE.code, AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_YELLOW.code, 1),
     /**
      * Зеленый - удовлетворительное состояние
      */

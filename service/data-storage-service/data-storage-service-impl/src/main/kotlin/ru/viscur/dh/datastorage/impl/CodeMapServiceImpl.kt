@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.response.*
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.CodeMap
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.*
@@ -21,15 +22,40 @@ class CodeMapServiceImpl(
         private val resourceService: ResourceService
 ) : CodeMapService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    override fun codeMap(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap =
-            resourceService.single(ResourceType.CodeMap, RequestBodyForResources(filter = mapOf(
-                    "sourceUrl" to "ValueSet/${sourceValueSet.id}",
-                    "targetUrl" to "ValueSet/${targetValueSet.id}",
-                    "sourceCode" to sourceCode
-            )))
+    override fun codeMap(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap {
+        val query = em.createNativeQuery("""
+            select cm.resource from
+                (with recursive r AS (
+                    SELECT r1.resource ->> 'code' as code, r1.resource ->> 'parentCode' as parentCode
+                    FROM concept r1
+                    WHERE r1.resource ->> 'system' = :sourceUrl
+                      and r1.resource ->> 'code' = :sourceCode
+            
+                    UNION
+            
+                    SELECT r2.resource ->> 'code' as code, r2.resource ->> 'parentCode' as parentCode
+                    FROM concept r2
+                             JOIN r
+                                  ON r2.resource ->> 'code' = r.parentCode
+                    where r2.resource ->> 'system' = :sourceUrl
+                )
+                select code from r) r
+            join
+                (select cm.resource
+                 from codeMap cm
+                 where cm.resource ->> 'sourceUrl' = :sourceUrl
+                   and cm.resource ->> 'targetUrl' = :targetUrl) cm
+            on cm.resource ->> 'sourceCode' = r.code
+        """)
+        query.setParameter("sourceCode", sourceCode)
+        query.setParameter("sourceUrl", "ValueSet/${sourceValueSet.id}")
+        query.setParameter("targetUrl", "ValueSet/${targetValueSet.id}")
+        return query.fetchResource()
+                ?: throw Exception("not found codeMap for sourceCode: $sourceCode (sourceValueSet: $sourceValueSet, targetValueSet: $targetValueSet)")
+    }
 
     override fun all(sourceValueSet: ValueSetName, targetValueSet: ValueSetName): List<CodeMap> =
             resourceService.all(ResourceType.CodeMap, RequestBodyForResources(filter = mapOf(

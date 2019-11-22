@@ -6,6 +6,7 @@ import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
 import ru.viscur.dh.datastorage.api.util.filterForQueue
+import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
@@ -286,6 +287,8 @@ class QueueManagerServiceImpl(
             Bundle(entry = queueService.queueItemsOfOffice(officeId).map { BundleEntry(it) })
 
     override fun queueItems(): List<QueueItem> = queueService.queueItems()
+
+    override fun locationMonitor(officeId: String): LocationMonitorDto = locationMonitorInformService.queueCurrentState(officeId)
 
     override fun loqAndValidate(): String {
         val offices = officeService.all()

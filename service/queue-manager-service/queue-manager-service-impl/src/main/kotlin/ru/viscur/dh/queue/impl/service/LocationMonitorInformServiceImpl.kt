@@ -26,6 +26,8 @@ class LocationMonitorInformServiceImpl(
         }
     }
 
+    override fun queueCurrentState(officeId: String) = locationMonitor(officeId)
+
     /**
      * Информация для монитора для отображения очереди/приема в кабинет/зоне
      */

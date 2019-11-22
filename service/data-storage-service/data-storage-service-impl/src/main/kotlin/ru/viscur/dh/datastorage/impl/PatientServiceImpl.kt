@@ -5,6 +5,7 @@ import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.INSPECTION_ON_RECEPTION
 import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_LINK_ID_SEVERITY
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
+import ru.viscur.dh.datastorage.impl.utils.ResponsibleQualificationsPredictor
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
@@ -24,7 +25,8 @@ class PatientServiceImpl(
         private val codeMapService: CodeMapService,
         private val conceptService: ConceptService,
         private val observationDurationService: ObservationDurationEstimationService,
-        private val practitionerService: PractitionerService
+        private val practitionerService: PractitionerService,
+        private val responsibleQualificationsPredictor: ResponsibleQualificationsPredictor
 ) : PatientService {
 
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
@@ -103,12 +105,18 @@ class PatientServiceImpl(
     override fun predictServiceRequests(diagnosis: String, gender: String, complaints: List<String>): Bundle {
         //определяем отв. специальности -> врачей данной специальностей -> самый "свободный" на рабочем месте будет отв.
         //услуги в маршрутном листе определяются по диагнозу + осмотр отв.
-        val responsibleQualifications = responsibleQualifications(diagnosis, gender, complaints)
+        val responsibleQualifications = responsibleQualificationsPredictor.predict(diagnosis, gender, complaints)
         val practitionersId = practitionerService.byQualifications(responsibleQualifications)
         if (practitionersId.isEmpty()) {
             throw Exception("ERROR. Can't find practitioners by qualifications: ${responsibleQualifications.joinToString()}")
         }
-        val responsiblePractitionerId = practitionersId.first()//todo смотреть кто в системе + кто менее нагружен пациентами под отв-ю
+        //todo смотреть кто на работе по локации
+        // practitionersId = practitionersId.filter кто на работе сейчас
+
+        //берем наименее загруженного врача
+        val responsiblePractitionerId = practitionersId.map { practitionerId ->
+            Pair(patientsToExamine(practitionerId).sumBy { enumValueOf<Severity>(it.severity).workloadWeight }, practitionerId)
+        }.minBy { it.first }!!.second
         val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
 
         val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10.id, diagnosis)
@@ -131,39 +139,6 @@ class PatientServiceImpl(
                         )
                         .map { BundleEntry(it) }
         )
-    }
-
-    /**
-     * По диагнозу + полу пациента + жалобам определяются специальности, которые м б назначены отв. такому пациенту
-     */
-    private fun responsibleQualifications(diagnosis: String, gender: String, complaints: List<String>): List<String> {
-        val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10.id, diagnosis)
-        var qualifications = codeMapService.icdToPractitionerQualifications(diagnosisConcept.parentCode!!)
-        //фильтруем по связанному полу. Если были уролог или гинеколог, то один ненужный отсеивается по полу пациента
-        qualifications = qualifications.filter {
-            val qualification = conceptService.byCode(ValueSetName.PRACTITIONER_QUALIFICATIONS.id, it.code)
-            val relativeGender = qualification.relativeGender
-            relativeGender.isNullOrEmpty() || relativeGender == gender
-        }
-        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS.id, complaints)
-        //случай, если у пациента есть жалобы, указанные в условиях назначения отв. специалиста (например, с сильной болью направляем к хирургу при I70-I79)
-        val qualificationsFilteredByComplaints = qualifications.filter { qualification ->
-            complaintCodes.any { complaintCode ->
-                !qualification.condition.isNullOrEmpty() && complaintCode in qualification.condition!!.map { it.code }
-            }
-        }
-        if (qualificationsFilteredByComplaints.isNotEmpty()) {
-            return qualificationsFilteredByComplaints.map { it.code }
-        }
-        //случай, если у пациента нет сильной боли при I70-I79 (а хирург при сильной боли), тогда к терапевту, т к у него нет условий
-        //или случай, если у специальности(ей) нет условий приема для этого диагноза
-        val qualificationsWithoutConditions = qualifications.filter { it.condition.isNullOrEmpty() }
-        if (qualificationsWithoutConditions.isNotEmpty()) {
-            return qualificationsWithoutConditions.map { it.code }
-        }
-        //случай, если у всех специальностей для диагноза есть условия, которых нет у пациента
-        // (A00-A09 - хирург при острой боли, терапевт при лихорадке, а у пациента нет таких жалоб - тогда все равнозначны и без фильтрации
-        return qualifications.map { it.code }
     }
 
     @Tx
@@ -336,7 +311,7 @@ class PatientServiceImpl(
                             patientId = it[1] as String,
                             severity = it[2] as String,
                             carePlanStatus = enumValueOf(it[3] as String),
-                            queueOfficeId = it[4] as String,
+                            queueOfficeId = it[4] as String?,
                             patient = it[5].toResourceEntity()!!
                     )
                 }

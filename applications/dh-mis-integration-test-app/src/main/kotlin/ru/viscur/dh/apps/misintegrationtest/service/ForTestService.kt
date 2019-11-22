@@ -1,5 +1,6 @@
 package ru.viscur.dh.apps.misintegrationtest.service
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.beans.factory.annotation.Autowired
@@ -189,12 +190,13 @@ class ForTestService {
     private fun List<ServiceRequestSimple>.toServiceRequests(patientId: String) =
             this.map { Helpers.createServiceRequestResource(servRequestCode = it.code, patientId = patientId, status = it.status) }
 
-    fun registerPatient(servReqs: List<ServiceRequestSimple>, severity: Severity = Severity.GREEN): List<ServiceRequest> {
+    fun registerPatient(servReqs: List<ServiceRequestSimple>, severity: Severity = Severity.GREEN, diagnosisCode: String = "A00.0"): List<ServiceRequest> {
+//        fun registerPatient(servReqs: List<ServiceRequestSimple>, severity: Severity = Severity.GREEN): List<ServiceRequest> {
         val patient = Helpers.createPatientResource(enp = genId())
         val bodyWeight = Helpers.createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = Helpers.paramedicId)
         val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity.name)
         val personalDataConsent = Helpers.createConsentResource()
-        val diagnosticReport = Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = Helpers.paramedicId)
+        val diagnosticReport = Helpers.createDiagnosticReportResource(diagnosisCode = diagnosisCode, practitionerId = Helpers.paramedicId)
         val list = Helpers.createPractitionerListResource(Helpers.surgeonId)
         val claim = Helpers.createClaimResource()
 
@@ -357,4 +359,6 @@ class ForTestService {
     }
 
     private fun createQueueNumber(severity: Severity) = severity.display.substring(0, 1) + "00" + counter++
+
+    fun compareListOfString(expList: List<String>,actList: List<String>, desc: String) =  Assertions.assertLinesMatch(expList.sorted(), actList.sorted())
 }
