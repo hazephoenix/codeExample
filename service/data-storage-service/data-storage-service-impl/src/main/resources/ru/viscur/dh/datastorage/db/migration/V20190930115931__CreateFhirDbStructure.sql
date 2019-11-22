@@ -4237,7 +4237,7 @@ BEGIN
       rt || '_history', rt, rt, rt);
 
   EXECUTE _sql
-  USING txid, rid, resource || ('{"id": "' || rid || '"}')::jsonb
+  USING txid, rid, resource || ('{"id": "' || rid || '", "meta": {"versionId": ' || txid ||'}}')::jsonb
   INTO result;
 
   return result;
