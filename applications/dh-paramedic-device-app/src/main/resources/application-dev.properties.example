@@ -25,3 +25,5 @@ logging.level.ru.viscur.dh.apps.paramedicdevice.device.WristbandPrinter=DEBUG
 paramedic.triton.ip=192.168.1.20
 paramedic.triton.mac=02:02:03:04:3f:df
 paramedic.triton.broadcast=192.168.1.255
+
+route.printer.name=RoutePrinter

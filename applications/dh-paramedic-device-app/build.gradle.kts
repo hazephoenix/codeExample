@@ -12,6 +12,10 @@ dependencies {
     implementation("org.apache.xmlgraphics:batik:1.12")
     implementation("org.apache.xmlgraphics:batik-transcoder:1.12")
     implementation("org.apache.xmlgraphics:batik-codec:1.12")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:2.0.2")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:2.0.2")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:2.0.2")
+    implementation("org.apache.pdfbox:pdfbox:2.0.17")
 
     testCompile("junit:junit:4.13-rc-1")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
