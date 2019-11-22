@@ -51,6 +51,19 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
             "system" to "ValueSet/${valueSet.id}"
     )))
 
+    override fun allInLastLevel(valueSet: ValueSetName): List<String> {
+        val query = em.createNativeQuery("""
+            select r.resource->>'code' from concept r
+            where r.resource->>'system' = :system
+                and not exists (
+                    select 1 from concept rIntr
+                    where rIntr.resource->>'parentCode' = r.resource->>'code'
+                    )
+        """)
+        query.setParameter("system", "ValueSet/${valueSet.id}")
+        return query.resultList as List<String>
+    }
+
     override fun byAlternative(valueSetId: String, realAlternatives: List<String>): List<String> {
         if (realAlternatives.isEmpty()) return listOf()
         val realAlternativesStr = realAlternatives.mapIndexed { index, code -> "(?${index + 1})" }.joinToString(", ")

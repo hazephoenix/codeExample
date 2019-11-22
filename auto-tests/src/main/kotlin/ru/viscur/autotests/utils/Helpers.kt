@@ -32,6 +32,7 @@ class Helpers {
          * id хирурга
          */
         const val surgeonId = "хирург_Петров"
+        const val surgeon2Id = "хирург_Иванов"
 
         //создать спецификацию запроса RestApi
         fun createRequestSpec(body: Any): RequestSpecification {

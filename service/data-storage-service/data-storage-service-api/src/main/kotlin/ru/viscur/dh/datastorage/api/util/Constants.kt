@@ -107,3 +107,14 @@ const val CLINICAL_IMPRESSION = "Clinical_impression"
  * linkId опросника, в котором указывается степень тяжести пациента
  */
 const val QUESTIONNAIRE_LINK_ID_SEVERITY = "Severity"
+
+/**
+ * Квалификации (специальности) врачей
+ */
+const val QUALIFICATION_THERAPIST = "Therapist"
+const val QUALIFICATION_SURGEON = "Surgeon"
+const val QUALIFICATION_NEUROLOGIST = "Neurologist"
+const val QUALIFICATION_UROLOGIST = "Urologist"
+const val QUALIFICATION_GYNECOLOGIST = "Gynecologist"
+const val QUALIFICATION_PARAMEDIC = "Paramedic"
+const val QUALIFICATION_DIAGNOSTIC_ASSISTANT = "Diagnostic_assistant"

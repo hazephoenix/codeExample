@@ -163,6 +163,11 @@ interface QueueManagerService {
     fun queueItems(): List<QueueItem>
 
     /**
+     * Информация для монитора для отображения очереди/приема в кабинет/зоне
+     */
+    fun locationMonitor(officeId: String): LocationMonitorDto
+
+    /**
      * Отобразить в логах очередь и провалидировать
      * todo только на время отладки
      */

@@ -13,6 +13,8 @@ interface CodeMapService {
 
     /**
      * Получение [CodeMap]
+     * В [sourceCode] можно указывать любой дочерний элемент.
+     * например, для диагноз A50.9 найдется CodeMap для A50-A64, т к A50.9 входит в A50-A64
      */
     fun codeMap(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap
 
@@ -65,7 +67,7 @@ interface CodeMapService {
     ).targetCode.map { it.code }
 
     /**
-     * Нати код диагноза по всем жалобам из списка
+     * Найти код диагноза по всем жалобам из списка
      *
      * @param complaints Список кодов жалоб, найденных в справочнике и соответсвующих тем,
      *  что ввел фельдшер
@@ -75,7 +77,7 @@ interface CodeMapService {
     fun icdByAllComplaints(complaints: List<String>, take: Int): List<String>
 
     /**
-     * Нати код диагноза по любым из жалоб из списка
+     * Найти код диагноза по любым из жалоб из списка
      *
      * @param complaints Список кодов жалоб, найденных в справочнике и соответсвующих тем,
      *  что ввел фельдшер

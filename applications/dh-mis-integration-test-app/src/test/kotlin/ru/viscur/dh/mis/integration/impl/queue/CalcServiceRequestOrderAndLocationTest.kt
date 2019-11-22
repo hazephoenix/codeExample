@@ -421,6 +421,25 @@ class CalcServiceRequestOrderAndLocationTest {
                                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202),
                                 ServiceRequestSimple(code = OBSERVATION_OF_SURGEON)
                         )
+                ),
+                TestCase(desc = "Пересчет выключен. Проверка, что 151 (ЭГДС) имеет самый низкий приоритет (перед осмотром отв.)",
+                        queue = listOf(QueueOfOfficeSimple(OFFICE_150, listOf(
+                                QueueItemSimple(status = PatientQueueStatus.IN_QUEUE, estDuration = 40 * SECONDS_IN_MINUTE)
+                        ))),
+                        carePlan = CarePlanSimple(servReqs = listOf(
+                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_104),
+                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_151),
+                                ServiceRequestSimple(OBSERVATION_IN_OFFICE_150)
+                        )),
+                        recalcNextOffice = false,
+                        expServReqs = listOf(
+                                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_104),
+                                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101),
+                                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_150),
+                                ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_151),
+                                ServiceRequestSimple(code = OBSERVATION_OF_SURGEON)
+                        )
                 )
         )
 
