@@ -12,11 +12,11 @@ class Predictions {
 
     @Test
     fun predictDiagnosis() {
-        val expectedDiagnosis = "A00.0"
+        val expectedDiagnosis = "A00"
         val bundle = Helpers.bundleForDiagnosis("RED")
-        //получени и проверка предпололительных диагнозов по результатам осмотра фельдшером
-        val diagnosisList = QueRequests.getDiagnosis(bundle, "1")
-        assertEquals(1, diagnosisList.diagnoses.size, "wrong diagnosis count")
+        //получени и проверка предположительных диагнозов по результатам осмотра фельдшером
+        val diagnosisList = QueRequests.getDiagnosis(bundle, "2")
+        assertEquals(2, diagnosisList.diagnoses.size, "wrong diagnosis count")
         assertEquals(expectedDiagnosis, diagnosisList.diagnoses.first().code, "wrong diagnosis")
     }
 

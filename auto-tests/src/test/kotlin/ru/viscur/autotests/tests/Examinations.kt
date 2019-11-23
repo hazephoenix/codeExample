@@ -45,6 +45,7 @@ class Examinations {
                 status = ObservationStatus.final,
                 patientId = patientId
         )
+
         //завершение обращение пациента отвественным
         val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
                 diagnosisCode = "A00.0",
@@ -59,6 +60,7 @@ class Examinations {
                 BundleEntry(encounter)
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+
         //проверка отсутствия Service Requests, Observation
         Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
         checkServiceRequestsOfPatient(patientId, listOf())
@@ -76,6 +78,7 @@ class Examinations {
         val responseBundle = QueRequests.createPatient(bundle)
         val serviceRequest = responseBundle.resources(ResourceType.ServiceRequest).first()
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
+
         //завершение обращения с активным Service Request
         val obsOfRespPract = Helpers.createObservation(code = serviceRequest.code.code(),
                 valueString = "состояние удовлетворительное",
@@ -97,6 +100,7 @@ class Examinations {
                 BundleEntry(encounter)
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+
         //проверка, что обращение завершено и больше нет активных ServiceRequests
         checkServiceRequestsOfPatient(patientId, listOf())
     }
@@ -112,6 +116,7 @@ class Examinations {
         val bundle = Helpers.bundle("7879", "RED", servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
+
         //проверка наличия активных Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
@@ -125,8 +130,10 @@ class Examinations {
                         status = ServiceRequestStatus.active
                 )
         ))
+
         //отмена обращения
         QueRequests.cancelExamination(patientId)
+
         //проверка, что обращение отменено и больше нет активных Service Request
         checkServiceRequestsOfPatient(patientId, listOf())
     }

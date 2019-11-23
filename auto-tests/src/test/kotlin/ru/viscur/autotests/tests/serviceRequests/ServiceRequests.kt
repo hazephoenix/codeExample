@@ -22,7 +22,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class ServiceRequests {
 
     companion object {
@@ -45,6 +45,7 @@ class ServiceRequests {
     @Test
     fun gettingServiceRequestsByDiagnosis () {
         val diagnosis = " {\"diagnosis\": \"A01\",\"complaints\": [\"Сильная боль в правом подреберье\", \"Тошнит\"],\"gender\": \"male\"}"
+
         //получение предположительных Service Request по диагнозу и проверка
         QueRequests.getSupposedServRequests(diagnosis).
                 assertThat().body("entry.size()", equalTo(6))
@@ -63,6 +64,7 @@ class ServiceRequests {
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = "СтХир", locationId = redZone)
         ))
+
         //создание дополнительного Service Request
         val additionalServiceRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101, patientId)
@@ -71,9 +73,9 @@ class ServiceRequests {
                 entry = additionalServiceRequests.map { BundleEntry(it) }
         )
         val updatedCarePlan = QueRequests.addServiceRequests(bundleForExamin)
+
         //проверка, что в в CarePlan добавлен новый ServiceRequest
         assertEquals(2, updatedCarePlan.activity.size, "wrong care plan activities")
-
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone, status = ServiceRequestStatus.active),
                 ServiceRequestInfo(code = observation1Office101, locationId = office101, status = ServiceRequestStatus.active)
@@ -95,6 +97,7 @@ class ServiceRequests {
                 ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone),
                 ServiceRequestInfo(code = observation1Office101, locationId = office101)
         ))
+
         //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelServiceRequest(serviceRequestId)
         checkServiceRequestsOfPatient(patientId, listOf(
@@ -121,6 +124,7 @@ class ServiceRequests {
                 status = ObservationStatus.registered
         )
         QueRequests.createObservation(observation)
+
         //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelServiceRequest(serviceRequest.id)
         checkServiceRequestsOfPatient(patientId, listOf(
@@ -146,6 +150,7 @@ class ServiceRequests {
                 ServiceRequestInfo(code = observation2Office101, locationId = office101),
                 ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone)
         ))
+
         //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelOfficeServiceRequests(patientId, office101)
         checkServiceRequestsOfPatient(patientId, listOf(
@@ -166,8 +171,10 @@ class ServiceRequests {
         val bundle1 = Helpers.bundle("1122", "RED", servRequests)
         QueRequests.officeIsReady(referenceToLocation(office101))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+
         //вход в кабинет
         val servRequestsInOffice = QueRequests.patientEntered(Helpers.createListResource(patientId, Observations.office101))
+
         //проверка, что в кабинете соответствующие Service Requests
         assertEquals(2, servRequestsInOffice.size, "wrong number of service requests in $office101")
         assertEquals(observation1Office101, servRequestsInOffice.find{it.code.code() == observation1Office101 }?.code!!.code() , "wrong service request in office")
@@ -185,9 +192,11 @@ class ServiceRequests {
         val bundle1 = Helpers.bundle("1111", "GREEN", servRequests)
         QueRequests.officeIsReady(referenceToLocation(Observations.office101))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+
         //пациент вошел в офис, в котором у него не назначены обследования
         QueRequests.invitePatientToOffice(createListResource(patientId, office140))
         val allActServRequest = QueRequests.patientEntered(createListResource(patientId, office140))
+
         //проверка, что в офисе, в котором не назначены обследования получаем список всех Service Request пациента
         assertEquals(4, allActServRequest.size, "wrong service requests for patient $patientId")
     }
@@ -202,11 +211,13 @@ class ServiceRequests {
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         QueRequests.officeIsBusy(referenceToLocation(redZone))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle).resources(ResourceType.ServiceRequest))
+
         //проверка, что анализ мочи есть в Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = observationUrineOffice104, locationId = office104, status = ServiceRequestStatus.active),
                 ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone)
         ))
+
         //проверка, что анализ мочи игнорируется и пациента сразу отправляет на приём к ответственному
         checkQueueItems(listOf(
                 QueueItemsOfOffice(redZone, listOf(

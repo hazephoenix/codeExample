@@ -37,6 +37,7 @@ class DeletePatient {
 
     @Test
     fun deleteMiddlePositionPatientInQue() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observCode)
@@ -48,16 +49,10 @@ class DeletePatient {
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
 
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-
+        //удаление пациента
         QueRequests.deletePatientFromQueue(referenceToPatient(patientId2))
 
+        //проверка состояния очереди
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
@@ -68,6 +63,7 @@ class DeletePatient {
 
     @Test
     fun deleteFirstPositionPatientInQue() {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observCode)
@@ -79,16 +75,10 @@ class DeletePatient {
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
 
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-
+        //удаление пациента
         QueRequests.deletePatientFromQueue(referenceToPatient(patientId1))
 
+        //проверка состояния очереди
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
@@ -99,6 +89,7 @@ class DeletePatient {
 
     @Test
     fun deleteLastPositionPatientInQue() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observCode)
@@ -110,16 +101,10 @@ class DeletePatient {
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
 
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-
+        //удаление пациента
         QueRequests.deletePatientFromQueue(referenceToPatient(patientId3))
 
+        //проверка состояния очереди
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
@@ -130,6 +115,7 @@ class DeletePatient {
 
     @Test
     fun deletePatientWithoutNextInQue() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observCode)
@@ -137,14 +123,10 @@ class DeletePatient {
         val bundle1 = bundle("1122", "RED", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
 
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION)
-                ))
-        ))
-
+        //удаление пациента
         QueRequests.deletePatientFromQueue(referenceToPatient(patientId1))
 
+        //проверка состояния очереди
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf())
         ))
@@ -152,6 +134,7 @@ class DeletePatient {
 
     @Test
     fun deletePatientGoingToObservationWithNextInQue() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observCode)
@@ -161,15 +144,10 @@ class DeletePatient {
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
 
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-
+        //удаление пациента
         QueRequests.deletePatientFromQueue(referenceToPatient(patientId1))
 
+        //проверка состояния очереди
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)

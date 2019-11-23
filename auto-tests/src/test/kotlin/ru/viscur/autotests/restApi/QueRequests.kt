@@ -246,7 +246,17 @@ class QueRequests {
                         get(Endpoints.PATIENTS_CLINICAL_IMPESSION_DURATION).
                         then().statusCode(200).extract().`as`(Array<ClinicalImpressionDurationInfo>::class.java)
 
+        fun getPatientObservationHistory(patientId: String) =
+                Helpers.createRequestWithQuery(mapOf("patientId" to patientId)).`when`().
+                        get(Endpoints.GET_OBSERVATION_HISTORY_OF_PATIENT).
+                        then().log().all().statusCode(200).
+                        extract().response().`as`(Array<ObservationHistoryInfo>::class.java)
 
+        fun getPatientQueueHistory(patientId: String) =
+                Helpers.createRequestWithQuery(mapOf("patientId" to patientId)).`when`().
+                        get(Endpoints.GET_QUEUE_HISTORY_OF_PATIENT).
+                        then().log().all().statusCode(200).
+                        extract().response().`as`(Array<PatientQueueHistoryInfo>::class.java)
     }
 }
 

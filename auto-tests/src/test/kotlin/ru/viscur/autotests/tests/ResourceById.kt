@@ -13,6 +13,7 @@ class ResourceById {
     fun gettingLocationResourceById() {
         //запрос ресурса Location
         val location = QueRequests.resource(ResourceType.Location, "Office:101")
+
         //проверка, что в ответе соответствующий ресурс
         assertEquals("Office:101", location.id, "wrong resourse in response")
     }

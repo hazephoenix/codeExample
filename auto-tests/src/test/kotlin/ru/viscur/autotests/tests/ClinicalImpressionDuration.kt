@@ -17,8 +17,10 @@ class ClinicalImpressionDuration {
     fun settingDefaultDuration() {
         //установка значения продолжительности обследования RED пациента
         QueRequests.setDefaultDuration("RED", 700)
+
         //получение значения продолжительности обследования RED пациента
         val defaultDurationOfRed = QueRequests.getDefaultDuration().find {it.severity == "RED"}?.defaultDuration
+
         //проверка, что значение установлено
         assertEquals(700, defaultDurationOfRed, "wrong default duration for severity" )
     }
@@ -31,9 +33,11 @@ class ClinicalImpressionDuration {
                 Helpers.createServiceRequestResource("B03.016.002")
         )
         val bundle1 = Helpers.bundle("1120", "GREEN", servRequests)
+
         //получение информации о продолжительности обследования пациента
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientDurationInfo = QueRequests.getPatientsClinicalImpressionDuration().find{it.patientId == patientId}?.duration
+
         //проверка, что существует информация о продолжительности
         assertNotNull(patientDurationInfo)
     }

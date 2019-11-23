@@ -29,6 +29,7 @@ class NextPatient {
 
     @Test
     fun inviteNextWithInQueue() {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -58,6 +59,7 @@ class NextPatient {
 
     @Test
     fun inviteNextWithGoingAndOnObservation() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -95,6 +97,7 @@ class NextPatient {
 
     @Test
     fun inviteNextWithoutNextInQueue() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)

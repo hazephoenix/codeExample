@@ -30,6 +30,7 @@ class PatientLeft {
 
     @Test
     fun onObservationPatientLeft() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -61,6 +62,7 @@ class PatientLeft {
 
     @Test
     fun inQueuePatientLeft() {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)

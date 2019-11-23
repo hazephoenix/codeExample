@@ -29,6 +29,7 @@ class SetPatientAsFirst {
 
     @Test
     fun settingPatientAsFirstOnlyInQueue () {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -62,6 +63,7 @@ class SetPatientAsFirst {
 
     @Test
     fun settingPatientAsFirstWithGoingToObservationAndOnObservation() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -70,12 +72,10 @@ class SetPatientAsFirst {
         val bundle2 = Helpers.bundle("1112", "YELLOW", servRequests)
         val bundle3 = Helpers.bundle("1113", "RED", servRequests)
         val bundle4 = Helpers.bundle("1114", "GREEN", servRequests)
-
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
         val patientId4 = patientIdFromServiceRequests(QueRequests.createPatient(bundle4).resources(ResourceType.ServiceRequest))
-
         QueRequests.inviteNextPatientToOffice(referenceToLocation(office101))
         QueRequests.patientEntered(Helpers.createListResource(patientId1, office101))
 

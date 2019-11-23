@@ -80,6 +80,16 @@ class Helpers {
                     return bundle
         }
 
+        fun bundleForSeverity(): Bundle {
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource("ignored")
+            val bundle = Bundle(entry = listOf(
+                    BundleEntry(bodyWeight),
+                    BundleEntry(questionnaireResponseSeverityCriteria)
+            ))
+            return bundle
+        }
+
         //создание ресурсов
         fun createPatientResource(enp: String, queueStatus: PatientQueueStatus = PatientQueueStatus.READY) = Patient(
                 identifier = listOf(

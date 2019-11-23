@@ -32,6 +32,7 @@ class ForceInvite {
 
     @Test
     fun inQueuePatientForceInviteToOffice() {
+        //создание очереди
         val servReq1 = Helpers.createServiceRequestResource(observation1Office101)
         val bundle = Helpers.bundle("1122", "RED", listOf(servReq1))
 
@@ -58,6 +59,7 @@ class ForceInvite {
 
     @Test
     fun notInQueuePatientForceInviteToOffice() {
+        //создание очереди
         val servReq1 = Helpers.createServiceRequestResource(observation1Office101)
         val bundle = Helpers.bundle("1122", "RED", listOf(servReq1))
 

@@ -35,6 +35,7 @@ class Endpoints {
         const val OBSERVATIONS: String = "$BASE_URI/Observation"
         const val SUPPOSED_SERVICE_REQUEST: String = "$BASE_URI/reception/serviceRequests"
         const val ADD_SERVICE_REQUEST = "$BASE_URI/examination/serviceRequests  "
+
         //examination
         const val COMPLETE_EXAMINATION: String = "$BASE_URI/examination"
         const val PATIENTS_OF_RESP: String = "$BASE_URI/examination/patients"
@@ -52,5 +53,7 @@ class Endpoints {
         const val GET_DEFAULT_DURATION: String = "$BASE_URI/clinicalImpressionDuration/default"
         const val REPORT_QUEUE: String = "$BASE_URI/report/queue"
         const val PRACTITIONER_WORKLOAD = "$BASE_URI/report/workload"
+        const val GET_OBSERVATION_HISTORY_OF_PATIENT = "$BASE_URI/report/observationHistoryOfPatient"
+        const val GET_QUEUE_HISTORY_OF_PATIENT = "$BASE_URI/report/queueHistoryOfPatient"
     }
 }

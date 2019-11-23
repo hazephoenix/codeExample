@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
@@ -14,6 +15,10 @@ import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.SQLException
+import java.util.*
 
 @Disabled("Debug purposes only")
 class QueueReport {
@@ -32,20 +37,20 @@ class QueueReport {
 
     @Test
     fun gettingQueueReport () {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         QueRequests.officeIsBusy(referenceToLocation(office202))
-
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOffice101)
         )
         val servRequests2 = listOf(
                 Helpers.createServiceRequestResource(observationOffice202)
         )
-
         val bundle1 = Helpers.bundle("1120", "GREEN", servRequests)
         val bundle2 = Helpers.bundle("1121", "YELLOW", servRequests2)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+
         //проверка наличия очереди в разные кабинеты
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
@@ -55,10 +60,12 @@ class QueueReport {
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
+
         //получение отчета о полном состоянии очереди
         val queueItems = QueRequests.getQueueReport()
         val queueItemOffice101 = queueItems.find{it.officeId== office101}!!
         val queueItemOffice119 = queueItems.find{it.officeId== office202}!!
+
         //проверка отчета по состоянию очереди
         Assertions.assertEquals(2, queueItems.size, "wrong office number in report")
         Assertions.assertEquals(1,  queueItemOffice101.queueSize, "wrong patient number for $office101")
@@ -67,20 +74,20 @@ class QueueReport {
 
     @Test
     fun gettingOfficeQueueReport () {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         QueRequests.officeIsBusy(referenceToLocation(office202))
-
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOffice101)
         )
         val servRequests2 = listOf(
                 Helpers.createServiceRequestResource(observationOffice202)
         )
-
         val bundle1 = Helpers.bundle("1120", "GREEN", servRequests)
         val bundle2 = Helpers.bundle("1121", "YELLOW", servRequests2)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+
         //проверка наличия очереди в разные кабинеты
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
@@ -90,9 +97,11 @@ class QueueReport {
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
+
         //получение отчета о состоянии очереди в 101
         val queueItems = QueRequests.getOfficeQueueReport(office101)
         val queueItemOffice101 = queueItems.first()
+
         //проверка отчета по состоянию очереди в 101
         Assertions.assertEquals(1, queueItems.size, "wrong office number in report")
         Assertions.assertEquals(office101, queueItemOffice101.officeId, "wrong office id in report")

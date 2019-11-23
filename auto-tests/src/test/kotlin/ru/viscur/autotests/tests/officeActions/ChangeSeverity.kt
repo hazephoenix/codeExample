@@ -31,6 +31,7 @@ class ChangeSeverity {
 
     @Test
     fun GreenToRed() {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -41,15 +42,6 @@ class ChangeSeverity {
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
-
-        //проверка очереди до смены severity
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
 
         //проверка, что очередь отсортирована правильно после смены severity
         QueRequests.changeSeverity(patientId1, "RED")
@@ -64,6 +56,7 @@ class ChangeSeverity {
 
     @Test
     fun RedToGreen() {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -74,15 +67,6 @@ class ChangeSeverity {
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
-
-        //проверка очереди до смены severity
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
 
         //проверка, что очередь отсортирована правильно после смены severity
         QueRequests.changeSeverity(patientId3, "GREEN")
@@ -97,6 +81,7 @@ class ChangeSeverity {
 
     @Test
     fun YellowToYellow() {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
@@ -108,15 +93,6 @@ class ChangeSeverity {
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
 
-        //проверка очереди до смены severity
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-
         //проверка, что очередь не изменилась
         QueRequests.changeSeverity(patientId1, "YELLOW")
         checkQueueItems(listOf(
@@ -127,5 +103,4 @@ class ChangeSeverity {
                 ))
         ))
     }
-
 }

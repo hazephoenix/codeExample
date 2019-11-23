@@ -30,6 +30,7 @@ class DelayGoingToObservation {
 
     @Test
     fun delayPatientWithInQueue() {
+        //создание очереди
         val servReq1 = listOf(Helpers.createServiceRequestResource(observation1Office101))
         val bundleRed1 = Helpers.bundle("1111", "RED", servReq1)
         val bundleRed2 = Helpers.bundle("1112", "RED", servReq1)
@@ -40,7 +41,6 @@ class DelayGoingToObservation {
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed3).resources(ResourceType.ServiceRequest))
         val patientId4 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed4).resources(ResourceType.ServiceRequest))
-
         QueRequests.inviteNextPatientToOffice(referenceToLocation(office101))
         QueRequests.patientEntered(Helpers.createListResource(patientId2, office101))
 
@@ -54,8 +54,10 @@ class DelayGoingToObservation {
                 ))
         ))
 
-        //проверка, что пациент был переставлен в очереди
+        //перестановка пациента в очереди
         QueRequests.delayPatient(referenceToPatient(patientId1))
+
+        //проверка состояния очереди
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.ON_OBSERVATION),
@@ -68,9 +70,9 @@ class DelayGoingToObservation {
 
     @Test
     fun delayPatientWithNoQueueAfter() {
+        //создание очереди
         val servReq1 = listOf(Helpers.createServiceRequestResource(observation1Office101))
         val bundleRed1 = Helpers.bundle("1111", "RED", servReq1)
-
         QueRequests.officeIsReady(referenceToLocation(office101))
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
 

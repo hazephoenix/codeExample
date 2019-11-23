@@ -28,6 +28,7 @@ class CloseOffice {
     }
     @Test
     fun closingOfficeGoingToObservation() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office)
@@ -57,6 +58,7 @@ class CloseOffice {
 
     @Test
     fun closingOfficeInQueue() {
+        //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office)
@@ -78,6 +80,7 @@ class CloseOffice {
 
     @Test
     fun closingOfficeOnObservation() {
+        //создание очереди
         QueRequests.officeIsReady(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation101Office)
