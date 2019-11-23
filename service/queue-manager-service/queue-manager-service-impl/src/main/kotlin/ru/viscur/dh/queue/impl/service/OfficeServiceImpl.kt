@@ -58,7 +58,7 @@ class OfficeServiceImpl(
                 subject = referenceToPatient(id = patientId),
                 location = referenceToLocation(id = officeId),
                 estDuration = estDuration,
-                queueNumber = patientService.queueNumber(patientId)
+                queueCode = patientService.queueCode(patientId)
         )
         val queue = queueService.queueItemsOfOffice(officeId)
         if (toIndex != null) {
@@ -123,7 +123,7 @@ class OfficeServiceImpl(
             val newNextOfficeForPatientInfo = LocationExtensionNextOfficeForPatientInfo(
                     subject = referenceToPatient(patientId),
                     severity = patientService.severity(patientId),
-                    queueNumber = patientService.queueNumber(patientId),
+                    queueCode = patientService.queueCode(patientId),
                     nextOffice = referenceToLocation(nextOfficeId)
             )
             extension.nextOfficeForPatientsInfo = extension.nextOfficeForPatientsInfo + newNextOfficeForPatientInfo

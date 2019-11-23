@@ -2,6 +2,7 @@ package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.*
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.BANDAGE
 import ru.viscur.dh.datastorage.api.util.INSPECTION_ON_RECEPTION
 import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_LINK_ID_SEVERITY
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
@@ -51,7 +52,7 @@ class PatientServiceImpl(
         return enumValueOf(severityStr)
     }
 
-    override fun queueNumber(patientId: String) = clinicalImpressionService.active(patientId).extension.queueNumber
+    override fun queueCode(patientId: String) = clinicalImpressionService.active(patientId).extension.queueCode
 
     override fun updateSeverity(patientId: String, severity: Severity): Boolean {
         var updated = false
@@ -146,31 +147,10 @@ class PatientServiceImpl(
         var patient = bundle.resources(ResourceType.Patient).first()
         val queueCode = patient.identifier?.find { it.type.code() == IdentifierType.QUEUE_CODE.name }?.value
                 ?: throw Exception("Not defined QUEUE_CODE identifier")
-        //код очереди не храним в пациенте, перекладываем в обращение
-        val identifiersWithoutQueueCode = patient.identifier?.filter { it.type.code() != IdentifierType.QUEUE_CODE.name }
-        val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.name }?.value
-        val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
-        //нашли по ЕНП - обновляем, нет - создаем
-        patient = patientByEnp?.let { byEnp ->
-            resourceService.update(ResourceType.Patient, byEnp.id) {
-                identifier = identifiersWithoutQueueCode
-                name = patient.name
-                birthDate = patient.birthDate
-                gender = patient.gender
-                extension.nationality = patient.extension.nationality
-                extension.birthPlace = patient.extension.birthPlace
-            }
-        } ?: let {
-            resourceService.create(patient.apply {
-                id = genId()
-                identifier = identifiersWithoutQueueCode
-                extension.queueStatusUpdatedAt = now()
-                extension.queueStatus = PatientQueueStatus.READY
-            })
-        }
+        patient = creaeteOrUpdatePatient(patient)
 
         val patientId = patient.id
-        clinicalImpressionService.cancelActive(patientId)//todo может лучше сообщать о том, что есть активное обращение?
+        clinicalImpressionService.cancelActive(patientId)
 
         val patientReference = Reference(patient)
         val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport)
@@ -252,7 +232,7 @@ class PatientServiceImpl(
                 supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) },
                 extension = ClinicalImpressionExtension(
                         severity = enumValueOf(severity),
-                        queueNumber = queueCode
+                        queueCode = queueCode
                 )
         ).let { resourceService.create(it) }
         inspectionOnReceptionStart?.run {
@@ -261,6 +241,91 @@ class PatientServiceImpl(
                     INSPECTION_ON_RECEPTION,
                     diagnosticReport.conclusionCode.first().code(),
                     enumValueOf(severity),
+                    inspectionOnReceptionStart,
+                    now
+            )
+        }
+        return patientId
+    }
+
+    @Tx
+    override fun saveFinalPatientDataForBandage(bundle: Bundle): String {
+        var patient = bundle.resources(ResourceType.Patient).first()
+        val queueCode = patient.identifier?.find { it.type.code() == IdentifierType.QUEUE_CODE.name }?.value
+                ?: throw Exception("Not defined QUEUE_CODE identifier")
+        patient = creaeteOrUpdatePatient(patient)
+
+        val patientId = patient.id
+        clinicalImpressionService.cancelActive(patientId)
+
+        val patientReference = Reference(patient)
+        val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport)
+                .firstOrNull()?.let {
+                    resourceService.create(it.apply {
+                        subject = patientReference
+                    })
+                }
+                ?: throw Error("No DiagnosticReport provided")
+        val paramedicReference = diagnosticReport.performer.first()
+        val now = now()
+
+        val bandageServiceRequest = ServiceRequest(code = BANDAGE).let {
+            it.subject = patientReference
+            resourceService.create(it)
+        }
+
+        val carePlan = CarePlan(
+                subject = patientReference,
+                contributor = paramedicReference,
+                status = CarePlanStatus.active,
+                created = now,
+                title = "Маршрутный лист",
+                activity =  listOf(bandageServiceRequest)
+                        .map { CarePlanActivity(outcomeReference = Reference(it)) }
+        ).let { resourceService.create(it) }
+        val claim = bundle.resources(ResourceType.Claim).firstOrNull()?.let {
+            resourceService.create(it.apply {
+                it.patient = patientReference
+            })
+        }
+        val consents = bundle.resources(ResourceType.Consent).map {
+            resourceService.create(it.apply {
+                it.patient = patientReference
+                performer = paramedicReference
+            })
+        }
+        val observations = bundle.resources(ResourceType.Observation).map {
+            resourceService.create(it.apply {
+                subject = patientReference
+                performer = listOf(paramedicReference)
+            })
+        }
+        val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse).map {
+            resourceService.create(it.apply {
+                source = patientReference
+                author = paramedicReference
+            })
+        }
+
+        val inspectionOnReceptionStart = consents.firstOrNull()?.dateTime
+        ClinicalImpression(
+                status = ClinicalImpressionStatus.active,
+                date = inspectionOnReceptionStart ?: now,
+                subject = patientReference,
+                summary = "Заключение: ${diagnosticReport.conclusion}",
+                supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).filterNotNull().map { Reference(it) },
+                extension = ClinicalImpressionExtension(
+                        severity = Severity.GREEN,
+                        queueCode = queueCode,
+                        forBandageOnly = true
+                )
+        ).let { resourceService.create(it) }
+        inspectionOnReceptionStart?.run {
+            observationDurationService.saveToHistory(
+                    patientId,
+                    INSPECTION_ON_RECEPTION,
+                    diagnosticReport.conclusionCode.first().code(),
+                    Severity.GREEN,
                     inspectionOnReceptionStart,
                     now
             )
@@ -291,6 +356,31 @@ class PatientServiceImpl(
         """)
         query.setParameter("criticalTime", criticalTimeForDeletingNextOfficeForPatientsInfo().time)
         return query.resultList.map { it as String }
+    }
+
+    private fun creaeteOrUpdatePatient(patient: Patient): Patient {
+        //код очереди не храним в пациенте, перекладываем в обращение
+        val identifiersWithoutQueueCode = patient.identifier?.filter { it.type.code() != IdentifierType.QUEUE_CODE.name }
+        val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.name }?.value
+        val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
+        //нашли по ЕНП - обновляем, нет - создаем
+        return patientByEnp?.let { byEnp ->
+            resourceService.update(ResourceType.Patient, byEnp.id) {
+                identifier = identifiersWithoutQueueCode
+                name = patient.name
+                birthDate = patient.birthDate
+                gender = patient.gender
+                extension.nationality = patient.extension.nationality
+                extension.birthPlace = patient.extension.birthPlace
+            }
+        } ?: let {
+            resourceService.create(patient.apply {
+                id = genId()
+                identifier = identifiersWithoutQueueCode
+                extension.queueStatusUpdatedAt = now()
+                extension.queueStatus = PatientQueueStatus.READY
+            })
+        }
     }
 
     /**

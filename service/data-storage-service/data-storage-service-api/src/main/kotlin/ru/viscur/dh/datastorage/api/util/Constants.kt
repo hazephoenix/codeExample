@@ -27,6 +27,7 @@ const val OFFICE_117 = "Office:117"
 const val OFFICE_104 = "Office:104"
 const val OFFICE_139 = "Office:139"
 const val OFFICE_149 = "Office:149"
+const val OFFICE_128 = "Office:128"
 const val OFFICE_129 = "Office:129"
 const val OFFICE_130 = "Office:130"
 const val OFFICE_202 = "Office:202"
@@ -44,6 +45,7 @@ const val GREEN_ZONE = "Office:GreenZone"
 
 val GROUP_1 = listOf(
         RECEPTION,
+        OFFICE_128,
         RED_ZONE,
         YELLOW_ZONE_SECTION_1,
         YELLOW_ZONE_SECTION_2,
@@ -92,6 +94,11 @@ val URINE_ANALYSIS_TYPES = listOf(
         "B03.016.006",
         "A09.28.029"
 )
+
+/**
+ * Код услуги "Перевязка"
+ */
+const val BANDAGE = "Перевязка"
 
 /**
  * Код услуги "Первичный осмотр при регистрации обращения"

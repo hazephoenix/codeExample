@@ -30,10 +30,10 @@ interface PatientService {
     fun severity(patientId: String): Severity
 
     /**
-     * Код в очереди, [ru.viscur.dh.fhir.model.type.ClinicalImpressionExtension.queueNumber]
+     * Код в очереди, [ru.viscur.dh.fhir.model.type.ClinicalImpressionExtension.queueCode]
      * Только если есть активное обращение
      */
-    fun queueNumber(patientId: String): String
+    fun queueCode(patientId: String): String
 
     /**
      * Задать степень тяжести пациенту
@@ -76,6 +76,11 @@ interface PatientService {
      * @return id пациента в data-storage
      */
     fun saveFinalPatientData(bundle: Bundle): String
+
+    /**
+     * Сохранение данных регистрации пациента фельдшером для перевязки
+     */
+    fun saveFinalPatientDataForBandage(bundle: Bundle): String
 
     /**
      * Получить список ожидающих осмотра пациентов по id ответственного врача

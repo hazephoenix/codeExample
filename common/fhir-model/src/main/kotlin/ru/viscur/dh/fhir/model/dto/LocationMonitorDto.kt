@@ -35,14 +35,14 @@ data class LocationMonitorDto(
  * @param patientId id пациента
  * @param status статус элемента в очереди, соответствует [PatientQueueStatus]
  * @param severity степень тяжести, соответствует [ru.viscur.dh.fhir.model.enums.Severity]
- * @param queueNumber код в очереди (З-012, Ж-113...)
+ * @param queueCode код в очереди (З-012, Ж-113...)
  */
 data class LocationMonitorQueueItemDto(
         val onum: Int,
         val patientId: String,
         val status: String,
         val severity: String,
-        val queueNumber: String
+        val queueCode: String
 )
 
 /**
@@ -52,12 +52,12 @@ data class LocationMonitorQueueItemDto(
  *
  * @param patientId id пациента
  * @param severity степень тяжести, соответствует [ru.viscur.dh.fhir.model.enums.Severity]
- * @param queueNumber код в очереди (З-012, Ж-113...)
+ * @param queueCode код в очереди (З-012, Ж-113...)
  * @param nextOfficeId id следующего кабинета
  */
 data class LocationMonitorNextOfficeForPatientInfoDto(
         val patientId: String,
         val severity: String,
-        val queueNumber: String,
+        val queueCode: String,
         val nextOfficeId: String
 )

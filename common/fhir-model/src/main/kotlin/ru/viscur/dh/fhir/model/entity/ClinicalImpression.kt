@@ -31,7 +31,7 @@ class ClinicalImpression @JsonCreator constructor(
         @JsonProperty("status") var status: ClinicalImpressionStatus,
         @JsonProperty("date") val date: Date,
         @JsonProperty("subject") val subject: Reference,
-        @JsonProperty("assessor") val assessor: Reference,
+        @JsonProperty("assessor") val assessor: Reference? = null,
         @JsonProperty("supportingInfo") var supportingInfo: List<Reference>,
         @JsonProperty("summary") val summary: String,
         @JsonProperty("extension") val extension: ClinicalImpressionExtension
