@@ -107,17 +107,17 @@ class PatientServiceImpl(
         //определяем отв. специальности -> врачей данной специальностей -> самый "свободный" на рабочем месте будет отв.
         //услуги в маршрутном листе определяются по диагнозу + осмотр отв.
         val responsibleQualifications = responsibleQualificationsPredictor.predict(diagnosis, gender, complaints)
-        val practitionersId = practitionerService.byQualifications(responsibleQualifications)
-        if (practitionersId.isEmpty()) {
+        val respPractitioners = practitionerService.byQualifications(responsibleQualifications)
+        if (respPractitioners.isEmpty()) {
             throw Exception("ERROR. Can't find practitioners by qualifications: ${responsibleQualifications.joinToString()}")
         }
         //todo смотреть кто на работе по локации
         // practitionersId = practitionersId.filter кто на работе сейчас
 
         //берем наименее загруженного врача
-        val responsiblePractitionerId = practitionersId.map { practitionerId ->
-            Pair(patientsToExamine(practitionerId).sumBy { enumValueOf<Severity>(it.severity).workloadWeight }, practitionerId)
-        }.minBy { it.first }!!.second
+        val responsiblePractitionerId = respPractitioners.map { practitioner ->
+            Pair(patientsToExamine(practitioner.id).sumBy { enumValueOf<Severity>(it.severity).workloadWeight }, practitioner)
+        }.sortedWith(compareBy({ it.first }, { it.second.name.first().family })).first().second.id
         val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
 
         val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10.id, diagnosis)
@@ -135,7 +135,7 @@ class PatientServiceImpl(
                 (serviceRequests +
                         ListResource(
                                 title = "Предлагаемый список ответсвенных врачей",
-                                entry = practitionersId.map { practitionerId -> ListResourceEntry(referenceToPractitioner(practitionerId)) }
+                                entry = respPractitioners.map { practitioner -> ListResourceEntry(referenceToPractitioner(practitioner.id)) }
                         )
                         )
                         .map { BundleEntry(it) }
@@ -280,7 +280,7 @@ class PatientServiceImpl(
                 status = CarePlanStatus.active,
                 created = now,
                 title = "Маршрутный лист",
-                activity =  listOf(bandageServiceRequest)
+                activity = listOf(bandageServiceRequest)
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
         val claim = bundle.resources(ResourceType.Claim).firstOrNull()?.let {

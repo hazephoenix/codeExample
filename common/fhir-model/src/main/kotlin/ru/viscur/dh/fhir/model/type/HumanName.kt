@@ -12,14 +12,15 @@ import ru.viscur.dh.fhir.model.enums.HumanNameUse
  * @param use тип: официальное, устаревшее и т.д., [HumanNameUse]
  * @param text представление полного ФИО
  * @param family фамилия
- * @param given набор имен (имя, отчество)
+ * @param given список хранит имя
+ * @param suffix список хранит отчество
  * @param period период, когда это описание имени было катуально
-//todo еще есть suffix, prefix
  */
 class HumanName @JsonCreator constructor(
         @JsonProperty("use") val use: HumanNameUse = HumanNameUse.official,
         @JsonProperty("text") val text: String,
         @JsonProperty("family") val family: String,
         @JsonProperty("given") val given: List<String>,
+        @JsonProperty("suffix") val suffix: List<String>,
         @JsonProperty("period") val period: Period? = null
 )

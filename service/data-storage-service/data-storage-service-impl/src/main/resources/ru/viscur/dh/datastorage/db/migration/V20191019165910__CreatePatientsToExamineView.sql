@@ -16,7 +16,7 @@ from
                     ci.resource -> 'extension' ->> 'severity' as severity
              from clinicalImpression ci
              where ci.resource ->> 'status' = 'active'
-                 and ci.resource -> 'assessor' is not null
+                 and ci.resource -> 'assessor' ->> 'reference' is not null
          ) as ci
          join patient p on p.id = SPLIT_PART(patientRef, '/', 2)
          join (select *

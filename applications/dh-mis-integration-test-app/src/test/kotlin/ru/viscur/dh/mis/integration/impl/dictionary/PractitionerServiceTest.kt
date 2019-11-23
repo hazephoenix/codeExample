@@ -1,0 +1,91 @@
+package ru.viscur.dh.mis.integration.impl.dictionary
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.test.context.SpringBootTest
+import ru.viscur.autotests.utils.Helpers
+import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
+import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
+import ru.viscur.dh.datastorage.api.PractitionerService
+import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.api.util.QUALIFICATION_SURGEON
+import ru.viscur.dh.fhir.model.enums.ResourceType
+
+/**
+ * Created at 23.11.2019 12:28 by SherbakovaMA
+ *
+ * Тест на методы сервиса [PractitionerService]
+ */
+@SpringBootTest(
+        classes = [MisIntegrationTestConfig::class]
+)
+@EnableAutoConfiguration
+@Disabled("Debug purposes only. Test cleans and modifies db. Practitioners ids are for tests only")
+class PractitionerServiceTest {
+
+    @Autowired
+    lateinit var practitionerService: PractitionerService
+
+    @Autowired
+    lateinit var forTestService: ForTestService
+
+    @Autowired
+    lateinit var resourceService: ResourceService
+
+    @Test
+    fun testUpdateAndGet() {
+        val practitionerId = Helpers.surgeonId
+        //предполагается, что изначально нет заблокированных
+        val initAll = practitionerService.all()
+        val initAllByQualification = practitionerService.byQualification(QUALIFICATION_SURGEON)
+        assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = true).size)
+        checkBlocked(practitionerId, false)
+
+        //блокируем врача
+        practitionerService.updateBlocked(practitionerId, true)
+
+        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_SURGEON).size + 1, "количество должно уменьшиться на 1 после блокировки")
+        assertEquals(practitionerService.all().size + 1, practitionerService.all(withBlocked = true).size, "незаблокированных должно быть меньше чем всех на 1")
+        checkBlocked(practitionerId, true)
+
+        //разблокируем врача
+        practitionerService.updateBlocked(practitionerId, false)
+
+        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_SURGEON).size, "количество должно совпадать с начальным")
+        assertEquals(initAll.size, practitionerService.all().size, "количество должно совпадать с начальным")
+        assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = true).size, "все должны быть незаблокированные")
+        checkBlocked(practitionerId, false)
+    }
+
+    private fun checkBlocked(practitionerId: String, value: Boolean) {
+        assertEquals(value, practitionerService.byId(practitionerId).extension.blocked, "непрпавильное значени блокировки у врача $practitionerId")
+    }
+
+    @Test
+    fun testWithBlockedFalse() {
+        //Количество должно совпадать с переданным значением false и значением по умолчанию
+        val practitionerId = Helpers.surgeonId
+        assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = false).size)
+        practitionerService.updateBlocked(practitionerId, true)
+        assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = false).size)
+        practitionerService.updateBlocked(practitionerId, false)
+        assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = false).size)
+    }
+
+    @Test
+    fun testCreate() {
+        val initSize = practitionerService.all().size
+        val createdPractitioner = practitionerService.create(Helpers.createPractitioner())
+        val practitionerId = createdPractitioner.id
+        try {
+            checkBlocked(practitionerId, false)
+            assertEquals(initSize + 1, practitionerService.all().size, "количество врачей должно увеличиться после создания")
+        } finally {
+            resourceService.deleteById(ResourceType.Practitioner, practitionerId)
+        }
+        assertEquals(initSize, practitionerService.all().size, "количество должно быть как в начале проверки")
+    }
+}
