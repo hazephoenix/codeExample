@@ -93,32 +93,6 @@ class ObservationServiceImpl(
      */
     override fun create(patientId: String, observation: Observation, diagnosis: String?, severity: Severity): Observation {
         observation.subject = referenceToPatient(patientId)
-        observation.basedOn?.id?.run {
-            val updatedServiceRequest = resourceService.update(ResourceType.ServiceRequest, this) {
-                extension = extension?.apply { execEnd = now() }
-                        ?: ServiceRequestExtension(execEnd = now())
-                observation.code = this.code
-            }
-            if (diagnosis != null && updatedServiceRequest.extension?.execStart != null) {
-                observationDurationService.saveToHistory(patientId, updatedServiceRequest.code.code(), diagnosis, severity, updatedServiceRequest.extension!!.execStart!!, updatedServiceRequest.extension!!.execEnd!!)
-            }
-        } ?: throw Exception("not defined serviceRequestId in basedOn of observation")
-        //если это кровь, то необходимо автоматом сделать прием мочи
-        //todo пред. версия. если не вернемся к ней, можно удалить
-//        val observationTypeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, observation.code.code())
-//        if (observationTypeConcept.parentCode == BLOOD_ANALYSIS_CATEGORY) {
-//            val urineServiceRequests = serviceRequestService.activeByObservationCategory(patientId, URINE_ANALYSIS_CATEGORY)
-//            urineServiceRequests.forEach {
-//                create(patientId, Observation(
-//                        code = it.code,
-//                        subject = observation.subject,
-//                        performer = listOf(),
-//                        basedOn = Reference(it),
-//                        issued = now()
-//                ), diagnosis, severity)
-//            }
-//        }
-        updateRelated(patientId, observation)
         return resourceService.create(observation)
     }
 
@@ -135,7 +109,6 @@ class ObservationServiceImpl(
             valueSampledData = observation.valueSampledData
             valueString = observation.valueString
         }
-        updateRelated(patientId, updatedObservation)
         return updatedObservation
     }
 
@@ -154,53 +127,6 @@ class ObservationServiceImpl(
                 }
             }
         }
-    }
-
-    /**
-     * Обновить связанные ресурсы -
-     *  статус направления на обследование и маршрутного листа
-     */
-    private fun updateRelated(patientId: String, observation: Observation) {
-        // Обновить статус направления на обследование
-        val updatedServiceRequest = serviceRequestService.updateStatusByObservation(observation)
-        // Обновить статус маршрутного листа
-        updateCarePlan(patientId, updatedServiceRequest.id)
-    }
-
-
-    /**
-     * Обновить соответствующий направлению [ServiceRequest] маршрутный лист [CarePlan]
-     */
-    private fun updateCarePlan(patientId: String, serviceRequestId: String) {
-        getCarePlanByServiceRequestId(serviceRequestId)?.let { carePlan ->
-            resourceService.update(ResourceType.CarePlan, carePlan.id) {
-                val serviceRequests = serviceRequestService.all(patientId)
-                val serviceRequestsWithoutResp = serviceRequests.filter { !it.isInspectionOfResp() }
-                status = when {
-                    serviceRequestsWithoutResp.any { it.status == ServiceRequestStatus.active } -> CarePlanStatus.active
-                    serviceRequestsWithoutResp.all { it.status == ServiceRequestStatus.completed } -> CarePlanStatus.results_are_ready
-                    else -> CarePlanStatus.waiting_results
-                }
-            }
-        }
-    }
-
-    /**
-     * Получить [CarePlan] по id [ServiceRequest]
-     */
-    private fun getCarePlanByServiceRequestId(serviceRequestId: String): CarePlan? {
-        val query = em.createNativeQuery("""
-                select r.resource
-                from CarePlan r
-                where 'ServiceRequest/' || :servReqId in (
-                    select
-                        jsonb_array_elements(rIntr.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
-                    from CarePlan rIntr
-                    where rIntr.id = r.id
-                )
-        """)
-        query.setParameter("servReqId", serviceRequestId)
-        return query.fetchResource()
     }
 
     /**

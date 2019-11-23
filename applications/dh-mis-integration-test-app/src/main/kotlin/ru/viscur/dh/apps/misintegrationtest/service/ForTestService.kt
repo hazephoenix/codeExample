@@ -96,7 +96,7 @@ class ForTestService {
                         subject = referenceToPatient(patientId),
                         estDuration = item.estDuration,
                         location = referenceToLocation(queueOfOffice.officeId),
-                        queueNumber = createQueueNumber(item.severity)
+                        queueCode = createQueueCode(item.severity)
                 ))
             }
         }
@@ -137,7 +137,7 @@ class ForTestService {
                 subject = referenceToPatient(patientId),
                 estDuration = 5 * SECONDS_IN_MINUTE,
                 location = referenceToLocation(officeId),
-                queueNumber = createQueueNumber(severity)
+                queueCode = createQueueCode(severity)
         ))
         return patientId
     }
@@ -211,6 +211,20 @@ class ForTestService {
         ) + servReqs.toServiceRequests(patient.id).map { BundleEntry(it) })
 
         return receptionService.registerPatient(bundle)
+    }
+
+    fun registerPatientForBandage(diagnosisCode: String = "A00.0"): List<ServiceRequest> {
+        val patient = Helpers.createPatientResource(enp = genId())
+        val personalDataConsent = Helpers.createConsentResource()
+        val diagnosticReport = Helpers.createDiagnosticReportResource(diagnosisCode = diagnosisCode, practitionerId = Helpers.paramedicId)
+
+        val bundle = Bundle(entry = listOf(
+                BundleEntry(patient),
+                BundleEntry(diagnosticReport),
+                BundleEntry(personalDataConsent)
+        ))
+
+        return receptionService.registerPatientForBandage(bundle)
     }
 
 
@@ -358,7 +372,7 @@ class ForTestService {
                 "\n\n"
     }
 
-    private fun createQueueNumber(severity: Severity) = severity.display.substring(0, 1) + "00" + counter++
+    private fun createQueueCode(severity: Severity) = severity.display.substring(0, 1) + "00" + counter++
 
     fun compareListOfString(expList: List<String>,actList: List<String>, desc: String) =  Assertions.assertLinesMatch(expList.sorted(), actList.sorted())
 }

@@ -13,6 +13,7 @@ import ru.viscur.dh.apps.misintegrationtest.util.OBSERVATION_IN_OFFICE_101
 import ru.viscur.dh.apps.misintegrationtest.util.OBSERVATION_IN_OFFICE_202
 import ru.viscur.dh.apps.misintegrationtest.util.ServiceRequestSimple
 import ru.viscur.dh.datastorage.api.PatientService
+import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.Gender
 import ru.viscur.dh.fhir.model.enums.Severity
@@ -20,14 +21,14 @@ import ru.viscur.dh.fhir.model.enums.Severity
 /**
  * Created at 21.11.2019 14:29 by SherbakovaMA
  *
- * Проверка того, что отв. предлагает сделать самого "разгруженного" врача
+ * Тест на определение предлагаемого ответственного врача
  */
 @SpringBootTest(
         classes = [MisIntegrationTestConfig::class]
 )
 @EnableAutoConfiguration
 @Disabled("Debug purposes only. Practitioners ids are for tests only")
-class ResponsiblePractitionerPredictorCompareWorkloadTest {
+class ResponsiblePractitionerPredictorTest {
 
     @Autowired
     lateinit var forTestService: ForTestService
@@ -35,8 +36,12 @@ class ResponsiblePractitionerPredictorCompareWorkloadTest {
     @Autowired
     lateinit var patientService: PatientService
 
+    @Autowired
+    lateinit var practitionerService: PractitionerService
+
     @Test
-    fun test() {
+    fun testCompareWorkload() {
+        //Проверка того, что отв. предлагает сделать самого "разгруженного" врача
         forTestService.cleanDb()
         val diagnosisCode = "I80.0"
         val gender = Gender.male
@@ -44,7 +49,7 @@ class ResponsiblePractitionerPredictorCompareWorkloadTest {
         var actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }.find {
             it.performer?.isNotEmpty() ?: false
         }!!.performer!!.first().id
-        Assertions.assertEquals(actual, Helpers.surgeonId)
+        Assertions.assertEquals(Helpers.surgeonId, actual)
 
         val pSr1 = forTestService.registerPatient(
                 severity = Severity.RED,
@@ -62,6 +67,24 @@ class ResponsiblePractitionerPredictorCompareWorkloadTest {
         actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }.find {
             it.performer?.isNotEmpty() ?: false
         }!!.performer!!.first().id
-        Assertions.assertEquals(actual, Helpers.surgeon2Id)
+        Assertions.assertEquals(Helpers.surgeon2Id, actual)
+    }
+
+    @Test
+    fun testIgnoringBlockedPractitioner() {
+        //проверка того, что заблокированный врач не предлагается как отв-ый
+        forTestService.cleanDb()
+
+        practitionerService.updateBlocked(Helpers.surgeonId, true)
+
+        val diagnosisCode = "I80.0"
+        val gender = Gender.male
+        val predictedServRequests = patientService.predictServiceRequests(diagnosisCode, gender.name, listOf())
+        val actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }.find {
+            it.performer?.isNotEmpty() ?: false
+        }!!.performer!!.first().id
+        Assertions.assertEquals(Helpers.surgeon2Id, actual)
+
+        practitionerService.updateBlocked(Helpers.surgeonId, false)
     }
 }

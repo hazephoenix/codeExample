@@ -15,7 +15,7 @@ interface LocationService {
     fun byId(id: String): Location
 
     /**
-     * Все кабинеты, у которых в lastPatientInfo указан пациент [patientId]
+     * Все кабинеты, у которых в [ru.viscur.dh.fhir.model.type.LocationExtension.nextOfficeForPatientsInfo] указан пациент [patientId]
      */
     fun withPatientInNextOfficeForPatientsInfo(patientId: String): List<Location>
 

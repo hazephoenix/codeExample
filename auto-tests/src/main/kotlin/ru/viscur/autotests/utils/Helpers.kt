@@ -31,8 +31,13 @@ class Helpers {
         /**
          * id хирурга
          */
-        const val surgeonId = "хирург_Петров"
-        const val surgeon2Id = "хирург_Иванов"
+        const val surgeonId = "хирург_Иванов"
+        const val surgeon2Id = "хирург_Петров"
+
+        /**
+         * Квалификации
+         */
+        const val QUALIFICATION_SURGEON = "Surgeon"
 
         //создать спецификацию запроса RestApi
         fun createRequestSpec(body: Any): RequestSpecification {
@@ -121,7 +126,7 @@ class Helpers {
                                 type = IdentifierType.QUEUE_CODE
                         )
                 ),
-                name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван", "Алексеевич"))),
+                name = listOf(HumanName(text = "Петров Иван Алексеевич", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
                 birthDate = Date(),
                 gender = Gender.female,
                 extension = PatientExtension(
@@ -291,8 +296,14 @@ class Helpers {
                 supportingInfo = supportingInfo,
                 extension = ClinicalImpressionExtension(
                         severity = severity,
-                        queueNumber = severity.display.substring(0, 1) + "00" + counter++
+                        queueCode = severity.display.substring(0, 1) + "00" + counter++
                 )
+        )
+
+        fun createPractitioner() = Practitioner(
+                id = "ignored",
+                name = listOf(HumanName(text = "Петров Иван Алексеевич", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
+                qualification = PractitionerQualification(code = CodeableConcept(code = QUALIFICATION_SURGEON, systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
         )
     }
 }

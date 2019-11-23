@@ -17,6 +17,7 @@ import ru.viscur.dh.fhir.model.enums.ObservationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.integration.mis.api.ExaminationService
+import ru.viscur.dh.integration.mis.api.ObservationInCarePlanService
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.integration.mis.api.ReportService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -52,6 +53,9 @@ class DurationControlTest {
     lateinit var observationService: ObservationService
 
     @Autowired
+    lateinit var observationInCarePlanService: ObservationInCarePlanService
+
+    @Autowired
     lateinit var patientService: PatientService
 
     @Autowired
@@ -71,9 +75,6 @@ class DurationControlTest {
         ))
         val patientId = servReqsFromRegister.first().subject!!.id!!
 
-        val diagnosis = patientService.preliminaryDiagnosticConclusion(patientId)
-        val severity = patientService.severity(patientId)
-
         listOf(OFFICE_101, OFFICE_202).forEach { officeId ->
             Thread.sleep(1000)
             queueManagerService.officeIsReady(officeId)
@@ -90,7 +91,7 @@ class DurationControlTest {
                         status = ObservationStatus.final,
                         practitionerId = Helpers.diagnosticAssistantId
                 )
-                observationService.create(patientId, observation, diagnosis, severity)
+                observationInCarePlanService.create(observation)
             }
             queueManagerService.patientLeft(patientId, officeId)
         }

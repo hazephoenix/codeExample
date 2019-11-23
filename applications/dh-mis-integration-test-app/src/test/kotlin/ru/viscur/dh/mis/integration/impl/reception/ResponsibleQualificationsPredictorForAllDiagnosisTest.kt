@@ -17,10 +17,10 @@ import ru.viscur.dh.fhir.model.valueSets.ValueSetName
  *
  * Тест, что для ЛЮБОГО диагноза найдется "ответственная" специальность (или неск-ко)
  */
-@SpringBootTest(
-        classes = [MisIntegrationTestConfig::class]
-)
-@EnableAutoConfiguration
+//@SpringBootTest(
+//        classes = [MisIntegrationTestConfig::class]
+//)
+//@EnableAutoConfiguration
 @Disabled("Debug purposes only. Test checks more than 10000 diagnosis - more than 15 minutes")
 class ResponsibleQualificationsPredictorForAllDiagnosisTest {
 
@@ -30,7 +30,7 @@ class ResponsibleQualificationsPredictorForAllDiagnosisTest {
     @Autowired
     lateinit var conceptService: ConceptService
 
-    @Test
+//    @Test
     fun test() {
         val withoutResult = conceptService.allInLastLevel(ValueSetName.ICD_10).map { code ->
             val withoutResult = mutableListOf<String>()

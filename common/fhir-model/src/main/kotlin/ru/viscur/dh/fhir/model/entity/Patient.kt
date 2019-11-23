@@ -21,6 +21,7 @@ import java.util.*
  * @param birthDate дата рождения
  * @param gender пол
  * @param extension доп. поля, [PatientExtension]
+ * @param age возраст (количество полных лет), вычисляемое поле из даты рождения [birthDate]
  */
 class Patient @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),

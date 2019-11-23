@@ -16,4 +16,9 @@ interface ReceptionService {
      * Регистрация в очереди
      */
     fun registerPatient(bundle: Bundle): List<ServiceRequest>
+
+    /**
+     * Регистрация обращения пациента для перевязки
+     */
+    fun registerPatientForBandage(bundle: Bundle): List<ServiceRequest>
 }

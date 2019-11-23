@@ -18,17 +18,17 @@ import java.util.*
  *  @param fireDate дата создания записи
  *  @param subject пациент, ссылка на [Patient] [ru.viscur.dh.fhir.model.entity.Patient]
  *  @param severity степень тяжести пациента
- *  @param queueNumber номер в очереди
+ *  @param queueCode номер в очереди
  *  @param nextOffice кабинет, ссылка на [Location] [ru.viscur.dh.fhir.model.entity.Location]
  */
 class LocationExtensionNextOfficeForPatientInfo @JsonCreator constructor(
         @JsonProperty("fireDate") var fireDate: Date = now(),
         @JsonProperty("subject") var subject: Reference,
         @JsonProperty("severity") var severity: Severity,
-        @JsonProperty("queueNumber") var queueNumber: String,
+        @JsonProperty("queueCode") var queueCode: String,
         @JsonProperty("nextOffice") var nextOffice: Reference
 ) {
     override fun toString(): String {
-        return "LocationExtensionNextOfficeForPatientInfo(fireDate=$fireDate, patientId=${subject.id}, severity=$severity, queueNumber='$queueNumber', nextOfficeId=${nextOffice.id})"
+        return "LocationExtensionNextOfficeForPatientInfo(fireDate=$fireDate, patientId=${subject.id}, severity=$severity, queueCode='$queueCode', nextOfficeId=${nextOffice.id})"
     }
 }

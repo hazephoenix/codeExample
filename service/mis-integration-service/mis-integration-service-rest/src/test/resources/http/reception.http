@@ -594,7 +594,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "B03.016.002",
+              "code": "B03.016.006",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -815,7 +815,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             }
           },
           {
-            "value": "7878 11113",
+            "value": "7878 11114",
             "type": {
               "coding": [
                 {
@@ -827,7 +827,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "use": "official"
           },
           {
-            "value": "7878 77521487",
+            "value": "7878 77521487111111111",
             "type": {
               "coding": [
                 {
@@ -855,11 +855,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "name": [
           {
             "use": "official",
-            "text": "Петров И. А.",
+            "text": "Петров Иван Алексеевич",
             "family": "Петров",
             "given": [
-              "Иван",
-              "Алекссандрович"
+              "Иван"
+            ],
+            "suffix": [
+              "Алексеевич"
             ]
           }
         ],
@@ -1021,6 +1023,107 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         }
       ]
     }}
+  ],
+  "id": "ignored"
+}
+
+###
+
+POST http://localhost:8080/reception/patientForBandage
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "type": "Practitioner"
+          }
+        ],
+        "issued": "2019-10-24T12:01:00.00",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "A00.0",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "preliminary"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "identifier": [
+          {
+            "value": "7878 11114",
+            "type": {
+              "coding": [
+                {
+                  "code": "ENP",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          },
+          {
+            "value": "З-012",
+            "type": {
+              "coding": [
+                {
+                  "code": "QUEUE_CODE",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          }
+        ],
+        "resourceType": "Patient",
+        "name": [
+          {
+            "use": "official",
+            "text": "Петров Иван Алексеевич",
+            "family": "Петров",
+            "given": [
+              "Иван"
+            ],
+            "suffix": [
+              "Алексеевич"
+            ]
+          }
+        ],
+        "birthDate": "2000-10-11T04:07:05.243+0000",
+        "gender": "female",
+        "extension": {
+          "nationality": "Russian",
+          "birthPlace": {
+            "use": "home",
+            "type": "both",
+            "text": "Россия ТО г. Томск",
+            "city": "Tomsk",
+            "state": "TO",
+            "country": "Russia"
+          }
+        },
+        "age": 0
+      }
+    }
   ],
   "id": "ignored"
 }

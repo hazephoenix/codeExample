@@ -9,14 +9,13 @@ import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
-import ru.viscur.dh.datastorage.api.ObservationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
-import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.integration.mis.api.ExaminationService
+import ru.viscur.dh.integration.mis.api.ObservationInCarePlanService
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.QueueManagerService
 
@@ -45,7 +44,7 @@ class CancelServiceRequestsTest {
     lateinit var forTestService: ForTestService
 
     @Autowired
-    lateinit var observationService: ObservationService
+    lateinit var observationInCarePlanService: ObservationInCarePlanService
 
     @Autowired
     lateinit var patientService: PatientService
@@ -336,10 +335,8 @@ class CancelServiceRequestsTest {
         queueManagerService.officeIsReady(officeId)
         queueManagerService.patientEntered(checkP, officeId)
 
-        val diagnosis = patientService.preliminaryDiagnosticConclusion(checkP)
-        val severity = patientService.severity(checkP)
         val observation = Helpers.createObservation(basedOnServiceRequestId = checkSr.first().id)
-        observationService.create(checkP, observation, diagnosis, severity)
+        observationInCarePlanService.create(observation)
 
         //проверка до
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(
@@ -392,10 +389,8 @@ class CancelServiceRequestsTest {
         queueManagerService.officeIsReady(officeId)
         queueManagerService.patientEntered(checkP, officeId)
 
-        val diagnosis = patientService.preliminaryDiagnosticConclusion(checkP)
-        val severity = patientService.severity(checkP)
         val observation = Helpers.createObservation(basedOnServiceRequestId = checkSr.first().id)
-        observationService.create(checkP, observation, diagnosis, severity)
+        observationInCarePlanService.create(observation)
 
         //проверка до
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.OBSERVATION, items = listOf(

@@ -13,13 +13,12 @@ import java.util.*
  *
  * @param nationality национальность
  * @param birthPlace место рождения
-// * @param citizenship гражданство
+ * @param queueStatus статус в очереди, [PatientQueueStatus]
+ * @param queueStatusUpdatedAt дата-время изменения статуса в очереди [queueStatus]
  */
 class PatientExtension @JsonCreator constructor(
         @JsonProperty("nationality") var nationality: String,
         @JsonProperty("birthPlace") var birthPlace: Address,
-        @JsonProperty("queueStatusUpdatedAt") var queueStatusUpdatedAt: Date? = now(),
-        @JsonProperty("queueStatus") var queueStatus: PatientQueueStatus? = PatientQueueStatus.READY
-//        ,
-//        @JsonProperty("citizenship") val citizenship: String todo пока не нужно?
+        @JsonProperty("queueStatus") var queueStatus: PatientQueueStatus? = PatientQueueStatus.READY,
+        @JsonProperty("queueStatusUpdatedAt") var queueStatusUpdatedAt: Date? = now()
 )

@@ -20,13 +20,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:104",
+        "reference": "Location/Office:119",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a",
+        "reference": "Patient/b1ed1ac7-ff57-4b5d-95a3-230f560b5fe3",
         "type": "Patient"
       }
     }
@@ -46,13 +46,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:139",
+        "reference": "Location/Office:119",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/1f647c0c-6783-4285-9cca-ac434a4375af",
+        "reference": "Patient/b1ed1ac7-ff57-4b5d-95a3-230f560b5fe3",
         "type": "Patient"
       }
     }
