@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests.reports
 
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -15,7 +16,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class PractitionerReport {
 
     companion object {
@@ -24,6 +25,7 @@ class PractitionerReport {
         val observationOffice101 = "B03.016.002"
         val observationOffice116 = "A04.16.001"
         val pratitioner101Office = "фельдшер_Колосова"
+        val surgeonId = Helpers.surgeonId
     }
 
     @BeforeEach
@@ -83,5 +85,27 @@ class PractitionerReport {
         Assertions.assertEquals(1, queueItems.size, "wrong office number in report")
         Assertions.assertEquals(office101, queueItemForPractitioner101Office.officeId, "wrong office id in report")
         Assertions.assertEquals(1,  queueItemForPractitioner101Office.queueSize, "wrong patient number for $office101")
+    }
+
+    @Test
+    fun gettingPatientsOfResponsablePractitioner() {
+        //удаление всех активных ClinicalImpression
+        QueRequests.getPatientsOfResponsable().patients.
+                forEach() { patientInfo ->
+                    QueRequests.cancelExamination(patientInfo.patientId)
+                }
+
+        //создание пациентов
+        val servRequests = listOf(
+                Helpers.createServiceRequestResource(observationOffice101)
+        )
+        val bundle1 = Helpers.bundle("1120", "YELLOW", servRequests)
+        val bundle2 = Helpers.bundle("1121", "YELLOW", servRequests)
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        val surgeonPatients =  QueRequests.getPatientsOfResponsable("хирург_Петров").patients
+
+        //проверка, что у хирурга 2 пациента на ответственности
+        assertEquals(2, surgeonPatients.size,"wrong patient number for practitioner: $surgeonId")
     }
 }

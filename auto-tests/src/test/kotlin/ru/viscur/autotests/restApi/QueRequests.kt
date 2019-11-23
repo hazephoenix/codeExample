@@ -206,6 +206,12 @@ class QueRequests {
                         then().statusCode(200).
                         extract().response().`as`(PatientsOfRespResponse::class.java)["patients"]!!
 
+        fun getPatientsOfResponsable(practitionerId: String? = null) =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.PATIENTS_OF_RESP + if (practitionerId == null) "" else "?practitionerId=$practitionerId").
+                        then().statusCode(200).
+                        extract().response().`as`(ActivePatientsInfo::class.java)
+
         //duration and reports
         fun getDefaultDuration() =
                 Helpers.createRequestSpecWithoutBody().`when`().
