@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
+import ru.viscur.dh.apps.paramedicdevice.service.RouteSheetBuilder
 import ru.viscur.dh.common.dto.events.TaskComplete
 import ru.viscur.dh.common.dto.events.TaskError
 import ru.viscur.dh.common.dto.events.TaskRequested
@@ -36,7 +37,8 @@ import javax.print.PrintServiceLookup
 class RoutePrinter(
         @Value("\${route.printer.name:RoutePrinter}")
         private val printerName: String,
-        private val eventPublisher: ApplicationEventPublisher
+        private val eventPublisher: ApplicationEventPublisher,
+        private val routeSheetBuilder: RouteSheetBuilder
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(RoutePrinter::class.java)
@@ -57,7 +59,7 @@ class RoutePrinter(
             try {
                 check(task.payload != null) { "Payload for route print is required!" }
                 eventPublisher.publishEvent(TaskStarted(task))
-                printRoute(task.payload!!)
+                printRoute(task.payload!!["patientId"] as String)
                 task.payload = null
                 eventPublisher.publishEvent(TaskComplete(task))
             } catch (e: Exception) {
@@ -67,11 +69,14 @@ class RoutePrinter(
         }
     }
 
-    private fun printRoute(payload: Map<String, Any>) {
+    private fun printRoute(patientId: String) {
+        if (log.isDebugEnabled) {
+            log.debug("Print route sheet for patientId[$patientId]")
+        }
         val routeSheet = XDocReportRegistry.getRegistry()
                 .loadReport(template, TemplateEngineKind.Velocity)
         val options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.ODFDOM)
-        val context = routeSheet.createContext(payload)
+        val context = routeSheet.createContext(routeSheetBuilder.build(patientId))
         ByteArrayOutputStream().use { os ->
             routeSheet.convert(context, options, os)
             PDDocument.load(os.toByteArray()).use { doc ->
@@ -86,6 +91,9 @@ class RoutePrinter(
                 val job = PrinterJob.getPrinterJob().apply { setPageable(pageable); setPrintService(printService) }
                 job.print()
             }
+        }
+        if (log.isDebugEnabled) {
+            log.debug("Print complete!")
         }
     }
 }
