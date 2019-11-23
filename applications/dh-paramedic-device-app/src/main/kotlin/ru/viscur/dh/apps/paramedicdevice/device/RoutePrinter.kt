@@ -58,6 +58,7 @@ class RoutePrinter(
                 check(task.payload != null) { "Payload for route print is required!" }
                 eventPublisher.publishEvent(TaskStarted(task))
                 printRoute(task.payload!!)
+                task.payload = null
                 eventPublisher.publishEvent(TaskComplete(task))
             } catch (e: Exception) {
                 log.error(e.message, e)
