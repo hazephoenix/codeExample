@@ -59,18 +59,6 @@ val responseToColor = listOf(
         ),
         ResponseToColor(
                 Severity.YELLOW,
-                ValueSetName.PAIN_INTENSITY_ASSESSMENT.id,
-                "From_4_to_10",
-                "уровень боли 4-10"
-        ),
-        ResponseToColor(
-                Severity.GREEN,
-                ValueSetName.PAIN_INTENSITY_ASSESSMENT.id,
-                "From_0_to_3",
-                "уровень боли 0-3"
-        ),
-        ResponseToColor(
-                Severity.YELLOW,
                 ValueSetName.PATIENT_CAN_STAND.id,
                 "Cant_stand",
                 "не может стоять"
@@ -80,6 +68,22 @@ val responseToColor = listOf(
                 ValueSetName.PATIENT_CAN_STAND.id,
                 "Can_stand",
                 "может стоять"
+        ),
+        ResponseToColor(
+                Severity.GREEN,
+                ObservationType.PAIN_INTENSITY.id,
+                null,
+                "уровень боли 0-3",
+                0.0,
+                3.0
+        ),
+        ResponseToColor(
+                Severity.YELLOW,
+                ObservationType.PAIN_INTENSITY.id,
+                null,
+                "уровень боли 4-10",
+                3.0,
+                10.0
         ),
         ResponseToColor(
                 Severity.RED,

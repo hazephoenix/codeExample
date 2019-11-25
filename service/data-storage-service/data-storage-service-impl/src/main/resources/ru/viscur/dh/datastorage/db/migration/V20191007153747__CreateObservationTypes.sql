@@ -13,6 +13,7 @@ select resource_create('{"resourceType": "Concept", "id": "Observation_types:Ele
 select resource_create('{"resourceType": "Concept", "id": "Observation_types:Blood_oxygen_saturation", "code": "Blood_oxygen_saturation", "parentCode": "Vital_signs", "display": "Степень насыщения крови кислородом", "system": "ValueSet/Observation_types"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Observation_types:Weight", "code": "Weight", "parentCode": "Vital_signs", "display": "Вес", "system": "ValueSet/Observation_types"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Observation_types:Height", "code": "Height", "parentCode": "Vital_signs", "display": "Рост", "system": "ValueSet/Observation_types"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Observation_types:Pain_intensity", "code": "Pain_intensity", "parentCode": "Vital_signs", "display": "Интенсивность боли", "system": "ValueSet/Observation_types"}'::jsonb);
 
 
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Inspection", "display": "Осмотры", "id": "Observation_types:Inspection", "priority": "0.1"}'::jsonb);
