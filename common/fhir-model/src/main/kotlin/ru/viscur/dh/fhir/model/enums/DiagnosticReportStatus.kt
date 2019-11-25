@@ -13,5 +13,9 @@ enum class DiagnosticReportStatus {
     /**
      * Окончательный
      */
-    final
+    final,
+    /**
+     * Ведущий синдром
+     */
+    mainSyndrome
 }

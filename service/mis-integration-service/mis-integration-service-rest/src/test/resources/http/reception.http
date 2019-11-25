@@ -22,7 +22,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -36,7 +36,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -63,7 +63,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -90,7 +90,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -103,7 +103,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "d80684b9-d4e2-4b10-b40a-020b8938367d",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -117,7 +117,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -144,7 +144,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -162,7 +162,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "reference": "Practitioner/фельдшер_Колосова",
         "type": "Practitioner"
       },
       "source": {
@@ -278,7 +278,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -292,7 +292,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -319,7 +319,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -346,7 +346,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -359,7 +359,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "d80684b9-d4e2-4b10-b40a-020b8938367d",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -373,7 +373,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -400,7 +400,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -418,7 +418,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "reference": "Practitioner/фельдшер_Колосова",
         "type": "Practitioner"
       },
       "source": {
@@ -557,7 +557,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -571,7 +571,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -608,7 +608,55 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74u",
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "A04.20.001.001",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "A04.28.002.004",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -622,7 +670,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -635,7 +683,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74o",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -649,7 +697,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -662,7 +710,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74p",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -676,7 +724,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -691,7 +739,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae790",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -705,7 +753,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -718,7 +766,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     },
     {
       "resource": {
-        "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae789",
+        "id": "ignored",
         "resourceType": "Observation",
         "status": "final",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -732,7 +780,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -755,7 +803,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -771,6 +819,34 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           }
         ],
         "status": "preliminary"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/фельдшер_Колосова",
+            "type": "Practitioner"
+          }
+        ],
+        "issued": "2019-10-24T12:01:00.00",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "A00.1",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "mainSyndrome"
       }
     },
     {
@@ -849,6 +925,18 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
               ]
             },
             "use": "official"
+          },
+          {
+            "value": "МЛ-1222",
+            "type": {
+              "coding": [
+                {
+                  "code": "CARE_PLAN_CODE",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
           }
         ],
         "resourceType": "Patient",
@@ -886,7 +974,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+        "reference": "Practitioner/фельдшер_Колосова",
         "type": "Practitioner"
       },
       "source": {
@@ -953,8 +1041,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           "answer": [
             {
               "valueCoding": {
-                "code": "RED",
-                "display": "Красный",
+                "code": "YELLOW",
                 "system": "ValueSet/Severity"
               }
             }
@@ -986,43 +1073,83 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         }
       ]
     }},
-    { "resource":  {
-      "id": "2fa4a612-dffe-4382-a03b-804fc48263e7",
-      "resourceType": "ServiceRequest",
-      "status": "active",
-      "subject": {
-        "reference": "Patient/1a77ce5f-8473-4627-84b0-b1ddc5c46364",
-        "type": "Patient"
-      },
-      "code": {
-        "coding": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "QuestionnaireResponse",
+        "status": "completed",
+        "author": {
+          "reference": "Practitioner/фельдшер_Колосова",
+          "type": "Practitioner"
+        },
+        "source": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "questionnaire": "Questionnaire/Common_info",
+        "item": [
           {
-            "code": "СтХир",
-            "display": "Осмотр хирурга",
-            "system": "ValueSet/Observation_types"
+            "linkId": "Entry_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Personal_encounter",
+                  "system": "ValueSet/Entry_types"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "Transportation_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Sitting",
+                  "system": "ValueSet/Transportation_types"
+                }
+              }
+            ]
           }
         ]
-      },
-      "locationReference": [
-        {
-          "reference": "Location/Office:ignored"
-        }
-      ]
-    }},
-    { "resource": {
-      "mode": "working",
-      "status": "current",
-      "resourceType": "ListResource",
-      "id": "12121",
-      "entry": [
-        {
-          "item": {
-            "reference": "Practitioner/хирург_Петров",
-            "type": "Practitioner"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "СтХир",
+              "display": "Осмотр хирурга",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "locationReference": []
+      }
+    },
+    {
+      "resource": {
+        "mode": "working",
+        "status": "current",
+        "resourceType": "ListResource",
+        "id": "ignored",
+        "entry": [
+          {
+            "item": {
+              "reference": "Practitioner/хирург_Петров",
+              "type": "Practitioner"
+            }
           }
-        }
-      ]
-    }}
+        ]
+      }
+    }
   ],
   "id": "ignored"
 }
@@ -1047,7 +1174,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/37030497-7d8b-48ec-a5cf-5f3097c813ac",
+            "reference": "Practitioner/фельдшер_Колосова",
             "type": "Practitioner"
           }
         ],
@@ -1063,6 +1190,34 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           }
         ],
         "status": "preliminary"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/фельдшер_Колосова",
+            "type": "Practitioner"
+          }
+        ],
+        "issued": "2019-10-24T12:01:00.00",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "A00.1",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "mainSyndrome"
       }
     },
     {
@@ -1122,6 +1277,46 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           }
         },
         "age": 0
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "QuestionnaireResponse",
+        "status": "completed",
+        "author": {
+          "reference": "Practitioner/фельдшер_Колосова",
+          "type": "Practitioner"
+        },
+        "source": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "questionnaire": "Questionnaire/Common_info",
+        "item": [
+          {
+            "linkId": "Entry_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Personal_encounter",
+                  "system": "ValueSet/Entry_types"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "Transportation_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Sitting",
+                  "system": "ValueSet/Transportation_types"
+                }
+              }
+            ]
+          }
+        ]
       }
     }
   ],

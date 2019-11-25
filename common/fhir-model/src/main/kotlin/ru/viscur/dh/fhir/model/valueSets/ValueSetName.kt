@@ -59,5 +59,13 @@ enum class ValueSetName(val id: String) {
     /**
      * Коды настроек системы
      */
-    CONFIG_CODES("Config_codes")
+    CONFIG_CODES("Config_codes"),
+    /**
+     * Коды каналов поступления
+     */
+    ENTRY_TYPES("Entry_types"),
+    /**
+     * Коды типов транспортировки
+     */
+    TRANSPORTATION_TYPES("Transportation_types")
 }

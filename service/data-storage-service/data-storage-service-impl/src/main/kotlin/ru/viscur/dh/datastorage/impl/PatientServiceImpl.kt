@@ -87,21 +87,9 @@ class PatientServiceImpl(
         return diagnosticReport?.conclusionCode?.first()?.code()
     }
 
-    override fun finalDiagnosticReport(patientId: String): DiagnosticReport {
-        val query = em.createNativeQuery("""
-            select r.resource
-            from diagnosticReport r
-            where r.resource ->> 'status' = '${DiagnosticReportStatus.final}'
-              and 'DiagnosticReport/' || r.id in (
-                select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
-                from clinicalImpression ci
-                where ci.resource -> 'subject' ->> 'reference' = :patientRef
-                  and ci.resource ->> 'status' = 'active'
-            )""")
-        query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResource()
-                ?: throw Exception("not found final DiagnosticReport for patient with id '$patientId'")
-    }
+    override fun mainSyndrome(patientId: String): DiagnosticReport = diagnosticReport(patientId, DiagnosticReportStatus.mainSyndrome)
+
+    override fun finalDiagnosticReport(patientId: String): DiagnosticReport = diagnosticReport(patientId, DiagnosticReportStatus.final)
 
     override fun predictServiceRequests(diagnosis: String, gender: String, complaints: List<String>): Bundle {
         //определяем отв. специальности -> врачей данной специальностей -> самый "свободный" на рабочем месте будет отв.
@@ -120,7 +108,7 @@ class PatientServiceImpl(
         }.sortedWith(compareBy({ it.first }, { it.second.name.first().family })).first().second.id
         val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
 
-        val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10.id, diagnosis)
+        val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10, diagnosis)
         val observationTypes =
                 (codeMapService.icdToObservationTypes(diagnosisConcept.parentCode!!) +
                         observationTypeOfResponsible).distinct()
@@ -145,22 +133,26 @@ class PatientServiceImpl(
     @Tx
     override fun saveFinalPatientData(bundle: Bundle): String {
         var patient = bundle.resources(ResourceType.Patient).first()
-        val queueCode = patient.identifier?.find { it.type.code() == IdentifierType.QUEUE_CODE.name }?.value
-                ?: throw Exception("Not defined QUEUE_CODE identifier")
+        val queueCode = patient.identifierValue(IdentifierType.QUEUE_CODE)
+        val clinicalImpressionCode = patient.identifier?.find { it.type.code() == IdentifierType.CARE_PLAN_CODE.name }
         patient = creaeteOrUpdatePatient(patient)
 
         val patientId = patient.id
         clinicalImpressionService.cancelActive(patientId)
 
         val patientReference = Reference(patient)
-        val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport)
-                .firstOrNull()?.let {
+        val diagnosticReports = bundle.resources(ResourceType.DiagnosticReport)
+                .map {
                     resourceService.create(it.apply {
+                        id = genId()
                         subject = patientReference
                     })
                 }
-                ?: throw Error("No DiagnosticReport provided")
-        val paramedicReference = diagnosticReport.performer.first()
+        diagnosticReports.find { it.status == DiagnosticReportStatus.mainSyndrome }
+                ?: throw Error("No mainSyndrome provided")
+        val preliminaryDiagnosticReport = diagnosticReports.find { it.status == DiagnosticReportStatus.preliminary }
+                ?: throw Error("No preliminary DiagnosticReport provided")
+        val paramedicReference = diagnosticReports.first().performer.first()
         val now = now()
 
         val serviceRequests = bundle.resources(ResourceType.ServiceRequest)
@@ -179,6 +171,7 @@ class PatientServiceImpl(
         var resultServices = serviceRequests.filterNot { it.code.code() == observationTypeOfResponsible } + serviceRequestOfResponsiblePr
         resultServices = resultServices.map {
             resourceService.create(it.apply {
+                id = genId()
                 subject = patientReference
             })
         }
@@ -195,23 +188,27 @@ class PatientServiceImpl(
         ).let { resourceService.create(it) }
         val claim = bundle.resources(ResourceType.Claim).first().let {
             resourceService.create(it.apply {
+                id = genId()
                 it.patient = patientReference
             })
         }
         val consents = bundle.resources(ResourceType.Consent).map {
             resourceService.create(it.apply {
+                id = genId()
                 it.patient = patientReference
                 performer = paramedicReference
             })
         }
         val observations = bundle.resources(ResourceType.Observation).map {
             resourceService.create(it.apply {
+                id = genId()
                 subject = patientReference
                 performer = listOf(paramedicReference)
             })
         }
         val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse).map {
             resourceService.create(it.apply {
+                id = genId()
                 source = patientReference
                 author = paramedicReference
             })
@@ -224,12 +221,13 @@ class PatientServiceImpl(
 
         val inspectionOnReceptionStart = consents.firstOrNull()?.dateTime
         ClinicalImpression(
+                identifier = listOfNotNull(clinicalImpressionCode),
                 status = ClinicalImpressionStatus.active,
                 date = inspectionOnReceptionStart ?: now,
                 subject = patientReference,
                 assessor = responsiblePractitionerRef, // ответственный врач
-                summary = "Заключение: ${diagnosticReport.conclusion}",
-                supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).map { Reference(it) },
+                summary = "Заключение: ${preliminaryDiagnosticReport.conclusion}",
+                supportingInfo = (consents + observations + questionnaireResponse + diagnosticReports + listOf(claim, carePlan)).map { Reference(it) },
                 extension = ClinicalImpressionExtension(
                         severity = enumValueOf(severity),
                         queueCode = queueCode
@@ -239,7 +237,7 @@ class PatientServiceImpl(
             observationDurationService.saveToHistory(
                     patientId,
                     INSPECTION_ON_RECEPTION,
-                    diagnosticReport.conclusionCode.first().code(),
+                    preliminaryDiagnosticReport.conclusionCode.first().code(),
                     enumValueOf(severity),
                     inspectionOnReceptionStart,
                     now
@@ -251,22 +249,26 @@ class PatientServiceImpl(
     @Tx
     override fun saveFinalPatientDataForBandage(bundle: Bundle): String {
         var patient = bundle.resources(ResourceType.Patient).first()
-        val queueCode = patient.identifier?.find { it.type.code() == IdentifierType.QUEUE_CODE.name }?.value
-                ?: throw Exception("Not defined QUEUE_CODE identifier")
+        val queueCode = patient.identifierValue(IdentifierType.QUEUE_CODE)
+        val clinicalImpressionCode = patient.identifier?.find { it.type.code() == IdentifierType.CARE_PLAN_CODE.name }
         patient = creaeteOrUpdatePatient(patient)
 
         val patientId = patient.id
         clinicalImpressionService.cancelActive(patientId)
 
         val patientReference = Reference(patient)
-        val diagnosticReport = bundle.resources(ResourceType.DiagnosticReport)
-                .firstOrNull()?.let {
+        val diagnosticReports = bundle.resources(ResourceType.DiagnosticReport)
+                .map {
                     resourceService.create(it.apply {
+                        id = genId()
                         subject = patientReference
                     })
                 }
-                ?: throw Error("No DiagnosticReport provided")
-        val paramedicReference = diagnosticReport.performer.first()
+        diagnosticReports.find { it.status == DiagnosticReportStatus.mainSyndrome }
+                ?: throw Error("No mainSyndrome provided")
+        val preliminaryDiagnosticReport = diagnosticReports.find { it.status == DiagnosticReportStatus.preliminary }
+                ?: throw Error("No preliminary DiagnosticReport provided")
+        val paramedicReference = diagnosticReports.first().performer.first()
         val now = now()
 
         val bandageServiceRequest = ServiceRequest(code = BANDAGE).let {
@@ -285,23 +287,27 @@ class PatientServiceImpl(
         ).let { resourceService.create(it) }
         val claim = bundle.resources(ResourceType.Claim).firstOrNull()?.let {
             resourceService.create(it.apply {
+                id = genId()
                 it.patient = patientReference
             })
         }
         val consents = bundle.resources(ResourceType.Consent).map {
             resourceService.create(it.apply {
+                id = genId()
                 it.patient = patientReference
                 performer = paramedicReference
             })
         }
         val observations = bundle.resources(ResourceType.Observation).map {
             resourceService.create(it.apply {
+                id = genId()
                 subject = patientReference
                 performer = listOf(paramedicReference)
             })
         }
         val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse).map {
             resourceService.create(it.apply {
+                id = genId()
                 source = patientReference
                 author = paramedicReference
             })
@@ -309,11 +315,12 @@ class PatientServiceImpl(
 
         val inspectionOnReceptionStart = consents.firstOrNull()?.dateTime
         ClinicalImpression(
+                identifier = listOfNotNull(clinicalImpressionCode),
                 status = ClinicalImpressionStatus.active,
                 date = inspectionOnReceptionStart ?: now,
                 subject = patientReference,
-                summary = "Заключение: ${diagnosticReport.conclusion}",
-                supportingInfo = (consents + observations + questionnaireResponse + listOf(claim, diagnosticReport, carePlan)).filterNotNull().map { Reference(it) },
+                summary = "Заключение: ${preliminaryDiagnosticReport.conclusion}",
+                supportingInfo = (consents + observations + questionnaireResponse + diagnosticReports + listOfNotNull(claim, carePlan)).map { Reference(it) },
                 extension = ClinicalImpressionExtension(
                         severity = Severity.GREEN,
                         queueCode = queueCode,
@@ -324,7 +331,7 @@ class PatientServiceImpl(
             observationDurationService.saveToHistory(
                     patientId,
                     INSPECTION_ON_RECEPTION,
-                    diagnosticReport.conclusionCode.first().code(),
+                    preliminaryDiagnosticReport.conclusionCode.first().code(),
                     Severity.GREEN,
                     inspectionOnReceptionStart,
                     now
@@ -359,8 +366,8 @@ class PatientServiceImpl(
     }
 
     private fun creaeteOrUpdatePatient(patient: Patient): Patient {
-        //код очереди не храним в пациенте, перекладываем в обращение
-        val identifiersWithoutQueueCode = patient.identifier?.filter { it.type.code() != IdentifierType.QUEUE_CODE.name }
+        //код очереди и № маршрутного листа не храним в пациенте, перекладываем в обращение
+        val identifiersWithoutQueueCode = patient.identifier?.filter { it.type.code() !in listOf(IdentifierType.QUEUE_CODE.name, IdentifierType.CARE_PLAN_CODE.name) }
         val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.name }?.value
         val patientByEnp = patientEnp?.let { byEnp(patientEnp) }
         //нашли по ЕНП - обновляем, нет - создаем
@@ -407,5 +414,21 @@ class PatientServiceImpl(
                 }
                 .filterNotNull()
                 .toList()
+    }
+
+    private fun diagnosticReport(patientId: String, status: DiagnosticReportStatus): DiagnosticReport {
+        val query = em.createNativeQuery("""
+            select r.resource
+            from diagnosticReport r
+            where r.resource ->> 'status' = '$status'
+              and 'DiagnosticReport/' || r.id in (
+                select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
+                from clinicalImpression ci
+                where ci.resource -> 'subject' ->> 'reference' = :patientRef
+                  and ci.resource ->> 'status' = 'active'
+            )""")
+        query.setParameter("patientRef", "Patient/$patientId")
+        return query.fetchResource()
+                ?: throw Exception("not found DiagnosticReport with status $status for patient with id '$patientId'")
     }
 }

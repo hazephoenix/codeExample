@@ -8,6 +8,11 @@ select resource_create('{"resourceType": "Questionnaire", "id": "Common_info", "
         {"valueCoding": {"code": "Personal_encounter", "display": "Самообращение", "system": "ValueSet/Entry_types"}},
         {"valueCoding": {"code": "Emergency", "display": "Скорая помощь", "system": "ValueSet/Entry_types"}}
     ]},
+    {"linkId": "Transportation_type", "text": "Транспортировка",  "type": "choice", "answerOption": [
+        {"valueCoding": {"code": "Personal", "display": "Самостоятельно", "system": "ValueSet/Transportation_types"}},
+        {"valueCoding": {"code": "Sitting", "display": "Сидя", "system": "ValueSet/Transportation_types"}},
+        {"valueCoding": {"code": "Lying", "display": "Лежа", "system": "ValueSet/Transportation_types"}}
+    ]},
     {"linkId": "Main_syndrome", "text": "Ведущий синдром", "type": "string"},
     {"linkId": "Pregnancy", "text": "Беременность", "type": "boolean"}
 ]}'::jsonb);
