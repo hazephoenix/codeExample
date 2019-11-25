@@ -5,6 +5,7 @@ import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.BANDAGE
 import ru.viscur.dh.datastorage.api.util.INSPECTION_ON_RECEPTION
 import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_LINK_ID_SEVERITY
+import ru.viscur.dh.datastorage.api.util.REGISTERING
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.datastorage.impl.utils.ResponsibleQualificationsPredictor
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
@@ -135,7 +136,7 @@ class PatientServiceImpl(
         var patient = bundle.resources(ResourceType.Patient).first()
         val queueCode = patient.identifierValue(IdentifierType.QUEUE_CODE)
         val clinicalImpressionCode = patient.identifier?.find { it.type.code() == IdentifierType.CARE_PLAN_CODE.name }
-        patient = creaeteOrUpdatePatient(patient)
+        patient = createOrUpdatePatient(patient)
 
         val patientId = patient.id
         clinicalImpressionService.cancelActive(patientId)
@@ -169,6 +170,10 @@ class PatientServiceImpl(
                 .apply { performer = listOf(referenceToPractitioner(responsiblePractitionerId)) }
 
         var resultServices = serviceRequests.filterNot { it.code.code() == observationTypeOfResponsible } + serviceRequestOfResponsiblePr
+        //регистрация экстренного пациента - услуга оказывается автоматически при регистрации пациента
+        resultServices.find { it.code.code() == REGISTERING }?.apply {
+            status = ServiceRequestStatus.completed
+        }
         resultServices = resultServices.map {
             resourceService.create(it.apply {
                 id = genId()
@@ -186,7 +191,8 @@ class PatientServiceImpl(
                 activity = resultServices
                         .map { CarePlanActivity(outcomeReference = Reference(it)) }
         ).let { resourceService.create(it) }
-        val claim = bundle.resources(ResourceType.Claim).first().let {
+
+        val claim = bundle.resources(ResourceType.Claim).firstOrNull()?.let {
             resourceService.create(it.apply {
                 id = genId()
                 it.patient = patientReference
@@ -227,7 +233,7 @@ class PatientServiceImpl(
                 subject = patientReference,
                 assessor = responsiblePractitionerRef, // ответственный врач
                 summary = "Заключение: ${preliminaryDiagnosticReport.conclusion}",
-                supportingInfo = (consents + observations + questionnaireResponse + diagnosticReports + listOf(claim, carePlan)).map { Reference(it) },
+                supportingInfo = (consents + observations + questionnaireResponse + diagnosticReports + listOfNotNull(claim, carePlan)).map { Reference(it) },
                 extension = ClinicalImpressionExtension(
                         severity = enumValueOf(severity),
                         queueCode = queueCode
@@ -251,7 +257,7 @@ class PatientServiceImpl(
         var patient = bundle.resources(ResourceType.Patient).first()
         val queueCode = patient.identifierValue(IdentifierType.QUEUE_CODE)
         val clinicalImpressionCode = patient.identifier?.find { it.type.code() == IdentifierType.CARE_PLAN_CODE.name }
-        patient = creaeteOrUpdatePatient(patient)
+        patient = createOrUpdatePatient(patient)
 
         val patientId = patient.id
         clinicalImpressionService.cancelActive(patientId)
@@ -365,7 +371,7 @@ class PatientServiceImpl(
         return query.resultList.map { it as String }
     }
 
-    private fun creaeteOrUpdatePatient(patient: Patient): Patient {
+    private fun createOrUpdatePatient(patient: Patient): Patient {
         //код очереди и № маршрутного листа не храним в пациенте, перекладываем в обращение
         val identifiersWithoutQueueCode = patient.identifier?.filter { it.type.code() !in listOf(IdentifierType.QUEUE_CODE.name, IdentifierType.CARE_PLAN_CODE.name) }
         val patientEnp = patient.identifier?.find { it.type.code() == IdentifierType.ENP.name }?.value

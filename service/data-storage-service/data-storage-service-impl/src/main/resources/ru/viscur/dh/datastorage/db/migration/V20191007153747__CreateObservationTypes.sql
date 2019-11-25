@@ -27,6 +27,7 @@ select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observat
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Colonoscopy", "display": "Колоноскопия", "id": "Observation_types:Colonoscopy"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": null, "code": "Bandage", "display": "Перевязка", "id": "Observation_types:Bandage"}'::jsonb);
 
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": "Inspection", "code": "B01.044.001", "display": "Регистрация экстренного пациента", "id": "Observation_types:B01.044.001"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": "Inspection", "code": "Clinical_impression", "display": "Обращение в скорую помощь", "id": "Observation_types:Clinical_impression"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": "Inspection", "code": "Inspection_on_reception", "display": "Первичный осмотр при регистрации обращения", "id": "Observation_types:Inspection_on_reception"}'::jsonb);
 -- select resource_create('{"resourceType": "Concept", "system": "ValueSet/Observation_types", "parentCode": "Inspection", "code": "СтФтизиатр", "display": "Осмотр (консультация) врача фтизиатра в стационаре", "id": "Observation_types:СтФтизиатр.Inspection_of_a_TB_doctor"}'::jsonb);

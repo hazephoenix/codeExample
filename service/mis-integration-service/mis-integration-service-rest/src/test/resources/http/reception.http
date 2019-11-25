@@ -523,41 +523,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     {
       "resource": {
         "id": "ignored",
-        "resourceType": "Claim",
-        "identifier": [
-          {
-            "value": "12382(Номер обращения)",
-            "type": {
-              "coding": [
-                {
-                  "code": "CLAIM_NUMBER",
-                  "system": "ValueSet/Identifier_types"
-                }
-              ]
-            },
-            "use": "official"
-          }],
-        "status": "active",
-        "accident": {
-          "date": "2019-01-01T00:57:04.242+0000",
-          "type": {
-            "coding": [
-              {
-                "code": "travma(еще нет кодов)",
-                "system": "ValueSet/Claim_accident_types"
-              }
-            ]
-          }
-        },
-        "patient": {
-          "reference": "Patient/ignored",
-          "type": "Patient"
-        }
-      }
-    },
-    {
-      "resource": {
-        "id": "ignored",
         "resourceType": "Observation",
         "status": "registered",
         "issued": "1970-01-01T00:57:04.242+0000",
@@ -1275,8 +1240,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "state": "TO",
             "country": "Russia"
           }
-        },
-        "age": 0
+        }
       }
     },
     {

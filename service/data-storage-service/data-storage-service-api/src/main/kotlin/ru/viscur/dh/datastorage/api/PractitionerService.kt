@@ -21,6 +21,11 @@ interface PractitionerService {
     fun create(practitioner: Practitioner): Practitioner
 
     /**
+     * Редактирование мед. работника
+     */
+    fun update(practitioner: Practitioner): Practitioner
+
+    /**
      * Мед. работник по [id]
      */
     fun byId(id: String): Practitioner

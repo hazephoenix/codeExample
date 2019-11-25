@@ -34,6 +34,12 @@ class PractitionerController(
     fun create(@RequestBody practitioner: Practitioner) = practitionerService.create(practitioner)
 
     /**
+     * see [PractitionerService.update]
+     */
+    @PutMapping
+    fun update(@RequestBody practitioner: Practitioner) = practitionerService.update(practitioner)
+
+    /**
      * see [PractitionerService.updateBlocked]
      */
     @PostMapping("blocked")

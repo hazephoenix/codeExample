@@ -102,6 +102,11 @@ const val BANDAGE = "Перевязка"
 const val INSPECTION_ON_RECEPTION = "Inspection_on_reception"
 
 /**
+ * Код услуги "Регистрация экстренного пациента"
+ */
+const val REGISTERING = "B01.044.001"
+
+/**
  * Код услуги "Обращение в скорую помощь" (в целом: от регистрации до завершения)
  */
 const val CLINICAL_IMPRESSION = "Clinical_impression"

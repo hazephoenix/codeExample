@@ -124,7 +124,6 @@ class Helpers {
         fun createClaimResource(patientId: String = "ignore", id: String = genId()): Claim {
             return Claim(
                     id = id,
-                    identifier = listOf(Identifier(value = "123/012345", type = CodeableConcept(systemId = ValueSetName.IDENTIFIER_TYPES.id, code = IdentifierType.CLAIM_NUMBER.toString()))),//номер обращения
                     patient = referenceToPatient(patientId),
                     accident = ClaimAccident(
                             date = Date(), //дата и время происшествия

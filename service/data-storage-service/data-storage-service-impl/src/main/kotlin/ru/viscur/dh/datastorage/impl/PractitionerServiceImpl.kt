@@ -35,6 +35,14 @@ class PractitionerServiceImpl(
         id = genId()
     })
 
+    override fun update(practitioner: Practitioner): Practitioner = resourceService.update(ResourceType.Practitioner, practitioner.id) {
+        identifier = practitioner.identifier
+        name = practitioner.name
+        gender = practitioner.gender
+        qualification = practitioner.qualification
+        extension = practitioner.extension
+    }
+
     override fun byId(id: String): Practitioner = resourceService.byId(ResourceType.Practitioner, id)
 
     override fun byQualifications(codes: List<String>): List<Practitioner> {
