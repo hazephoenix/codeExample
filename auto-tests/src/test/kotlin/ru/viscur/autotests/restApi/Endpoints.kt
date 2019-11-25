@@ -55,5 +55,14 @@ class Endpoints {
         const val PRACTITIONER_WORKLOAD = "$BASE_URI/report/workload"
         const val GET_OBSERVATION_HISTORY_OF_PATIENT = "$BASE_URI/report/observationHistoryOfPatient"
         const val GET_QUEUE_HISTORY_OF_PATIENT = "$BASE_URI/report/queueHistoryOfPatient"
+        //dictionaries
+        const val GET_PRACTITIONERS = "$BASE_URI/practitioner"
+        const val BLOCK_PRACTITIONER = "$BASE_URI/practitioner/blocked"
+        const val GET_PRACTITIONER_BY_ID = "$BASE_URI/practitioner/byId"
+        const val GET_ICD_TO_OBSERVATION_TYPES = "$BASE_URI/dictionary/icdToObservationTypes"
+        const val GET_OBSERVATION_TYPES = "$BASE_URI/dictionary/Observation_types"
+        const val GET_ICD_TO_PRACTITIONER_QUALIFICATION = "$BASE_URI/dictionary/icdToPractitionerQualifications"
+        const val GET_RESP_QUALIFICATION_TO_OBSERVATION_TYPES = "$BASE_URI/dictionary/respQualificationToObservationTypes"
+        const val GET_OFFICES = "$BASE_URI/dictionary/offices"
     }
 }

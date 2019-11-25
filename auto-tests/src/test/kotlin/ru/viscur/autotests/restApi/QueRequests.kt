@@ -33,16 +33,22 @@ class QueRequests {
                         get(Endpoints.RECALC_QUEUE_CONFIG).
                         then().statusCode(200)
 
-        fun deleteQue() = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
-                `when`().delete(Endpoints.QUE_DELETE_ALL).then().statusCode(200)
+        fun deleteQue() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        delete(Endpoints.QUE_DELETE_ALL).
+                        then().statusCode(200)
 
-        fun getOfficeQue(officeRef: Reference) = Helpers.createRequestSpec(officeRef).
-                `when`().get(Endpoints.OFFICE_QUE).
-                then().statusCode(200).extract().response().`as`(Bundle::class.java)
+        fun getOfficeQue(officeRef: Reference) =
+                Helpers.createRequestSpec(officeRef).`when`().
+                        get(Endpoints.OFFICE_QUE).
+                        then().statusCode(200).
+                        extract().response().`as`(Bundle::class.java)
 
-        fun queueItems() = RestAssured.given().auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").
-                `when`().get(Endpoints.QUE_ITEMS).
-                then().statusCode(200).extract().response().`as`(QueueItemsResponse::class.java)
+        fun queueItems() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.QUE_ITEMS).
+                        then().statusCode(200).
+                        extract().response().`as`(QueueItemsResponse::class.java)
 
         //patient
         fun addPatientToQue(patientRef: Reference) =
@@ -54,6 +60,7 @@ class QueRequests {
                 Helpers.createRequestSpec(patientRef).`when`().
                         delete(Endpoints.QUE_DELETE_PATIENT).
                         then().statusCode(200)
+
         fun setPatientFirst(patientAndOfficeRef: ListResource) =
                 Helpers.createRequestSpec(patientAndOfficeRef).`when`().
                         post(Endpoints.SET_PATIENT_FIRST).
@@ -116,12 +123,14 @@ class QueRequests {
         fun createPatient(bundle : Bundle) =
                 Helpers.createRequestSpec(bundle).`when`().
                         post(Endpoints.CREATE_PATIENT).
-                        then().log().all().statusCode(200).extract().response().`as`(Bundle::class.java)
+                        then().log().all().statusCode(200).
+                        extract().response().`as`(Bundle::class.java)
 
-        fun <T> resource(resourceType: ResourceType<T>, id: String): T
-                where T : BaseResource =
-                Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.BASE_URI + "/" + resourceType.id.toString() + "/" + id).then().statusCode(200)
-                        .extract().response().`as`(resourceType.entityClass)
+        fun <T> resource(resourceType: ResourceType<T>, id: String): T where T : BaseResource =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.BASE_URI + "/" + resourceType.id.toString() + "/" + id).
+                        then().statusCode(200).
+                        extract().response().`as`(resourceType.entityClass)
 
         //observation
         fun startObservation(serviceRequestId: String) =
@@ -263,6 +272,55 @@ class QueRequests {
                         get(Endpoints.GET_QUEUE_HISTORY_OF_PATIENT).
                         then().log().all().statusCode(200).
                         extract().response().`as`(Array<PatientQueueHistoryInfo>::class.java)
+
+        //dictionaries
+        fun getPractitioners(withBlocked: Boolean? = null) =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.GET_PRACTITIONERS + if (withBlocked == null) "" else "?withBlocked=$withBlocked").
+                        then().statusCode(200).
+                        extract().response().`as`(Array<Practitioner>::class.java)
+
+        fun blockPractitioner(practitionerId: String, value: Boolean) =
+                Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId, "value" to value)).`when`().
+                        post(Endpoints.BLOCK_PRACTITIONER).
+                        then().statusCode(200)
+
+        fun getPractitionerById(practitionerId: String) =
+                Helpers.createRequestWithQuery(mapOf("id" to practitionerId)).`when`().
+                        get(Endpoints.GET_PRACTITIONER_BY_ID).
+                        then().statusCode(200).
+                        extract().response().`as`(Practitioner::class.java)
+
+        fun getIcdToObservationTypes() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.GET_ICD_TO_OBSERVATION_TYPES).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<CodeMap>::class.java)
+
+        fun getObservationTypes(parentCode: String? = null) =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.GET_OBSERVATION_TYPES + if (parentCode == null) "" else "?parentCode=$parentCode").
+                        then().statusCode(200).
+                        extract().response().`as`(Array<Concept>::class.java)
+
+        fun getIcdToPractitionerQualification() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.GET_ICD_TO_PRACTITIONER_QUALIFICATION).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<CodeMap>::class.java)
+
+        fun getRespQualificationToObservationTypes() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.GET_RESP_QUALIFICATION_TO_OBSERVATION_TYPES).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<CodeMap>::class.java)
+
+        fun getOffices() =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.GET_OFFICES).
+                        then().statusCode(200).
+                        extract().response().`as`(Array<Location>::class.java)
+
     }
 }
 
