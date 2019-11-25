@@ -58,6 +58,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "start": "2019-11-01T00:57:04.242+0000",
   "end": "2019-11-20T00:57:04.242+0000"
 }
+###                                              Маршрутный лист для печати
+###
+GET http://localhost:8080/report/carePlan?patientId=71494710-5cb8-484d-a208-223fec118b07
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
 
 ###                                              Информация об очередях в кабинет за период
 ###

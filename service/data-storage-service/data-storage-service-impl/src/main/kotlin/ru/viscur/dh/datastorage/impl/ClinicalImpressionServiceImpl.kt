@@ -3,6 +3,9 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
+import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_ID_COMMON_INFO
+import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_LINK_ID_ENTRY_TYPE
+import ru.viscur.dh.datastorage.api.util.QUESTIONNAIRE_LINK_ID_TRANSPORTATION_TYPE
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -133,8 +136,24 @@ class ClinicalImpressionServiceImpl(
         return completedClinicalImpression
     }
 
+    override fun entryType(clinicalImpression: ClinicalImpression) =
+            responseCode(clinicalImpression, QUESTIONNAIRE_ID_COMMON_INFO, QUESTIONNAIRE_LINK_ID_ENTRY_TYPE)
+
+    override fun transportationType(clinicalImpression: ClinicalImpression) =
+            responseCode(clinicalImpression, QUESTIONNAIRE_ID_COMMON_INFO, QUESTIONNAIRE_LINK_ID_TRANSPORTATION_TYPE)
+
+    /**
+     * Код ответа на вопрос с [linkId] в опроснике [questionnaireId]
+     */
+    private fun responseCode(clinicalImpression: ClinicalImpression, questionnaireId: String, linkId: String) =
+            getResources(clinicalImpression.supportingInfo, ResourceType.QuestionnaireResponse)
+                    .map { resourceService.byId(ResourceType.QuestionnaireResponse, it.id) }
+                    .find { it.questionnaire == "Questionnaire/$questionnaireId" }
+                    ?.item?.find { it.linkId == linkId }?.answer?.first()?.valueCoding?.code
+                    ?: throw Exception("not found answer for questionnaire $questionnaireId and linkId $linkId for" +
+                            " patient with id '${clinicalImpression.subject.id}' (clinicalImpressionId: '${clinicalImpression.id}')")
+
     private fun <T> getResources(references: List<Reference>, resourceType: ResourceType<T>): List<T>
             where T : BaseResource =
             references.filter { it.type == resourceType.id }.map { resourceService.byId(resourceType, it.id!!) }
-
 }

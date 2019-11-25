@@ -1,6 +1,7 @@
 package ru.viscur.dh.fhir.model.entity
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import ru.viscur.dh.fhir.model.enums.Gender
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -30,6 +31,9 @@ class Patient @JsonCreator constructor(
         @JsonProperty("name") var name: List<HumanName>,
         @JsonProperty("birthDate") var birthDate: Date,
         @JsonProperty("gender") var gender: Gender,
-        @JsonProperty("extension") val extension: PatientExtension,
-        @JsonProperty("age") var age: Int = birthDate.toAge()
-) : BaseResource(id, identifier, resourceType)
+        @JsonProperty("extension") val extension: PatientExtension
+) : BaseResource(id, identifier, resourceType) {
+
+    @JsonIgnore
+    val age: Int = birthDate.toAge()
+}

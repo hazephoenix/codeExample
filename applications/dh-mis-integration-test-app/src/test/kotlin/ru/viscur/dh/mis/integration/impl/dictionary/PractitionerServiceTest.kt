@@ -12,7 +12,10 @@ import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.api.util.QUALIFICATION_SURGEON
+import ru.viscur.dh.fhir.model.entity.Practitioner
+import ru.viscur.dh.fhir.model.enums.Gender
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.PractitionerExtension
 
 /**
  * Created at 23.11.2019 12:28 by SherbakovaMA
@@ -83,6 +86,33 @@ class PractitionerServiceTest {
         try {
             checkBlocked(practitionerId, false)
             assertEquals(initSize + 1, practitionerService.all().size, "количество врачей должно увеличиться после создания")
+        } finally {
+            resourceService.deleteById(ResourceType.Practitioner, practitionerId)
+        }
+        assertEquals(initSize, practitionerService.all().size, "количество должно быть как в начале проверки")
+    }
+
+    @Test
+    fun testUpdate() {
+        val initSize = practitionerService.all().size
+        val createdPractitioner = practitionerService.create(Helpers.createPractitioner().apply { gender = Gender.male })
+        val practitionerId = createdPractitioner.id
+        try {
+            checkBlocked(practitionerId, false)
+            val newValues = Practitioner(
+                    id = practitionerId,
+                    identifier = createdPractitioner.identifier,
+                            name = createdPractitioner.name,
+                            gender = Gender.female,
+                            qualification = createdPractitioner.qualification,
+                            extension = PractitionerExtension(blocked = true)
+            )
+            val updatedPractitioner = practitionerService.update(newValues)
+            val updatedPractitionerId = updatedPractitioner.id
+            assertEquals(practitionerId, updatedPractitionerId, "id врача не должен был измениться")
+            val actual = practitionerService.byId(updatedPractitionerId)
+            checkBlocked(practitionerId, true)
+            assertEquals(newValues.gender, actual.gender, "пол должен был обновиться")
         } finally {
             resourceService.deleteById(ResourceType.Practitioner, practitionerId)
         }

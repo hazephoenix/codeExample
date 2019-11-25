@@ -52,6 +52,12 @@ interface PatientService {
     fun preliminaryDiagnosticConclusion(patientId: String): String?
 
     /**
+     * Ведущий синдром
+     * Если не найден - падение
+     */
+    fun mainSyndrome(patientId: String): DiagnosticReport
+
+    /**
      * Окончательный диагноз
      * Если не найден - падение
      */

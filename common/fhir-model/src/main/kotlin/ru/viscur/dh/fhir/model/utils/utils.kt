@@ -2,11 +2,14 @@ package ru.viscur.dh.fhir.model.utils
 
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.ClinicalImpression
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
+import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
+import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -101,6 +104,15 @@ fun Date?.toStringFmt(): String? {
     return sdf.format(this)
 }
 
+/**
+ * Дата в формате строки yyyy.MM.dd
+ */
+fun Date.toStringWithoutTime(): String {
+    val pattern = "yyyy.MM.dd"
+    val sdf = SimpleDateFormat(pattern)
+    return sdf.format(this)
+}
+
 fun genId() = UUID.randomUUID().toString()
 
 /**
@@ -152,6 +164,18 @@ fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execSt
  * Назначение является осмотром ответственного - если указан исполнитель
  */
 fun ServiceRequest.isInspectionOfResp() = !this.performer.isNullOrEmpty()
+
+/**
+ * Значение [BaseResource.identifier] определенного типа
+ * Если не нашел - падение
+ */
+fun BaseResource.identifierValue(type: IdentifierType) = identifierValueNullable(type)
+        ?:throw Exception("not found identifier with type '$type' of resource '${this.resourceType}' with id: '${this.id}'")
+
+/**
+ * Значение [BaseResource.identifier] определенного типа
+ */
+fun BaseResource.identifierValueNullable(type: IdentifierType) = this.identifier?.find { it.type.code() == type.name }?.value
 
 /**
  * Критичное время для удаления [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]

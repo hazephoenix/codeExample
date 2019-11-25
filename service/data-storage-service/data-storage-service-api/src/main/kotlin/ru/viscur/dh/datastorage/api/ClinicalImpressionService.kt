@@ -2,6 +2,7 @@ package ru.viscur.dh.datastorage.api
 
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.Coding
 
 /**
  * Сервис для работы с обращениями пациентов
@@ -47,4 +48,14 @@ interface ClinicalImpressionService {
      * Завершить активное обращение пациента
      */
     fun complete(clinicalImpression: ClinicalImpression): ClinicalImpression
+
+    /**
+     * Канал поступления (код)
+     */
+    fun entryType(clinicalImpression: ClinicalImpression): String
+
+    /**
+     * Тип транспортировки (код)
+     */
+    fun transportationType(clinicalImpression: ClinicalImpression): String
 }

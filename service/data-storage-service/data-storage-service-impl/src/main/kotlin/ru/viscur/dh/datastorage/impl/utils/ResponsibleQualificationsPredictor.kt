@@ -23,11 +23,11 @@ class ResponsibleQualificationsPredictor(
         var qualifications = codeMapService.icdToPractitionerQualifications(diagnosis)
         //фильтруем по связанному полу. Для мужчин отсеивается гинеколог
         qualifications = qualifications.filter {
-            val qualification = conceptService.byCode(ValueSetName.PRACTITIONER_QUALIFICATIONS.id, it.code)
+            val qualification = conceptService.byCode(ValueSetName.PRACTITIONER_QUALIFICATIONS, it.code)
             val relativeGender = qualification.relativeGender
             relativeGender.isNullOrEmpty() || relativeGender == gender
         }
-        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS.id, complaints)
+        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
         //случай, если у пациента есть жалобы, указанные в условиях назначения отв. специалиста (например, с сильной болью направляем к хирургу при I70-I79)
         val qualificationsFilteredByComplaints = qualifications.filter { qualification ->
             complaintCodes.any { complaintCode ->

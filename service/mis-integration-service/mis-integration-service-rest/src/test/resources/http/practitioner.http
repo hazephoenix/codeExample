@@ -14,7 +14,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 {}
 ###
 
-GET http://localhost:8080/practitioner/byId?id=хирург_Иванов
+GET http://localhost:8080/practitioner/byId?id=хирург_Петров
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -68,6 +68,43 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   },
   "extension": {
     "blocked": false
+  }
+}
+###
+
+PUT http://localhost:8080/practitioner
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "id": "хирург_Петров",
+  "resourceType": "Practitioner",
+  "name": [
+    {
+      "use": "official",
+      "text": "Отредактированный Петр Валерьевич",
+      "family": "Отредактированный",
+      "given": [
+        "Петр"
+      ],
+      "suffix": [
+        "Валерьевич"
+      ]
+    }
+  ],
+  "gender": "male",
+  "qualification": {
+    "code": {
+      "coding": [
+        {
+          "code": "Surgeon",
+          "system": "ValueSet/Practitioner_qualifications"
+        }
+      ]
+    }
+  },
+  "extension": {
+    "blocked": true
   }
 }
 ###
