@@ -6,6 +6,7 @@ import ru.viscur.dh.fhir.model.enums.Gender
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.HumanName
 import ru.viscur.dh.fhir.model.type.Identifier
+import ru.viscur.dh.fhir.model.type.PractitionerExtension
 import ru.viscur.dh.fhir.model.type.PractitionerQualification
 import ru.viscur.dh.fhir.model.utils.genId
 
@@ -18,6 +19,7 @@ import ru.viscur.dh.fhir.model.utils.genId
  * @param name информация о ФИО
  * @param gender пол
  * @param qualification квалификация специалиста, [PractitionerQualification]
+ * @param extension доп. поля, [PractitionerExtension]
  */
 class Practitioner @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
@@ -25,5 +27,6 @@ class Practitioner @JsonCreator constructor(
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Practitioner.id,
         @JsonProperty("name") val name: List<HumanName>,
         @JsonProperty("gender") val gender: Gender = Gender.unknown,
-        @JsonProperty("qualification") val qualification: PractitionerQualification
+        @JsonProperty("qualification") val qualification: PractitionerQualification,
+        @JsonProperty("extension") val extension: PractitionerExtension = PractitionerExtension()
 ) : BaseResource(id, identifier, resourceType)

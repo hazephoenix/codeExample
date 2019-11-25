@@ -123,10 +123,15 @@ class ClinicalImpressionServiceImpl(
     }
 
     @Tx
-    override fun complete(clinicalImpression: ClinicalImpression): ClinicalImpression =
-            resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
-                status = ClinicalImpressionStatus.completed
-            }
+    override fun complete(clinicalImpression: ClinicalImpression): ClinicalImpression {
+        val completedClinicalImpression = resourceService.update(ResourceType.ClinicalImpression, clinicalImpression.id) {
+            status = ClinicalImpressionStatus.completed
+        }
+        getResources(completedClinicalImpression.supportingInfo, ResourceType.CarePlan).firstOrNull()?.run {
+            carePlanService.complete(this.id)
+        }
+        return completedClinicalImpression
+    }
 
     private fun <T> getResources(references: List<Reference>, resourceType: ResourceType<T>): List<T>
             where T : BaseResource =

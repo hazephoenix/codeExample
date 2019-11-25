@@ -3,7 +3,6 @@ package ru.viscur.dh.integration.mis.rest
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.CodeMapService
 import ru.viscur.dh.datastorage.api.ConceptService
-import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.fhir.model.utils.valueSetNameById
 import ru.viscur.dh.queue.api.OfficeService
 
@@ -17,8 +16,7 @@ import ru.viscur.dh.queue.api.OfficeService
 class DictionaryController(
         private val codeMapService: CodeMapService,
         private val officeService: OfficeService,
-        private val conceptService: ConceptService,
-        private val practitionerService: PractitionerService
+        private val conceptService: ConceptService
 ) {
 
     /**
@@ -54,11 +52,4 @@ class DictionaryController(
      */
     @GetMapping("/offices")
     fun offices() = officeService.all()
-
-    /**
-     * Все мед. работники
-     */
-    @GetMapping("/practitioners")
-    fun practitioners() = practitionerService.all()
-
 }

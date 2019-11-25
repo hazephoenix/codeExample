@@ -10,4 +10,11 @@ interface CarePlanService {
      * Получить текущий маршрутный лист пациента
      */
     fun current(patientId: String): CarePlan?
+
+    /**
+     * Получить [CarePlan] по id [ServiceRequest]
+     */
+    fun byServiceRequestId(serviceRequestId: String): CarePlan?
+
+    fun complete(carePlanId: String)
 }

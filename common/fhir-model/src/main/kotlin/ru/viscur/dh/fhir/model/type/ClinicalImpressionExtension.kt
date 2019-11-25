@@ -10,9 +10,11 @@ import ru.viscur.dh.fhir.model.enums.Severity
  * Доп. поля для [ru.viscur.dh.fhir.model.entity.ClinicalImpression]
  *
  * @param severity степень тяжести пациента на текущее обращение
- * @param queueNumber отображаемый код для очереди. Например: З-12/Ж-122 - степень тяжести + №п/п от начала смены
+ * @param queueCode отображаемый код для очереди. Например: З-12/Ж-122 - степень тяжести + №п/п от начала смены
+ * @param forBandageOnly обращение выполняется только для выполнения перевязки
  */
 class ClinicalImpressionExtension @JsonCreator constructor(
         @JsonProperty("severity") var severity: Severity,
-        @JsonProperty("queueNumber") val queueNumber: String
+        @JsonProperty("queueCode") val queueCode: String,
+        @JsonProperty("forBandageOnly") val forBandageOnly: Boolean? = null
 )

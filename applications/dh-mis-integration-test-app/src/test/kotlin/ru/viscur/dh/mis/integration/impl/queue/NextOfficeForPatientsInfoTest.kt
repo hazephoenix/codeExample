@@ -9,7 +9,6 @@ import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
-import ru.viscur.dh.datastorage.api.ObservationService
 import ru.viscur.dh.datastorage.api.PatientService
 import ru.viscur.dh.datastorage.api.util.OFFICE_101
 import ru.viscur.dh.datastorage.api.util.OFFICE_119
@@ -18,6 +17,7 @@ import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.integration.mis.api.ExaminationService
+import ru.viscur.dh.integration.mis.api.ObservationInCarePlanService
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.QueueManagerService
 
@@ -46,7 +46,7 @@ class NextOfficeForPatientsInfoTest {
     lateinit var forTestService: ForTestService
 
     @Autowired
-    lateinit var observationService: ObservationService
+    lateinit var observationInCarePlanService: ObservationInCarePlanService
 
     @Autowired
     lateinit var patientService: PatientService
@@ -326,10 +326,8 @@ class NextOfficeForPatientsInfoTest {
     private fun patientDoneSingleServiceRequestInOffice(officeId: String, patientId: String, servReqs: List<ServiceRequest>) {
         queueManagerService.officeIsReady(officeId)
         queueManagerService.patientEntered(patientId, officeId)
-        val diagnosis = patientService.preliminaryDiagnosticConclusion(patientId)
-        val severity = patientService.severity(patientId)
         val observation = Helpers.createObservation(basedOnServiceRequestId = servReqs.first().id)
-        observationService.create(patientId, observation, diagnosis, severity)
+        observationInCarePlanService.create(observation)
         queueManagerService.patientLeft(patientId, officeId)
     }
 }

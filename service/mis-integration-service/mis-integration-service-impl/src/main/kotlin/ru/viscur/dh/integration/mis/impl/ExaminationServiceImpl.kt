@@ -11,6 +11,7 @@ import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.utils.resources
 import ru.viscur.dh.integration.mis.api.ExaminationService
+import ru.viscur.dh.integration.mis.api.ObservationInCarePlanService
 import ru.viscur.dh.queue.api.QueueManagerService
 
 /**
@@ -24,6 +25,7 @@ class ExaminationServiceImpl(
         private val queueManagerService: QueueManagerService,
         private val queueService: QueueService,
         private val observationService: ObservationService,
+        private val observationInCarePlanService: ObservationInCarePlanService,
         private val diagnosisPredictor: DiagnosisPredictor,
         private val observationDurationService: ObservationDurationEstimationService
 ) : ExaminationService {
@@ -51,12 +53,11 @@ class ExaminationServiceImpl(
                 .singleOrNull()
                 ?: throw Exception("Error. Not found single observation in request bundle")
 
-        val updatedServiceRequest = serviceRequestService.updateStatusByObservation(observation)
-        val patientId = updatedServiceRequest.subject?.id
-                ?: throw Error("Not defined patient in subject of ServiceRequest with id: '${updatedServiceRequest.id}'")
+        val createdObservation = observationInCarePlanService.create(observation)
+
+        val patientId = createdObservation.subject.id!!
         val diagnosis = patientService.preliminaryDiagnosticConclusion(patientId)
         val severity = patientService.severity(patientId)
-        observationService.create(patientId, observation, diagnosis, severity)
 
         //завершить обследование в кабинете (если пациент со статусом На обследовании)
         queueManagerService.patientLeftByPatientId(patientId)

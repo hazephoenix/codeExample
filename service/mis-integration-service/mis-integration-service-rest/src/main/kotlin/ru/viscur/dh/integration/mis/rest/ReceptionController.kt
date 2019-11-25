@@ -56,4 +56,12 @@ class ReceptionController(
     fun registerPatient(@RequestBody bundle: Bundle) = Bundle(
             entry = receptionService.registerPatient(bundle).map { BundleEntry(it) }
     )
+
+    /**
+     * see [ReceptionService.registerPatientForBandage]
+     */
+    @PostMapping("/patientForBandage")
+    fun registerPatientForBandage(@RequestBody bundle: Bundle) = Bundle(
+            entry = receptionService.registerPatientForBandage(bundle).map { BundleEntry(it) }
+    )
 }
