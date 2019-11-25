@@ -1,5 +1,6 @@
 package ru.viscur.dh.integration.mis.api
 
+import ru.viscur.dh.fhir.model.dto.CarePlanToPrintDto
 import ru.viscur.dh.fhir.model.dto.ObservationDuration
 import ru.viscur.dh.fhir.model.dto.QueueStatusDuration
 import ru.viscur.dh.integration.mis.api.dto.*
@@ -52,4 +53,9 @@ interface ReportService {
      * Информация об очередях в кабинет за период
      */
     fun queueHistory(start: Date, end: Date): List<QueueInOfficeHistoryDto>
+
+    /**
+     * Данные о маршрутном листе для печати
+     */
+    fun carePlanToPrint(patientId: String): CarePlanToPrintDto
 }

@@ -56,12 +56,15 @@ class ReportController(
     @GetMapping("/workloadHistory")
     fun workloadHistory(@RequestBody period: PeriodRequestBody) = reportService.workloadHistory(period.start, period.end)
 
-
     /**
      * see [ReportService.queueHistory]
      */
     @GetMapping("/queueHistory")
     fun queueHistory(@RequestBody period: PeriodRequestBody) = reportService.queueHistory(period.start, period.end)
 
-
+    /**
+     * see [ReportService.carePlanToPrint]
+     */
+    @GetMapping("/carePlan")
+    fun carePlanToPrint(@RequestParam patientId: String) = reportService.carePlanToPrint(patientId)
 }

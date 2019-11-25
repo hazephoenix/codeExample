@@ -1,9 +1,5 @@
 package ru.viscur.dh.datastorage.api.util
 
-import ru.viscur.dh.fhir.model.entity.ServiceRequest
-import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.fhir.model.utils.code
-
 /**
  * Created at 07.11.2019 16:09 by SherbakovaMA
  *
@@ -111,9 +107,24 @@ const val INSPECTION_ON_RECEPTION = "Inspection_on_reception"
 const val CLINICAL_IMPRESSION = "Clinical_impression"
 
 /**
- * linkId опросника, в котором указывается степень тяжести пациента
+ * linkId вопроса опросника, в котором указывается степень тяжести пациента
  */
 const val QUESTIONNAIRE_LINK_ID_SEVERITY = "Severity"
+
+/**
+ * linkId вопроса опросника, в котором указывается Канал поступления
+ */
+const val QUESTIONNAIRE_LINK_ID_ENTRY_TYPE = "Entry_type"
+
+/**
+ * linkId вопроса опросника, в котором указывается тип транспортировка
+ */
+const val QUESTIONNAIRE_LINK_ID_TRANSPORTATION_TYPE = "Transportation_type"
+
+/**
+ * id опросника с общей информацией
+ */
+const val QUESTIONNAIRE_ID_COMMON_INFO = "Common_info"
 
 /**
  * Квалификации (специальности) врачей

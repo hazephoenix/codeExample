@@ -171,8 +171,14 @@ class ForTestService {
         val createdServRequests = servRequests.map { resourceService.create(it) }
         val carePlan = resourceService.create(Helpers.createCarePlan(patientId, createdServRequests))
         val diagnosticReport = resourceService.create(Helpers.createDiagnosticReportResource(diagnosisCode = "A00.0", patientId = patientId))
-        val questionnaireResponse = resourceService.create(Helpers.createQuestResponseResource(severity = severity.name, patientId = patientId))
-        resourceService.create(Helpers.createClinicalImpression(patientId, severity, listOf(Reference(questionnaireResponse), Reference(carePlan), Reference(diagnosticReport))))
+        val questionnaireResponseSeverityCriteria = resourceService.create(Helpers.createQuestResponseResource(severity = severity.name, patientId = patientId))
+        val questionnaireResponseCommonInfo = resourceService.create(Helpers.createQuestResponseResourceWithCommonInfo(patientId = patientId))
+        resourceService.create(Helpers.createClinicalImpression(patientId, severity, listOf(
+                questionnaireResponseSeverityCriteria,
+                questionnaireResponseCommonInfo,
+                carePlan,
+                diagnosticReport
+        ).map { Reference(it) }))
         queueManagerService.calcServiceRequestExecOrders(patientId)
 
         if (!servReqs.isNullOrEmpty()) {
@@ -191,24 +197,28 @@ class ForTestService {
             this.map { Helpers.createServiceRequestResource(servRequestCode = it.code, patientId = patientId, status = it.status) }
 
     fun registerPatient(servReqs: List<ServiceRequestSimple>, severity: Severity = Severity.GREEN, diagnosisCode: String = "A00.0"): List<ServiceRequest> {
-//        fun registerPatient(servReqs: List<ServiceRequestSimple>, severity: Severity = Severity.GREEN): List<ServiceRequest> {
         val patient = Helpers.createPatientResource(enp = genId())
-        val bodyWeight = Helpers.createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = Helpers.paramedicId)
-        val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity.name)
-        val personalDataConsent = Helpers.createConsentResource()
-        val diagnosticReport = Helpers.createDiagnosticReportResource(diagnosisCode = diagnosisCode, practitionerId = Helpers.paramedicId)
-        val list = Helpers.createPractitionerListResource(Helpers.surgeonId)
-        val claim = Helpers.createClaimResource()
+        val bodyWeight = Helpers.createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = Helpers.paramedicId, id = "ignored")
+        val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity.name, id = "ignored")
+        val questionnaireResponseCommonInfo = Helpers.createQuestResponseResourceWithCommonInfo(severity.name, id = "ignored")
+        val personalDataConsent = Helpers.createConsentResource(id = "ignored")
+        val diagnosticReport = Helpers.createDiagnosticReportResource(diagnosisCode = diagnosisCode, practitionerId = Helpers.paramedicId, id = "ignored")
+        val mainSyndrome = Helpers.createDiagnosticReportResource(diagnosisCode = diagnosisCode, practitionerId = Helpers.paramedicId, status = DiagnosticReportStatus.mainSyndrome, id = "ignored")
+        val listWithRespPractitioner = Helpers.createPractitionerListResource(Helpers.surgeonId, id = "ignored")
+        val claim = Helpers.createClaimResource(id = "ignored")
 
-        val bundle = Bundle(entry = listOf(
-                BundleEntry(patient),
-                BundleEntry(diagnosticReport),
-                BundleEntry(bodyWeight),
-                BundleEntry(personalDataConsent),
-                BundleEntry(list),
-                BundleEntry(claim),
-                BundleEntry(questionnaireResponseSeverityCriteria)
-        ) + servReqs.toServiceRequests(patient.id).map { BundleEntry(it) })
+        val bundle = Bundle(entry = (
+                servReqs.toServiceRequests(patient.id) +
+                        listWithRespPractitioner +
+                        patient +
+                        diagnosticReport +
+                        mainSyndrome +
+                        bodyWeight +
+                        personalDataConsent +
+                        claim +
+                        questionnaireResponseSeverityCriteria +
+                        questionnaireResponseCommonInfo
+                ).map { BundleEntry(it) })
 
         return receptionService.registerPatient(bundle)
     }
@@ -217,12 +227,16 @@ class ForTestService {
         val patient = Helpers.createPatientResource(enp = genId())
         val personalDataConsent = Helpers.createConsentResource()
         val diagnosticReport = Helpers.createDiagnosticReportResource(diagnosisCode = diagnosisCode, practitionerId = Helpers.paramedicId)
+        val mainSyndrome = Helpers.createDiagnosticReportResource(diagnosisCode = "A00.1", practitionerId = Helpers.paramedicId, status = DiagnosticReportStatus.mainSyndrome)
 
-        val bundle = Bundle(entry = listOf(
-                BundleEntry(patient),
-                BundleEntry(diagnosticReport),
-                BundleEntry(personalDataConsent)
-        ))
+        val bundle = Bundle(
+                id = "ignored",
+                entry = listOf(
+                        patient,
+                        diagnosticReport,
+                        personalDataConsent,
+                        mainSyndrome
+                ).map { BundleEntry(it) })
 
         return receptionService.registerPatientForBandage(bundle)
     }
@@ -374,5 +388,5 @@ class ForTestService {
 
     private fun createQueueCode(severity: Severity) = severity.display.substring(0, 1) + "00" + counter++
 
-    fun compareListOfString(expList: List<String>,actList: List<String>, desc: String) =  Assertions.assertLinesMatch(expList.sorted(), actList.sorted())
+    fun compareListOfString(expList: List<String>, actList: List<String>, desc: String) = Assertions.assertLinesMatch(expList.sorted(), actList.sorted())
 }

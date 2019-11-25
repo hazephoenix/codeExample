@@ -3,10 +3,15 @@ package ru.viscur.dh.integration.mis.impl
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.OFFICE_101
+import ru.viscur.dh.fhir.model.dto.CarePlanToPrintDto
+import ru.viscur.dh.fhir.model.dto.CarePlanToPrintLocationDto
 import ru.viscur.dh.fhir.model.dto.ObservationDuration
 import ru.viscur.dh.fhir.model.dto.QueueStatusDuration
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.utils.*
+import ru.viscur.dh.fhir.model.valueSets.IdentifierType
+import ru.viscur.dh.fhir.model.valueSets.LocationType
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import ru.viscur.dh.integration.mis.api.ReportService
 import ru.viscur.dh.integration.mis.api.dto.*
 import java.util.*
@@ -18,6 +23,9 @@ import java.util.*
 class ReportServiceImpl(
         private val patientService: PatientService,
         private val clinicalImpressionService: ClinicalImpressionService,
+        private val serviceRequestService: ServiceRequestService,
+        private val conceptService: ConceptService,
+        private val locationService: LocationService,
         private val practitionerService: PractitionerService,
         private val queueService: QueueService,
         private val observationDurationService: ObservationDurationEstimationService,
@@ -86,6 +94,50 @@ class ReportServiceImpl(
                     workload = items.map { it.severity.workloadWeight }.sum()
             )
         }
+    }
+
+    override fun carePlanToPrint(patientId: String): CarePlanToPrintDto {
+        val patient = patientService.byId(patientId)
+        val clinicalImpression = clinicalImpressionService.active(patientId)
+        val mainSyndrome = patientService.mainSyndrome(patientId)
+        val practitionerId = mainSyndrome.performer.first().id!!
+        val transportationType = clinicalImpressionService.transportationType(clinicalImpression)
+        val transportationTypeConcept = conceptService.byCode(ValueSetName.TRANSPORTATION_TYPES, transportationType)
+        val entryType = clinicalImpressionService.entryType(clinicalImpression)
+        val entryTypeConcept = conceptService.byCode(ValueSetName.ENTRY_TYPES, entryType)
+        return CarePlanToPrintDto(
+                clinicalImpressionCode = clinicalImpression.identifierValueNullable(IdentifierType.CARE_PLAN_CODE),
+                queueCode = clinicalImpression.extension.queueCode,
+                severity = clinicalImpression.extension.severity.display,
+                name = patient.name.first().text,
+                birthDate = patient.birthDate.toStringWithoutTime(),
+                age = patient.age,
+                entryType = entryTypeConcept.display,
+                mainSyndrome = mainSyndrome.conclusionCode.first().code(),
+                practitionerName = practitionerService.byId(practitionerId).name.first().text,
+                transportation = transportationTypeConcept.display,
+                locations = serviceRequestService.active(patientId).asSequence().filterNot { it.locationReference.isNullOrEmpty() }
+                        //не можем использовать нумерацию назначений для нумерации кабинетов, т к множество назначений в один кабинет
+                        //конвертим в кабинетId + любой номер назначения в этот кабинет - этого достаточно для определния порядка прохождения кабинетов
+                        .groupBy { it.locationReference!!.first().id }.map { Pair(it.key, it.value.first().extension!!.executionOrder) }
+                        .sortedBy { it.second }
+                        .mapIndexed { index, locationIdWithOrder ->
+                            val locationId = locationIdWithOrder.first!!
+                            val location = locationService.byId(locationId)
+                            val locationType = location.type()
+                            //для кабинетов указываем номер кабинета, для зон их тип: Зеленая зона/Желтая зона/Красная зона
+                            val locationStr = if (locationType in listOf(LocationType.GREEN_ZONE.id, LocationType.YELLOW_ZONE.id, LocationType.RED_ZONE.id)) {
+                                conceptService.byCode(ValueSetName.LOCATION_TYPE, locationType).display
+                            } else {
+                                location.identifierValue(IdentifierType.OFFICE_NUMBER)
+                            }
+                            CarePlanToPrintLocationDto(
+                                    onum = index + 1,
+                                    location = locationStr,
+                                    address = location.address!!.text
+                            )
+                        }.toList()
+        )
     }
 
     private data class ObservationInfo(

@@ -110,8 +110,9 @@ class Helpers {
                 )
         )
 
-        fun createServiceRequestResource(servRequestCode: String, patientId: String = "ignore", status: ServiceRequestStatus = ServiceRequestStatus.active) =
+        fun createServiceRequestResource(servRequestCode: String, patientId: String = "ignore", status: ServiceRequestStatus = ServiceRequestStatus.active, id: String = genId()) =
                 ServiceRequest(
+                        id = id,
                         subject = referenceToPatient(patientId),
                         code = CodeableConcept(
                                 code = servRequestCode,
@@ -120,8 +121,9 @@ class Helpers {
                         status = status
                 )
 
-        fun createClaimResource(patientId: String = "ignore"): Claim {
+        fun createClaimResource(patientId: String = "ignore", id: String = genId()): Claim {
             return Claim(
+                    id = id,
                     identifier = listOf(Identifier(value = "123/012345", type = CodeableConcept(systemId = ValueSetName.IDENTIFIER_TYPES.id, code = IdentifierType.CLAIM_NUMBER.toString()))),//номер обращения
                     patient = referenceToPatient(patientId),
                     accident = ClaimAccident(
@@ -136,8 +138,10 @@ class Helpers {
                 diagnosisCode: String,
                 patientId: String = "ignored",
                 practitionerId: String = paramedicId,
-                status: DiagnosticReportStatus = DiagnosticReportStatus.preliminary
+                status: DiagnosticReportStatus = DiagnosticReportStatus.preliminary,
+                id: String = genId()
         ) = DiagnosticReport(
+                id = id,
                 subject = referenceToPatient(patientId),
                 performer = listOf(referenceToPractitioner(practitionerId)),
                 conclusionCode = listOf(CodeableConcept(code = diagnosisCode, systemId = ValueSetName.ICD_10.id)),
@@ -145,7 +149,8 @@ class Helpers {
                 issued = now()
         )
 
-        fun createConsentResource(patientId: String = "ignore") = Consent(
+        fun createConsentResource(patientId: String = "ignored", id: String = genId()) = Consent(
+                id = id,
                 category = listOf(CodeableConcept(
                         code = "PERSONAL_DATA",
                         systemId = ValueSetName.CONSENT_CATEGORIES.id,
@@ -157,7 +162,8 @@ class Helpers {
                 organization = listOf(Reference(Organization(name = "СибГМУ")))
         )
 
-        fun createQuestResponseResource(severity: String, patientId: String = "ignore") = QuestionnaireResponse(
+        fun createQuestResponseResource(severity: String, patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
+                id = id,
                 status = QuestionnaireResponseStatus.completed,
                 author = referenceToPractitioner("ignored"),
                 source = referenceToPatient(patientId),
@@ -215,14 +221,38 @@ class Helpers {
                 )
         )
 
+        fun createQuestResponseResourceWithCommonInfo(patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
+                id = id,
+                status = QuestionnaireResponseStatus.completed,
+                author = referenceToPractitioner("ignored"),
+                source = referenceToPatient(patientId),
+                questionnaire = "Questionnaire/Common_info",
+                item = listOf(
+                        QuestionnaireResponseItem(
+                                linkId = "Entry_type",
+                                answer = listOf(QuestionnaireResponseItemAnswer(
+                                        valueCoding = Coding(code = "Personal_encounter", system = ValueSetName.ENTRY_TYPES.id)
+                                ))
+                        ),
+                        QuestionnaireResponseItem(
+                                linkId = "Transportation_type",
+                                answer = listOf(QuestionnaireResponseItemAnswer(
+                                        valueCoding = Coding(code = "Sitting", system = ValueSetName.TRANSPORTATION_TYPES.id)
+                                ))
+                        )
+                )
+        )
+
         fun createObservation(code: String = "ignored",
                               practitionerId: String = "ignored",
                               patientId: String = "ignored",
                               valueInt: Int? = null,
                               valueString: String? = null,
                               basedOnServiceRequestId: String? = null,
-                              status: ObservationStatus = ObservationStatus.registered
+                              status: ObservationStatus = ObservationStatus.registered,
+                              id: String = genId()
         ) = Observation(
+                id = id,
                 performer = listOf(referenceToPractitioner(practitionerId)),
                 subject = referenceToPatient(patientId),
                 issued = now(),
@@ -237,11 +267,13 @@ class Helpers {
                 status = status
         )
 
-        fun createPractitionerListResource(practitionerId: String) = ListResource(
+        fun createPractitionerListResource(practitionerId: String, id: String = genId()) = ListResource(
+                id = id,
                 entry = listOf(ListResourceEntry(item = referenceToPractitioner(practitionerId)))
         )
 
-        fun createEncounter(hospitalizationStr: String, patientId: String = "ignored") = Encounter(
+        fun createEncounter(hospitalizationStr: String, patientId: String = "ignored", id: String = genId()) = Encounter(
+                id = id,
                 subject = referenceToPatient(patientId),
                 hospitalization = EncounterHospitalization(destination = Reference(display = hospitalizationStr))
         )
@@ -251,7 +283,8 @@ class Helpers {
                 ListResourceEntry(item = referenceToLocation(officeId))
         ))
 
-        fun createCarePlan(patientId: String, serviceRequests: List<ServiceRequest>) = CarePlan(
+        fun createCarePlan(patientId: String, serviceRequests: List<ServiceRequest>, id: String = genId()) = CarePlan(
+                id = id,
                 author = referenceToPractitioner(paramedicId),
                 contributor = referenceToPractitioner(surgeonId),
                 created = now(),
@@ -259,7 +292,8 @@ class Helpers {
                 activity = serviceRequests.map { CarePlanActivity(outcomeReference = Reference(it)) }
         )
 
-        fun createClinicalImpression(patientId: String, severity: Severity, supportingInfo: List<Reference>) = ClinicalImpression(
+        fun createClinicalImpression(patientId: String, severity: Severity, supportingInfo: List<Reference>, id: String = genId()) = ClinicalImpression(
+                id = id,
                 status = ClinicalImpressionStatus.active,
                 date = now(),
                 subject = referenceToPatient(patientId),

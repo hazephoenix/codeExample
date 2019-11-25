@@ -23,10 +23,10 @@ interface ConceptService {
 
     /**
      * Поиск концепта по коду
-     * @param valueSetId id ValueSet-а, где искать, [ru.viscur.dh.fhir.model.valueSets.ValueSetName]
+     * @param valueSet ValueSet, где искать, [ru.viscur.dh.fhir.model.valueSets.ValueSetName]
      * @param code значение кода
      */
-    fun byCode(valueSetId: String, code: String): Concept
+    fun byCode(valueSet: ValueSetName, code: String): Concept
 
     /**
      * По коду родителя
@@ -46,5 +46,5 @@ interface ConceptService {
      * В коде Violent_pain (острая боль) указаны альтернативы "острая боль", "сильная боль"
      * В результате будет найден код "Violent_pain"
      */
-    fun byAlternative(valueSetId: String, realAlternatives: List<String>): List<String>
+    fun byAlternative(valueSet: ValueSetName, realAlternatives: List<String>): List<String>
 }

@@ -17,6 +17,7 @@ import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.Gender
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.utils.isInspectionOfResp
 
 /**
  * Created at 21.11.2019 14:29 by SherbakovaMA
@@ -46,9 +47,8 @@ class ResponsiblePractitionerPredictorTest {
         val diagnosisCode = "I80.0"
         val gender = Gender.male
         var predictedServRequests = patientService.predictServiceRequests(diagnosisCode, gender.name, listOf())
-        var actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }.find {
-            it.performer?.isNotEmpty() ?: false
-        }!!.performer!!.first().id
+        var actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }
+                .find { it.isInspectionOfResp() }!!.performer!!.first().id
         Assertions.assertEquals(Helpers.surgeonId, actual)
 
         val pSr1 = forTestService.registerPatient(
@@ -64,9 +64,8 @@ class ResponsiblePractitionerPredictorTest {
         forTestService.compareListOfString(listOf(pId1), patientToExamineForSurgeon1.map { it.patientId }, "должен быть один пациент в ответственности у ${Helpers.surgeonId}")
 
         predictedServRequests = patientService.predictServiceRequests(diagnosisCode, gender.name, listOf())
-        actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }.find {
-            it.performer?.isNotEmpty() ?: false
-        }!!.performer!!.first().id
+        actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }
+                .find { it.isInspectionOfResp() }!!.performer!!.first().id
         Assertions.assertEquals(Helpers.surgeon2Id, actual)
     }
 
@@ -80,9 +79,8 @@ class ResponsiblePractitionerPredictorTest {
         val diagnosisCode = "I80.0"
         val gender = Gender.male
         val predictedServRequests = patientService.predictServiceRequests(diagnosisCode, gender.name, listOf())
-        val actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }.find {
-            it.performer?.isNotEmpty() ?: false
-        }!!.performer!!.first().id
+        val actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }
+                .find { it.isInspectionOfResp() }!!.performer!!.first().id
         Assertions.assertEquals(Helpers.surgeon2Id, actual)
 
         practitionerService.updateBlocked(Helpers.surgeonId, false)

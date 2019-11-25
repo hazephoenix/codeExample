@@ -52,7 +52,7 @@ class LocationServiceImpl(
     }
 
     override fun byObservationType(type: String): List<String> {
-        val typeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES.id, type)
+        val typeConcept = conceptService.byCode(ValueSetName.OBSERVATION_TYPES, type)
         val observationCategory = typeConcept.parentCode
         val query = em.createNativeQuery("""
                 select id

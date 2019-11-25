@@ -38,11 +38,11 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
         )))
     }
 
-    override fun byCode(valueSetId: String, code: String): Concept =
+    override fun byCode(valueSet: ValueSetName, code: String): Concept =
             resourceService.single(
                     ResourceType.Concept, RequestBodyForResources(filter = mapOf(
                     "code" to code,
-                    "system" to "ValueSet/$valueSetId"
+                    "system" to "ValueSet/${valueSet.id}"
             )))
 
     override fun byParent(valueSet: ValueSetName, parentCode: String?): List<Concept> = resourceService.all(
@@ -64,7 +64,7 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
         return query.resultList as List<String>
     }
 
-    override fun byAlternative(valueSetId: String, realAlternatives: List<String>): List<String> {
+    override fun byAlternative(valueSet: ValueSetName, realAlternatives: List<String>): List<String> {
         if (realAlternatives.isEmpty()) return listOf()
         val realAlternativesStr = realAlternatives.mapIndexed { index, code -> "(?${index + 1})" }.joinToString(", ")
         val systemParamNumber = realAlternatives.size + 1
@@ -80,7 +80,7 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
         realAlternatives.forEachIndexed { index, code ->
             q.setParameter(index + 1, code)
         }
-        q.setParameter(systemParamNumber, "ValueSet/$valueSetId")
+        q.setParameter(systemParamNumber, "ValueSet/${valueSet.id}")
         return q.resultList as List<String>
     }
 }

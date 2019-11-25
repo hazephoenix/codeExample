@@ -36,7 +36,7 @@ class DiagnosisPredictorImpl(
                 ?.answer?.mapNotNull { it.valueString }
                 ?: throw Exception("Could not predict diagnosis: no complaints provided")
 
-        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS.id, complaints)
+        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
         if (complaintCodes.isEmpty()) throw Error("Complaint codes not found")
 
         val diagnosisCodes = codeMapService.icdByAllComplaints(complaintCodes,take)
@@ -87,7 +87,7 @@ class DiagnosisPredictorImpl(
                     // заключительный диагноз всегда один
                     val diagnosisCode = diagnosticReport.conclusionCode.first().code()
                     codeMapService.icdToComplaints(diagnosisCode).let { sourceCodes ->
-                        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS.id, complaints)
+                        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
                         val resultComplaints = mutableListOf<CodeMapTargetCode>()
                         complaintCodes.forEach { code ->
                             if (!sourceCodes.contains(code)) {

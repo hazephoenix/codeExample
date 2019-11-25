@@ -1,7 +1,7 @@
 package ru.viscur.dh.fhir.model.valueSets
 
 /**
- * Названия типов обследований в ValueSet/Observation_types
+ * Названия типов обследований в [ValueSetName.OBSERVATION_TYPES] (ValueSet/Observation_types)
  */
 enum class ObservationType(val id: String) {
     /**
