@@ -2,9 +2,11 @@ package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 
+@Disabled("Debug purposes only")
 class Dictionaries {
 
     @Test
@@ -35,11 +37,15 @@ class Dictionaries {
         QueRequests.blockPractitioner(surgeonId, true)
 
         //проверка, что practitioner заблокирован
-        val surgeonInfo = QueRequests.getPractitionerById(surgeonId)
+        var surgeonInfo = QueRequests.getPractitionerById(surgeonId)
         assertEquals(true, surgeonInfo.extension.blocked, "wrong $surgeonId status")
 
         //разблокировка
         QueRequests.blockPractitioner(surgeonId, false)
+
+        //проверка, что practitioner разблокирован
+        surgeonInfo = QueRequests.getPractitionerById(surgeonId)
+        assertEquals(false, surgeonInfo.extension.blocked, "wrong $surgeonId status")
     }
 
     @Test
@@ -113,5 +119,23 @@ class Dictionaries {
 
         //проверка, что список не пустой
         assertFalse(respQualificationToObservInfo.isEmpty())
+    }
+
+    @Test
+    fun getIcdList() {
+        //получение списка кодов диагнозов
+        val icdListInfo = QueRequests.getCodeInfo("ICD-10")
+
+        //проверка, что список не пустой
+        assertFalse(icdListInfo.isEmpty())
+    }
+
+    @Test
+    fun getIcdListParentCode() {
+        //получение списка кодов диагнозов
+        val icdListInfo = QueRequests.getCodeInfo("ICD-10", "A00")
+
+        //проверка, что список не пустой
+        assertFalse(icdListInfo.isEmpty())
     }
 }

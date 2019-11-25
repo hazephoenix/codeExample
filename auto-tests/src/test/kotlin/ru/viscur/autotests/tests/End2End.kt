@@ -52,9 +52,7 @@ class End2End {
         //пациент вошел в кабинет
         QueRequests.officeIsReady(referenceToLocation(office139))
         val patientEnteredListResource = Helpers.createListResource(patientId, office139)
-        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
-        val actPatient = QueRequests.resource(ResourceType.Patient, patientId)
-
+        QueRequests.patientEntered(patientEnteredListResource)
 
         //добавление ответственным дополнительного Service Request
         val additionalServiceRequests = listOf(
@@ -99,6 +97,7 @@ class End2End {
         QueRequests.officeIsReady(referenceToLocation(office139))
 
         assertEquals(3, responseBundle.entry.size, "wrong number of service request")
+
         //прохождение всех обследований поочередно
         //office101
         val servRequestOf101office = QueRequests.patientEntered(Helpers.createListResource(patientId, office101)).find{it.code.code() == observation101Office} as ServiceRequest
@@ -115,6 +114,7 @@ class End2End {
         )
         QueRequests.createObservation(obs)
         QueRequests.patientLeft(Helpers.createListResource(patientId, office101))
+
         //office116
         val servRequestOf116office = QueRequests.patientEntered(Helpers.createListResource(patientId = patientId, officeId = office116)).find{it.code.code() == observation116Office} as ServiceRequest
         checkQueueItems(listOf(
@@ -130,12 +130,14 @@ class End2End {
         )
         QueRequests.createObservation(obs3)
         QueRequests.patientLeft(Helpers.createListResource(patientId, office116))
+
         //проверка что все обследования, кроме ответственного пройдены
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(code = observation101Office, locationId = office101, status = ServiceRequestStatus.completed),
                 ServiceRequestInfo(code = observation116Office, locationId = office116, status = ServiceRequestStatus.completed),
                 ServiceRequestInfo(code = observationOfResp,  locationId = redZone)
         ))
+
         //office 139 осмотр ответственного и завершение маршрутного листа с госпитализацией
         QueRequests.invitePatientToOffice(Helpers.createListResource(patientId, office139))
         val servRequestOfResp = QueRequests.patientEntered(Helpers.createListResource(patientId, office139)).find{it.code.code() == observationOfResp} as ServiceRequest
@@ -159,8 +161,9 @@ class End2End {
                 BundleEntry(encounter)
         ))
         val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+
         //проверка, что маршрутный лист пациента завершен и он удален из системы очередь
-        Assertions.assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status of ClinicalImpression")
+        assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status of ClinicalImpression")
         checkQueueItems(listOf())
         checkServiceRequestsOfPatient(patientId, listOf())
         checkObservationsOfPatient(patientId, listOf())

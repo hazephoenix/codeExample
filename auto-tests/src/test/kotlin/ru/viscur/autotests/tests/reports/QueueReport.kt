@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
@@ -15,10 +14,6 @@ import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.SQLException
-import java.util.*
 
 @Disabled("Debug purposes only")
 class QueueReport {
@@ -33,6 +28,7 @@ class QueueReport {
     @BeforeEach
     fun init() {
         QueRequests.deleteQue()
+        QueRequests.cancelAllActivePatient()
     }
 
     @Test
@@ -70,6 +66,11 @@ class QueueReport {
         Assertions.assertEquals(2, queueItems.size, "wrong office number in report")
         Assertions.assertEquals(1,  queueItemOffice101.queueSize, "wrong patient number for $office101")
         Assertions.assertEquals(1,  queueItemOffice119.queueSize, "wrong patient number for $office202")
+    }
+
+    @Test
+    fun gettingQueueReportByPeriod () {
+
     }
 
     @Test

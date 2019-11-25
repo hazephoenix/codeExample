@@ -38,6 +38,11 @@ class QueRequests {
                         delete(Endpoints.QUE_DELETE_ALL).
                         then().statusCode(200)
 
+        fun cancelAllActivePatient() = getPatientsOfResponsable().patients.
+                forEach() { patientInfo ->
+                    cancelExamination(patientInfo.patientId)
+                }
+
         fun getOfficeQue(officeRef: Reference) =
                 Helpers.createRequestSpec(officeRef).`when`().
                         get(Endpoints.OFFICE_QUE).
@@ -123,7 +128,13 @@ class QueRequests {
         fun createPatient(bundle : Bundle) =
                 Helpers.createRequestSpec(bundle).`when`().
                         post(Endpoints.CREATE_PATIENT).
-                        then().log().all().statusCode(200).
+                        then().statusCode(200).
+                        extract().response().`as`(Bundle::class.java)
+
+        fun createBandagePatient(bundle : Bundle) =
+                Helpers.createRequestSpec(bundle).`when`().
+                        post(Endpoints.CREATE_BANDAGE_PATIENT).
+                        then().statusCode(200).
                         extract().response().`as`(Bundle::class.java)
 
         fun <T> resource(resourceType: ResourceType<T>, id: String): T where T : BaseResource =
@@ -314,6 +325,12 @@ class QueRequests {
                         get(Endpoints.GET_RESP_QUALIFICATION_TO_OBSERVATION_TYPES).
                         then().statusCode(200).
                         extract().response().`as`(Array<CodeMap>::class.java)
+
+        fun getCodeInfo(codeName: String, parentCode: String? = null) =
+                Helpers.createRequestSpecWithoutBody().`when`().
+                        get(Endpoints.GET_CODE_INFO + "/$codeName" + if (parentCode == null) "" else "?parentCode=$parentCode").
+                        then().statusCode(200).
+                        extract().response().`as`(Array<Concept>::class.java)
 
         fun getOffices() =
                 Helpers.createRequestSpecWithoutBody().`when`().

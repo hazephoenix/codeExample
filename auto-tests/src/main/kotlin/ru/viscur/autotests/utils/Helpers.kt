@@ -54,7 +54,7 @@ class Helpers {
                 RestAssured.given().queryParams(paramsMap).body(body).header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
 
         //создание bundle для пациента
-        fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>): Bundle {
+        fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>? = null): Bundle {
             val patient = createPatientResource(enp = enp)
             val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
             val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
@@ -71,7 +71,7 @@ class Helpers {
                     BundleEntry(list),
                     BundleEntry(claim),
                     BundleEntry(questionnaireResponseSeverityCriteria)
-            ) + servRequests.map { BundleEntry(it) })
+            ) + (servRequests?.map { BundleEntry(it) } ?: emptyList()))
             return bundle
         }
 
@@ -82,7 +82,7 @@ class Helpers {
                     BundleEntry(bodyWeight),
                     BundleEntry(questionnaireResponseSeverityCriteria)
             ))
-                    return bundle
+            return bundle
         }
 
         fun bundleForSeverity(): Bundle {
@@ -221,15 +221,15 @@ class Helpers {
                                 linkId = "Questionnaire/paramedic-qa-form/complaints",
                                 text = "Жалобы пациента",
                                 answer = listOf(
-                                        QuestionnaireResponseItemAnswer(valueString = "Озноб"),
+                                        QuestionnaireResponseItemAnswer(valueString = "лихорадка"),
                                         QuestionnaireResponseItemAnswer(valueString = "Слабость"),
-                                        QuestionnaireResponseItemAnswer(valueString = "Недомогание")
+                                        QuestionnaireResponseItemAnswer(valueString = "острая боль")
                                 )
                         ),
                         QuestionnaireResponseItem(
                                 linkId = "Questionnaire/paramedic-qa-form/base-syndrom",
                                 text = "Ведущий синдром",
-                                answer = listOf(QuestionnaireResponseItemAnswer(valueString = "Высокая температура"))
+                                answer = listOf(QuestionnaireResponseItemAnswer(valueString = "высокая температура"))
                         ),
                         QuestionnaireResponseItem(
                                 linkId = "Severity",

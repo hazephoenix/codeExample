@@ -7,6 +7,7 @@ class Endpoints {
         //const val BASE_URI: String = "http://84.201.154.121:8080"
         //Patient
         const val CREATE_PATIENT: String = "$BASE_URI/reception/patient"
+        const val CREATE_BANDAGE_PATIENT: String = "$BASE_URI/reception/patientForBandage"
         //Queue
         const val PATIENTS_CLINICAL_IMPESSION_DURATION = "$BASE_URI/clinicalImpressionDuration"
         const val SET_DEFAULT_DURATION = "$BASE_URI/clinicalImpressionDuration/duration"
@@ -64,5 +65,6 @@ class Endpoints {
         const val GET_ICD_TO_PRACTITIONER_QUALIFICATION = "$BASE_URI/dictionary/icdToPractitionerQualifications"
         const val GET_RESP_QUALIFICATION_TO_OBSERVATION_TYPES = "$BASE_URI/dictionary/respQualificationToObservationTypes"
         const val GET_OFFICES = "$BASE_URI/dictionary/offices"
+        const val GET_CODE_INFO = "$BASE_URI/dictionary"
     }
 }

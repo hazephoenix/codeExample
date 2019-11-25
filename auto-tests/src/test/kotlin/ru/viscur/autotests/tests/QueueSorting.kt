@@ -25,7 +25,6 @@ class QueueSorting {
         val office116 = "Office:116"
         val office117 = "Office:117"
         val office101 = "Office:101"
-        val office119 = "Office:119"
         val office202 = "Office:202"
         val office149 = "Office:149"
         val redZone = "Office:RedZone"

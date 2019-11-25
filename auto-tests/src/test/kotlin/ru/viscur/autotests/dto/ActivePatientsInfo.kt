@@ -1,6 +1,5 @@
 package ru.viscur.autotests.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import ru.viscur.dh.fhir.model.entity.Patient
 
 
