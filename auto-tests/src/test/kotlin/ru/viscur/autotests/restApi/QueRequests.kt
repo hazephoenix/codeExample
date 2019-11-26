@@ -128,7 +128,7 @@ class QueRequests {
         fun createPatient(bundle : Bundle) =
                 Helpers.createRequestSpec(bundle).`when`().
                         post(Endpoints.CREATE_PATIENT).
-                        then().statusCode(200).
+                        then().log().all().statusCode(200).
                         extract().response().`as`(Bundle::class.java)
 
         fun createBandagePatient(bundle : Bundle) =
@@ -178,15 +178,17 @@ class QueRequests {
         fun getSupposedServRequests(diagnosis : Any) =
                 Helpers.createRequestSpec(diagnosis).log().all().`when`().
                         post(Endpoints.SUPPOSED_SERVICE_REQUEST).
-                        then().statusCode(200)
+                        then().statusCode(200).
+                        extract().response().`as`(Bundle::class.java).
+                        let { it.entry.filter {it.resource.resourceType == ResourceType.ResourceTypeId.ServiceRequest } }.map { it.resource as ServiceRequest }
 
         fun serviceRequestsOfPatients(patientId: String) =
                 Helpers.createRequestSpecWithoutBody().
                         `when`().
                         get(Endpoints.SERVICE_REQUEST + "?patientId=$patientId").
-                        then().statusCode(200)
-                        .extract().response().`as`(Bundle::class.java)
-                        .let { it.entry.map { it.resource as ServiceRequest } }
+                        then().statusCode(200).
+                        extract().response().`as`(Bundle::class.java).
+                        let { it.entry.map { it.resource as ServiceRequest } }
 
         fun cancelServiceRequest(serviceRequestId: String) =
                 Helpers.createRequestSpecWithoutBody().`when`().log().all().
@@ -290,6 +292,11 @@ class QueRequests {
                         get(Endpoints.GET_PRACTITIONERS + if (withBlocked == null) "" else "?withBlocked=$withBlocked").
                         then().statusCode(200).
                         extract().response().`as`(Array<Practitioner>::class.java)
+
+        fun createPractitioner(practitioner: Practitioner) =
+                Helpers.createRequestSpec(practitioner).`when`().
+                        post(Endpoints.GET_PRACTITIONERS).
+                        then().statusCode(200)
 
         fun blockPractitioner(practitionerId: String, value: Boolean) =
                 Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId, "value" to value)).`when`().

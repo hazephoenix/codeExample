@@ -5,6 +5,13 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.utils.Helpers
+import ru.viscur.dh.fhir.model.entity.Practitioner
+import ru.viscur.dh.fhir.model.type.CodeableConcept
+import ru.viscur.dh.fhir.model.type.HumanName
+import ru.viscur.dh.fhir.model.type.PractitionerQualification
+import ru.viscur.dh.fhir.model.utils.now
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
 @Disabled("Debug purposes only")
 class Dictionaries {
@@ -16,6 +23,24 @@ class Dictionaries {
 
         //проверка, что список не пустой
         assertFalse(practitionersInfo.isEmpty())
+    }
+
+    @Test
+    fun practitionerCreating() {
+        val practitionerCountBeforeCreating = QueRequests.getPractitioners().size
+        //создание practitioner
+        val practitionerName = "Тест " + now()
+        val practitioner = Practitioner(
+                id = "ignored",
+                name = listOf(HumanName(text = practitionerName, family = practitionerName, given = listOf("Иван"), suffix = listOf("Алексеевич"))),
+                qualification = PractitionerQualification(code = CodeableConcept(code = "Test", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+        )
+
+        QueRequests.createPractitioner(practitioner)
+        val practitionerCountAfterCreating = QueRequests.getPractitioners().size
+
+        //проверка, что practitioner стало на 1 больше после создания
+        assertEquals(practitionerCountAfterCreating, practitionerCountBeforeCreating + 1, "wrong number of practitioners" )
     }
 
     @Test
@@ -59,11 +84,6 @@ class Dictionaries {
 
         //проверка, что в списке practitioner есть заблокированный
         assertEquals(true, practitionersInfo.find { it.id == surgeonId }?.extension?.blocked, "wrong $surgeonId status")
-    }
-
-    @Test
-    fun practitionerCreating() {
-
     }
 
     @Test

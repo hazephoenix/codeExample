@@ -150,6 +150,9 @@ class Helpers {
         fun createClaimResource(patientId: String = "ignore", id: String = genId()): Claim {
             return Claim(
                     id = id,
+                    identifier = listOf(
+                            Identifier("ignored", IdentifierType.CLAIM_NUMBER)
+                    ),
                     patient = referenceToPatient(patientId),
                     accident = ClaimAccident(
                             date = Date(), //дата и время происшествия
@@ -289,8 +292,7 @@ class Helpers {
                 valueInteger = valueInt,
                 valueString = valueString,
                 basedOn = basedOnServiceRequestId?.let { Reference(resourceType = ResourceType.ServiceRequest.id, id = basedOnServiceRequestId) },
-                status = status,
-                id = id
+                status = status
         )
 
         fun createPractitionerListResource(practitionerId: String, id: String = genId()) = ListResource(
