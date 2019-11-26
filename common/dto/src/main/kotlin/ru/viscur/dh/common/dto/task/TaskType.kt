@@ -48,6 +48,10 @@ enum class TaskType {
     /**
      * Снятие показаний с ЭКГ
      */
-    Electrocardiograph
+    Electrocardiograph,
 
+    /**
+     * Печать маршрутного листа
+     */
+    PrintRoute
 }
