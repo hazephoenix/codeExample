@@ -50,7 +50,6 @@ class RoutePrinter(
         template = RoutePrinter::class.java.classLoader.getResourceAsStream("RouteSheet.odt")!!
     }
 
-
     @EventListener(TaskRequested::class)
     fun eventListener(event: TaskRequested) {
         val task = event.task
@@ -76,7 +75,8 @@ class RoutePrinter(
         val routeSheet = XDocReportRegistry.getRegistry()
                 .loadReport(template, TemplateEngineKind.Velocity)
         val options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.ODFDOM)
-        val context = routeSheet.createContext(routeSheetBuilder.build(patientId))
+        val data = routeSheetBuilder.build(patientId)
+        val context = routeSheet.createContext(data)
         ByteArrayOutputStream().use { os ->
             routeSheet.convert(context, options, os)
             PDDocument.load(os.toByteArray()).use { doc ->
