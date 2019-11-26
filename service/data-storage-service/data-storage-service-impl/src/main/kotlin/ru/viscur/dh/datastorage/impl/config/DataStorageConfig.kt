@@ -6,7 +6,6 @@ import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.ComponentScan.Filter
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.scheduling.TaskScheduler
-import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import java.util.concurrent.Executor
