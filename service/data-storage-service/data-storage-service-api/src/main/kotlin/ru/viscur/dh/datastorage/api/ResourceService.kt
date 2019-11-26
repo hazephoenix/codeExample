@@ -15,8 +15,18 @@ interface ResourceService {
      *
      * @param resourceType тип ресурса
      * @param id идентификатор ресурса
+     * @throws ResourceNotFoundException если ресурс с указанным типом и id не найден
      */
     fun <T> byId(resourceType: ResourceType<T>, id: String): T
+            where T : BaseResource
+
+    /**
+     * Чтение списка ресурсов по списку id
+     *
+     * @param resourceType тип ресурса
+     * @param ids идентификаторы ресурса
+     */
+    fun <T> byIds(resourceType: ResourceType<T>, ids: List<String>): List<T>
             where T : BaseResource
 
     /**
@@ -70,6 +80,7 @@ interface ResourceService {
      * Удаление определенного ресурса по типу [resourceType] и [id]
      * С сохранением истории пред. состояния ресурса
      * Если не найден ресурс с таким id, то пробрасывается исключение
+     * @throws ResourceNotFoundException если ресурс с указанным типом и id не найден
      */
     fun <T> deleteById(resourceType: ResourceType<T>, id: String): T
             where T : BaseResource
@@ -83,4 +94,7 @@ interface ResourceService {
      */
     fun <T> deleteAll(resourceType: ResourceType<T>, requestBody: RequestBodyForResources? = null): Int
             where T : BaseResource
+
+
+    class ResourceNotFoundException(message: String) : RuntimeException(message)
 }

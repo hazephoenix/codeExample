@@ -1,12 +1,11 @@
 package ru.viscur.dh.integration.doctorapp.api
 
-import ru.viscur.dh.integration.doctorapp.api.cmd.AcceptDoctorCallCmd
-import ru.viscur.dh.integration.doctorapp.api.cmd.CallableDoctorStatusChangedCmd
-import ru.viscur.dh.integration.doctorapp.api.cmd.DeclineDoctorCallCmd
-import ru.viscur.dh.integration.doctorapp.api.cmd.NewDoctorCallCmd
-import ru.viscur.dh.integration.doctorapp.api.model.CallableDoctor
-import ru.viscur.dh.integration.doctorapp.api.model.DoctorCall
+import ru.viscur.dh.datastorage.api.request.PagedRequest
+import ru.viscur.dh.datastorage.api.response.PagedResponse
+import ru.viscur.dh.integration.doctorapp.api.cmd.*
+import ru.viscur.dh.integration.doctorapp.api.model.*
 import ru.viscur.dh.integration.doctorapp.api.request.DoctorCallsRequest
+import ru.viscur.dh.integration.doctorapp.api.response.DoctorCallsResponse
 
 interface DoctorAppService {
 
@@ -20,12 +19,12 @@ interface DoctorAppService {
     /**
      * Доктор принял вызов
      */
-    fun acceptCall(cmd: AcceptDoctorCallCmd)
+    fun acceptCall(cmd: AcceptDoctorCallCmd): DoctorCall
 
     /**
      * Доктор отклонил вызов
      */
-    fun declineCall(cmd: DeclineDoctorCallCmd)
+    fun declineCall(cmd: DeclineDoctorCallCmd): DoctorCall
 
     /**
      * Получить список докторов, которых можно вызвать (всех).
@@ -33,13 +32,29 @@ interface DoctorAppService {
     fun findCallableDoctors(): List<CallableDoctor>
 
     /**
+     * Поиск кабинетов в которые можно вызывать врачей
+     */
+    fun findLocations(): List<Location>;
+
+    /**
      * Статус доктора изменился (он перешел в интенсивную терапию или вышел из нее)
      */
     fun callableDoctorStatusChanged(doctor: CallableDoctorStatusChangedCmd)
 
     /**
-     * Получить список вызовов врача
+     * Поиск входящих сообщений для текущего пользователя
      */
-    fun getDoctorCalls(request: DoctorCallsRequest)
+    fun findIncomingCalls(request: PagedRequest): PagedResponse<DoctorCall>
+
+    /**
+     * Поиск исходящих сообщений для текущего пользователя
+     */
+    fun findOutcomingCall(request: PagedRequest): PagedResponse<DoctorCall>
+
+    /**
+     * Получение списка пациентов в очереди для текущего пользователя
+     */
+    fun getQueuePatients(): List<QueuePatient>
+
 
 }

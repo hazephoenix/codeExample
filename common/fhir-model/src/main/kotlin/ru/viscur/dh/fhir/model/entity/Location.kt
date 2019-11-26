@@ -7,6 +7,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.genId
+import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 
 /**
  * Created at 02.10.2019 18:20 by SherbakovaMA
@@ -35,4 +36,17 @@ class Location @JsonCreator constructor(
      * Тип места
      */
     fun type() = type.first().code()
+
+    /**
+     * Номер кабинета
+     */
+    fun officeNumber(): String? {
+        val officeNumberIdentifier =
+                identifier?.filter {
+                    it.type.coding.any { coding ->
+                        coding.code == IdentifierType.OFFICE_NUMBER.name
+                    }
+                }?.firstOrNull()
+        return officeNumberIdentifier?.value;
+    }
 }

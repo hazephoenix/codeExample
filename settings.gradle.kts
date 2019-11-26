@@ -24,7 +24,8 @@ include(
         "auto-tests",
         "common:transaction-desc",
         "common:triton-monitor-sdk",
-        "common:dto"
+        "common:dto",
+        "common:security"
         /*TODO "applications:dh-rfid-location-device-app"*/
 )
 
