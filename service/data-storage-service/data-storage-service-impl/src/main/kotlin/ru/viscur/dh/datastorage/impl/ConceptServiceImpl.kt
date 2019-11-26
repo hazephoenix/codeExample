@@ -69,7 +69,7 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
         val realAlternativesStr = realAlternatives.mapIndexed { index, code -> "(?${index + 1})" }.joinToString(", ")
         val systemParamNumber = realAlternatives.size + 1
         val q = em.createNativeQuery("""
-        select resource ->> 'code' code
+        select distinct resource ->> 'code' code
         from (select * from (values $realAlternativesStr) c (real_alt)) c
              join
          (select jsonb_array_elements(r.resource -> 'alternatives') ->> 0 alt, r.resource
