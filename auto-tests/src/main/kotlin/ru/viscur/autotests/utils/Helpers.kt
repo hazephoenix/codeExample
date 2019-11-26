@@ -60,12 +60,14 @@ class Helpers {
             val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
             val personalDataConsent = createConsentResource()
             val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
+            val diagnostiReportMainSyndrome = createDiagnosticReportResource(diagnosisCode = "A00.1", practitionerId = paramedicId, status = DiagnosticReportStatus.mainSyndrome)
             val list = createPractitionerListResource(surgeonId)
             val claim = createClaimResource()
 
             val bundle = Bundle(entry = listOf(
                     BundleEntry(patient),
                     BundleEntry(diagnosticReport),
+                    BundleEntry(diagnostiReportMainSyndrome),
                     BundleEntry(bodyWeight),
                     BundleEntry(personalDataConsent),
                     BundleEntry(list),
