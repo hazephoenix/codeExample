@@ -49,9 +49,12 @@ enum class TaskType {
      * Снятие показаний с ЭКГ
      */
     Electrocardiograph,
-
     /**
      * Печать маршрутного листа
      */
-    PrintRoute
+    PrintRoute,
+    /**
+     * Измерение шкалы интенсивности боли (с монитора)
+     */
+    PainIntensity
 }

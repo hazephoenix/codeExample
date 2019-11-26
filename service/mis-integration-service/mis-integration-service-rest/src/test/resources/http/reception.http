@@ -44,7 +44,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           "reference": "Patient/ignored",
           "type": "Patient"
         },
-        "valueInteger": 110
+        "valueInteger": 70
       }
     },
     {
@@ -98,7 +98,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           "reference": "Patient/ignored",
           "type": "Patient"
         },
-        "valueInteger": 90
+        "valueInteger": 110
       }
     },
     {
@@ -125,7 +125,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           "reference": "Patient/ignored",
           "type": "Patient"
         },
-        "valueInteger": 27
+        "valueInteger": 20
       }
     },
     {
@@ -155,6 +155,33 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "valueQuantity": {
           "value": 36.5
         }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Pain_intensity",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/фельдшер_Колосова",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 4
       }
     },
     { "resource": {
@@ -193,19 +220,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
                 "code": "Clear_mind",
                 "display": "Ясное сознание",
                 "system": "ValueSet/Consciousness_assessment"
-              }
-            }
-          ]
-        },
-        {
-          "linkId": "Pain_intensity_assessment",
-          "text": "Оценка интенсивности боли (0-10)",
-          "answer": [
-            {
-              "valueCoding": {
-                "code": "From_0_to_3",
-                "display": "0-3",
-                "system": "ValueSet/Pain_intensity_assessment"
               }
             }
           ]
@@ -413,6 +427,33 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         }
       }
     },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Pain_intensity",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/фельдшер_Колосова",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 4
+      }
+    },
     { "resource": {
       "id": "ignored",
       "resourceType": "QuestionnaireResponse",
@@ -449,19 +490,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
                 "code": "Clear_mind",
                 "display": "Ясное сознание",
                 "system": "ValueSet/Consciousness_assessment"
-              }
-            }
-          ]
-        },
-        {
-          "linkId": "Pain_intensity_assessment",
-          "text": "Оценка интенсивности боли (0-10)",
-          "answer": [
-            {
-              "valueCoding": {
-                "code": "From_0_to_3",
-                "display": "0-3",
-                "system": "ValueSet/Pain_intensity_assessment"
               }
             }
           ]
@@ -761,6 +789,33 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     {
       "resource": {
         "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Pain_intensity",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/фельдшер_Колосова",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 4
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
         "resourceType": "DiagnosticReport",
         "subject": {
           "reference": "Patient/ignored",
@@ -970,19 +1025,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
                 "code": "Clear_mind",
                 "display": "Ясное сознание",
                 "system": "ValueSet/Consciousness_assessment"
-              }
-            }
-          ]
-        },
-        {
-          "linkId": "Pain_intensity_assessment",
-          "text": "Оценка интенсивности боли (0-10)",
-          "answer": [
-            {
-              "valueCoding": {
-                "code": "From_0_to_3",
-                "display": "0-3",
-                "system": "ValueSet/Pain_intensity_assessment"
               }
             }
           ]
