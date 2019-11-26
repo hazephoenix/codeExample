@@ -47,7 +47,7 @@ class DiagnosisPredictorImpl(
                         PredictedDiagnosis(
                                 code = it!!.diagnosisCode,
                                 system = "ValueSet/${ValueSetName.ICD_10}",
-                                probability = it.complaintCodeCount.toDouble()/complaintCodes.size.toDouble())
+                                probability = it.complaintCodeCount.toDouble() / complaintCodes.size.toDouble())
                     }
             return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes).filter { it.probability > minimalProbability })
         }

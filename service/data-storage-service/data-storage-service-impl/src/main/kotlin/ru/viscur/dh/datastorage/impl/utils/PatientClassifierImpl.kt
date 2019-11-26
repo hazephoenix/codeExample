@@ -1,29 +1,23 @@
-package ru.viscur.dh.fhir.model.utils
+package ru.viscur.dh.datastorage.impl.utils
 
+import org.springframework.stereotype.*
+import ru.viscur.dh.datastorage.api.response.*
+import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.dto.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.valueSets.*
 
-/**
- * Классификатор, определяющий степень тяжести пациента [Severity]
- */
-class PatientClassifier {
-    companion object {
-        val mainSyndromePredictor = MainSyndromePredictor()
-    }
+@Component
+class PatientClassifierImpl(
+        private val diagnosisPredictor: DiagnosisPredictor
+) : PatientClassifier {
 
-    /**
-     * Определить степень тяжести пациента
-     *
-     * @param bundle Контейнер с входными измерениями
-     * @return [Severity] Степень тяжести пациента
-     */
-    fun classify(bundle: Bundle): SeverityResponse {
+    override fun classify(bundle: Bundle, takeSyndromes: Int): SeverityResponse {
         val colors = bundle.entry.mapNotNull {
             when(it.resource) {
-                is Observation -> getColorByValue(it.resource)
-                is QuestionnaireResponse -> checkQuestionnaireResponse(it.resource)
+                is Observation -> getColorByValue(it.resource as Observation)
+                is QuestionnaireResponse -> checkQuestionnaireResponse(it.resource as QuestionnaireResponse)
                 else -> null
             }
         }
@@ -35,7 +29,7 @@ class PatientClassifier {
                             system = "ValueSet/${ValueSetName.SEVERITY.id}",
                             display = it.severity.display
                     ),
-                    mainSyndrome = mainSyndromePredictor.predict(),
+                    mainSyndrome = diagnosisPredictor.predict(bundle, takeSyndromes),
                     severityReason = it.reason
             )
         } ?: throw Error("Не удалось определить степень тяжести пациента")
@@ -75,9 +69,10 @@ class PatientClassifier {
                         else -> null
                     }
                     value?.let {
-                        (answer.rangeFrom != null && answer.rangeTo != null && (answer.rangeFrom..answer.rangeTo).contains(value)) ||
-                                (answer.rangeFrom != null && answer.rangeTo === null && value < answer.rangeFrom) ||
-                                (answer.rangeTo != null && answer.rangeFrom === null && value > answer.rangeTo)
+                        (answer.rangeFrom != null && answer.rangeTo != null &&
+                                (answer.rangeFrom as Double..answer.rangeTo as Double).contains(value)) ||
+                            (answer.rangeFrom != null && answer.rangeTo === null && value < answer.rangeFrom as Double) ||
+                            (answer.rangeTo != null && answer.rangeFrom === null && value > answer.rangeTo as Double)
                     } ?: false
                 }?.let {
                     PatientSeverity(it.severity, it.reason)
