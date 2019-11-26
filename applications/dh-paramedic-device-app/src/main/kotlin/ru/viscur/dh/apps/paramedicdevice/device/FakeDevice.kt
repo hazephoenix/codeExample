@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.core.io.ClassPathResource
-import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 import ru.viscur.dh.apps.paramedicdevice.dto.*
 import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
@@ -27,7 +26,7 @@ import javax.annotation.PostConstruct
  */
 @Component
 @Profile("fake-device")
-class FakeDevice(private val publisher: ApplicationEventPublisher, private val resourceLoader: ResourceLoader) {
+class FakeDevice(private val publisher: ApplicationEventPublisher) {
 
     private val png: MutableList<String> = mutableListOf()
 
