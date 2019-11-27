@@ -1,6 +1,5 @@
 package ru.viscur.dh.datastorage.impl
 
-import com.fasterxml.jackson.databind.node.*
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
@@ -10,9 +9,7 @@ import ru.viscur.dh.fhir.model.entity.CodeMap
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
-import java.util.*
 import javax.persistence.*
-import kotlin.reflect.jvm.internal.impl.load.kotlin.*
 
 /**
  * Created at 23.10.2019 16:07 by SherbakovaMA
@@ -76,7 +73,7 @@ class CodeMapServiceImpl(
         return query.resultList as List<String>
     }
 
-    override fun icdByAnyComplaints(complaints: List<String>, take: Int): List<ComplaintOccurrence?> {
+    override fun icdByAnyComplaints(complaints: List<String>, exceptCodes: List<String>, take: Int): List<ComplaintOccurrence?> {
         // вместо оператора ?| для поиска вхождений используем свой оператор #-#, чтобы избежать
         // конфликтов с оператором ? для упорядоченных параметров Hibernate
         val query = em.createNativeQuery("""
@@ -91,12 +88,14 @@ class CodeMapServiceImpl(
                         select cm.resource ->> 'id' from codemap cm
                         where cm.resource ->> 'targetUrl'= :targetUrl
                     )
+                and cm.resource ->> 'sourceCode' != ALL(cast(:exceptCodes as text[]))
                 group by cm.resource
                 order by codeCount desc
                 limit :take
         """)
         query.setParameter("codes", "{\"${complaints.joinToString("\", \"")}\"}")
         query.setParameter("targetUrl", "ValueSet/Complaints")
+        query.setParameter("exceptCodes", "{\"${exceptCodes.joinToString("\", \"")}\"}")
         query.setParameter("take", take)
 
         return query.resultList.mapNotNull {

@@ -39,18 +39,18 @@ class DiagnosisPredictorImpl(
         val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
         if (complaintCodes.isEmpty()) throw Error("Complaint codes not found")
 
-        val diagnosisCodes = codeMapService.icdByAllComplaints(complaintCodes,take)
-                .map { PredictedDiagnosis(code = it, system = "ValueSet/${ValueSetName.ICD_10}", probability = 1.0) }
+        val diagnosisCodesList = codeMapService.icdByAllComplaints(complaintCodes, take)
+        val diagnosisCodes = diagnosisCodesList.map { PredictedDiagnosis(code = it, system = "ValueSet/${ValueSetName.ICD_10}", probability = 1.0) }
         if (diagnosisCodes.size < take) {
-            val moreDiagnosisCodes = codeMapService.icdByAnyComplaints(complaintCodes, take - diagnosisCodes.size)
+            val moreDiagnosisCodes = codeMapService.icdByAnyComplaints(complaintCodes, diagnosisCodesList, take - diagnosisCodesList.size)
                     .mapNotNull {
                         PredictedDiagnosis(
                                 code = it!!.diagnosisCode,
                                 system = "ValueSet/${ValueSetName.ICD_10}",
-                                probability = it.complaintCodeCount.toDouble() / complaintCodes.size.toDouble())
+                                probability = it.complaintCodeCount.toDouble() / diagnosisCodesList.size.toDouble()
+                        )
                     }
             return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes)
-                    .distinctBy { it.code } // todo: distinct inside sql query?
                     .filter { it.probability > minimalProbability })
         }
         return PredictDiagnosisResponse(diagnosisCodes)
