@@ -18,7 +18,7 @@ import ru.viscur.dh.fhir.model.utils.genId
  * @param status статус пациента в очереди, [PatientQueueStatus]
  * @param subject пациент
  * @param location кабинет
- * @param estDuration предположительная продолжительность осмотра, мс
+ * @param estDuration предположительная продолжительность осмотра, в секундах
  * @param queueCode код в очереди
  * @param onum порядковый номер в очередь (в определенный кабинет)
  */
