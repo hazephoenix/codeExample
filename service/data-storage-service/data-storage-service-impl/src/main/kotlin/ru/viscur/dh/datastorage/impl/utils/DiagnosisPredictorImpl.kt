@@ -47,9 +47,11 @@ class DiagnosisPredictorImpl(
                         PredictedDiagnosis(
                                 code = it!!.diagnosisCode,
                                 system = "ValueSet/${ValueSetName.ICD_10}",
-                                probability = it.complaintCodeCount.toDouble()/complaintCodes.size.toDouble())
+                                probability = it.complaintCodeCount.toDouble() / complaintCodes.size.toDouble())
                     }
-            return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes).filter { it.probability > minimalProbability })
+            return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes)
+                    .distinctBy { it.code } // todo: distinct inside sql query?
+                    .filter { it.probability > minimalProbability })
         }
         return PredictDiagnosisResponse(diagnosisCodes)
     }

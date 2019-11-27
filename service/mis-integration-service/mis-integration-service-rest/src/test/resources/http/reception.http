@@ -12,7 +12,7 @@ Accept: application/json
 
 ###
 
-POST http://localhost:8080/reception/severity
+POST http://localhost:8080/reception/severity?takeSyndromes=5
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

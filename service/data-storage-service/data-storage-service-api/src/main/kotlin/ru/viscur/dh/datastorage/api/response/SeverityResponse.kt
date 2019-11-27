@@ -1,10 +1,10 @@
-package ru.viscur.dh.fhir.model.dto
+package ru.viscur.dh.datastorage.api.response
 
 import ru.viscur.dh.fhir.model.entity.*
 
 /**
  * Ответ на запрос определения степени тяжести пациента,
- * используется в [ru.viscur.dh.fhir.model.utils.PatientClassifier]
+ * используется в [ru.viscur.dh.datastorage.api.util.PatientClassifier]
  *
  * @param severity Степень тяжести пациента
  * @param mainSyndrome Ведущий синдром
@@ -12,6 +12,6 @@ import ru.viscur.dh.fhir.model.entity.*
  */
 data class SeverityResponse(
         var severity: Concept,
-        var mainSyndrome: String,
+        var mainSyndrome: PredictDiagnosisResponse,
         var severityReason: String
 )
