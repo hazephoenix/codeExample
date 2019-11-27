@@ -46,7 +46,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   },
   "valueInteger": 110,
   "basedOn" : {
-    "reference": "ServiceRequest/ignored"
+    "reference": "ServiceRequest/4a61c6fc-fe03-4eed-861a-85ad9d1982db"
   }
 }
 

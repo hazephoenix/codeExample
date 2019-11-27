@@ -3,7 +3,7 @@ package ru.viscur.dh.integration.mis.api.dto
 /**
  * Created at 12.11.2019 18:06 by SherbakovaMA
  *
- * Описание очереди в кабинет
+ * Описание очереди в кабинет/к врачу
  *
  * @param practitioner информация о мед. персонале в кабинете (если требуется по мед. персоналу информация)
  * @param officeId id кабинета
@@ -14,7 +14,7 @@ package ru.viscur.dh.integration.mis.api.dto
  */
 data class QueueInOfficeDto(
         var practitioner: PractitionerDto? = null,
-        val officeId: String,
+        val officeId: String? = null,
         val queueSize: Int,
         val queueWaitingSum: Int,
         val queueWorkload: Int,

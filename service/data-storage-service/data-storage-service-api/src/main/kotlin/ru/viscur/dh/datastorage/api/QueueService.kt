@@ -15,9 +15,14 @@ import java.util.*
 interface QueueService {
 
     /**
+     * Все записи [QueueItem] по кабинетам [officeIds] с сортировкой по [QueueItem.onum]
+     */
+    fun queueItemsOfOffices(officeIds: List<String>): MutableList<QueueItem>
+
+    /**
      * Все записи [QueueItem] по кабинету [officeId] с сортировкой по [QueueItem.onum]
      */
-    fun queueItemsOfOffice(officeId: String): MutableList<QueueItem>
+    fun queueItemsOfOffice(officeId: String): MutableList<QueueItem> = queueItemsOfOffices(listOf(officeId))
 
     /**
      * Удаление всех записей [QueueItem] по кабинету [officeId]

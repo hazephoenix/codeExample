@@ -45,4 +45,12 @@ interface PractitionerService {
      * Обновить значение поля Заблокирован [ru.viscur.dh.fhir.model.type.PractitionerExtension.blocked]
      */
     fun updateBlocked(practitionerId: String, value: Boolean): Practitioner
+
+    /**
+     * Мед. работник заступил на смену/ушел со смены
+     * Обновить значения полей
+     * [ru.viscur.dh.fhir.model.type.PractitionerExtension.onWork],
+     * [ru.viscur.dh.fhir.model.type.PractitionerExtension.onWorkInOfficeId]
+     */
+    fun updateOnWork(practitionerId: String, value: Boolean, officeId: String? = null): Practitioner
 }

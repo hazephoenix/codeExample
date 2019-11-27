@@ -34,14 +34,15 @@ class QueueServiceImpl(
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    override fun queueItemsOfOffice(officeId: String): MutableList<QueueItem> {
+    override fun queueItemsOfOffices(officeIds: List<String>): MutableList<QueueItem> {
+        val officeIdPlaceholders = officeIds.mapIndexed { index, _ -> "?${index + 1}" }.joinToString()
         val query = em.createNativeQuery("""
             select r.resource
             from QueueItem r
-            where r.resource -> 'location' ->> 'reference' = :officeRef
-            order by r.resource ->> 'onum'
+            where r.resource -> 'location' ->> 'reference' in ($officeIdPlaceholders)
+            order by r.resource -> 'location' ->> 'reference', r.resource ->> 'onum'
             """)
-        query.setParameter("officeRef", "Location/$officeId")
+        query.setParameters(officeIds.map { "Location/$it" })
         return query.fetchResourceList<QueueItem>().fillExtraFields().toMutableList()
     }
 

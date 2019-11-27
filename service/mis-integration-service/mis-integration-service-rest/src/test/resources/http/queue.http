@@ -20,13 +20,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:119",
+        "reference": "Location/Office:116",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/b1ed1ac7-ff57-4b5d-95a3-230f560b5fe3",
+        "reference": "Patient/dfdd7016-ec6e-47fb-ab10-f57d9cb6b2bc",
         "type": "Patient"
       }
     }
@@ -91,8 +91,24 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:101",
-  "type": "Location"
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:116",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/dfdd7016-ec6e-47fb-ab10-f57d9cb6b2bc",
+        "type": "Patient"
+      }
+    }
+  ]
 }
 ###                                                                                Отменить "вход" пациента в кабинет
 ###
@@ -110,7 +126,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:101",
+  "reference": "Location/Office:116",
   "type": "Location"
 }
 ###

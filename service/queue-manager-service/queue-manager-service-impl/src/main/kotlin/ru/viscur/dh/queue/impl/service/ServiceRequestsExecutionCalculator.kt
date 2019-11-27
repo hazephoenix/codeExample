@@ -5,6 +5,7 @@ import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
 import ru.viscur.dh.datastorage.api.util.RECEPTION
 import ru.viscur.dh.datastorage.api.util.allLocationIdsInGroup
+import ru.viscur.dh.datastorage.api.util.isInspection
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -66,8 +67,8 @@ class ServiceRequestsExecutionCalculator(
         return serviceRequests.map { serviceRequest ->
             val serviceRequestId = serviceRequest.id
             val officeIds =
-                    if (serviceRequest.isInspectionOfResp()) {
-                        val locationType = severity.zoneForInspectionOfResp
+                    if (serviceRequest.isInspection()) {
+                        val locationType = severity.zoneForInspections
                         locationService.byLocationType(locationType).map { it.id }
                     } else {
                         locationService.byObservationType(serviceRequest.code.code())
@@ -92,7 +93,7 @@ class ServiceRequestsExecutionCalculator(
     fun recalcOfficeForInspectionOfResp(patientId: String, severity: Severity) {
         val inspectionOfResp = serviceRequestService.active(patientId).find { it.isInspectionOfResp() }
                 ?: throw Exception("not found inspection of responsible practitioner for patient with id '$patientId'")
-        val locationType = severity.zoneForInspectionOfResp
+        val locationType = severity.zoneForInspections
         val locationInfos = locationService.byLocationType(locationType).map {
             val officeId = it.id
             ServiceRequestExecLocationInfo(inspectionOfResp.id, inspectionOfResp.code.code(), officeId, estWaitingInQueueWithType(officeId, severity))

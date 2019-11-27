@@ -1,5 +1,6 @@
 package ru.viscur.dh.mis.integration.impl.dictionary
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -11,6 +12,7 @@ import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.api.util.OFFICE_117
 import ru.viscur.dh.datastorage.api.util.QUALIFICATION_SURGEON
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.enums.Gender
@@ -39,7 +41,7 @@ class PractitionerServiceTest {
     lateinit var resourceService: ResourceService
 
     @Test
-    fun testUpdateAndGet() {
+    fun testupdateBlockedAndGet() {
         val practitionerId = Helpers.surgeonId
         //предполагается, что изначально нет заблокированных
         val initAll = practitionerService.all()
@@ -102,10 +104,10 @@ class PractitionerServiceTest {
             val newValues = Practitioner(
                     id = practitionerId,
                     identifier = createdPractitioner.identifier,
-                            name = createdPractitioner.name,
-                            gender = Gender.female,
-                            qualification = createdPractitioner.qualification,
-                            extension = PractitionerExtension(blocked = true)
+                    name = createdPractitioner.name,
+                    gender = Gender.female,
+                    qualification = createdPractitioner.qualification,
+                    extension = PractitionerExtension(blocked = true)
             )
             val updatedPractitioner = practitionerService.update(newValues)
             val updatedPractitionerId = updatedPractitioner.id
@@ -117,5 +119,62 @@ class PractitionerServiceTest {
             resourceService.deleteById(ResourceType.Practitioner, practitionerId)
         }
         assertEquals(initSize, practitionerService.all().size, "количество должно быть как в начале проверки")
+    }
+
+    @Test
+    fun `test update on work true for inspection practitioner`() {
+        val practitionerId = Helpers.surgeonId
+        checkOnWork(practitionerId, false, null)
+        practitionerService.updateOnWork(practitionerId, true)
+        checkOnWork(practitionerId, true, null)
+
+        //возвращаем значение по умолчанию
+        practitionerService.updateOnWork(practitionerId, false)
+    }
+
+    @Test
+    fun `test update on work true for inspection practitioner, officeId is ignored`() {
+        val practitionerId = Helpers.surgeonId
+        checkOnWork(practitionerId, false, null)
+        practitionerService.updateOnWork(practitionerId, true, "must be ignored")
+        checkOnWork(practitionerId, true, null)
+
+        //возвращаем значение по умолчанию
+        practitionerService.updateOnWork(practitionerId, false)
+    }
+
+    @Test
+    fun `test update on work true for diagnostic practitioner`() {
+        val practitionerId = Helpers.diagnosticAssistantId
+        checkOnWork(practitionerId, false, null)
+        practitionerService.updateOnWork(practitionerId, true, OFFICE_117)
+        checkOnWork(practitionerId, true, OFFICE_117)
+
+        //возвращаем значение по умолчанию
+        practitionerService.updateOnWork(practitionerId, false)
+    }
+
+    @Test
+    fun `test update on work true for diagnostic practitioner, error if office is not defined`() {
+        val practitionerId = Helpers.diagnosticAssistantId
+        checkOnWork(practitionerId, false, null)
+        Assertions.assertThrows(Exception::class.java) { practitionerService.updateOnWork(practitionerId, true) }
+    }
+
+    @Test
+    fun `test update on work false for inspection practitioner`() {
+        val practitionerId = Helpers.surgeonId
+        checkOnWork(practitionerId, false, null)
+        practitionerService.updateOnWork(practitionerId, true)
+        checkOnWork(practitionerId, true, null)
+
+        practitionerService.updateOnWork(practitionerId, false)
+        checkOnWork(practitionerId, false, null)
+    }
+
+    private fun checkOnWork(practitionerId: String, expOnWork: Boolean, expOnWorkInOfficeId: String? = null) {
+        val practitioner = practitionerService.byId(practitionerId)
+        assertEquals(expOnWork, practitioner.extension.onWork, "неправильное значение onWork для $practitionerId")
+        assertEquals(expOnWorkInOfficeId, practitioner.extension.onWorkInOfficeId, "неправильное значение onWorkOfficeId для $practitionerId")
     }
 }
