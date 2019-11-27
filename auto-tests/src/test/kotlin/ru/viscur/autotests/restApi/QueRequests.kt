@@ -205,9 +205,9 @@ class QueRequests {
                         `when`().log().all().post(Endpoints.GET_DIAGNOSIS).
                         then().log().all().statusCode(200).extract().response().`as`(DiagnosesListInfo::class.java)
 
-        fun getSeverity(bundle: Bundle) =
+        fun getSeverity(bundle: Bundle, mainSyndromeCount: String? = null) =
                 Helpers.createRequestSpec(bundle).
-                        `when`().log().all().post(Endpoints.GET_SEVERITY).
+                        `when`().log().all().post(Endpoints.GET_SEVERITY + if (mainSyndromeCount == null) "" else "?mainSyndromeCount=$mainSyndromeCount").
                         then().log().all().statusCode(200)
 
         //examination

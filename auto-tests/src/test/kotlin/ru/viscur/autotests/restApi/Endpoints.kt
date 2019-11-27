@@ -36,7 +36,6 @@ class Endpoints {
         const val OBSERVATIONS: String = "$BASE_URI/Observation"
         const val SUPPOSED_SERVICE_REQUEST: String = "$BASE_URI/reception/serviceRequests"
         const val ADD_SERVICE_REQUEST = "$BASE_URI/examination/serviceRequests  "
-
         //examination
         const val COMPLETE_EXAMINATION: String = "$BASE_URI/examination"
         const val PATIENTS_OF_RESP: String = "$BASE_URI/examination/patients"
@@ -66,5 +65,10 @@ class Endpoints {
         const val GET_RESP_QUALIFICATION_TO_OBSERVATION_TYPES = "$BASE_URI/dictionary/respQualificationToObservationTypes"
         const val GET_OFFICES = "$BASE_URI/dictionary/offices"
         const val GET_CODE_INFO = "$BASE_URI/dictionary"
+        //device
+        const val TEST_UID = "developer-paramedic-device-test"
+        const val ADD_DEVICE_TASK = "$BASE_URI/desktop/task/add"
+        const val GET_TASK_STATUS = "$BASE_URI/desktop/task/status"
+        const val GET_TASK_RESULT = "$BASE_URI/desktop/task/result"
     }
 }

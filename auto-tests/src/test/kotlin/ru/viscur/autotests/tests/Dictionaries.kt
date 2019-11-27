@@ -1,7 +1,6 @@
 package ru.viscur.autotests.tests
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
@@ -13,7 +12,7 @@ import ru.viscur.dh.fhir.model.type.PractitionerQualification
 import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class Dictionaries {
 
     @Test
@@ -23,6 +22,9 @@ class Dictionaries {
 
         //проверка, что список не пустой
         assertFalse(practitionersInfo.isEmpty())
+
+        //проверка, что в списке нет заблокированных
+        assertNull(practitionersInfo.find { it.extension.blocked == true }?.id)
     }
 
     @Test
@@ -41,6 +43,11 @@ class Dictionaries {
 
         //проверка, что practitioner стало на 1 больше после создания
         assertEquals(practitionerCountAfterCreating, practitionerCountBeforeCreating + 1, "wrong number of practitioners" )
+    }
+
+    @Test
+    fun practitionerUpdating() {
+       
     }
 
     @Test

@@ -16,21 +16,21 @@ import ru.viscur.dh.fhir.model.utils.resources
 @Disabled("Debug purposes only")
 class Predictions {
 
-   /* @Test
+    @Test
     fun predictDiagnosis() {
-        val expectedDiagnosis = "A00"
+        val expectedDiagnosis = "A00-B99"
         val bundle = Helpers.bundleForDiagnosis("RED")
         //получени и проверка предположительных диагнозов по результатам осмотра фельдшером
         val diagnosisList = QueRequests.getDiagnosis(bundle, "2")
         assertEquals(2, diagnosisList.diagnoses.size, "wrong diagnosis count")
         assertEquals(expectedDiagnosis, diagnosisList.diagnoses.first().code, "wrong diagnosis")
-    }*/
+    }
 
     @Test
     fun predictSeverity() {
         val bundle = Helpers.bundleForSeverity()
         //получение и проверка степени тяжести пациента по результатам осмотра фельдшером
-        val severityResponse = QueRequests.getSeverity(bundle)
+        val severityResponse = QueRequests.getSeverity(bundle, "2")
         severityResponse.
                 assertThat().body("severity.code", equalTo("GREEN"))
     }
