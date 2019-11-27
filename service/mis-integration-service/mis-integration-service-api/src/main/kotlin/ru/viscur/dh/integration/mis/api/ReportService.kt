@@ -26,23 +26,23 @@ interface ReportService {
     /**
      * Информация об очередях в кабинеты на тек. момент
      */
-    fun queueInOffices(withPractitioners: Boolean = false): List<QueueInOfficeDto>
+    fun queueInOffices(): List<QueueInOfficeDto>
 
     /**
      * Информация об очереди в кабинет на тек. момент
      */
-    fun queueInOffice(officeId: String): List<QueueInOfficeDto>
+    fun queueInOffice(officeId: String): QueueInOfficeDto
 
     /**
      * Информация об очереди для врача на тек. момент
      * Определяется в каком кабинете находится врач и определяется по [queueInOffice]
      */
-    fun queueOfPractitioner(practitionerId: String): List<QueueInOfficeDto>
+    fun queueOfPractitioner(practitionerId: String): QueueInOfficeDto?
 
     /**
      * Текущая нагрузка на врачей
      */
-    fun workload(): List<QueueInOfficeDto> = queueInOffices(true)
+    fun workload(): List<QueueInOfficeDto>
 
     /**
      * История нагрузки на врачей за период

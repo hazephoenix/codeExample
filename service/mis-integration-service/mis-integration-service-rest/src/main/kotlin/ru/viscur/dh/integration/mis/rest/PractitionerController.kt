@@ -47,4 +47,14 @@ class PractitionerController(
             @RequestParam practitionerId: String,
             @RequestParam value: Boolean
     ) = practitionerService.updateBlocked(practitionerId, value)
+
+    /**
+     * see [PractitionerService.updateOnWork]
+     */
+    @PostMapping("onWork")
+    fun updateOnWork(
+            @RequestParam practitionerId: String,
+            @RequestParam value: Boolean,
+            @RequestParam(required = false) officeId: String? = null
+    ) = practitionerService.updateOnWork(practitionerId, value, officeId)
 }
