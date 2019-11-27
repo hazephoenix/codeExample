@@ -39,5 +39,9 @@ enum class ObservationType(val id: String) {
     /**
      * Рост
      */
-    HEIGHT("Height")
+    HEIGHT("Height"),
+    /**
+     * Оценка интенсивности боли
+     */
+    PAIN_INTENSITY("Pain_intensity")
 }

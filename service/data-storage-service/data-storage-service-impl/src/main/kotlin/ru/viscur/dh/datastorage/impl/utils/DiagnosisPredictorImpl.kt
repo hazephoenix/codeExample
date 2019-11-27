@@ -47,9 +47,11 @@ class DiagnosisPredictorImpl(
                         PredictedDiagnosis(
                                 code = it!!.diagnosisCode,
                                 system = "ValueSet/${ValueSetName.ICD_10}",
-                                probability = it.complaintCodeCount.toDouble()/complaintCodes.size.toDouble())
+                                probability = it.complaintCodeCount.toDouble() / complaintCodes.size.toDouble())
                     }
-            return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes).filter { it.probability > minimalProbability })
+            return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes)
+                    .distinctBy { it.code } // todo: distinct inside sql query?
+                    .filter { it.probability > minimalProbability })
         }
         return PredictDiagnosisResponse(diagnosisCodes)
     }
@@ -135,7 +137,7 @@ class DiagnosisPredictorImpl(
             bloodOxygenSaturation = observations.find { it.code.code() == ObservationType.BLOOD_OXYGEN_SATURATION.id }?.valueInteger,
             consciousnessAssessment = questionnaireResponse?.item?.find { it.linkId == "Consciousness_assessment" }?.answer?.first()?.valueCoding?.code,
             upperRespiratoryAirway = questionnaireResponse?.item?.find { it.linkId == "Upper_respiratory_airway" }?.answer?.first()?.valueCoding?.code,
-            painIntensityAssessment = questionnaireResponse?.item?.find { it.linkId == "Pain_intensity_assessment" }?.answer?.first()?.valueCoding?.code,
+            painIntensity = observations.find { it.code.code() == ObservationType.PAIN_INTENSITY.id }?.valueInteger,
             patientCanStand = questionnaireResponse?.item?.find { it.linkId == "Patient_can_stand" }?.answer?.first()?.valueCoding?.code,
             complaints = questionnaireResponse?.item?.find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }?.answer?.mapNotNull { it.valueString }?.joinToString(", "),
             severity = questionnaireResponse?.item?.find { it.linkId == "Severity" }?.answer?.first()?.valueCoding?.code,

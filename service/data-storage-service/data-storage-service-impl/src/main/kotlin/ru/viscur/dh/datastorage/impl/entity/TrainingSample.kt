@@ -18,7 +18,7 @@ import javax.persistence.*
  * @param consciousnessAssessment Оценка уровня сознания
  * @param bloodOxygenSaturation Уровень оксигенации крови
  * @param bodyTemperature Температура
- * @param painIntensityAssessment Оценка интенсивности боли
+ * @param painIntensity Интенсивность боли
  * @param patientCanStand Пациент может стоять
  * @param complaints Жалобы пациента
  * @param severity Степень тяжести пациента
@@ -57,8 +57,8 @@ data class TrainingSample(
         var bloodOxygenSaturation: Int? = null,
         @Column(name = "body_temperature")
         var bodyTemperature: Double? = null,
-        @Column(name = "pain_intensity_assessment")
-        var painIntensityAssessment: String? = null,
+        @Column(name = "pain_intensity")
+        var painIntensity: Int? = null,
         @Column(name = "patient_can_stand")
         var patientCanStand: String? = null,
         @Column

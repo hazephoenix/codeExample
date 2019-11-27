@@ -5,26 +5,26 @@ drop table if exists training_sample cascade;
 
 create table training_sample
 (
-    id                        bigint     not null default nextval('pk_seq')
+    id                       bigint not null default nextval('pk_seq')
         constraint training_sample_pkey primary key,
-    systolic_bp               int,
-    diastolic_bp              int,
-    age                       int,
-    gender                    text,
-    weight                    int,
-    height                    int,
-    pulse_rate                int,
-    heart_rate                int,
-    breathing_rate            int,
-    upper_respiratory_airway  text,
-    consciousness_assessment  text,
-    blood_oxygen_saturation   int,
-    body_temperature          decimal,
-    pain_intensity_assessment text,
-    patient_can_stand         text,
-    complaints                text,
-    severity                  text,
-    diagnosis                 text       not null
+    systolic_bp              int,
+    diastolic_bp             int,
+    age                      int,
+    gender                   text,
+    weight                   int,
+    height                   int,
+    pulse_rate               int,
+    heart_rate               int,
+    breathing_rate           int,
+    upper_respiratory_airway text,
+    consciousness_assessment text,
+    blood_oxygen_saturation  int,
+    body_temperature         decimal,
+    pain_intensity           int,
+    patient_can_stand        text,
+    complaints               text,
+    severity                 text,
+    diagnosis                text   not null
 );
 
 comment on table training_sample is 'Предполагаемый диагноз МКБ по набору признаков';
@@ -42,7 +42,7 @@ comment on column training_sample.upper_respiratory_airway is 'Верхние д
 comment on column training_sample.consciousness_assessment is 'Оценка уровня сознания';
 comment on column training_sample.blood_oxygen_saturation is 'Уровень оксигенации крови';
 comment on column training_sample.body_temperature is 'Температура тела';
-comment on column training_sample.pain_intensity_assessment is 'Оценка интенсивности боли';
+comment on column training_sample.pain_intensity is 'Интенсивность боли';
 comment on column training_sample.patient_can_stand is 'Пациент может стоять';
 comment on column training_sample.complaints is 'Жалобы';
 comment on column training_sample.severity is 'Степень тяжести';

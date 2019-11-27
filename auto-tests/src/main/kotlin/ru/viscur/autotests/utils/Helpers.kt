@@ -214,13 +214,6 @@ class Helpers {
                                 ))
                         ),
                         QuestionnaireResponseItem(
-                                linkId = "Pain_intensity_assessment",
-                                text = "Оценка интенсивности боли (0-10)",
-                                answer = listOf(QuestionnaireResponseItemAnswer(
-                                        valueCoding = Coding(code = "From_0_to_3", display = "0-3", system = ValueSetName.PAIN_INTENSITY_ASSESSMENT.id)
-                                ))
-                        ),
-                        QuestionnaireResponseItem(
                                 linkId = "Patient_can_stand",
                                 text = "Опорная функция",
                                 answer = listOf(QuestionnaireResponseItemAnswer(

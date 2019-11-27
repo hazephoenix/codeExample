@@ -37,10 +37,6 @@ enum class ValueSetName(val id: String) {
      */
     CONSCIOUSNESS_ASSESSMENT("Consciousness_assessment"),
     /**
-     * Оценка интенсивности боли
-     */
-    PAIN_INTENSITY_ASSESSMENT("Pain_intensity_assessment"),
-    /**
      * Пациент может стоять
      */
     PATIENT_CAN_STAND("Patient_can_stand"),

@@ -10,11 +10,15 @@ package ru.viscur.dh.integration.mis.api.dto
  * @param severityDisplay отображаемая степень тяжести
  * @param name ФИО пациента
  * @param age возраст пациента
+ * @param estDuration ориентировочное время оказания медицинских услуг
+ * @param queueCode код в очереди (З-122...)
  */
 data class QueueItemDto(
         val onum: Int,
         val severity: String,
         val severityDisplay: String,
         val name: String,
-        val age: Int
+        val age: Int,
+        val estDuration: Int,
+        val queueCode: String
 )

@@ -159,7 +159,9 @@ class ReportServiceImpl(
                             severity = queueItem.severity!!.name,
                             severityDisplay = queueItem.severity!!.display,
                             name = patient.name.first().text,
-                            age = patient.age
+                            age = patient.age,
+                            estDuration = queueItem.estDuration,
+                            queueCode = patientService.queueCode(patientId)
                     )
                 }
         )
