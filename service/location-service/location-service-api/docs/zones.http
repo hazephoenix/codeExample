@@ -1,0 +1,38 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+
+GET {{host}}/locations/zones
+Accept: application/json
+Authorization: {{auth_token}}
+
+###
+
+GET {{host}}/locations/zones/info/00
+Accept: application/json
+Authorization: {{auth_token}}
+
+###
+
+GET {{host}}/locations/actual
+Accept: application/json
+Authorization: {{auth_token}}
+
+###
+
+GET {{host}}/locations/list/practitioner/%D0%BD%D0%B5%D0%B2%D1%80%D0%BE%D0%BB%D0%BE%D0%B3_%D0%9F%D0%B5%D1%82%D1%80%D0%BE%D0%B2
+Accept: application/json
+Authorization: {{auth_token}}
+
+###
+
+GET {{host}}/locations/list/office/Office:202
+Accept: application/json
+Authorization: {{auth_token}}
+
+###
