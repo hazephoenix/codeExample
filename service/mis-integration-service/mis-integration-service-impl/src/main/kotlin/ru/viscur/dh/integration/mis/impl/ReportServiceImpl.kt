@@ -7,6 +7,7 @@ import ru.viscur.dh.fhir.model.dto.CarePlanToPrintDto
 import ru.viscur.dh.fhir.model.dto.CarePlanToPrintLocationDto
 import ru.viscur.dh.fhir.model.dto.ObservationDuration
 import ru.viscur.dh.fhir.model.dto.QueueStatusDuration
+import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.entity.QueueItem
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
@@ -48,10 +49,10 @@ class ReportServiceImpl(
     override fun queueInOffices(): List<QueueInOfficeDto> = queueService.queueItems().groupBy { it.location.id!! }.map {
         val officeId = it.key
         val items = it.value
-        queueInOfficeDto(officeId, items)
+        queueInOfficeDto(officeId = officeId, items = items)
     }
 
-    override fun queueInOffice(officeId: String): QueueInOfficeDto = queueInOfficeDto(officeId, queueService.queueItemsOfOffice(officeId))
+    override fun queueInOffice(officeId: String): QueueInOfficeDto = queueInOfficeDto(officeId = officeId, items = queueService.queueItemsOfOffice(officeId))
 
     override fun queueOfPractitioner(practitionerId: String): QueueInOfficeDto? {
         val practitioner = practitionerService.byId(practitionerId)
@@ -72,41 +73,16 @@ class ReportServiceImpl(
                 activeServiceRequests.any { it.code.code() == observationType && !it.isInspectionOfResp() }
                         || activeServiceRequests.all { it.code.code() == observationType && it.isInspectionOfResp() && practitionerId in (it.performer!!.map { it.id }) }
             }
-            return queueInOfficeDto(items = queueItems)
+            return queueInOfficeDto(items = queueItems, practitionerInOffice =  practitioner)
         } else {
             return practitioner.extension.onWorkInOfficeId?.let { queueInOffice(it) }
         }
     }
 
     override fun workload(): List<QueueInOfficeDto> {
-        return queueInOffices().map { queueInOffice ->
-            //todo здесь нужно определение по локации какие врачи находятся в кабинете officeId
-            val officeId = queueInOffice.officeId
-            val practitionerIdsInOffice = when (officeId) {
-                "Office:101" -> listOf("фельдшер_Колосова", "мед_работник_диагностики_Иванова")
-                "Office:140" -> listOf("мед_работник_диагностики_Сидорова")
-                "Office:150" -> listOf("терапевт_Петров")
-                "Office:151" -> listOf("терапевт_Иванов")
-                "Office:116" -> listOf("хирург_Петров")
-                "Office:117" -> listOf("хирург_Иванов")
-                "Office:104" -> listOf("невролог_Петров")
-                "Office:139" -> listOf("невролог_Иванов")
-                "Office:149" -> listOf("уролог_Петров")
-                "Office:129" -> listOf("уролог_Иванов")
-                "Office:130" -> listOf("гинеколог_Петров")
-                "Office:202" -> listOf("гинеколог_Иванов")
-                else -> listOf()
-            }
-            practitionerIdsInOffice.map {
-                val practitionerInOffice = practitionerService.byId(it)
-                queueInOffice.copy().apply {
-                    practitioner = PractitionerDto(
-                            practitionerId = practitionerInOffice.id,
-                            name = practitionerInOffice.name.first().text
-                    )
-                }
-            }
-        }.flatten()
+        return practitionerService.all(onWorkOnly = true).mapNotNull {
+            queueOfPractitioner(it.id)
+        }.filter { it.items.isNotEmpty() }
     }
 
     override fun workloadHistory(start: Date, end: Date): List<WorkloadItemDto> {
@@ -196,7 +172,7 @@ class ReportServiceImpl(
             val workload: Int
     )
 
-    private fun queueInOfficeDto(officeId: String? = null, items: List<QueueItem>) = QueueInOfficeDto(
+    private fun queueInOfficeDto(officeId: String? = null, practitionerInOffice: Practitioner? = null, items: List<QueueItem>) = QueueInOfficeDto(
             officeId = officeId,
             queueSize = items.size,
             queueWaitingSum = items.sumBy { it.estDuration },
@@ -215,5 +191,12 @@ class ReportServiceImpl(
                         patientId = patientId
                 )
             }
-    )
+    ).apply {
+        practitionerInOffice?.run {
+            practitioner = PractitionerDto(
+                    practitionerId = practitionerInOffice.id,
+                    name = practitionerInOffice.name.first().text
+            )
+        }
+    }
 }

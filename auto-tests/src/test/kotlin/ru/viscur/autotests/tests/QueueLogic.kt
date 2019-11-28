@@ -122,7 +122,7 @@ class QueueLogic {
         QueRequests.officeIsBusy(referenceToLocation(office101))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource("B03.016.002"),
-                Helpers.createServiceRequestResource("СтХир")
+                Helpers.createServiceRequestResource("B01.057.001")
         )
         val bundle1 = Helpers.bundle("1120", "GREEN", servRequests)
         val bundle2 = Helpers.bundle("1121", "YELLOW", servRequests)

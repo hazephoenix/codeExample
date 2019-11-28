@@ -275,7 +275,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "diagnosis": "A01",
+  "diagnosis": "K61.4",
   "complaints": ["Сильная боль в правом подреберье"],
   "gender": "male"
 }
@@ -832,7 +832,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           {
             "coding": [
               {
-                "code": "A00.0",
+                "code": "D50.1",
                 "system": "ValueSet/ICD-10"
               }
             ]
@@ -1132,7 +1132,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "СтХир",
+              "code": "B01.057.001",
               "display": "Осмотр хирурга",
               "system": "ValueSet/Observation_types"
             }
@@ -1190,7 +1190,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           {
             "coding": [
               {
-                "code": "A00.0",
+                "code": "D50.1",
                 "system": "ValueSet/ICD-10"
               }
             ]
