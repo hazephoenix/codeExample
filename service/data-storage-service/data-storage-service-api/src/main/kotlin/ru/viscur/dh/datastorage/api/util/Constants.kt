@@ -141,3 +141,35 @@ const val QUALIFICATION_UROLOGIST = "Urologist"
 const val QUALIFICATION_GYNECOLOGIST = "Gynecologist"
 const val QUALIFICATION_PARAMEDIC = "Paramedic"
 const val QUALIFICATION_DIAGNOSTIC_ASSISTANT = "Diagnostic_assistant"
+
+/**
+ * Квалификации (специальности) врачей, которые проводят осмотры (осмотры, если они назначены отв. или осмотры при дообследовании)
+ * Мед. персонал только этих специальностей м. б. назначены ответственными
+ */
+val INSPECTION_QUALIFICATIONS = listOf(
+        QUALIFICATION_THERAPIST,
+        QUALIFICATION_SURGEON,
+        QUALIFICATION_NEUROLOGIST,
+        QUALIFICATION_UROLOGIST,
+        QUALIFICATION_GYNECOLOGIST
+)
+
+/**
+ * Коды осмотров специалистов
+ */
+const val INSPECTION_OF_THERAPIST = "СтТер"
+const val INSPECTION_OF_SURGEON = "СтХир"
+const val INSPECTION_OF_NEUROLOGIST = "СтНев"
+const val INSPECTION_OF_UROLOGIST = "СтУрол"
+const val INSPECTION_OF_GYNECOLOGIST = "СтГинек"
+
+/**
+ * Список кодов осмотров специалистов
+ */
+val INSPECTION_TYPES = listOf(
+        INSPECTION_OF_THERAPIST,
+        INSPECTION_OF_SURGEON,
+        INSPECTION_OF_NEUROLOGIST,
+        INSPECTION_OF_UROLOGIST,
+        INSPECTION_OF_GYNECOLOGIST
+)

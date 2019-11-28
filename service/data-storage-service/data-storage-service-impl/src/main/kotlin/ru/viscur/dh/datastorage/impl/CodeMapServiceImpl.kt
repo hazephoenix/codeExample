@@ -25,7 +25,7 @@ class CodeMapServiceImpl(
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    override fun codeMap(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap {
+    override fun codeMapNullable(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap? {
         val query = em.createNativeQuery("""
             select cm.resource from
                 (with recursive r AS (
@@ -54,7 +54,6 @@ class CodeMapServiceImpl(
         query.setParameter("sourceUrl", "ValueSet/${sourceValueSet.id}")
         query.setParameter("targetUrl", "ValueSet/${targetValueSet.id}")
         return query.fetchResource()
-                ?: throw Exception("not found codeMap for sourceCode: $sourceCode (sourceValueSet: $sourceValueSet, targetValueSet: $targetValueSet)")
     }
 
     override fun all(sourceValueSet: ValueSetName, targetValueSet: ValueSetName): List<CodeMap> =
