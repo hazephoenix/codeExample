@@ -33,6 +33,8 @@ class Helpers {
          */
         const val surgeonId = "хирург_Иванов"
         const val surgeon2Id = "хирург_Петров"
+        const val therapistId = "терапевт_Петров"
+        const val urologistId = "уролог_Петров"
 
         /**
          * Квалификации
@@ -62,6 +64,29 @@ class Helpers {
             val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
             val diagnostiReportMainSyndrome = createDiagnosticReportResource(diagnosisCode = "A00.1", practitionerId = paramedicId, status = DiagnosticReportStatus.mainSyndrome)
             val list = createPractitionerListResource(surgeonId)
+            val claim = createClaimResource()
+
+            val bundle = Bundle(entry = listOf(
+                    BundleEntry(patient),
+                    BundleEntry(diagnosticReport),
+                    BundleEntry(diagnostiReportMainSyndrome),
+                    BundleEntry(bodyWeight),
+                    BundleEntry(personalDataConsent),
+                    BundleEntry(list),
+                    BundleEntry(claim),
+                    BundleEntry(questionnaireResponseSeverityCriteria)
+            ) + (servRequests?.map { BundleEntry(it) } ?: emptyList()))
+            return bundle
+        }
+
+        fun bundleForUrologist(enp: String, severity: String, servRequests: List<ServiceRequest>? = null): Bundle {
+            val patient = createPatientResource(enp = enp)
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
+            val personalDataConsent = createConsentResource()
+            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
+            val diagnostiReportMainSyndrome = createDiagnosticReportResource(diagnosisCode = "A00.1", practitionerId = paramedicId, status = DiagnosticReportStatus.mainSyndrome)
+            val list = createPractitionerListResource(urologistId)
             val claim = createClaimResource()
 
             val bundle = Bundle(entry = listOf(

@@ -7,21 +7,25 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
+import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class PractitionerReport {
 
     companion object {
         val office101 = "Office:101"
         val office116 = "Office:116"
+        val office140 = "Office:140"
         val observationOffice101 = "B03.016.002"
         val observationOffice116 = "A04.16.001"
         val pratitioner101Office = "фельдшер_Колосова"
         val observation150Office = "A03.18.001"
         val surgeonId = Helpers.surgeonId
+        val observationOfSurgeon = "СтХир"
     }
 
     @BeforeEach
@@ -109,5 +113,28 @@ class PractitionerReport {
 
         //проверка, что у хирурга 2 пациента на ответственности
         assertEquals(2, surgeonPatients.size,"wrong patient number for practitioner: $surgeonId")
+    }
+
+    @Test
+    fun gettingPatientOfPractitionerRespAndIspection() {
+
+        val bundle1 = Helpers.bundle("1120", "YELLOW")
+        val bundle2 = Helpers.bundleForUrologist("1121", "RED")
+
+        val patient1ServRequests = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
+        val patientId1 = patientIdFromServiceRequests(patient1ServRequests)
+
+        val patient2ServRequests = QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest)
+        val patientId2 = patientIdFromServiceRequests(patient2ServRequests)
+
+        QueRequests.invitePatientToOffice(Helpers.createListResource(patientId2, office140))
+        QueRequests.patientEntered(Helpers.createListResource(patientId2, office140))
+        val additionalServiceRequests = listOf(
+                Helpers.createServiceRequestResource("СтХир", patientId2)
+        )
+        val bundleForExamin = Bundle(
+                entry = additionalServiceRequests.map { BundleEntry(it) }
+        )
+        QueRequests.addServiceRequests(bundleForExamin)
     }
 }
