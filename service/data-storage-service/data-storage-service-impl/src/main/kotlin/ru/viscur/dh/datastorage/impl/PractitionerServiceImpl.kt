@@ -24,8 +24,10 @@ class PractitionerServiceImpl(
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    override fun all(withBlocked: Boolean): List<Practitioner> {
-        val whereClause = if (withBlocked) "" else "where (r.resource->'extension'->>'blocked')\\:\\:boolean = false"
+    override fun all(withBlocked: Boolean, onWorkOnly: Boolean): List<Practitioner> {
+        val whereClauses = if (withBlocked) mutableListOf() else listOf("(r.resource->'extension'->>'blocked')\\:\\:boolean = false").toMutableList()
+        if (onWorkOnly) whereClauses += "(r.resource->'extension'->>'onWork')\\:\\:boolean = true"
+        val whereClause = if (whereClauses.isEmpty()) "" else "where " + whereClauses.joinToString(" and ")
         val query = em.createNativeQuery("""
             select r.resource
             from practitioner r

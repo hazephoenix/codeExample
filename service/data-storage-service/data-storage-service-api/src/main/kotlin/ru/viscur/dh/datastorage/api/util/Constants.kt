@@ -157,11 +157,11 @@ val INSPECTION_QUALIFICATIONS = listOf(
 /**
  * Коды осмотров специалистов
  */
-const val INSPECTION_OF_THERAPIST = "СтТер"
-const val INSPECTION_OF_SURGEON = "СтХир"
-const val INSPECTION_OF_NEUROLOGIST = "СтНев"
-const val INSPECTION_OF_UROLOGIST = "СтУрол"
-const val INSPECTION_OF_GYNECOLOGIST = "СтГинек"
+const val INSPECTION_OF_THERAPIST = "B01.047.001"
+const val INSPECTION_OF_SURGEON = "B01.057.001"
+const val INSPECTION_OF_NEUROLOGIST = "B01.023.001"
+const val INSPECTION_OF_UROLOGIST = "B01.053.001"
+const val INSPECTION_OF_GYNECOLOGIST = "B01.001.001"
 
 /**
  * Список кодов осмотров специалистов

@@ -12,8 +12,9 @@ interface PractitionerService {
     /**
      * Все мед. работники
      * @param withBlocked с заблокированными. иначе только активные/незаблокированные
+     * @param onWorkOnly только те, кто на работе
      */
-    fun all(withBlocked: Boolean = false): List<Practitioner>
+    fun all(withBlocked: Boolean = false, onWorkOnly: Boolean = false): List<Practitioner>
 
     /**
      * Создание мед. работника

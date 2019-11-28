@@ -35,14 +35,14 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 {}
 ###
 
-POST http://localhost:8080/practitioner/onWork?practitionerId=хирург_Петров&value=false
+POST http://localhost:8080/practitioner/onWork?practitionerId=хирург_Петров&value=true
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-POST http://localhost:8080/practitioner/onWork?practitionerId=мед_работник_диагностики_Сидорова&value=false&officeId=Office:101
+POST http://localhost:8080/practitioner/onWork?practitionerId=мед_работник_диагностики_Сидорова&value=true&officeId=Office:101
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
