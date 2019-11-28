@@ -109,13 +109,22 @@ class PatientServiceImpl(
         }.sortedWith(compareBy({ it.first }, { it.second.name.first().family })).first().second.id
         val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
 
-        val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10, diagnosis)
         val observationTypes =
-                (codeMapService.icdToObservationTypes(diagnosisConcept.parentCode!!) +
+                ((codeMapService.icdToObservationTypes(diagnosis) ?: listOf()) +
                         observationTypeOfResponsible).distinct()
 
-        val serviceRequests = observationTypes.map { observationType ->
-            ServiceRequest(code = observationType)
+//        val serviceRequests = observationTypes.map { observationType ->
+//            ServiceRequest(code = observationType)
+//        }
+        //todo вернуть вариант выше. это сделано т к в V20191017113521__CreateCodeMapIcdToObservationType.sql еще есть типы обследований,
+        // которых в базе нет, их нужно заменить как только врачи скажут на что заменить или добавить недостающие в базу
+        val serviceRequests = observationTypes.mapNotNull { observationType ->
+            try {
+                conceptService.byCode(ValueSetName.OBSERVATION_TYPES, observationType)
+                ServiceRequest(code = observationType)
+            } catch (e: Exception) {
+                null
+            }
         }
         serviceRequests.find { it.code.code() == observationTypeOfResponsible }!!.apply { performer = listOf(referenceToPractitioner(responsiblePractitionerId)) }
 

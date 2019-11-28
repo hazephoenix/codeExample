@@ -54,8 +54,6 @@ class ReportServiceImpl(
     override fun queueInOffice(officeId: String): QueueInOfficeDto = queueInOfficeDto(officeId, queueService.queueItemsOfOffice(officeId))
 
     override fun queueOfPractitioner(practitionerId: String): QueueInOfficeDto? {
-        //todo здесь нужно определение по локации в каком кабинете находится врач
-        val officeId = OFFICE_101
         val practitioner = practitionerService.byId(practitionerId)
         if (practitioner.isInspectionQualification()) {
             val observationType = codeMapService.respQualificationToObservationTypes(practitioner.qualificationCode())
@@ -71,9 +69,8 @@ class ReportServiceImpl(
             )).filter { queueItem ->
                 val patientId = queueItem.subject.id!!
                 val activeServiceRequests = serviceRequestService.active(patientId)
-                activeServiceRequests.any {
-                    it.code.code() == observationType && (it.performer.isNullOrEmpty() || practitionerId in (it.performer!!.map { it.id }))
-                }
+                activeServiceRequests.any { it.code.code() == observationType && !it.isInspectionOfResp() }
+                        || activeServiceRequests.all { it.code.code() == observationType && it.isInspectionOfResp() && practitionerId in (it.performer!!.map { it.id }) }
             }
             return queueInOfficeDto(items = queueItems)
         } else {
