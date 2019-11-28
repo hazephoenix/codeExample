@@ -1,0 +1,8 @@
+delete from valueset r where r.resource ->> 'url' = 'ValueSet/Config_codes';
+delete from concept r where r.resource ->> 'system' = 'ValueSet/Config_codes';
+
+select resource_create('{"resourceType": "ValueSet", "id": "Config_codes", "description": "Коды настроек системы", "name": "Config_codes", "title": "Коды настроек системы", "status": "active", "url": "ValueSet/Config_codes"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Config_codes", "id": "Config_codes:RECALC_NEXT_OFFICE_IN_QUEUE", "code": "RECALC_NEXT_OFFICE_IN_QUEUE", "display": "Пересчитывать следующий кабинет в очереди"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Config_codes", "id": "Config_codes:AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_RED", "code": "AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_RED", "display": "Автоматическая корректировка регламентного времени обслуживания для степени тяжести Красный"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Config_codes", "id": "Config_codes:AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_YELLOW", "code": "AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_YELLOW", "display": "Автоматическая корректировка регламентного времени обслуживания для степени тяжести Желтый"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "system": "ValueSet/Config_codes", "id": "Config_codes:AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_GREEN", "code": "AUTO_CORRECTION_OF_DEFAULT_CLINICAL_IMPRESSION_DURATION_FOR_GREEN", "display": "Автоматическая корректировка регламентного времени обслуживания для степени тяжести Зеленый"}'::jsonb);

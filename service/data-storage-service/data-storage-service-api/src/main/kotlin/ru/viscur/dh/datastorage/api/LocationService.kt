@@ -15,9 +15,14 @@ interface LocationService {
     fun byId(id: String): Location
 
     /**
-     * Все кабинеты, у которых в lastPatientInfo указан пациент [patientId]
+     * Все кабинеты, у которых в [ru.viscur.dh.fhir.model.type.LocationExtension.nextOfficeForPatientsInfo] указан пациент [patientId]
      */
-    fun withPatientInLastPatientInfo(patientId: String): List<Location>
+    fun withPatientInNextOfficeForPatientsInfo(patientId: String): List<Location>
+
+    /**
+     * С устаревшей информацией [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]
+     */
+    fun withOldNextOfficeForPatientsInfo(): List<Location>
 
     /**
      * По типу процедур, обследований: определить НЕЗАКРЫТЫЕ кабинеты, в которых проводится определенная процедура
@@ -25,4 +30,9 @@ interface LocationService {
      * @param type код услуги/процедуры, код из "ValueSet/Observation_types"
      */
     fun byObservationType(type: String): List<String>
+
+    /**
+     * По типу места/кабинета [Location.type]
+     */
+    fun byLocationType(type: String): List<Location>
 }

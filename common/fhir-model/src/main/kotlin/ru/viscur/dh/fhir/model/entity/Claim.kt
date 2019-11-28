@@ -18,19 +18,13 @@ import ru.viscur.dh.fhir.model.utils.genId
  * @param status статус, [ClaimStatus]
  * @param supportingInfo доп.информация:  String/Boolean/Other, [ClaimSupportingInfo]
  * @param accident детали происшествия, [ClaimAccident]
- * @param diagnosis описание диагнозов, [ClaimDiagnosis]
- * @param careTeam назначенные специалисты, [ClaimCareTeam]
- * @param encounter взаимодействия, ссылки на [Encounter]
  */
 class Claim @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
-        @JsonProperty("identifier") identifier: List<Identifier>,
+        @JsonProperty("identifier") identifier: List<Identifier>? =  null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Claim.id,
         @JsonProperty("patient") var patient: Reference,
-        @JsonProperty("status") var status: ClaimStatus =  ClaimStatus.active,
+        @JsonProperty("status") var status: ClaimStatus = ClaimStatus.active,
         @JsonProperty("supportingInfo") val supportingInfo: List<ClaimSupportingInfo>? = null,
-        @JsonProperty("accident") val accident: ClaimAccident,
-        @JsonProperty("diagnosis") val diagnosis: List<ClaimDiagnosis>? = null,
-        @JsonProperty("careTeam") val careTeam: List<ClaimCareTeam>? = null,
-        @JsonProperty("encounter") val encounter: List<Reference>? = null
+        @JsonProperty("accident") val accident: ClaimAccident
 ) : BaseResource(id, identifier, resourceType)

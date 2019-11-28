@@ -56,9 +56,9 @@ class ObservationServiceImplTest {
                         //СНИЛС
                         Identifier(value = "7878 77521487",/*номер*/ type = IdentifierType.SNILS),
                         //qr браслета
-                        Identifier(value = "7878 77521487",/*номер*/ type = IdentifierType.BRACELET)
+                        Identifier(value = "З-018",/*номер*/ type = IdentifierType.QUEUE_CODE)
                 ),
-                name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван", "Алексеевич"))),
+                name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
                 birthDate = Date(),
                 gender = Gender.female,
                 extension = PatientExtension(
@@ -74,7 +74,7 @@ class ObservationServiceImplTest {
                                 type = IdentifierType.RFID
                         )
                 ),
-                name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван", "Алексеевич"))),
+                name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
                 qualification = PractitionerQualification(
                         code = CodeableConcept(systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id, code = "Hirurg"),
                         period = Period(now(), now())
@@ -113,7 +113,9 @@ class ObservationServiceImplTest {
                     ),
                     valueString = "Слизистые носоглотки без изменений",
                     issued = now()
-            )
+            ),
+            "",
+            Severity.GREEN
         )
         createdResources.add(observation as BaseResource)
 

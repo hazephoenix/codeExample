@@ -22,5 +22,5 @@ class CodeMap @JsonCreator constructor(
         @JsonProperty("sourceUrl") val sourceUrl: String,
         @JsonProperty("targetUrl") val targetUrl: String,
         @JsonProperty("sourceCode") val sourceCode: String,
-        @JsonProperty("targetCode") val targetCode: List<CodeMapTargetCode>
+        @JsonProperty("targetCode") var targetCode: List<CodeMapTargetCode>
 ) : BaseResource(id, identifier, resourceType)

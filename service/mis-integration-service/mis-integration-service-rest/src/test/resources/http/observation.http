@@ -41,12 +41,12 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     }
   ],
   "subject": {
-    "reference": "Patient/58e716a0-ee53-409f-a133-424bf875cf14",
+    "reference": "Patient/ignored",
     "type": "Patient"
   },
   "valueInteger": 110,
   "basedOn" : {
-    "reference": "ServiceRequest/18f56d06-43a0-43b3-837a-dd64254c3233"
+    "reference": "ServiceRequest/4a61c6fc-fe03-4eed-861a-85ad9d1982db"
   }
 }
 

@@ -33,33 +33,9 @@ enum class ValueSetName(val id: String) {
      */
     UPPER_RESPIRATORY_AIRWAY("Upper_respiratory_airway"),
     /**
-     * Частота дыхания
-     */
-    BREATHING_RATE("Breathing_rate"),
-    /**
-     * Уровень оксигенации крови
-     */
-    BLOOD_OXYGENATION_LEVEL("Blood_oxygenation_level"),
-    /**
-     * Частота сердечных сокращений в минуту
-     */
-    HEART_RATE_PER_MINUTE("Heart_rate_per_minute"),
-    /**
-     * Артериальное давление верхняя граница
-     */
-    BLOOD_PRESSURE_UPPER_LIMIT("Blood_pressure_upper_limit"),
-    /**
      * Оценка уровня сознания
      */
     CONSCIOUSNESS_ASSESSMENT("Consciousness_assessment"),
-    /**
-     * Температура тела
-     */
-    BODY_TEMPERATURE("Body_temperature"),
-    /**
-     * Оценка интенсивности боли
-     */
-    PAIN_INTENSITY_ASSESSMENT("Pain_intensity_assessment"),
     /**
      * Пациент может стоять
      */
@@ -71,5 +47,21 @@ enum class ValueSetName(val id: String) {
     /**
      * Жалобы пациента
      */
-    COMPLAINTS("Complaints")
+    COMPLAINTS("Complaints"),
+    /**
+     * Типы мест
+     */
+    LOCATION_TYPE("Location_types"),
+    /**
+     * Коды настроек системы
+     */
+    CONFIG_CODES("Config_codes"),
+    /**
+     * Коды каналов поступления
+     */
+    ENTRY_TYPES("Entry_types"),
+    /**
+     * Коды типов транспортировки
+     */
+    TRANSPORTATION_TYPES("Transportation_types")
 }

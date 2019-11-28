@@ -2,23 +2,33 @@ package ru.viscur.dh.datastorage.api
 
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.Coding
 
 /**
  * Сервис для работы с обращениями пациентов
  */
 interface ClinicalImpressionService {
+
+    /**
+     * Все активные обращения пациентов
+     */
+    fun allActive(): List<ClinicalImpression>
+
+    /**
+     * Есть ли активное обращение
+     * Если есть, то возвращается найденное
+     */
+    fun hasActive(patientId: String): ClinicalImpression?
+
     /**
      * Активное обращение пациента
+     * Падение, если не найдено
      */
-    fun active(patientId: String): ClinicalImpression?
+    fun active(patientId: String): ClinicalImpression
 
-    /** todo del
-     * По ссылке в [ClinicalImpression.supportingInfo]
-     * @param refResourceType тип ресурса в ссылке
-     * @param refResourceId id ресурса в ссылке
+    /**
+     * По id назначения
      */
-    fun bySupportingInfoReference(refResourceType: ResourceType.ResourceTypeId, refResourceId: String): ClinicalImpression
-
     fun byServiceRequest(serviceRequestId: String): ClinicalImpression
 
     /**
@@ -32,10 +42,20 @@ interface ClinicalImpressionService {
     /**
      * Завершить все, что связано с активным обращением пациента
      */
-    fun completeRelated(bundle: Bundle): ClinicalImpression
+    fun completeRelated(patientId: String, bundle: Bundle): ClinicalImpression
 
     /**
      * Завершить активное обращение пациента
      */
     fun complete(clinicalImpression: ClinicalImpression): ClinicalImpression
+
+    /**
+     * Канал поступления (код)
+     */
+    fun entryType(clinicalImpression: ClinicalImpression): String
+
+    /**
+     * Тип транспортировки (код)
+     */
+    fun transportationType(clinicalImpression: ClinicalImpression): String
 }

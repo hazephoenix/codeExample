@@ -20,13 +20,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:104",
+        "reference": "Location/Office:116",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a",
+        "reference": "Patient/dfdd7016-ec6e-47fb-ab10-f57d9cb6b2bc",
         "type": "Patient"
       }
     }
@@ -46,13 +46,39 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:101",
+        "reference": "Location/Office:119",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/94b5afcc-8719-4553-9f32-5994b08a4ed8",
+        "reference": "Patient/b1ed1ac7-ff57-4b5d-95a3-230f560b5fe3",
+        "type": "Patient"
+      }
+    }
+  ]
+}
+###                                                                                Поставить пациента первым в очередь в кабинет
+###
+POST http://localhost:8080/queue/office/setAsFirst
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:150",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/1f647c0c-6783-4285-9cca-ac434a4375af",
         "type": "Patient"
       }
     }
@@ -65,8 +91,24 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:101",
-  "type": "Location"
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:116",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/dfdd7016-ec6e-47fb-ab10-f57d9cb6b2bc",
+        "type": "Patient"
+      }
+    }
+  ]
 }
 ###                                                                                Отменить "вход" пациента в кабинет
 ###
@@ -84,7 +126,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:101",
+  "reference": "Location/Office:116",
   "type": "Location"
 }
 ###
@@ -117,6 +159,17 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "reference": "Location/Office:101",
   "type": "Location"
 }
+###                                                                                Отложить прием ожидаемого пациента в кабинет
+###
+POST http://localhost:8080/queue/office/delayGoingToObservation
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/e0393e1a-1c72-4e92-90f8-e02f39bab21c",
+  "type": "Patient"
+}
+###
 ###                                                                                Убрать пациента из очереди
 ###
 DELETE http://localhost:8080/queue/patient
@@ -124,7 +177,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Patient/94b5afcc-8719-4553-9f32-5994b08a4ed8",
+  "reference": "Patient/e0393e1a-1c72-4e92-90f8-e02f39bab21c",
   "type": "Patient"
 }
 ###
@@ -151,9 +204,16 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:101",
+  "reference": "Location/Office:104",
   "type": "Location"
 }
+###                                                                              Информация для монитора для отображения очереди/приема в кабинет/зоне
+###
+GET http://localhost:8080/queue/locationMonitor?officeId=Office:202
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
 ###                                                                              Информация об очереди в целом
 ###
 GET http://localhost:8080/queue/info

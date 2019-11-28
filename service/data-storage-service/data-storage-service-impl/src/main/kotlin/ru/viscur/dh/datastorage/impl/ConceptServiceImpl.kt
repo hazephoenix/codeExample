@@ -4,6 +4,7 @@ import org.springframework.stereotype.*
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.Concept
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
@@ -17,7 +18,7 @@ import javax.persistence.PersistenceContext
 @Service
 class ConceptServiceImpl(private val resourceService: ResourceService) : ConceptService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     override fun byCodeableConcept(codeableConcept: CodeableConcept): Concept {
@@ -37,11 +38,11 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
         )))
     }
 
-    override fun byCode(valueSetId: String, code: String): Concept =
+    override fun byCode(valueSet: ValueSetName, code: String): Concept =
             resourceService.single(
                     ResourceType.Concept, RequestBodyForResources(filter = mapOf(
                     "code" to code,
-                    "system" to "ValueSet/$valueSetId"
+                    "system" to "ValueSet/${valueSet.id}"
             )))
 
     override fun byParent(valueSet: ValueSetName, parentCode: String?): List<Concept> = resourceService.all(
@@ -50,12 +51,25 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
             "system" to "ValueSet/${valueSet.id}"
     )))
 
-    override fun byAlternative(valueSetId: String, realAlternatives: List<String>): List<String> {
+    override fun allInLastLevel(valueSet: ValueSetName): List<String> {
+        val query = em.createNativeQuery("""
+            select r.resource->>'code' from concept r
+            where r.resource->>'system' = :system
+                and not exists (
+                    select 1 from concept rIntr
+                    where rIntr.resource->>'parentCode' = r.resource->>'code'
+                    )
+        """)
+        query.setParameter("system", "ValueSet/${valueSet.id}")
+        return query.resultList as List<String>
+    }
+
+    override fun byAlternative(valueSet: ValueSetName, realAlternatives: List<String>): List<String> {
         if (realAlternatives.isEmpty()) return listOf()
         val realAlternativesStr = realAlternatives.mapIndexed { index, code -> "(?${index + 1})" }.joinToString(", ")
         val systemParamNumber = realAlternatives.size + 1
         val q = em.createNativeQuery("""
-        select resource ->> 'code' code
+        select distinct resource ->> 'code' code
         from (select * from (values $realAlternativesStr) c (real_alt)) c
              join
          (select jsonb_array_elements(r.resource -> 'alternatives') ->> 0 alt, r.resource
@@ -66,7 +80,7 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
         realAlternatives.forEachIndexed { index, code ->
             q.setParameter(index + 1, code)
         }
-        q.setParameter(systemParamNumber, "ValueSet/$valueSetId")
+        q.setParameter(systemParamNumber, "ValueSet/${valueSet.id}")
         return q.resultList as List<String>
     }
 }

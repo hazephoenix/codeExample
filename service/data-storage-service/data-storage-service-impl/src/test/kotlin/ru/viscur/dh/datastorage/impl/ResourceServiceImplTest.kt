@@ -10,11 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.impl.config.DataStorageConfig
-import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.HealthcareService
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.CodeableConcept
+import ru.viscur.dh.fhir.model.type.LocationExtension
+import ru.viscur.dh.fhir.model.utils.now
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
+import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import java.util.concurrent.CompletableFuture
 
 @SpringBootTest(
@@ -25,6 +29,15 @@ import java.util.concurrent.CompletableFuture
 class ResourceServiceImplTest {
     @Autowired
     lateinit var resourceServiceImpl: ResourceService
+
+    companion object {
+        private fun location(id: String, name: String): Location = Location(
+                id = id,
+                name = name,
+                extension = LocationExtension(statusUpdatedAt = now()),
+                type = listOf(CodeableConcept(code = "Diagnostic", systemId = ValueSetName.LOCATION_TYPE.id))
+        )
+    }
 
     @Test
     @Order(1)
@@ -126,7 +139,7 @@ class ResourceServiceImplTest {
     fun updateResource() {
         val id = "for test"
         try {
-            resourceServiceImpl.create(Location(id = id, name = "1"))
+            resourceServiceImpl.create(location(id = id, name = "1"))
             val updated = resourceServiceImpl.update(ResourceType.Location, id) {
                 name = "newName"
             }
@@ -141,7 +154,7 @@ class ResourceServiceImplTest {
         val locationId = "for test. location"
         val hsId = "for test. hs"
         try {
-            resourceServiceImpl.create(Location(id = locationId, name = "1"))
+            resourceServiceImpl.create(location(id = locationId, name = "1"))
             resourceServiceImpl.create(HealthcareService(
                     id = hsId,
                     name = "1",
@@ -168,7 +181,7 @@ class ResourceServiceImplTest {
 
         val id = "for test severalUpdatingResourceInTx"
         try {
-            resourceServiceImpl.create(Location(id = id, name = "20"))
+            resourceServiceImpl.create(location(id = id, name = "20"))
             updateLocation(id)
             val locationAfterUpdated = resourceServiceImpl.byId(ResourceType.Location, id)
             assertEquals("21", locationAfterUpdated.name)
@@ -195,7 +208,7 @@ class ResourceServiceImplTest {
     fun asyncUpdateResource() {
         val id = "for async test"
         try {
-            resourceServiceImpl.create(Location(id = id, name = "1"))
+            resourceServiceImpl.create(location(id = id, name = "1"))
             for (i in (1..100)) {
                 CompletableFuture.runAsync {
                     resourceServiceImpl.update(ResourceType.Location, id) {

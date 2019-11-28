@@ -4,17 +4,17 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import ru.viscur.dh.apps.paramedicdevice.dto.Task
-import ru.viscur.dh.apps.paramedicdevice.dto.TaskType
 import ru.viscur.dh.apps.paramedicdevice.dto.TvesResponse
-import ru.viscur.dh.apps.paramedicdevice.events.TaskComplete
-import ru.viscur.dh.apps.paramedicdevice.events.TaskError
-import ru.viscur.dh.apps.paramedicdevice.events.TaskRequested
-import ru.viscur.dh.apps.paramedicdevice.events.TaskStarted
-import java.lang.Exception
+import ru.viscur.dh.common.dto.events.TaskComplete
+import ru.viscur.dh.common.dto.events.TaskError
+import ru.viscur.dh.common.dto.events.TaskRequested
+import ru.viscur.dh.common.dto.events.TaskStarted
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskType
 
 /**
  * Created at 11.10.2019 11:36 by TimochkinEA
@@ -22,6 +22,7 @@ import java.lang.Exception
  * Весы
  */
 @Component
+@Profile("!fake-device")
 class Weight(
         private val restTemplate: RestTemplate,
         @Value("\${paramedic.tves.url:http://localhost:1221/tves}")

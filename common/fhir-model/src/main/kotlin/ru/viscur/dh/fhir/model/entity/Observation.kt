@@ -38,7 +38,7 @@ class Observation @JsonCreator constructor(
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Observation.id,
         @JsonProperty("status") var status: ObservationStatus = ObservationStatus.registered,
         @JsonProperty("issued") val issued: Date,
-        @JsonProperty("code") val code: CodeableConcept,
+        @JsonProperty("code") var code: CodeableConcept,
         @JsonProperty("basedOn") var basedOn: Reference? = null,
         @JsonProperty("performer") var performer: List<Reference>,
         @JsonProperty("subject") var subject: Reference,

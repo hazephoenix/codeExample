@@ -21,13 +21,13 @@ select resource_create('{"resourceType": "Concept", "id": "Blood_oxygenation_lev
 select resource_create('{"resourceType": "Concept", "id": "Blood_oxygenation_level:2.More_than_90%_with_oxygen_inhalation", "code": "More_than_90%_with_oxygen_inhalation", "system": "ValueSet/Blood_oxygenation_level", "display": "Более 90% с ингаляцией кислорода"}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Blood_oxygenation_level:3.More_than_95%_without_oxygen_inhalation", "code": "More_than_95%_without_oxygen_inhalation", "system": "ValueSet/Blood_oxygenation_level", "display": "Более 95% без ингаляции кислорода"}'::jsonb);
 
-delete from valueset r where r.resource ->> 'url' = 'ValueSet/Heart_rate_per_minute';
-delete from concept r where r.resource ->> 'system' = 'ValueSet/Heart_rate_per_minute';
+delete from valueset r where r.resource ->> 'url' = 'ValueSet/Heart_rate';
+delete from concept r where r.resource ->> 'system' = 'ValueSet/Heart_rate';
 
-select resource_create('{"resourceType": "ValueSet", "id": "Heart_rate_per_minute", "url": "ValueSet/Heart_rate_per_minute", "name": "Heart_rate_per_minute", "title": "Частота сердечных сокращений в минуту", "description": "Частота сердечных сокращений в минуту", "status": "active"}'::jsonb);
-select resource_create('{"resourceType": "Concept", "id": "Heart_rate_per_minute:1.More_than_150_or_less_than_40", "code": "More_than_150_or_less_than_40", "system": "ValueSet/Heart_rate_per_minute", "display": "Более 150 или менее 40"}'::jsonb);
-select resource_create('{"resourceType": "Concept", "id": "Heart_rate_per_minute:2.More_than_120_and_less_than_50", "code": "More_than_120_and_less_than_50", "system": "ValueSet/Heart_rate_per_minute", "display": "Более 120 и менее 50"}'::jsonb);
-select resource_create('{"resourceType": "Concept", "id": "Heart_rate_per_minute:3.From_51_to_119", "code": "From_51_to_119", "system": "ValueSet/Heart_rate_per_minute", "display": "От 51 до 119"}'::jsonb);
+select resource_create('{"resourceType": "ValueSet", "id": "Heart_rate", "url": "ValueSet/Heart_rate", "name": "Heart_rate", "title": "Частота сердечных сокращений в минуту", "description": "Частота сердечных сокращений в минуту", "status": "active"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Heart_rate:1.More_than_150_or_less_than_40", "code": "More_than_150_or_less_than_40", "system": "ValueSet/Heart_rate", "display": "Более 150 или менее 40"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Heart_rate:2.More_than_120_and_less_than_50", "code": "More_than_120_and_less_than_50", "system": "ValueSet/Heart_rate", "display": "Более 120 и менее 50"}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Heart_rate:3.From_51_to_119", "code": "From_51_to_119", "system": "ValueSet/Heart_rate", "display": "От 51 до 119"}'::jsonb);
 
 delete from valueset r where r.resource ->> 'url' = 'ValueSet/Blood_pressure_upper_limit';
 delete from concept r where r.resource ->> 'system' = 'ValueSet/Blood_pressure_upper_limit';

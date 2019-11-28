@@ -30,6 +30,18 @@ interface PatientService {
     fun severity(patientId: String): Severity
 
     /**
+     * Код в очереди, [ru.viscur.dh.fhir.model.type.ClinicalImpressionExtension.queueCode]
+     * Только если есть активное обращение
+     */
+    fun queueCode(patientId: String): String
+
+    /**
+     * Задать степень тяжести пациенту
+     * Возвращает true если поменяли на новое. Иначе пытались поменять на тот же тип
+     */
+    fun updateSeverity(patientId: String, severity: Severity): Boolean
+
+    /**
      * Узнать статус пациента в очереди [PatientQueueStatus]
      */
     fun queueStatusOfPatient(patientId: String): PatientQueueStatus
@@ -38,6 +50,18 @@ interface PatientService {
      * Код предварительного диагноза
      */
     fun preliminaryDiagnosticConclusion(patientId: String): String?
+
+    /**
+     * Ведущий синдром
+     * Если не найден - падение
+     */
+    fun mainSyndrome(patientId: String): DiagnosticReport
+
+    /**
+     * Окончательный диагноз
+     * Если не найден - падение
+     */
+    fun finalDiagnosticReport(patientId: String): DiagnosticReport
 
     /**
      * Определение по диагнозу МКБ, полу пациента и жалобам:
@@ -60,8 +84,18 @@ interface PatientService {
     fun saveFinalPatientData(bundle: Bundle): String
 
     /**
+     * Сохранение данных регистрации пациента фельдшером для перевязки
+     */
+    fun saveFinalPatientDataForBandage(bundle: Bundle): String
+
+    /**
      * Получить список ожидающих осмотра пациентов по id ответственного врача
      * Если [practitionerId] не задан, возвращаются все
      */
     fun patientsToExamine(practitionerId: String? = null): List<PatientToExamine>
+
+    /**
+     * Id пациентов, которые долгое время имеют статус [PatientQueueStatus.GOING_TO_OBSERVATION]
+     */
+    fun withLongGoingToObservation(): List<String>
 }

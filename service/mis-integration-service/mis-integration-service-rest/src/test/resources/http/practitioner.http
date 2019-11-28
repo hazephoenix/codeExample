@@ -1,0 +1,124 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###
+
+GET http://localhost:8080/practitioner
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+GET http://localhost:8080/practitioner/byId?id=хирург_Петров
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+GET http://localhost:8080/practitioner?withBlocked=true
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST http://localhost:8080/practitioner/blocked?practitionerId=хирург_Петров&value=false
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST http://localhost:8080/practitioner/onWork?practitionerId=хирург_Петров&value=false
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST http://localhost:8080/practitioner/onWork?practitionerId=мед_работник_диагностики_Сидорова&value=false&officeId=Office:101
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST http://localhost:8080/practitioner
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "id": "ignored",
+  "resourceType": "Practitioner",
+  "name": [
+    {
+      "use": "official",
+      "text": "Новый Петр Валерьевич",
+      "family": "Новый",
+      "given": [
+        "Петр"
+      ],
+      "suffix": [
+        "Валерьевич"
+      ]
+    }
+  ],
+  "gender": "male",
+  "qualification": {
+    "code": {
+      "coding": [
+        {
+          "code": "Surgeon",
+          "system": "ValueSet/Practitioner_qualifications"
+        }
+      ]
+    }
+  },
+  "extension": {
+    "blocked": false
+  }
+}
+###
+
+PUT http://localhost:8080/practitioner
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "id": "хирург_Петров",
+  "resourceType": "Practitioner",
+  "name": [
+    {
+      "use": "official",
+      "text": "Отредактированный Петр Валерьевич",
+      "family": "Отредактированный",
+      "given": [
+        "Петр"
+      ],
+      "suffix": [
+        "Валерьевич"
+      ]
+    }
+  ],
+  "gender": "male",
+  "qualification": {
+    "code": {
+      "coding": [
+        {
+          "code": "Surgeon",
+          "system": "ValueSet/Practitioner_qualifications"
+        }
+      ]
+    }
+  },
+  "extension": {
+    "blocked": true
+  }
+}
+###

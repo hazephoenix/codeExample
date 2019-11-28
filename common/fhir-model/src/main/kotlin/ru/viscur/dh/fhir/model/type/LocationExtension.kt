@@ -2,7 +2,6 @@ package ru.viscur.dh.fhir.model.type
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import java.util.*
 
 /**
@@ -12,10 +11,10 @@ import java.util.*
  *
  * @param observationType  типы проводимых услуг/процедур, коды из "ValueSet/Observation_types"
  * @param statusUpdatedAt когда поменялся [статус Location.status][ru.viscur.dh.fhir.model.entity.Location.status]
- * @param lastPatientInfo информация кабинета о последнем принятом пациенте, [LocationExtensionLastPatientInfo]
+ * @param nextOfficeForPatientsInfo информация кабинета о последих принятых пациентах, [LocationExtensionNextOfficeForPatientInfo]
  */
 class LocationExtension @JsonCreator constructor(
         @JsonProperty("observationType") var observationType: List<Coding>? = null,
-        @JsonProperty("statusUpdatedAt") var statusUpdatedAt: Date? = null,
-        @JsonProperty("lastPatientInfo") var lastPatientInfo: LocationExtensionLastPatientInfo? = null
+        @JsonProperty("statusUpdatedAt") var statusUpdatedAt: Date,
+        @JsonProperty("nextOfficeForPatientsInfo") var nextOfficeForPatientsInfo: List<LocationExtensionNextOfficeForPatientInfo> = listOf()
 )
