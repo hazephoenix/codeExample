@@ -18,6 +18,7 @@ include(
         "applications:dh-central-server-app",
         "applications:dh-paramedic-device-app",
         "applications:dh-mis-integration-test-app",
+        "applications:dh-rfid-location-device-app",
         "auto-tests",
         "common:transaction-desc",
         "common:triton-monitor-sdk",

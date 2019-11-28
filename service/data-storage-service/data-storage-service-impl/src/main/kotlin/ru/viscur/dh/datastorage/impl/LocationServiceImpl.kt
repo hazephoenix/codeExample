@@ -78,4 +78,12 @@ class LocationServiceImpl(
         query.setParameter("type", type)
         return query.fetchResourceList()
     }
+
+    override fun allLocations(): List<Location> {
+        val query = em.createNativeQuery("""
+            select r.resource 
+            from location r 
+        """.trimIndent())
+        return query.fetchResourceList()
+    }
 }

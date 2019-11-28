@@ -89,10 +89,11 @@ interface CodeMapService {
      *
      * @param complaints Список кодов жалоб, найденных в справочнике и соответсвующих тем,
      *  что ввел фельдшер
+     * @param exceptCodes Список кодов диагнозов для исключения из выборки
      * @param take Сколько подходящих записей необходимо найти
      * @return Список кодов МКБ, подходящих по списку жалоб, и число вхождений искомых жалоб
      */
-    fun icdByAnyComplaints(complaints: List<String>, take: Int): List<ComplaintOccurrence?>
+    fun icdByAnyComplaints(complaints: List<String>, exceptCodes: List<String>, take: Int): List<ComplaintOccurrence?>
 
     /**
      * По коду специальности ответственного врача [ValueSetName.PRACTITIONER_QUALIFICATIONS] код выполняемой услуги из [ValueSetName.OBSERVATION_TYPES]

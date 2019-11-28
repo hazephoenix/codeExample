@@ -64,18 +64,26 @@ class ConceptServiceImpl(private val resourceService: ResourceService) : Concept
         return query.resultList as List<String>
     }
 
-    override fun byAlternative(valueSet: ValueSetName, realAlternatives: List<String>): List<String> {
+    override fun byAlternativeOrDisplay(valueSet: ValueSetName, realAlternatives: List<String>): List<String> {
         if (realAlternatives.isEmpty()) return listOf()
         val realAlternativesStr = realAlternatives.mapIndexed { index, code -> "(?${index + 1})" }.joinToString(", ")
         val systemParamNumber = realAlternatives.size + 1
         val q = em.createNativeQuery("""
-        select distinct resource ->> 'code' code
+         select distinct resource ->> 'code' code
         from (select * from (values $realAlternativesStr) c (real_alt)) c
-             join
-         (select jsonb_array_elements(r.resource -> 'alternatives') ->> 0 alt, r.resource
-          from concept r
-          where r.resource ->> 'system' = ?$systemParamNumber) alts
-         on c.real_alt ilike '%' || alts.alt || '%'
+                 join
+             ( select disp.resource, alts.alt, disp.display from
+                 (select r.id, r.resource->>'display' display, r.resource
+              from concept r
+              where r.resource ->> 'system' = 'ValueSet/Complaints') disp
+                 left join
+                 (
+                     select r.id, jsonb_array_elements(r.resource -> 'alternatives') ->> 0 alt
+                     from concept r
+                     where r.resource ->> 'system' = ?$systemParamNumber) alts
+                 on disp.id = alts.id
+                 ) alts
+             on c.real_alt ilike '%' || alts.alt || '%' or c.real_alt ilike '%' || alts.display || '%'
         """.trimIndent())
         realAlternatives.forEachIndexed { index, code ->
             q.setParameter(index + 1, code)

@@ -1,4 +1,4 @@
-package ru.viscur.dh.apps.centralserver.config
+package ru.viscur.dh.apps.rfidlocationdevice
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -10,26 +10,19 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter
 import org.springframework.jms.support.converter.MessageType
 
-/**
- * Created at 11.11.2019 15:08 by TimochkinEA
- *
- * Настройки JMS
- */
 @Configuration
 @EnableJms
-class JmsConfig(
+class RfidLocationDeviceAppConfiguration(
         private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
 ) {
 
     @Bean
-    fun jacksonJmsMessageConverter(): MessageConverter {
+    fun jacksonJmsMessageConverter(): MessageConverter = MappingJackson2MessageConverter().apply {
         val objectMapper = jackson2ObjectMapperBuilder.build<ObjectMapper>().apply {
             configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         }
-        val converter = MappingJackson2MessageConverter()
-        converter.setObjectMapper(objectMapper)
-        converter.setTargetType(MessageType.TEXT)
-        converter.setTypeIdPropertyName("_type")
-        return converter
+        setObjectMapper(objectMapper)
+        setTargetType(MessageType.TEXT)
+        setTypeIdPropertyName("_type")
     }
 }

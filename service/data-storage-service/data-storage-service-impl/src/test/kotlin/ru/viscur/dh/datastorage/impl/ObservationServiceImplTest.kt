@@ -5,14 +5,13 @@ import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.*
 import org.springframework.boot.autoconfigure.*
 import org.springframework.boot.test.context.*
+import ru.viscur.autotests.utils.*
 import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.impl.config.*
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.valueSets.*
-import java.util.Date
 
 @SpringBootTest(
         classes = [DataStorageConfig::class]
@@ -24,81 +23,23 @@ class ObservationServiceImplTest {
     lateinit var resourceService: ResourceService
     @Autowired
     lateinit var observationService: ObservationService
+    @Autowired
+    lateinit var serviceRequestService: ServiceRequestService
 
     @Test
     @Order(1)
     fun `should return ServiceRequest by observation`() {
         val createdResources = mutableListOf<BaseResource>()
-        val patient = Patient(
-                identifier = listOf(
-                        //паспорт
-                        Identifier(
-                                value = "7878 77521487",//серия номер
-                                type = CodeableConcept(
-                                        systemId = ValueSetName.IDENTIFIER_TYPES.id,
-                                        code = IdentifierType.PASSPORT.toString()
-                                ),
-                                assigner = Reference(display = "ОУФМС по ТО..."),//кем выдан
-                                period = Period(start = now())
-                        ),
-                        //полис
-                        Identifier(
-                                value = "7878 77521487",//серия номер
-                                type = CodeableConcept(
-                                        systemId = ValueSetName.IDENTIFIER_TYPES.id,
-                                        code = IdentifierType.DIGITAL_ASSURANCE.toString()
-                                ),//|| physicalPolis - полис + вид полиса
-                                assigner = Reference(display = "ОУФМС по ТО..."),//кем выдан
-                                period = Period(start = now(), end = now())//действует с по
-                        ),
-                        //ЕНП
-                        Identifier(value = "7878 77521487",/*серия номер*/ type = IdentifierType.ENP),
-                        //СНИЛС
-                        Identifier(value = "7878 77521487",/*номер*/ type = IdentifierType.SNILS),
-                        //qr браслета
-                        Identifier(value = "З-018",/*номер*/ type = IdentifierType.QUEUE_CODE)
-                ),
-                name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
-                birthDate = Date(),
-                gender = Gender.female,
-                extension = PatientExtension(
-                        nationality = "Russian",//национальность
-                        birthPlace = Address(country = "Russia", text = "Россия ТО г. Томск", state = "TO", city = "Tomsk")//место рождения
-                )
-        ).let { resourceService.create(it) }.also { createdResources.add(it) }
-        val practitioner = Practitioner(
-                identifier = listOf(
-                        //rfid
-                        Identifier(
-                                value = "wrewfwefwe",
-                                type = IdentifierType.RFID
-                        )
-                ),
-                name = listOf(HumanName(text = "Петров И. А.", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
-                qualification = PractitionerQualification(
-                        code = CodeableConcept(systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id, code = "Hirurg"),
-                        period = Period(now(), now())
-                )
-
-        ).let { resourceService.create(it) }.also { createdResources.add(it) }
-        val servReq = ServiceRequest(
-                subject = Reference(patient),
-                code = CodeableConcept(
-                        code = "HIRURG",
-                        systemId = ValueSetName.OBSERVATION_TYPES.id,
-                        display = "Осмотр хирурга"
-                ),
-                extension = ServiceRequestExtension(executionOrder = 1)
-        ).let { resourceService.create(it) }.also { createdResources.add(it) }
-
-        val carePlan = CarePlan(
-                status = CarePlanStatus.active,
-                contributor = Reference(practitioner),
-                author = Reference(practitioner),
-                subject = Reference(patient),
-                activity = listOf(CarePlanActivity(Reference(servReq))),
-                created = now()
-        ).let { resourceService.create(it) }.also { createdResources.add(it) }
+        val patient = Helpers.createPatientResource("103")
+                .let { resourceService.create(it) }.also { createdResources.add(it) }
+        val practitioner = Helpers.createPractitioner()
+                .let { resourceService.create(it) }.also { createdResources.add(it) }
+        val servReq = Helpers.createServiceRequestResource("", patient.id)
+                .let { resourceService.create(it) }.also { createdResources.add(it) }
+        val carePlan = Helpers.createCarePlan(patient.id, listOf(servReq))
+                .let { resourceService.create(it) }.also { createdResources.add(it) }
+        val clinicalImpression = Helpers.createClinicalImpression(patient.id, Severity.YELLOW, listOf(Reference(carePlan)))
+                .let { resourceService.create(it) }.also { createdResources.add(it) }
 
         // Добавляем обследование
         val observation = observationService.create(patient.id,
@@ -120,27 +61,17 @@ class ObservationServiceImplTest {
         createdResources.add(observation as BaseResource)
 
         // Проверяем, что статус маршрутного листа изменился на "ожидает результатов"
-        assertEquals(resourceService.byId(ResourceType.CarePlan, carePlan.id).status, CarePlanStatus.waiting_results)
+        assertEquals(resourceService.byId(ResourceType.CarePlan, carePlan.id).status, CarePlanStatus.active)
 
         // Обследование зарегистрировано
         assertEquals(resourceService.byId(ResourceType.Observation, observation.id).status, ObservationStatus.registered)
-
-        // TODO: убрать, когда заменим метод поиска обследований
-        // Поиск обследования по id пациента и статусу обследования
-        val createdObservation = observationService.byPatientAndStatus(patient.id, ObservationStatus.registered).firstOrNull()
-        assertNotNull(createdObservation)
-
-        // Ждем результатов обследования
-        assertEquals(resourceService.byId(ResourceType.ServiceRequest, servReq.id).status, ServiceRequestStatus.waiting_result)
 
         // Добавляем результаты в обследование и завершаем его
         observation.valueInteger = 180
         observation.status = ObservationStatus.final
         observationService.update(patient.id, observation)
-
-        // Проверяем, что статусы направления и маршрутного листа обновились
+        serviceRequestService.updateStatusByObservation(observation)
         assertEquals(resourceService.byId(ResourceType.ServiceRequest, servReq.id).status, ServiceRequestStatus.completed)
-        assertEquals(resourceService.byId(ResourceType.CarePlan, carePlan.id).status, CarePlanStatus.results_are_ready)
 
         // TODO: finalize deleting test resources
         createdResources.forEach {

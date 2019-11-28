@@ -27,7 +27,7 @@ class ResponsibleQualificationsPredictor(
             val relativeGender = qualification.relativeGender
             relativeGender.isNullOrEmpty() || relativeGender == gender
         }
-        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
+        val complaintCodes = conceptService.byAlternativeOrDisplay(ValueSetName.COMPLAINTS, complaints)
         //случай, если у пациента есть жалобы, указанные в условиях назначения отв. специалиста (например, с сильной болью направляем к хирургу при I70-I79)
         val qualificationsFilteredByComplaints = qualifications.filter { qualification ->
             complaintCodes.any { complaintCode ->
