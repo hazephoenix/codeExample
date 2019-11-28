@@ -1,0 +1,6 @@
+spring:
+  artemis:
+    user: admin
+    password: admin
+  main:
+    web-application-type: none
