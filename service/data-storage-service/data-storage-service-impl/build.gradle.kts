@@ -6,6 +6,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
 
     implementation ("org.postgresql:postgresql")
+    implementation(project(":auto-tests"))
 
     compile("javax.validation:validation-api:2.0.1.Final")
 }

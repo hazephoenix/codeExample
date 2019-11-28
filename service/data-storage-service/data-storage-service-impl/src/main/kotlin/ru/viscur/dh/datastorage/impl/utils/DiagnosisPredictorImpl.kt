@@ -30,13 +30,16 @@ class DiagnosisPredictorImpl(
     private val minimalProbability = 0.95
 
     override fun predict(bundle: Bundle, take: Int): PredictDiagnosisResponse {
-        val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse).first()
+        val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse)
+                .find { it.questionnaire == "Questionnaire/Severity_criteria" }
+                ?: throw Exception("Could not predict diagnosis: no severity criteria questionnaire response found ")
         val complaints = questionnaireResponse.item
                 .find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }
                 ?.answer?.mapNotNull { it.valueString }
                 ?: throw Exception("Could not predict diagnosis: no complaints provided")
 
-        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
+        // todo: debug byAlternativesOrCode
+        val complaintCodes = conceptService.byAlternativeOrDisplay(ValueSetName.COMPLAINTS, complaints)
         if (complaintCodes.isEmpty()) throw Error("Complaint codes not found")
 
         val diagnosisCodesList = codeMapService.icdByAllComplaints(complaintCodes, take)
@@ -47,7 +50,7 @@ class DiagnosisPredictorImpl(
                         PredictedDiagnosis(
                                 code = it!!.diagnosisCode,
                                 system = "ValueSet/${ValueSetName.ICD_10}",
-                                probability = it.complaintCodeCount.toDouble() / diagnosisCodesList.size.toDouble()
+                                probability = it.complaintCodeCount.toDouble() / complaintCodes.size.toDouble()
                         )
                     }
             return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes)
@@ -89,7 +92,7 @@ class DiagnosisPredictorImpl(
                     // заключительный диагноз всегда один
                     val diagnosisCode = diagnosticReport.conclusionCode.first().code()
                     codeMapService.icdToComplaints(diagnosisCode).let { sourceCodes ->
-                        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
+                        val complaintCodes = conceptService.byAlternativeOrDisplay(ValueSetName.COMPLAINTS, complaints)
                         val resultComplaints = mutableListOf<CodeMapTargetCode>()
                         complaintCodes.forEach { code ->
                             if (!sourceCodes.contains(code)) {
