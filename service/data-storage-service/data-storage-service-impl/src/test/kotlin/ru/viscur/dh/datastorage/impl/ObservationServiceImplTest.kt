@@ -23,6 +23,8 @@ class ObservationServiceImplTest {
     lateinit var resourceService: ResourceService
     @Autowired
     lateinit var observationService: ObservationService
+    @Autowired
+    lateinit var serviceRequestService: ServiceRequestService
 
     @Test
     @Order(1)
@@ -35,6 +37,8 @@ class ObservationServiceImplTest {
         val servReq = Helpers.createServiceRequestResource("", patient.id)
                 .let { resourceService.create(it) }.also { createdResources.add(it) }
         val carePlan = Helpers.createCarePlan(patient.id, listOf(servReq))
+                .let { resourceService.create(it) }.also { createdResources.add(it) }
+        val clinicalImpression = Helpers.createClinicalImpression(patient.id, Severity.YELLOW, listOf(Reference(carePlan)))
                 .let { resourceService.create(it) }.also { createdResources.add(it) }
 
         // Добавляем обследование
@@ -57,27 +61,17 @@ class ObservationServiceImplTest {
         createdResources.add(observation as BaseResource)
 
         // Проверяем, что статус маршрутного листа изменился на "ожидает результатов"
-        assertEquals(resourceService.byId(ResourceType.CarePlan, carePlan.id).status, CarePlanStatus.waiting_results)
+        assertEquals(resourceService.byId(ResourceType.CarePlan, carePlan.id).status, CarePlanStatus.active)
 
         // Обследование зарегистрировано
         assertEquals(resourceService.byId(ResourceType.Observation, observation.id).status, ObservationStatus.registered)
-
-        // TODO: убрать, когда заменим метод поиска обследований
-        // Поиск обследования по id пациента и статусу обследования
-        val createdObservation = observationService.byPatientAndStatus(patient.id, ObservationStatus.registered).firstOrNull()
-        assertNotNull(createdObservation)
-
-        // Ждем результатов обследования
-        assertEquals(resourceService.byId(ResourceType.ServiceRequest, servReq.id).status, ServiceRequestStatus.waiting_result)
 
         // Добавляем результаты в обследование и завершаем его
         observation.valueInteger = 180
         observation.status = ObservationStatus.final
         observationService.update(patient.id, observation)
-
-        // Проверяем, что статусы направления и маршрутного листа обновились
+        serviceRequestService.updateStatusByObservation(observation)
         assertEquals(resourceService.byId(ResourceType.ServiceRequest, servReq.id).status, ServiceRequestStatus.completed)
-        assertEquals(resourceService.byId(ResourceType.CarePlan, carePlan.id).status, CarePlanStatus.results_are_ready)
 
         // TODO: finalize deleting test resources
         createdResources.forEach {
