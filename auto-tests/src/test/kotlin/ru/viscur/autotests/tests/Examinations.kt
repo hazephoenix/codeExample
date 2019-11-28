@@ -6,22 +6,25 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
+import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
+import ru.viscur.autotests.tests.Constants.Companion.office101Id
+import ru.viscur.autotests.tests.Constants.Companion.redZoneId
 import ru.viscur.autotests.utils.*
+import ru.viscur.autotests.utils.Helpers.Companion.bundle
+import ru.viscur.autotests.utils.Helpers.Companion.createDiagnosticReportResource
+import ru.viscur.autotests.utils.Helpers.Companion.createEncounter
+import ru.viscur.autotests.utils.Helpers.Companion.createObservation
+import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
+import ru.viscur.autotests.utils.Helpers.Companion.surgeonId
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class Examinations {
-
-    companion object {
-        val office101 = "Office:101"
-        val redZone = "Office:RedZone"
-        val observationOfSurgeonCode = "СтХир"
-        val observation1 = "A04.16.001"
-    }
 
     @BeforeEach
     fun init() {
@@ -31,14 +34,11 @@ class Examinations {
     @Test
     fun addingExamination() {
         //создание пациента
-        val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeonCode)
-        )
-        val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
+        val bundle = bundle("7879", Severity.RED.toString())
         val responseBundle = QueRequests.createPatient(bundle)
         val serviceRequest = responseBundle.resources(ResourceType.ServiceRequest).first()
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
-        val obsOfRespPract = Helpers.createObservation(code = serviceRequest.code.code(),
+        val obsOfRespPract = createObservation(code = serviceRequest.code.code(),
                 valueString = "состояние удовлетворительное",
                 practitionerId = serviceRequest.performer?.first()?.id!!,
                 basedOnServiceRequestId = serviceRequest.id,
@@ -47,13 +47,13 @@ class Examinations {
         )
 
         //завершение обращение пациента отвественным
-        val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
-                diagnosisCode = "A00.0",
-                practitionerId = Helpers.surgeonId,
+        val diagnosticReportOfResp = createDiagnosticReportResource(
+                diagnosisCode = "A16",
+                practitionerId = surgeonId,
                 status = DiagnosticReportStatus.final,
                 patientId = patientId
         )
-        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму", patientId = patientId)
+        val encounter = createEncounter(hospitalizationStr = "Клиники СибГму", patientId = patientId)
         val bundleForExamination = Bundle(entry = listOf(
                 BundleEntry(obsOfRespPract),
                 BundleEntry(diagnosticReportOfResp),
@@ -71,29 +71,28 @@ class Examinations {
     fun addingExaminationWithActiveObservation() {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeonCode),
-                Helpers.createServiceRequestResource(observation1)
+                createServiceRequestResource(observation1Office101)
         )
-        val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
+        val bundle = bundle("7879", Severity.RED.toString(), servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
         val serviceRequest = responseBundle.resources(ResourceType.ServiceRequest).first()
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
 
         //завершение обращения с активным Service Request
-        val obsOfRespPract = Helpers.createObservation(code = serviceRequest.code.code(),
+        val obsOfRespPract = createObservation(code = serviceRequest.code.code(),
                 valueString = "состояние удовлетворительное",
-                practitionerId = Helpers.surgeonId,
+                practitionerId = surgeonId,
                 basedOnServiceRequestId = serviceRequest.id,
                 status = ObservationStatus.final,
                 patientId = patientId
         )
-        val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
-                diagnosisCode = "A00.0",
-                practitionerId = Helpers.surgeonId,
+        val diagnosticReportOfResp = createDiagnosticReportResource(
+                diagnosisCode = "A16",
+                practitionerId = surgeonId,
                 status = DiagnosticReportStatus.final,
                 patientId = patientId
         )
-        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму", patientId = patientId)
+        val encounter = createEncounter(hospitalizationStr = "Клиники СибГму", patientId = patientId)
         val bundleForExamination = Bundle(entry = listOf(
                 BundleEntry(obsOfRespPract),
                 BundleEntry(diagnosticReportOfResp),
@@ -108,25 +107,23 @@ class Examinations {
     @Test
     fun cancelingClinicalImpression() {
         //создание пациента
-        val observation = "B03.016.002"
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeonCode),
-                Helpers.createServiceRequestResource(observation)
+                createServiceRequestResource(observation1Office101)
         )
-        val bundle = Helpers.bundle("7879", "RED", servRequests)
+        val bundle = bundle("7879", "RED", servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
 
         //проверка наличия активных Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
-                        code = observationOfSurgeonCode,
-                        locationId = redZone,
+                        code = observationOfSurgeon,
+                        locationId = redZoneId,
                         status = ServiceRequestStatus.active
                 ),
                 ServiceRequestInfo(
-                        code = observation,
-                        locationId = office101,
+                        code = observation1Office101,
+                        locationId = office101Id,
                         status = ServiceRequestStatus.active
                 )
         ))

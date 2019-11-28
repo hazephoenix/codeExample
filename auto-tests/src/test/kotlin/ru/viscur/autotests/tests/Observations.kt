@@ -6,7 +6,13 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ObservationInfo
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Helpers
+import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
+import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
+import ru.viscur.autotests.tests.Constants.Companion.office101Id
+import ru.viscur.autotests.tests.Constants.Companion.redZoneId
+import ru.viscur.autotests.utils.Helpers.Companion.bundle
+import ru.viscur.autotests.utils.Helpers.Companion.createObservation
+import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
 import ru.viscur.autotests.utils.checkObservationsOfPatient
 import ru.viscur.autotests.utils.checkServiceRequestsOfPatient
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
@@ -15,15 +21,8 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class Observations {
-
-    companion object {
-        val office101 = "Office:101"
-        val redZone = "Office:RedZone"
-        val observationCode = "B03.016.002"
-        val observationCode2 = "СтХир"
-    }
 
     @BeforeEach
     fun init() {
@@ -34,16 +33,16 @@ class Observations {
     fun addingObservation() {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationCode)
+                createServiceRequestResource(observation1Office101)
         )
-        val bundle1 = Helpers.bundle("1122", "RED", servRequests)
+        val bundle1 = bundle("1122", "RED", servRequests)
         val actServRequests = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
         val patientId = patientIdFromServiceRequests(actServRequests)
         val servRequstId = actServRequests.first().id
 
         //создание Observation со статусом registered
-        val obs = Helpers.createObservation(
-                code = observationCode,
+        val obs = createObservation(
+                code = observation1Office101,
                 status = ObservationStatus.registered,
                 basedOnServiceRequestId = servRequstId,
                 valueString = "good quality of blood"
@@ -54,7 +53,7 @@ class Observations {
         checkObservationsOfPatient(patientId, listOf(
                 ObservationInfo(
                         basedOnId = servRequstId,
-                        code = observationCode,
+                        code = observation1Office101,
                         status = ObservationStatus.registered,
                         valueStr = "good quality of blood"
                 )
@@ -63,13 +62,13 @@ class Observations {
         //проверка изменения статуса в Service Requests пациента
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
-                        code = observationCode,
-                        locationId = office101,
+                        code = observation1Office101,
+                        locationId = office101Id,
                         status = ServiceRequestStatus.waiting_result
                 ),
                 ServiceRequestInfo(
-                        code = observationCode2,
-                        locationId = redZone,
+                        code = observationOfSurgeon,
+                        locationId = redZoneId,
                         status = ServiceRequestStatus.active
                 )
         ))
@@ -79,24 +78,24 @@ class Observations {
     fun updatingObservation() {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationCode)
+                createServiceRequestResource(observation1Office101)
         )
-        val bundle1 = Helpers.bundle("1122", "RED", servRequests)
+        val bundle1 = bundle("1122", "RED", servRequests)
         val actServRequests = QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest)
         val patientId = patientIdFromServiceRequests(actServRequests)
         val servRequstId = actServRequests.first().id
 
         //создание Observation со статусом registered
-        val obs = Helpers.createObservation(
-                code = observationCode,
+        val obs = createObservation(
+                code = observation1Office101,
                 status = ObservationStatus.registered,
                 basedOnServiceRequestId = servRequstId
         )
         val actObs = QueRequests.createObservation(obs)
 
         //обновление Observation - статус final, заполнено значение valueString
-        val updatedObs = Helpers.createObservation(
-                code = observationCode,
+        val updatedObs = createObservation(
+                code = observation1Office101,
                 status = ObservationStatus.final,
                 basedOnServiceRequestId = servRequstId,
                 id = actObs.id,
@@ -107,20 +106,20 @@ class Observations {
         checkObservationsOfPatient(patientId, listOf(
                 ObservationInfo(
                         basedOnId = servRequstId,
-                        code = observationCode,
+                        code = observation1Office101,
                         status = ObservationStatus.final,
                         valueStr = "quality of blood is good")))
 
         //проверка изменения статуса в Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
-                        code = observationCode,
-                        locationId = office101,
+                        code = observation1Office101,
+                        locationId = office101Id,
                         status = ServiceRequestStatus.completed
                 ),
                 ServiceRequestInfo(
-                        code = observationCode2,
-                        locationId = redZone,
+                        code = observationOfSurgeon,
+                        locationId = redZoneId,
                         status = ServiceRequestStatus.active
                 )
         ))

@@ -178,7 +178,7 @@ class QueRequests {
         fun getSupposedServRequests(diagnosis : Any) =
                 Helpers.createRequestSpec(diagnosis).log().all().`when`().
                         post(Endpoints.SUPPOSED_SERVICE_REQUEST).
-                        then().statusCode(200).
+                        then().statusCode(200).log().all().
                         extract().response().`as`(Bundle::class.java).
                         let { it.entry.filter {it.resource.resourceType == ResourceType.ResourceTypeId.ServiceRequest } }.map { it.resource as ServiceRequest }
 
@@ -207,7 +207,7 @@ class QueRequests {
 
         fun getSeverity(bundle: Bundle, mainSyndromeCount: String? = null) =
                 Helpers.createRequestSpec(bundle).
-                        `when`().log().all().post(Endpoints.GET_SEVERITY + if (mainSyndromeCount == null) "" else "?mainSyndromeCount=$mainSyndromeCount").
+                        `when`().log().all().post(Endpoints.GET_SEVERITY + if (mainSyndromeCount == null) "" else "?takeSyndromes=$mainSyndromeCount").
                         then().log().all().statusCode(200)
 
         //examination
