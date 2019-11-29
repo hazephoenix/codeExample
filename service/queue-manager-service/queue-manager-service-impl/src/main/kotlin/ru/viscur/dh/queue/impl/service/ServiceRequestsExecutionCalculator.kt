@@ -68,19 +68,30 @@ class ServiceRequestsExecutionCalculator(
             val serviceRequestId = serviceRequest.id
             val officeIds =
                     if (serviceRequest.isInspection()) {
-                        val locationType = severity.zoneForInspections
-                        locationService.byLocationType(locationType).map { it.id }
+                        locationIdsBySeverity(severity)
                     } else {
-                        locationService.byObservationType(serviceRequest.code.code())
+                        val byObservationType = locationService.byObservationType(serviceRequest.code.code())
+                        //если не получилось определить кабинет для какой-то услуги, то отправляем в зону по степени тяжести
+                        //это случай, например, осмотра анестезиолога - не привязан к кабинету, или если попала какая-то услуга, для которой нет соответсвия в кабинете
+                        if (byObservationType.isEmpty()) locationIdsBySeverity(severity) else byObservationType
                     }
             val locationInfos = officeIds.map { officeId ->
                 ServiceRequestExecLocationInfo(serviceRequestId, serviceRequest.code.code(), officeId, estWaitingInQueueWithType(officeId, severity))
             }
             if (locationInfos.isEmpty()) {
-                throw Exception("ERROR. Can't find opened office by observation type '${serviceRequest.code.code()}'")
+                throw Exception("ERROR. Can't find opened office for observation type '${serviceRequest.code.code()}'")
             }
             ServiceRequestExecInfo(serviceRequestId, priority(serviceRequest), locationInfos)
         }
+    }
+
+    /**
+     * Места в зависимости от степени тяжести.
+     * Для зеленых определяется зеленая зона, для красных - красная и т.д.
+     */
+    private fun locationIdsBySeverity(severity: Severity): List<String> {
+        val locationType = severity.zoneForInspections
+        return locationService.byLocationType(locationType).map { it.id }
     }
 
     fun calcNextOfficeId(patientId: String, prevOfficeId: String?, forQueueOnly: Boolean = false): String? {
@@ -346,17 +357,17 @@ class ServiceRequestsExecutionCalculator(
 
     private fun List<ServiceRequestExecLocationInfo>.distinctLocationSize() = this.map { it.locationId }.distinct().size
 
-    private fun List<Pair<Double, ServiceRequestExecLocationInfo>>.filterWithMinFirstValue(): List<ServiceRequestExecLocationInfo>{
+    private fun List<Pair<Double, ServiceRequestExecLocationInfo>>.filterWithMinFirstValue(): List<ServiceRequestExecLocationInfo> {
         val minValue = this.map { it.first }.min()
         return this.filter { it.first == minValue }.map { it.second }
     }
 
-    private fun List<ServiceRequestExecLocationInfo>.filterWithMinEstWaiting(): List<ServiceRequestExecLocationInfo>{
+    private fun List<ServiceRequestExecLocationInfo>.filterWithMinEstWaiting(): List<ServiceRequestExecLocationInfo> {
         val minEstWaiting = this.map { it.estWaiting }.min()!!
         return this.filter { it.estWaiting == minEstWaiting }
     }
 
-    private fun List<ServiceRequestExecInfo>.filterWithMaxPriority(): List<ServiceRequestExecLocationInfo>{
+    private fun List<ServiceRequestExecInfo>.filterWithMaxPriority(): List<ServiceRequestExecLocationInfo> {
         val maxPriority = this.map { it.priority }.max()!!
         return this.filter { it.priority == maxPriority }.flatMap { it.locationInfos }
     }
