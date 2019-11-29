@@ -32,6 +32,9 @@ class ResourceServiceImpl : ResourceService {
     }
 
     override fun <T : BaseResource> byIds(resourceType: ResourceType<T>, ids: List<String>): List<T> {
+        if (ids.isEmpty()) {
+            return listOf()
+        }
         return em.createNativeQuery(
                 "select r.resource from ${resourceType.id.name} r where r.id in (?1)"
         )

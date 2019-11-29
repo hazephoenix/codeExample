@@ -3,6 +3,7 @@ package ru.viscur.dh.integration.doctorapp.rest
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import ru.viscur.dh.datastorage.api.request.PagedRequest
+import ru.viscur.dh.datastorage.api.response.PagedResponse
 import ru.viscur.dh.integration.doctorapp.api.DoctorAppService
 import ru.viscur.dh.integration.doctorapp.api.cmd.AcceptDoctorCallCmd
 import ru.viscur.dh.integration.doctorapp.api.cmd.DeclineDoctorCallCmd
@@ -10,6 +11,7 @@ import ru.viscur.dh.integration.doctorapp.api.cmd.NewDoctorCallCmd
 import ru.viscur.dh.integration.doctorapp.api.model.CallableDoctor
 import ru.viscur.dh.integration.doctorapp.api.model.DoctorCall
 import ru.viscur.dh.integration.doctorapp.api.model.Location
+import ru.viscur.dh.integration.doctorapp.api.model.Message
 
 @RestController
 @RequestMapping("/integration/doctor-app")
@@ -45,4 +47,22 @@ class DoctorAppController(
     @PutMapping("/outcoming-calls")
     fun findOutcomingCalls(@RequestBody request: PagedRequest) =
             doctorAppService.findOutcomingCall(request)
+
+    @GetMapping("/queue-patients")
+    fun getQueuePatients() =
+            doctorAppService.getQueuePatients()
+
+    @PutMapping(path = ["/messages"], params = ["actual"])
+    fun findActualMessages(
+            @RequestBody request: PagedRequest,
+            @RequestParam("actual") actual: Boolean
+    ): PagedResponse<Message> {
+        return doctorAppService.findMessages(request, actual)
+    }
+
+    @PutMapping(path = ["/messages/hide/{messageId}"])
+    fun hideMessage(@PathVariable("messageId") messageId: String): Message {
+        return doctorAppService.hideMessage(messageId)
+    }
+
 }

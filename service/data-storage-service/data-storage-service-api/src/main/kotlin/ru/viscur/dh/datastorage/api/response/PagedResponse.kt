@@ -12,6 +12,11 @@ class PagedResponse<T>(
         val pagesCount: Int,
 
         /**
+         * Сколько всего записей есть
+         */
+        val totalItemsCount: Int,
+
+        /**
          * Данные страницы
          */
         val data: List<T>
@@ -21,6 +26,7 @@ class PagedResponse<T>(
             PagedResponse(
                     page,
                     pagesCount,
+                    totalItemsCount,
                     data.map(mapper)
             )
 

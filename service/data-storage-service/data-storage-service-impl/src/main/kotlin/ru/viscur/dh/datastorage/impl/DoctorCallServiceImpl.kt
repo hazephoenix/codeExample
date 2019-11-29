@@ -122,6 +122,7 @@ class DoctorCallServiceImpl(
         return PagedResponse(
                 page = request.page,
                 pagesCount = ceil(totalCount.toDouble() / pageSize).toInt(),
+                totalItemsCount = totalCount.toInt(),
                 data = data.map { toApi(it, practitioners, locations) }
         )
     }

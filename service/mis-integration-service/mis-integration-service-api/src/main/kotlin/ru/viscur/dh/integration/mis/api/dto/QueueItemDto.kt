@@ -15,6 +15,7 @@ package ru.viscur.dh.integration.mis.api.dto
  */
 data class QueueItemDto(
         val onum: Int,
+        val patientId: String,
         val severity: String,
         val severityDisplay: String,
         val name: String,

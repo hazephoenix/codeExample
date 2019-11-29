@@ -3,12 +3,10 @@ package ru.viscur.dh.integration.doctorapp.impl.mapper
 import org.springframework.stereotype.Component
 import ru.viscur.dh.datastorage.api.model.call.CallableSpecialization
 import ru.viscur.dh.datastorage.api.model.call.DoctorCall
+import ru.viscur.dh.datastorage.api.model.message.DoctorMessage
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.enums.Severity
-import ru.viscur.dh.integration.doctorapp.api.model.CallableDoctor
-import ru.viscur.dh.integration.doctorapp.api.model.Location
-import ru.viscur.dh.integration.doctorapp.api.model.Person
-import ru.viscur.dh.integration.doctorapp.api.model.QueuePatient
+import ru.viscur.dh.integration.doctorapp.api.model.*
 import ru.viscur.dh.integration.mis.api.dto.QueueItemDto
 
 @Component
@@ -68,14 +66,24 @@ class DoctorAppMapper {
             )
 
 
-    fun mapQueueOfficeToQueuePatient(it: QueueItemDto): QueuePatient {
-        return QueuePatient(
-                "TODO PatientId",
-                it.onum,
-                Severity.valueOf(it.severity),
-                "TODO Code",
-                15 /* TODO */
-        )
-    }
+    fun mapQueueOfficeToQueuePatient(it: QueueItemDto): QueuePatient = QueuePatient(
+            it.patientId,
+            it.onum,
+            Severity.valueOf(it.severity),
+            it.queueCode,
+            it.estDuration
+    )
+
+    fun mapMessage(it: DoctorMessage) = Message(
+            it.id,
+            ClinicalImpression(
+                    it.clinicalImpression.id,
+                    it.clinicalImpression.extension.queueCode,
+                    it.clinicalImpression.extension.severity
+            ),
+            it.dateTime,
+            it.messageType.text,
+            it.hidden
+    )
 
 }

@@ -34,7 +34,7 @@ class DoctorAppRestConfig(
 
     @Bean
     fun doctorAppWebSocketHandler() =
-            DoctorAppWebSocketHandler(doctorAppService)
+            DoctorAppWebSocketHandler()
 
     @Configuration
     @Order(1)

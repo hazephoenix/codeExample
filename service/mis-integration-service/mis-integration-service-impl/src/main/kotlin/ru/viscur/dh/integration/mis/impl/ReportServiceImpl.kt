@@ -156,6 +156,7 @@ class ReportServiceImpl(
                     val patient = patientService.byId(patientId)
                     QueueItemDto(
                             onum = queueItem.onum!! + 1,
+                            patientId = patientId,
                             severity = queueItem.severity!!.name,
                             severityDisplay = queueItem.severity!!.display,
                             name = patient.name.first().text,

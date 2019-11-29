@@ -56,5 +56,15 @@ interface DoctorAppService {
      */
     fun getQueuePatients(): List<QueuePatient>
 
+    /**
+     * Получение сообщений
+     */
+    fun findMessages(request: PagedRequest, actual: Boolean): PagedResponse<Message>
+
+    /**
+     * Скрыть сообщение
+     */
+    fun hideMessage(messageId: String): Message
+
 
 }
