@@ -15,6 +15,9 @@ interface DiagnosisPredictor {
 
     /**
      * Сохранить данные для обучения
+     *
+     * @param diagnosticReport Окончательный диагноз пациента
+     * @return id созданного TrainingSample
      */
-    fun saveTrainingSample(diagnosticReport: DiagnosticReport)
+    fun saveTrainingSample(diagnosticReport: DiagnosticReport): Long?
 }

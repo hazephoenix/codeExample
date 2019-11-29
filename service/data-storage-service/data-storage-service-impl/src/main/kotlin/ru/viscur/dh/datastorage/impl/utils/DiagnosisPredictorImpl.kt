@@ -71,7 +71,7 @@ class DiagnosisPredictorImpl(
      * содержащего ссылки на перечисленные ресурсы.
      *
      */
-    override fun saveTrainingSample(diagnosticReport: DiagnosticReport) {
+    override fun saveTrainingSample(diagnosticReport: DiagnosticReport): Long? {
         diagnosticReport.subject.id?.let { patientId ->
             patientService.byId(patientId).let { patient ->
                 clinicalImpressionService.active(patientId).let { clinicalImpression ->
@@ -91,8 +91,8 @@ class DiagnosisPredictorImpl(
 
                     // заключительный диагноз всегда один
                     val diagnosisCode = diagnosticReport.conclusionCode.first().code()
-                    codeMapService.icdToComplaints(diagnosisCode).let { sourceCodes ->
-                        val complaintCodes = conceptService.byAlternativeOrDisplay(ValueSetName.COMPLAINTS, complaints)
+                    val complaintCodes = conceptService.byAlternativeOrDisplay(ValueSetName.COMPLAINTS, complaints)
+                    val codeMap = codeMapService.icdToComplaints(diagnosisCode)?.let { sourceCodes ->
                         val resultComplaints = mutableListOf<CodeMapTargetCode>()
                         complaintCodes.forEach { code ->
                             if (!sourceCodes.contains(code)) {
@@ -106,12 +106,25 @@ class DiagnosisPredictorImpl(
                             }
                         }
                     }
-
-                    toTrainingSample(observations, patient, diagnosticReport, questionnaireResponse)
-                        .let { trainingSampleRepository.save(it) }
+                    if (codeMap == null) {
+                        conceptService.byCode(ValueSetName.ICD_10, diagnosisCode).let {
+                            resourceService.create(
+                                CodeMap(
+                                    id = "ICD-10_to_Complaints:$diagnosisCode",
+                                    sourceUrl = "ValueSet/${ValueSetName.ICD_10.id}",
+                                    targetUrl = "ValueSet/${ValueSetName.COMPLAINTS.id}",
+                                    sourceCode = it.code,
+                                    targetCode = complaintCodes.map { code -> CodeMapTargetCode(code) }
+                                )
+                            )
+                        }
+                    }
+                    return toTrainingSample(observations, patient, diagnosticReport, questionnaireResponse)
+                        .let { trainingSampleRepository.save(it) }.id
                 }
             }
         }
+        return null
     }
 
     /**
