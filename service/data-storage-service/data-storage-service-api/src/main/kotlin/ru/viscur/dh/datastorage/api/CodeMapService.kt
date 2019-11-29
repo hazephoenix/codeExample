@@ -68,11 +68,11 @@ interface CodeMapService {
     /**
      * Найти список кодов жалоб, соответствующих коду МКБ-10
      */
-    fun icdToComplaints(sourceCode: String) = codeMap(
+    fun icdToComplaints(sourceCode: String) = codeMapNullable(
             ValueSetName.ICD_10,
             ValueSetName.COMPLAINTS,
             sourceCode
-    ).targetCode.map { it.code }
+    )?.targetCode?.map { it.code }
 
     /**
      * Найти код диагноза по всем жалобам из списка
