@@ -9,6 +9,7 @@ import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.tests.Constants.Companion.office101Id
 import ru.viscur.autotests.tests.Observations
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.Helpers.Companion.createListResource
@@ -47,8 +48,7 @@ class ServiceRequests {
         val diagnosis = " {\"diagnosis\": \"A01\",\"complaints\": [\"Сильная боль в правом подреберье\", \"Тошнит\"],\"gender\": \"male\"}"
 
         //получение предположительных Service Request по диагнозу и проверка
-        QueRequests.getSupposedServRequests(diagnosis).
-                assertThat().body("entry.size()", equalTo(6))
+        QueRequests.getSupposedServRequests(diagnosis)
     }
 
     @Test
@@ -173,7 +173,7 @@ class ServiceRequests {
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
 
         //вход в кабинет
-        val servRequestsInOffice = QueRequests.patientEntered(Helpers.createListResource(patientId, Observations.office101))
+        val servRequestsInOffice = QueRequests.patientEntered(Helpers.createListResource(patientId, office101Id))
 
         //проверка, что в кабинете соответствующие Service Requests
         assertEquals(2, servRequestsInOffice.size, "wrong number of service requests in $office101")
@@ -190,7 +190,7 @@ class ServiceRequests {
                 Helpers.createServiceRequestResource(observation2Office101)
         )
         val bundle1 = Helpers.bundle("1111", "GREEN", servRequests)
-        QueRequests.officeIsReady(referenceToLocation(Observations.office101))
+        QueRequests.officeIsReady(referenceToLocation(office101Id))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
 
         //пациент вошел в офис, в котором у него не назначены обследования

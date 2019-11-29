@@ -1,7 +1,7 @@
 package ru.viscur.autotests.dto
 
 class PractitionerWorkloadInfo(
-        officeId: String,
+        officeId: String?,
         queueSize: Int,
         queueWaitingSum: Int,
         queueWorkload: Int,

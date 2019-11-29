@@ -23,7 +23,7 @@ class ServiceRequestExecDurationTest {
     fun test() {
 
         QueRequests.deleteQue()
-        val observationOfSurgeonCode = "СтХир"
+        val observationOfSurgeonCode = "B01.057.001"
         val observationOfBloodCode = "A09.05.010"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode),

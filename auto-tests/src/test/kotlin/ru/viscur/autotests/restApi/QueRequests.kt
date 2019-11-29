@@ -267,7 +267,7 @@ class QueRequests {
                 Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId)).`when`().
                         get(Endpoints.REPORT_QUEUE).
                         then().statusCode(200).
-                        extract().response().`as`(Array<PractitionerWorkloadInfo>::class.java)
+                        extract().response().`as`(PractitionerWorkloadInfo::class.java)
 
         fun getPatientsClinicalImpressionDuration() =
                 Helpers.createRequestSpecWithoutBody().`when`().
