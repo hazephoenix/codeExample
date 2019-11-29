@@ -80,7 +80,7 @@ class CodeMapServiceImpl(
                 --where x -> 'code' #-# cast(:codes as text[])
                 --and cm.resource ->> 'targetUrl' = :targetUrl
                 --limit :take
-            select cm.resource ->> 'sourceCode', count(x -> 'code') as codeCount
+            select distinct cm.resource ->> 'sourceCode', count(x -> 'code') as codeCount
                 from codemap cm, jsonb_array_elements(cm.resource -> 'targetCode') as x
                 where  x ->> 'code' = ANY(cast(:codes as text[]))
                 and cm.resource ->> 'id' in (
