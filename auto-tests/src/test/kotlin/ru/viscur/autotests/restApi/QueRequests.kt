@@ -255,7 +255,7 @@ class QueRequests {
                 Helpers.createRequestWithQuery(mapOf("officeId" to officeId)).`when`().
                         get(Endpoints.REPORT_QUEUE).
                         then().statusCode(200).
-                        extract().response().`as`(Array<QueueReportInfo>::class.java)
+                        extract().response().`as`(QueueReportInfo::class.java)
 
         fun getAllPractitionersWorkload() =
                 Helpers.createRequestSpecWithoutBody().`when`().

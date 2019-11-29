@@ -22,7 +22,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class QueueReport {
 
     @BeforeEach
@@ -69,11 +69,6 @@ class QueueReport {
     }
 
     @Test
-    fun gettingQueueReportByPeriod () {
-
-    }
-
-    @Test
     fun gettingOfficeQueueReport () {
         //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101Id))
@@ -100,11 +95,9 @@ class QueueReport {
         ))
 
         //получение отчета о состоянии очереди в 101
-        val queueItems = QueRequests.getOfficeQueueReport(office101Id)
-        val queueItemOffice101 = queueItems.first()
+        val queueItemOffice101 = QueRequests.getOfficeQueueReport(office101Id)
 
         //проверка отчета по состоянию очереди в 101
-        assertEquals(1, queueItems.size, "wrong office number in report")
         assertEquals(office101Id, queueItemOffice101.officeId, "wrong office id in report")
         assertEquals(1,  queueItemOffice101.queueSize, "wrong patient number for $office101Id")
     }
