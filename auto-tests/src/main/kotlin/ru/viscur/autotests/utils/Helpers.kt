@@ -102,9 +102,10 @@ class Helpers {
             return bundle
         }
 
+
         fun bundleForDiagnosis(severity: String): Bundle {
             val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
-            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResourceDiagnosis(severity)
             val bundle = Bundle(entry = listOf(
                     BundleEntry(bodyWeight),
                     BundleEntry(questionnaireResponseSeverityCriteria)
@@ -269,6 +270,46 @@ class Helpers {
                 )
         )
 
+        fun createQuestResponseResourceDiagnosis(severity: String, patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
+                id = id,
+                status = QuestionnaireResponseStatus.completed,
+                author = referenceToPractitioner("ignored"),
+                source = referenceToPatient(patientId),
+                questionnaire = "Questionnaire/Severity_criteria",
+                item = listOf(
+                        QuestionnaireResponseItem(
+                                linkId = "Upper_respiratory_airway",
+                                text = "Результат осмотра верхних дыхательных путей",
+                                answer = listOf(QuestionnaireResponseItemAnswer(
+                                        valueCoding = Coding(code = "Airways_passable", display = "Дыхательные пути проходимы", system = ValueSetName.UPPER_RESPIRATORY_AIRWAY.id)
+                                ))
+                        ),
+                        QuestionnaireResponseItem(
+                                linkId = "Consciousness_assessment",
+                                text = "Сознание",
+                                answer = listOf(QuestionnaireResponseItemAnswer(
+                                        valueCoding = Coding(code = "Clear_mind", display = "Ясное сознание", system = ValueSetName.CONSCIOUSNESS_ASSESSMENT.id)
+                                ))
+                        ),
+                        QuestionnaireResponseItem(
+                                linkId = "Patient_can_stand",
+                                text = "Опорная функция",
+                                answer = listOf(QuestionnaireResponseItemAnswer(
+                                        valueCoding = Coding(code = "Can_stand", display = "Может стоять", system = ValueSetName.PATIENT_CAN_STAND.id)
+                                ))
+                        ),
+                        QuestionnaireResponseItem(
+                                linkId = "Questionnaire/paramedic-qa-form/complaints",
+                                text = "Жалобы пациента",
+                                answer = listOf(
+                                        QuestionnaireResponseItemAnswer(valueString = "Жар"),
+                                        QuestionnaireResponseItemAnswer(valueString = "Острая боль"),
+                                        QuestionnaireResponseItemAnswer(valueString = "Головная боль")
+                                )
+                        )
+
+                )
+        )
         fun createQuestResponseResourceWithCommonInfo(patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
                 id = id,
                 status = QuestionnaireResponseStatus.completed,

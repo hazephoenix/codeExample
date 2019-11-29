@@ -20,12 +20,10 @@ class Predictions {
 
     @Test
     fun predictDiagnosis() {
-        val expectedDiagnosis = "A16"
         val bundle = bundleForDiagnosis("RED")
-        //получени и проверка предположительных диагнозов по результатам осмотра фельдшером
-        val diagnosisList = QueRequests.getDiagnosis(bundle, "5")
-        assertEquals(5, diagnosisList.diagnoses.size, "wrong diagnosis count")
-        assertEquals(expectedDiagnosis, diagnosisList.diagnoses.first().code, "wrong diagnosis")
+        //получение и проверка предположительных диагнозов по результатам осмотра фельдшером
+        val diagnosisList = QueRequests.getDiagnosis(bundle, "100")
+        assertEquals(100, diagnosisList.diagnoses.size, "wrong diagnosis count")
     }
 
     @Test
@@ -33,19 +31,24 @@ class Predictions {
         val bundle = bundleForSeverity()
         //получение и проверка степени тяжести пациента по результатам осмотра фельдшером
         val severityResponse = QueRequests.getSeverity(bundle, "2")
-        severityResponse.
-                assertThat().body("severity.code", equalTo("GREEN"))
+        severityResponse.assertThat().body("severity.code", equalTo("GREEN"))
     }
 
     @Test
-    fun predictRequestsByDiagnosis () {
-        val diagnosis = " {\"diagnosis\": \"A01\"," +
-                "\"complaints\": [\"Сильная боль в правом подреберье\", \"Тошнит\"]," +
-                "\"gender\": \"male\"}"
+    fun predictServRequestsByDiagnosis () {
+        //создание диагноза
+        val diagnosisCode = "A16"
+        val diagnosis = mapOf(
+                "diagnosis" to diagnosisCode,
+                "complaints" to listOf("Сильная боль в правом подреберье", "Тошнит"),
+                "gender" to "male"
+        )
 
-        //получение предположительных Service Request по диагнозу и проверка
-        val predictedServReq = QueRequests.getSupposedServRequests(diagnosis)
-        assertEquals (5, predictedServReq.size, "wrong service requests number")
+        //получение предположительных Service Request по диагнозу
+        val servRequestsList = QueRequests.getSupposedServRequests(diagnosis)
+
+        //проверка количества предположительных Service Requests
+        assertEquals(18, servRequestsList.size, "wrong number of service requests for diagnosis: $diagnosisCode")
     }
 
     @Test
@@ -53,20 +56,21 @@ class Predictions {
     fun predictRespWithLessWorkload(){
         //отмена всех активных ClinicalImpression
         QueRequests.cancelAllActivePatient()
-        val diagnosis = "{\"diagnosis\": \"A01\"," +
-                "\"complaints\": [\"Сильная боль в правом подреберье\", \"Тошнит\"]," +
-                "\"gender\": \"male\"}"
-        val surgeon2 = surgeon2Id
+        val diagnosisCode = "Q11"
+        val diagnosis = mapOf(
+                "diagnosis" to diagnosisCode,
+                "complaints" to listOf("Сильная боль в правом подреберье", "Тошнит"),
+                "gender" to "male"
+        )
 
         //создаем пациента на ответственность surgeon1
-        val bundle1 = bundle("1120", "GREEN")
+        val bundle1 = bundle("1120", "RED")
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
 
         //получаем предположительный список ServiceRequest для следующего пациента
-        val predictedServRequests = QueRequests.getSupposedServRequests(diagnosis)
-        val predictedResp = predictedServRequests.find { it.code.code() == observationOfSurgeon }?.performer?.first()?.id
+        val predictedResp = QueRequests.getSupposedResp(diagnosis)
 
         //проверка, что в полученном списке предположительный ответственный - surgeon2, менее занятый
-        assertEquals(surgeon2, predictedResp, "wrong performer predicted")
+        //assertEquals(surgeon2Id, predictedResp, "wrong performer predicted")
     }
 }

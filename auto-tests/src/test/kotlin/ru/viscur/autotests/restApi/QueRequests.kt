@@ -182,6 +182,13 @@ class QueRequests {
                         extract().response().`as`(Bundle::class.java).
                         let { it.entry.filter {it.resource.resourceType == ResourceType.ResourceTypeId.ServiceRequest } }.map { it.resource as ServiceRequest }
 
+        fun getSupposedResp(diagnosis : Any) =
+                Helpers.createRequestSpec(diagnosis).log().all().`when`().
+                        post(Endpoints.SUPPOSED_SERVICE_REQUEST).
+                        then().statusCode(200).log().all().
+                        extract().response().`as`(Bundle::class.java).
+                        let { it.entry.filter {it.resource.resourceType == ResourceType.ResourceTypeId.ListResource } }.map { it.resource as ListResource }
+
         fun serviceRequestsOfPatients(patientId: String) =
                 Helpers.createRequestSpecWithoutBody().
                         `when`().
