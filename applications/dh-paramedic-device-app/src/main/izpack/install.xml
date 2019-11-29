@@ -38,30 +38,17 @@
     </resources>
 
     <packs>
-        <pack name="zebra" required="true" id="zebra">
-            <description>Zebra Printer</description>
-            <singlefile src="zebra-native.zip" target="zebra-native.zip"/>
-        </pack>
-        <pack name="tves" required="true" id="tves">
-            <description>
-                TVES Devices
-            </description>
-            <fileset dir="." targetdir="$INSTALL_PATH">
-                <filename name="tves-driver.zip"/>
-                <filename name="tves-backend.zip"/>
-            </fileset>
-        </pack>
-        <pack name="winsw" required="true">
-            <description>WINSW executable</description>
-            <singlefile src="winsw.exe" target="$INSTALL_PATH"/>
+        <pack name="stuff" required="true">
+            <description>Stuff</description>
+            <file src="tves-driver.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="tves-backend.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="zebra-native.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="openjdk-11_windows-x64.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="winsw.exe" targetdir="${INSTALL_PATH}"/>
         </pack>
         <pack name="app" required="true">
             <description>Main application</description>
-            <singlefile src="../libs/dh-paramedic-device-app.jar" target="$INSTALL_PATH"/>
-        </pack>
-        <pack name="java" required="true">
-            <description>Java Binary</description>
-            <singlefile src="openjdk-11_windows-x64.zip" target="$INSTALL_PATH"/>
+            <singlefile src="../libs/dh-paramedic-device-app.jar" target="${INSTALL_PATH}/app.jar"/>
         </pack>
     </packs>
     <logging>
