@@ -29,7 +29,11 @@ class Constants {
         const val bandageOffice128 = "Перевязка"
 
         //practitioners
-        val pratitioner101Office = "фельдшер_Колосова"
+        const val practitioner1Office101 = "фельдшер_Колосова"
+        const val practitioner2Office101 = "мед_работник_диагностики_Иванова"
+        const val surgeon1Id = "хирург_Иванов"
+        const val surgeon2Id = "хирург_Петров"
+        const val urologist1Id = "уролог_Петров"
 
     }
 }
