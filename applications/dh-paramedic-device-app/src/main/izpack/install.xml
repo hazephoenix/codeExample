@@ -12,17 +12,31 @@
     <locale>
         <langpack iso3="eng"/>
     </locale>
-
-    <guiprefs resizable="no" width="800" height="600">
+    <guiprefs width="640" height="480" resizable="yes"/>
+<!--    <guiprefs resizable="no" width="800" height="600">
         <laf name="substance">
             <os family="windows"/>
             <os family="unix"/>
-            <param name="variant" value="mist-silver"/>
+&lt;!&ndash;            <param name="variant" value="mist-silver"/>&ndash;&gt;
         </laf>
-    </guiprefs>
-    <panels>
+    </guiprefs>-->
+<!--    <panels>
         <panel classname="com.izforge.izpack.panels.hello.HelloPanel"/>
+    </panels>-->
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="InfoPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="FinishPanel"/>
     </panels>
+
+    <resources>
+        <res id="LicensePanel.license" src="info.txt"/>
+    </resources>
+
     <packs>
         <pack name="zebra" required="true" id="zebra">
             <description>Zebra Printer</description>
@@ -32,14 +46,22 @@
             <description>
                 TVES Devices
             </description>
-            <fileset dir="." targetdir="tves">
+            <fileset dir="." targetdir="$INSTALL_PATH">
                 <filename name="tves-driver.zip"/>
                 <filename name="tves-backend.zip"/>
             </fileset>
         </pack>
         <pack name="winsw" required="true">
             <description>WINSW executable</description>
-            <singlefile src="winsw.exe" target="winsw.exe"/>
+            <singlefile src="winsw.exe" target="$INSTALL_PATH"/>
+        </pack>
+        <pack name="app" required="true">
+            <description>Main application</description>
+            <singlefile src="../libs/dh-paramedic-device-app.jar" target="$INSTALL_PATH"/>
+        </pack>
+        <pack name="java" required="true">
+            <description>Java Binary</description>
+            <singlefile src="openjdk-11_windows-x64.zip" target="$INSTALL_PATH"/>
         </pack>
     </packs>
     <logging>
