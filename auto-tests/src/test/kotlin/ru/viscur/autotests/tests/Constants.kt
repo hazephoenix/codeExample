@@ -16,9 +16,9 @@ class Constants {
         const val redZoneId = "Office:RedZone"
 
         //observations
-        const val observationOfSurgeon = "СтХир"
-        const val observationOfUrologist = "СтУрол"
-        const val observationOfTherapist = "СтТер"
+        const val observationOfSurgeon = "B01.057.001"
+        const val observationOfUrologist = "B01.053.001"
+        const val observationOfTherapist = "B01.047.001"
         const val observation1Office101 = "B03.016.002"
         const val observation2Office101 = "A09.20.003"
         const val observation1Office116 = "A04.16.001"
@@ -31,6 +31,8 @@ class Constants {
         //practitioners
         const val practitioner1Office101 = "фельдшер_Колосова"
         const val practitioner2Office101 = "мед_работник_диагностики_Иванова"
+        const val practitioner1Office116 = "мед_работник_диагностики_Сидорова"
+
         const val surgeon1Id = "хирург_Иванов"
         const val surgeon2Id = "хирург_Петров"
         const val urologist1Id = "уролог_Петров"

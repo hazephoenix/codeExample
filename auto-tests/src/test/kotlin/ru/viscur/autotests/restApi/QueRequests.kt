@@ -309,6 +309,11 @@ class QueRequests {
                         then().statusCode(200).
                         extract().response().`as`(Practitioner::class.java)
 
+        fun setPractitionerActivityAndLocation(practitionerId: String, onWorkValue: Boolean, officeId: String? = null) =
+                Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId, "value" to onWorkValue) + if (officeId == null) mapOf() else mapOf("officeId" to officeId)).`when`().
+                        post(Endpoints.SET_PRACTITIONER_ACTIVITY).
+                        then().statusCode(200)
+
         fun getIcdToObservationTypes() =
                 Helpers.createRequestSpecWithoutBody().`when`().
                         get(Endpoints.GET_ICD_TO_OBSERVATION_TYPES).

@@ -65,6 +65,7 @@ class Endpoints {
         const val GET_RESP_QUALIFICATION_TO_OBSERVATION_TYPES = "$BASE_URI/dictionary/respQualificationToObservationTypes"
         const val GET_OFFICES = "$BASE_URI/dictionary/offices"
         const val GET_CODE_INFO = "$BASE_URI/dictionary"
+        const val SET_PRACTITIONER_ACTIVITY = "$BASE_URI/practitioner/onWork"
         //device
         const val TEST_UID = "developer-paramedic-device-test"
         const val ADD_DEVICE_TASK = "$BASE_URI/desktop/task/add"

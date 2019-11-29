@@ -9,15 +9,14 @@ import ru.viscur.autotests.tests.Constants.Companion.observation1Office116
 import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
 import ru.viscur.autotests.tests.Constants.Companion.office101Id
 import ru.viscur.autotests.tests.Constants.Companion.office116Id
-import ru.viscur.autotests.tests.Constants.Companion.office140Id
 import ru.viscur.autotests.tests.Constants.Companion.practitioner1Office101
+import ru.viscur.autotests.tests.Constants.Companion.practitioner1Office116
 import ru.viscur.autotests.tests.Constants.Companion.practitioner2Office101
 import ru.viscur.autotests.tests.Constants.Companion.surgeon1Id
 import ru.viscur.autotests.tests.Constants.Companion.surgeon2Id
 import ru.viscur.autotests.tests.Constants.Companion.urologist1Id
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForUrologist
-import ru.viscur.autotests.utils.Helpers.Companion.createListResource
 import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
 import ru.viscur.dh.fhir.model.entity.Bundle
@@ -36,7 +35,7 @@ class PractitionerReport {
     }
 
     @Test
-    fun gettingAllPractitionerWorkload () {
+    fun gettingAllPractitionerQueueReport () {
         //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101Id))
         QueRequests.officeIsBusy(referenceToLocation(office116Id))
@@ -52,21 +51,20 @@ class PractitionerReport {
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
 
-        //получение отчета о полном состоянии нагрузки на practitioners
-        val queueItemForPractitioners = QueRequests.getAllPractitionersWorkload()
-        val queueItemForPractitiner1Office101 =  queueItemForPractitioners.find{ it.practitioner!!.practitionerId  == practitioner1Office101}!!
-        val queueItemForPractitiner2Office101 =  queueItemForPractitioners.find{ it.practitioner!!.practitionerId  == practitioner2Office101}!!
-        val queueItemForOffice116 = queueItemForPractitioners.find{it.officeId== office116Id}!!
+        //привязка practitioners к кабинетам
+        QueRequests.setPractitionerActivityAndLocation(practitioner1Office101,true, office101Id)
+        QueRequests.setPractitionerActivityAndLocation(practitioner2Office101, true, office101Id)
+        QueRequests.setPractitionerActivityAndLocation(practitioner1Office116, true, office116Id)
 
-        //проверка отчета по состоянию нагрузки на practitioners
+        //получение отчета о полном состоянии очередей в кабинеты
+        val queueItemForPractitioners = QueRequests.getAllPractitionersWorkload()
+
+        //проверка отчета по состоянию очереди
         assertEquals(3, queueItemForPractitioners.size, "wrong office number in report for practitioner")
-        assertEquals(1,  queueItemForPractitiner1Office101.queueSize, "wrong number of patients for $practitioner1Office101")
-        assertEquals(1,  queueItemForPractitiner2Office101.queueSize, "wrong number of patients for $practitioner2Office101")
-        assertEquals(1,  queueItemForOffice116.queueSize, "wrong number of patients $office116Id")
     }
 
     @Test
-    fun gettingPractitionerWorkloadById () {
+    fun gettingDiagnosticPractitionerByIdQueueReport() {
         //создание очереди
         QueRequests.officeIsBusy(referenceToLocation(office101Id))
         QueRequests.officeIsBusy(referenceToLocation(office116Id))
@@ -82,6 +80,9 @@ class PractitionerReport {
         val patientServ = QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest)
         val patientId2 = patientIdFromServiceRequests(patientServ)
 
+        //привязка practitioner к кабинету
+        QueRequests.setPractitionerActivityAndLocation(practitioner1Office101,true, office101Id)
+
         //получение отчета о нагрузке на конкретного practitioner
         val queueItems = QueRequests.getPractitionersWorkloadById(practitioner1Office101)
 
@@ -90,35 +91,8 @@ class PractitionerReport {
         assertEquals(patientId1, queueItems.items.first().patientId,  "wrong patient in queue to practitioner $practitioner1Office101")
     }
 
-   /* @Test
-    fun gettingPractitionerWorkloadByPeriod () {
-        val servRequests = listOf(
-                createServiceRequestResource(observation150Office)
-        )
-        val bundle1 = bundle("1120", "YELLOW", servRequests)
-        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
-        QueRequests.officeIsReady(referenceToLocation("Office:150"))
-        QueRequests.patientEntered(createListResource(patientId1, "Office:150"))
-    }*/
-
     @Test
-    fun gettingPatientsOfResponsablePractitioner() {
-        //создание пациентов
-        val servRequests = listOf(
-                createServiceRequestResource(observation1Office101)
-        )
-        val bundle1 = bundle("1120", "YELLOW", servRequests)
-        val bundle2 = bundle("1121", "YELLOW", servRequests)
-        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
-        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
-        val surgeonPatients =  QueRequests.getPatientsOfResponsable(surgeon1Id).patients
-
-        //проверка, что у хирурга 2 пациента на ответственности
-        assertEquals(2, surgeonPatients.size,"wrong patient number for practitioner: $surgeon1Id")
-    }
-
-    @Test
-    fun gettingPatientOfPractitionerWithOnIncpectionAndOnResponsability() {
+    fun gettingRespPractitionerReportByIdWithOnInspectionAndOnResponsability() {
         //создание пациентов на отвественности
         val bundle1 = bundle("1120", "YELLOW")
         val bundle2 = bundleForUrologist("1121", "RED")
@@ -146,4 +120,19 @@ class PractitionerReport {
         assertEquals(0, patientsOfUrologist1.items.size, "wrong patient number for $surgeon1Id")
     }
 
+    @Test
+    fun gettingPatientsOfResponsablePractitioner() {
+        //создание пациентов
+        val servRequests = listOf(
+                createServiceRequestResource(observation1Office101)
+        )
+        val bundle1 = bundle("1120", "YELLOW", servRequests)
+        val bundle2 = bundle("1121", "YELLOW", servRequests)
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+        val surgeonPatients =  QueRequests.getPatientsOfResponsable(surgeon1Id).patients
+
+        //проверка, что у хирурга 2 пациента на ответственности
+        assertEquals(2, surgeonPatients.size,"wrong patient number for practitioner: $surgeon1Id")
+    }
 }

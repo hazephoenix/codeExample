@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests.reports
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.tests.Constants.Companion.observation1Office149
@@ -33,12 +34,12 @@ class PatientReport {
 
         //создание обследования с продолжительностью 2 секунды
         QueRequests.startObservation(xrayServiceRequestId)
-        Thread.sleep(2000)
+        Thread.sleep(5000)
         QueRequests.createObservation(createObservation(code = "ignored", valueInt = 20, basedOnServiceRequestId = xrayServiceRequestId))
         val observationsOfPatient = QueRequests.getPatientObservationHistory(patientId)
 
         //проверка, что обледование попало в историю обследований пациента за последние сутки
-        assertEquals(observation1Office202, observationsOfPatient.find{it.duration==2}?.code, "wrong observation in history")
+        assertNotNull(observationsOfPatient.find{it.code == observation1Office202}?.code, "no observation in history")
     }
 
     @Test
