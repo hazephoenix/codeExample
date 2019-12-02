@@ -22,6 +22,5 @@ data class QueueItemDto(
         val name: String,
         val age: Int,
         val estDuration: Int,
-        val queueCode: String,
-        val patientId: String
+        val queueCode: String
 )

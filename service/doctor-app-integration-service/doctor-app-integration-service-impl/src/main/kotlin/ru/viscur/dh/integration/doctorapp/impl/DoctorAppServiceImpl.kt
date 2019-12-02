@@ -142,9 +142,10 @@ class DoctorAppServiceImpl(
         val user = currentUserDetails()
         return reportService
                 .queueOfPractitioner(user.id)
-                .firstOrNull()?.run {
-                    items.map { doctorAppMapper.mapQueueOfficeToQueuePatient(it) }
-                } ?: listOf()
+                ?.items
+                ?.map { doctorAppMapper.mapQueueOfficeToQueuePatient(it) }
+                ?: listOf()
+
     }
 
     override fun findMessages(request: PagedRequest, actual: Boolean): PagedResponse<Message> {
