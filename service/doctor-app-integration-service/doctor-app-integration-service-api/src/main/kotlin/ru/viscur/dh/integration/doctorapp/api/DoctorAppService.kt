@@ -37,11 +37,6 @@ interface DoctorAppService {
     fun findLocations(): List<Location>;
 
     /**
-     * Статус доктора изменился (он перешел в интенсивную терапию или вышел из нее)
-     */
-    fun callableDoctorStatusChanged(doctor: CallableDoctorStatusChangedCmd)
-
-    /**
      * Поиск входящих сообщений для текущего пользователя
      */
     fun findIncomingCalls(request: PagedRequest): PagedResponse<DoctorCall>

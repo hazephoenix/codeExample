@@ -17,6 +17,7 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 
+@Deprecated("BackgroundTask with WebSocket doesn't work good enough in UWP")
 class DoctorAppWebSocketHandler : TextWebSocketHandler() {
     private val objectMapper = ObjectMapper()
     private val sessionsByUsers = mutableMapOf<String, MutableList<WebSocketSession>>()

@@ -42,6 +42,15 @@ class ResourceServiceImpl : ResourceService {
                 .fetchResourceList()
     }
 
+    override fun <T : BaseResource> classifiedByIds(resourceType: ResourceType<T>, ids: Collection<String>): Map<String, T> {
+        val map = mutableMapOf<String, T>()
+        val items = byIds(resourceType, ids.toList());
+        items.forEach {
+            map[it.id] = it
+        }
+        return map
+    }
+
     override fun <T : BaseResource> byIdentifier(resourceType: ResourceType<T>, type: IdentifierType, value: String): T? {
         val query = em
                 .createNativeQuery(

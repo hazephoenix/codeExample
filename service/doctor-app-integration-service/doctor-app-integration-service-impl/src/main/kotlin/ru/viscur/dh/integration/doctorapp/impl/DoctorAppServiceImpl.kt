@@ -116,10 +116,6 @@ class DoctorAppServiceImpl(
     }
 
 
-    override fun callableDoctorStatusChanged(doctor: CallableDoctorStatusChangedCmd) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun findIncomingCalls(request: PagedRequest): PagedResponse<DoctorCall> {
         val user = currentUserDetails()
         return doctorCallService.findCalls(

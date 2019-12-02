@@ -33,8 +33,10 @@ include(
 pluginManagement {
     repositories {
         // TODO убрать milestone и snapshot как релизнится spring boot 2.2.0
-        maven { url = uri("https://repo.spring.io/milestone") }
-        maven { url = uri("https://repo.spring.io/snapshot") }
+//        maven { url = uri("https://repo.spring.io/milestone") }
+//        maven { url = uri("https://repo.spring.io/snapshot") }
+        mavenCentral()
+        jcenter()
         gradlePluginPortal()
     }
     resolutionStrategy {

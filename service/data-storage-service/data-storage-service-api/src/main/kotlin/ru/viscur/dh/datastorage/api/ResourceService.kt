@@ -30,6 +30,13 @@ interface ResourceService {
             where T : BaseResource
 
     /**
+     * Чтение ресурсов по ID.
+     * Результат возвращается как map, в котором ключ - ID ресурса, а значение - ресурс
+     */
+    fun <T> classifiedByIds(resourceType: ResourceType<T>, ids: Collection<String>): Map<String, T>
+            where T : BaseResource
+
+    /**
      * Поиск ресурса по значению идентификатора [Identifier.value][ru.viscur.dh.fhir.model.type.Identifier.value]
      * @param resourceType тип ресурса
      * @param type тип идентификатора, [IdentifierType]

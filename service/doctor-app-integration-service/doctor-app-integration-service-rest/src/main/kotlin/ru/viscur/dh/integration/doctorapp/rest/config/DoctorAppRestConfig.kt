@@ -18,23 +18,25 @@ import ru.viscur.dh.integration.doctorapp.rest.security.MisAuthenticationProvide
 
 @Configuration
 @EnableWebMvc
-@EnableWebSocket
+//@EnableWebSocket
 @EnableWebSecurity
 @ComponentScan(basePackages = ["ru.viscur.dh.integration.doctorapp.rest"])
 class DoctorAppRestConfig(
         val doctorAppService: DoctorAppService
-) : WebSocketConfigurer {
+) /*: WebSocketConfigurer*/ {
 
+/*
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
         registry.addHandler(
                 doctorAppWebSocketHandler(),
                 "/integration/doctor-app/ws-endpoint"
         )
     }
+*/
 
-    @Bean
+    /*@Bean
     fun doctorAppWebSocketHandler() =
-            DoctorAppWebSocketHandler()
+            DoctorAppWebSocketHandler()*/
 
     @Configuration
     @Order(1)

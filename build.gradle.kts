@@ -48,16 +48,15 @@ plugins {
     kotlin("plugin.jpa") version "1.3.50" apply false
     id("org.flywaydb.flyway") version "5.2.4" apply false
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
-    id("org.springframework.boot") version "2.2.0.BUILD-SNAPSHOT" apply false // TODO заменить как появится релиз
+    id("org.springframework.boot") version "2.2.0.RELEASE" apply false // TODO заменить как появится релиз
 }
-
 
 allprojects {
     repositories {
         mavenCentral()
         // TODO убрать milestone и snapshot как релизнится spring boot 2.2.0
-        maven { url = uri("https://repo.spring.io/milestone") }
-        maven { url = uri("https://repo.spring.io/snapshot") }
+//        maven { url = uri("https://repo.spring.io/milestone") }
+//        maven { url = uri("https://repo.spring.io/snapshot") }
     }
     if (isBuildableProject(this)) {
         tasks.withType<KotlinCompile> {
