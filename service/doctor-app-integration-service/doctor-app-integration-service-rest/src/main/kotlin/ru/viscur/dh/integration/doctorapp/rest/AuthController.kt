@@ -48,7 +48,9 @@ class AuthController(
         val details = authentication.details as DhUserDetails
         return AuthInfo(
                 details.id, details.login,
-                details.fullName, details.family, details.given, listOf(), false
+                details.fullName, details.family, details.given,
+                details.specializations.map { it.name },
+                false
         )
     }
 

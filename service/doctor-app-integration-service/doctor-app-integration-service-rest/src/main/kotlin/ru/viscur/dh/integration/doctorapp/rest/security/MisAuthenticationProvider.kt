@@ -6,6 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.api.ResourceService.ResourceNotFoundException
 import ru.viscur.dh.fhir.model.enums.HumanNameUse
@@ -17,7 +18,8 @@ import ru.viscur.dh.security.DhUserDetails
  * AuthenticationProvider для аутентификации через МИС
  */
 class MisAuthenticationProvider(
-        private val resourceService: ResourceService
+        private val resourceService: ResourceService,
+        private val conceptService: ConceptService
 ) : AuthenticationProvider {
 
     override fun authenticate(authentication: Authentication?): Authentication? {
@@ -48,12 +50,18 @@ class MisAuthenticationProvider(
         val name =
                 practitioner.firstOfficialName ?: practitioner.firstUsualName ?: createEmpty()
 
+        val qualification = conceptService.byCodeableConcept(practitioner.qualification.code)
+
         token.details = DhUserDetails(
                 practitioner.id,
                 login,
                 name.text,
                 name.family,
-                name.given
+                name.given,
+                listOf(DhUserDetails.Specialization(
+                        qualification.code,
+                        qualification.display
+                ))
         )
         return token
     }

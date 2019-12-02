@@ -5,7 +5,14 @@ class DhUserDetails(
         val login: String,
         val fullName: String,
         val family: String,
-        val given: List<String>
+        val given: List<String>,
+        val specializations: List<Specialization>
 ) {
+
+
+    class Specialization(
+            val code: String,
+            val name: String
+    )
 
 }

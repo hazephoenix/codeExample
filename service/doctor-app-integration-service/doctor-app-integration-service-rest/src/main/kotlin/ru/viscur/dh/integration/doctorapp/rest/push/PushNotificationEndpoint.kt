@@ -5,13 +5,9 @@ import org.springframework.context.event.EventListener
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
 import org.springframework.stereotype.Component
+import ru.viscur.dh.datastorage.api.ConceptService
 import ru.viscur.dh.datastorage.api.ResourceService
-import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.integration.doctorapp.api.event.DoctorAppEvent
-import ru.viscur.dh.integration.doctorapp.api.event.MessageNewEvent
-import ru.viscur.dh.integration.doctorapp.api.model.ClinicalImpression
-import ru.viscur.dh.integration.doctorapp.api.model.Message
-import ru.viscur.dh.integration.doctorapp.rest.DoctorAppWebSocketHandler
 import ru.viscur.dh.integration.doctorapp.rest.push.protocol.Protocol
 import ru.viscur.dh.integration.doctorapp.rest.push.protocol.packet.AuthRequestPacket
 import ru.viscur.dh.integration.doctorapp.rest.push.protocol.packet.AuthResponsePacket
@@ -21,9 +17,9 @@ import ru.viscur.dh.security.DhUserDetails
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
-import java.lang.Exception
-import java.net.*
-import java.util.*
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.SocketException
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
@@ -39,10 +35,14 @@ import kotlin.concurrent.write
  */
 @Component
 class PushNotificationEndpoint(
-        resourceService: ResourceService
+        resourceService: ResourceService,
+        conceptService: ConceptService
 ) {
 
-    private val authProvider = MisAuthenticationProvider(resourceService)
+    private val authProvider = MisAuthenticationProvider(
+            resourceService,
+            conceptService
+    )
 
     private lateinit var socket: ServerSocket
     private lateinit var acceptThread: Thread
