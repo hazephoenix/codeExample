@@ -1,4 +1,4 @@
-package ru.viscur.autotests.tests
+package ru.viscur.autotests.utils
 
 class Constants {
     companion object {

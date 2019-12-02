@@ -1,9 +1,11 @@
 package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.utils.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.practitioner1Office101
+import ru.viscur.autotests.utils.Helpers.Companion.surgeonId
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.HumanName
@@ -11,7 +13,7 @@ import ru.viscur.dh.fhir.model.type.PractitionerQualification
 import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class Dictionaries {
 
     @Test
@@ -28,7 +30,6 @@ class Dictionaries {
 
     @Test
     fun getPractitionersWithBlocked() {
-        val surgeonId = "хирург_Иванов"
         //блокировка practitioner
         QueRequests.blockPractitioner(surgeonId, true)
 
@@ -37,6 +38,25 @@ class Dictionaries {
 
         //проверка, что в списке practitioner есть заблокированный
         assertEquals(true, practitionersInfo.find { it.id == surgeonId }?.extension?.blocked, "wrong $surgeonId status")
+    }
+
+    @Test
+    fun setPractitionerOnWork () {
+        //practitioner не на работе
+        QueRequests.setPractitionerActivityAndLocation(practitioner1Office101, false)
+
+        //проверка, что значения установлены
+        var practitionerInfo = QueRequests.getPractitionerById(practitioner1Office101)
+        assertEquals(false, practitionerInfo.extension.onWork, "wrong OnWork value for $practitioner1Office101")
+        assertNull(practitionerInfo.extension.onWorkInOfficeId, "wrong OnWorkInOfficeId value for $practitioner1Office101")
+
+        //practitioner на работе
+        QueRequests.setPractitionerActivityAndLocation(practitioner1Office101, true, office101Id)
+
+        //проверка, что значения установлены
+        practitionerInfo = QueRequests.getPractitionerById(practitioner1Office101)
+        assertEquals(true, practitionerInfo.extension.onWork, "wrong OnWork value for $practitioner1Office101")
+        assertEquals(office101Id, practitionerInfo.extension.onWorkInOfficeId, "wrong OnWorkInOfficeId value for $practitioner1Office101")
     }
 
     @Test
@@ -59,13 +79,33 @@ class Dictionaries {
 
     @Test
     fun practitionerUpdating() {
-       
+        //создание practitioner
+        val practitionerName = "Тест " + now()
+        val practitionerUpdatedName = practitionerName + "Updated"
+        val practitioner = Practitioner(
+                id = "ignored",
+                name = listOf(HumanName(text = practitionerName, family = practitionerName, given = listOf("Иван"), suffix = listOf("Алексеевич"))),
+                qualification = PractitionerQualification(code = CodeableConcept(code = "Test", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+        )
+
+        val createdPractitioner = QueRequests.createPractitioner(practitioner)
+
+        //обновление информации о practitioner
+        val practitionerNewInfo = Practitioner(
+                id = createdPractitioner.id,
+                name = listOf(HumanName(text = practitionerUpdatedName, family = practitionerUpdatedName, given = listOf(practitionerUpdatedName), suffix = listOf(practitionerUpdatedName))),
+                qualification =  PractitionerQualification(code = CodeableConcept(code = "TestUpdated", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+        )
+        val updatedPractitioner = QueRequests.updatePractitioner(practitionerNewInfo)
+
+        //проверка, что информация о practitioner изменена
+        assertEquals(createdPractitioner.id, updatedPractitioner.id, "wrong updated practitioner id")
+        assertEquals(practitionerUpdatedName, updatedPractitioner.name.first().text, "wrong updated practitioner name")
+        assertEquals(practitionerUpdatedName, updatedPractitioner.name.first().family, "wrong updated practitioner name")
     }
 
     @Test
     fun getPractitionerById() {
-        val surgeonId = "хирург_Иванов"
-
         //получение данных о practitioner
         val surgeonInfo = QueRequests.getPractitionerById(surgeonId)
 
@@ -75,7 +115,6 @@ class Dictionaries {
 
     @Test
     fun practitionerBlocking() {
-        val surgeonId = "хирург_Иванов"
 
         //блокировка practitioner
         QueRequests.blockPractitioner(surgeonId, true)
@@ -158,8 +197,10 @@ class Dictionaries {
 
     @Test
     fun getIcdListParentCode() {
-        //получение списка кодов диагнозов
-        val icdListInfo = QueRequests.getCodeInfo("ICD-10", "A00")
+        //получение списка кодов диагнозов подветки
+        val codeName = "ICD-10"
+        val parentCode = "A00"
+        val icdListInfo = QueRequests.getCodeInfo(codeName, parentCode)
 
         //проверка, что список не пустой
         assertFalse(icdListInfo.isEmpty())

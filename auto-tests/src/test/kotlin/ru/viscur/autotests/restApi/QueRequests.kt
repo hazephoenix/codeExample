@@ -1,6 +1,5 @@
 package ru.viscur.autotests.restApi
 
-import io.restassured.RestAssured
 import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
@@ -303,7 +302,14 @@ class QueRequests {
         fun createPractitioner(practitioner: Practitioner) =
                 Helpers.createRequestSpec(practitioner).`when`().
                         post(Endpoints.GET_PRACTITIONERS).
-                        then().statusCode(200)
+                        then().statusCode(200).
+                        extract().response().`as`(Practitioner::class.java)
+
+        fun updatePractitioner(practitioner: Practitioner) =
+                Helpers.createRequestSpec(practitioner).`when`().
+                        put(Endpoints.GET_PRACTITIONERS).
+                        then().statusCode(200).
+                        extract().response().`as`(Practitioner::class.java)
 
         fun blockPractitioner(practitionerId: String, value: Boolean) =
                 Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId, "value" to value)).`when`().

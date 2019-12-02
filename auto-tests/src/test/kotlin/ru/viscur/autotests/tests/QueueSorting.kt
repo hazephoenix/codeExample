@@ -1,24 +1,23 @@
 package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office116
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office149
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office202
-import ru.viscur.autotests.tests.Constants.Companion.observation2Office101
-import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
-import ru.viscur.autotests.tests.Constants.Companion.office101Id
-import ru.viscur.autotests.tests.Constants.Companion.office116Id
-import ru.viscur.autotests.tests.Constants.Companion.office117Id
-import ru.viscur.autotests.tests.Constants.Companion.office149Id
-import ru.viscur.autotests.tests.Constants.Companion.office202Id
-import ru.viscur.autotests.tests.Constants.Companion.redZoneId
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office116
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office149
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office202
+import ru.viscur.autotests.utils.Constants.Companion.observation2Office101
+import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
+import ru.viscur.autotests.utils.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.office116Id
+import ru.viscur.autotests.utils.Constants.Companion.office117Id
+import ru.viscur.autotests.utils.Constants.Companion.office149Id
+import ru.viscur.autotests.utils.Constants.Companion.office202Id
+import ru.viscur.autotests.utils.Constants.Companion.redZoneId
 import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createListResource
@@ -32,7 +31,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.utils.*
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class QueueSorting {
 
     @BeforeEach

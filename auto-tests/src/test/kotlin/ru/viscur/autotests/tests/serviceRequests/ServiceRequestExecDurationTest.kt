@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
-import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
-import ru.viscur.autotests.tests.Constants.Companion.office101Id
-import ru.viscur.autotests.tests.Constants.Companion.redZoneId
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
+import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
+import ru.viscur.autotests.utils.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.redZoneId
 import ru.viscur.autotests.utils.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus

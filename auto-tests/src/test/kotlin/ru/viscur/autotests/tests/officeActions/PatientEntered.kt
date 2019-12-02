@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
-import ru.viscur.autotests.tests.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
+import ru.viscur.autotests.utils.Constants.Companion.office101Id
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.autotests.utils.patientIdFromServiceRequests

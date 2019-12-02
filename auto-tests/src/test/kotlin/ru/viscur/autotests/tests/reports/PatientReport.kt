@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office149
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office202
-import ru.viscur.autotests.tests.Constants.Companion.office149Id
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office149
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office202
+import ru.viscur.autotests.utils.Constants.Companion.office149Id
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createObservation
 import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource

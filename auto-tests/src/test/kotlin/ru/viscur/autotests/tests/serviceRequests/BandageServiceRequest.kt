@@ -7,8 +7,8 @@ import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Constants.Companion.bandageOffice128
-import ru.viscur.autotests.tests.Constants.Companion.office128Id
+import ru.viscur.autotests.utils.Constants.Companion.bandageOffice128
+import ru.viscur.autotests.utils.Constants.Companion.office128Id
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.autotests.utils.checkServiceRequestsOfPatient

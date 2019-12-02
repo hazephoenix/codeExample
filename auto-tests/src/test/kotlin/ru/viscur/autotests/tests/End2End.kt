@@ -4,13 +4,13 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
-import ru.viscur.autotests.tests.Constants.Companion.observation1Office116
-import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
-import ru.viscur.autotests.tests.Constants.Companion.office101Id
-import ru.viscur.autotests.tests.Constants.Companion.office116Id
-import ru.viscur.autotests.tests.Constants.Companion.office139Id
-import ru.viscur.autotests.tests.Constants.Companion.redZoneId
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
+import ru.viscur.autotests.utils.Constants.Companion.observation1Office116
+import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
+import ru.viscur.autotests.utils.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.office116Id
+import ru.viscur.autotests.utils.Constants.Companion.office139Id
+import ru.viscur.autotests.utils.Constants.Companion.redZoneId
 import ru.viscur.autotests.utils.*
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createDiagnosticReportResource
@@ -83,7 +83,7 @@ class End2End {
     }
 
     @Test
-    fun patientObservationsFullCycle() {
+    fun patientClaimCompletingFullCycle() {
         //создание пациента с 3 разными по приоритету обследованиями
         val patientServiceRequests = listOf(
                 createServiceRequestResource(observation1Office101),

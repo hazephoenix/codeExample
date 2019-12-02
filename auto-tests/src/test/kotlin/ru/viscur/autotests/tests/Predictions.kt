@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
-import ru.viscur.autotests.tests.Constants.Companion.surgeon1Id
+import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
+import ru.viscur.autotests.utils.Constants.Companion.surgeon1Id
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForDiagnosis
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForSeverity
