@@ -73,9 +73,16 @@ class ReportServiceImpl(
                 activeServiceRequests.any { it.code.code() == observationType && !it.isInspectionOfResp() }
                         || activeServiceRequests.all { it.code.code() == observationType && it.isInspectionOfResp() && practitionerId in (it.performer!!.map { it.id }) }
             }
-            return queueInOfficeDto(items = queueItems, practitionerInOffice =  practitioner)
+            return queueInOfficeDto(items = queueItems, practitionerInOffice = practitioner)
         } else {
-            return practitioner.extension.onWorkInOfficeId?.let { queueInOffice(it) }
+            return practitioner.extension.onWorkInOfficeId?.let {
+                queueInOffice(it).apply {
+                    this.practitioner = PractitionerDto(
+                            practitionerId = practitioner.id,
+                            name = practitioner.name.first().text
+                    )
+                }
+            }
         }
     }
 
