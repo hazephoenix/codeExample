@@ -2,6 +2,7 @@ package ru.viscur.autotests.tests.  reports
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
@@ -25,7 +26,7 @@ import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class PractitionerReport {
 
     @BeforeEach

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
+import ru.viscur.autotests.tests.Constants.Companion.office101Id
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
@@ -17,11 +19,6 @@ import ru.viscur.dh.fhir.model.utils.resources
 @Disabled("Debug purposes only")
 class ChangeSeverity {
 
-    companion object {
-        val office101 = "Office:101"
-        val observation1Office101 = "B03.016.002"
-    }
-
     @BeforeEach
     fun init() {
         QueRequests.deleteQue()
@@ -30,7 +27,7 @@ class ChangeSeverity {
     @Test
     fun GreenToRed() {
         //создание очереди
-        QueRequests.officeIsBusy(referenceToLocation(office101))
+        QueRequests.officeIsBusy(referenceToLocation(office101Id))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
         )
@@ -44,7 +41,7 @@ class ChangeSeverity {
         //проверка, что очередь отсортирована правильно после смены severity
         QueRequests.changeSeverity(patientId1, "RED")
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
+                QueueItemsOfOffice(office101Id, listOf(
                         QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
@@ -55,7 +52,7 @@ class ChangeSeverity {
     @Test
     fun RedToGreen() {
         //создание очереди
-        QueRequests.officeIsBusy(referenceToLocation(office101))
+        QueRequests.officeIsBusy(referenceToLocation(office101Id))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
         )
@@ -69,7 +66,7 @@ class ChangeSeverity {
         //проверка, что очередь отсортирована правильно после смены severity
         QueRequests.changeSeverity(patientId3, "GREEN")
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
+                QueueItemsOfOffice(office101Id, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
@@ -80,7 +77,7 @@ class ChangeSeverity {
     @Test
     fun YellowToYellow() {
         //создание очереди
-        QueRequests.officeIsBusy(referenceToLocation(office101))
+        QueRequests.officeIsBusy(referenceToLocation(office101Id))
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observation1Office101)
         )
@@ -94,7 +91,7 @@ class ChangeSeverity {
         //проверка, что очередь не изменилась
         QueRequests.changeSeverity(patientId1, "YELLOW")
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
+                QueueItemsOfOffice(office101Id, listOf(
                         QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)

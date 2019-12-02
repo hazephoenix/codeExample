@@ -4,6 +4,10 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
+import ru.viscur.autotests.tests.Constants.Companion.observationOfSurgeon
+import ru.viscur.autotests.tests.Constants.Companion.office101Id
+import ru.viscur.autotests.tests.Constants.Companion.redZoneId
 import ru.viscur.autotests.utils.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
@@ -23,18 +27,13 @@ class ServiceRequestExecDurationTest {
     fun test() {
 
         QueRequests.deleteQue()
-        val observationOfSurgeonCode = "B01.057.001"
-        val observationOfBloodCode = "A09.05.010"
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeonCode),
-                Helpers.createServiceRequestResource(observationOfBloodCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-        val redZone = "Office:RedZone"
-        val office101Id = "Office:101"
 
         QueRequests.officeIsBusy(referenceToLocation(office101Id))
-        QueRequests.officeIsBusy(referenceToLocation(redZone))
+        QueRequests.officeIsBusy(referenceToLocation(redZoneId))
 
         //регистрация пациента
         val responseBundle = QueRequests.createPatient(bundle)
@@ -50,7 +49,7 @@ class ServiceRequestExecDurationTest {
         var actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
 
         //началась услуга
-        val bloodServiceRequestId = serviceRequestsFromResponse.find { it.code.code() == observationOfBloodCode }!!.id
+        val bloodServiceRequestId = serviceRequestsFromResponse.find { it.code.code() == observation1Office101 }!!.id
         QueRequests.startObservation(bloodServiceRequestId)
 
         //время выполнения 3 сек
@@ -61,8 +60,8 @@ class ServiceRequestExecDurationTest {
 
         //проверка, что услуга сохранилась длительностью 3 сек
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeonCode, locationId = redZone),
-                ServiceRequestInfo(code = observationOfBloodCode, locationId = office101Id, status = ServiceRequestStatus.waiting_result, execDuration = 3)
+                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId),
+                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.waiting_result, execDuration = 3)
         ))
     }
 }

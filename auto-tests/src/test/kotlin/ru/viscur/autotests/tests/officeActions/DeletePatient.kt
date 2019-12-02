@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.tests.Constants.Companion.observation1Office101
+import ru.viscur.autotests.tests.Constants.Companion.office101Id
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.checkQueueItems
@@ -20,16 +22,6 @@ import ru.viscur.dh.fhir.model.utils.resources
 @Disabled("Debug purposes only")
 class DeletePatient {
 
-    companion object {
-        val office116 = "Office:116"
-        val office117 = "Office:117"
-        val office101 = "Office:101"
-        val office139 = "Office:139"
-        val office104 = "Office:104"
-
-        val observCode = "B03.016.002"
-    }
-
     @BeforeEach
     fun init() {
         QueRequests.deleteQue()
@@ -38,9 +30,9 @@ class DeletePatient {
     @Test
     fun deleteMiddlePositionPatientInQue() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101))
+        QueRequests.officeIsReady(referenceToLocation(office101Id))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1122", "RED", servRequests)
         val bundle2 = bundle("1121", "YELLOW", servRequests)
@@ -54,7 +46,7 @@ class DeletePatient {
 
         //проверка состояния очереди
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
+                QueueItemsOfOffice(office101Id, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
                 ))
@@ -64,9 +56,9 @@ class DeletePatient {
     @Test
     fun deleteFirstPositionPatientInQue() {
         //создание очереди
-        QueRequests.officeIsBusy(referenceToLocation(office101))
+        QueRequests.officeIsBusy(referenceToLocation(office101Id))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1122", "RED", servRequests)
         val bundle2 = bundle("1121", "YELLOW", servRequests)
@@ -80,7 +72,7 @@ class DeletePatient {
 
         //проверка состояния очереди
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
+                QueueItemsOfOffice(office101Id, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
                 ))
@@ -90,9 +82,9 @@ class DeletePatient {
     @Test
     fun deleteLastPositionPatientInQue() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101))
+        QueRequests.officeIsReady(referenceToLocation(office101Id))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1122", "RED", servRequests)
         val bundle2 = bundle("1121", "YELLOW", servRequests)
@@ -106,7 +98,7 @@ class DeletePatient {
 
         //проверка состояния очереди
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
+                QueueItemsOfOffice(office101Id, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
@@ -116,9 +108,9 @@ class DeletePatient {
     @Test
     fun deletePatientWithoutNextInQue() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101))
+        QueRequests.officeIsReady(referenceToLocation(office101Id))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1122", "RED", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
@@ -128,16 +120,16 @@ class DeletePatient {
 
         //проверка состояния очереди
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf())
+                QueueItemsOfOffice(office101Id, listOf())
         ))
     }
 
     @Test
     fun deletePatientGoingToObservationWithNextInQue() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101))
+        QueRequests.officeIsReady(referenceToLocation(office101Id))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observCode)
+                Helpers.createServiceRequestResource(observation1Office101)
         )
         val bundle1 = bundle("1122", "RED", servRequests)
         val bundle2 = bundle("1121", "YELLOW", servRequests)
@@ -149,7 +141,7 @@ class DeletePatient {
 
         //проверка состояния очереди
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101, listOf(
+                QueueItemsOfOffice(office101Id, listOf(
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))

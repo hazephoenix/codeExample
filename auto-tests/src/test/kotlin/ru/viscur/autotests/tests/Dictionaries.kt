@@ -11,7 +11,7 @@ import ru.viscur.dh.fhir.model.type.PractitionerQualification
 import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class Dictionaries {
 
     @Test
@@ -24,6 +24,19 @@ class Dictionaries {
 
         //проверка, что в списке нет заблокированных
         assertNull(practitionersInfo.find { it.extension.blocked == true }?.id)
+    }
+
+    @Test
+    fun getPractitionersWithBlocked() {
+        val surgeonId = "хирург_Иванов"
+        //блокировка practitioner
+        QueRequests.blockPractitioner(surgeonId, true)
+
+        //получение списка всех practitioner, включая заблокированных
+        val practitionersInfo = QueRequests.getPractitioners(true)
+
+        //проверка, что в списке practitioner есть заблокированный
+        assertEquals(true, practitionersInfo.find { it.id == surgeonId }?.extension?.blocked, "wrong $surgeonId status")
     }
 
     @Test
@@ -77,19 +90,6 @@ class Dictionaries {
         //проверка, что practitioner разблокирован
         surgeonInfo = QueRequests.getPractitionerById(surgeonId)
         assertEquals(false, surgeonInfo.extension.blocked, "wrong $surgeonId status")
-    }
-
-    @Test
-    fun getPractitionersWithBlocked() {
-        val surgeonId = "хирург_Иванов"
-        //блокировка practitioner
-        QueRequests.blockPractitioner(surgeonId, true)
-
-        //получение списка всех practitioner, включая заблокированных
-        val practitionersInfo = QueRequests.getPractitioners(true)
-
-        //проверка, что в списке practitioner есть заблокированный
-        assertEquals(true, practitionersInfo.find { it.id == surgeonId }?.extension?.blocked, "wrong $surgeonId status")
     }
 
     @Test

@@ -39,9 +39,10 @@ class ClinicalImpressionDuration {
 
         //получение информации о продолжительности обследования пациента
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
-        val patientDurationInfo = QueRequests.getPatientsClinicalImpressionDuration().find{it.patientId == patientId}?.duration
+        val patientDurationInfo = QueRequests.getPatientsClinicalImpressionDuration().find{it.patientId == patientId}!!
 
         //проверка, что существует информация о продолжительности
-        assertNotNull(patientDurationInfo)
+        assertNotNull(patientDurationInfo.start)
+        assertNotNull(patientDurationInfo.duration)
     }
 }
