@@ -6,49 +6,57 @@
     <info>
         <appname>Paramedic Desktop</appname>
         <appversion>1.0</appversion>
-        <javaversion>11</javaversion>
+        <javaversion>1.11</javaversion>
     </info>
 
     <locale>
         <langpack iso3="eng"/>
     </locale>
     <guiprefs width="640" height="480" resizable="yes"/>
-<!--    <guiprefs resizable="no" width="800" height="600">
-        <laf name="substance">
-            <os family="windows"/>
-            <os family="unix"/>
-&lt;!&ndash;            <param name="variant" value="mist-silver"/>&ndash;&gt;
-        </laf>
-    </guiprefs>-->
-<!--    <panels>
-        <panel classname="com.izforge.izpack.panels.hello.HelloPanel"/>
-    </panels>-->
-    <panels>
-        <panel classname="HelloPanel"/>
-        <panel classname="InfoPanel"/>
-        <panel classname="LicencePanel"/>
-        <panel classname="TargetPanel"/>
-        <panel classname="PacksPanel"/>
-        <panel classname="InstallPanel"/>
-        <panel classname="FinishPanel"/>
-    </panels>
+
+    <jar src="../libs/paramedic-device-installer-all.jar"/>
 
     <resources>
-        <res id="LicensePanel.license" src="info.txt"/>
+        <res src="../resources/main/izpack/config.input.xml" id="userInputSpec.xml" parse="yes" type="xml" />
     </resources>
+
+    <dynamicvariables>
+        <variable name="arm.uuid" value="${COMPUTERNAME}" type="environment"/>
+    </dynamicvariables>
+
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel">
+            <actions>
+                <action stage="postvalidate"
+                        classname="installer.InstallStuff"/>
+            </actions>
+        </panel>
+        <panel classname="UserInputPanel" id="configPanel">
+            <actions>
+                <action stage="postvalidate" classname="installer.ConfigPanelAction"/>
+            </actions>
+        </panel>
+
+        <panel classname="FinishPanel"/>
+    </panels>
 
     <packs>
         <pack name="stuff" required="true">
             <description>Stuff</description>
             <file src="tves-driver.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
             <file src="tves-backend.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
-            <file src="zebra-native.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="zebra-native.zip" targetdir="${INSTALL_PATH}/stuff/native" unpack="true"/>
             <file src="openjdk-11_windows-x64.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="paramedic-device-native-service.exe" targetdir="${INSTALL_PATH}/stuff"/>
+            <file src="SDK_4_15_1_msi.zip" targetdir="${INSTALL_PATH}/stuff/regula" unpack="true"/>
             <file src="winsw.exe" targetdir="${INSTALL_PATH}"/>
         </pack>
         <pack name="app" required="true">
             <description>Main application</description>
-            <singlefile src="../libs/dh-paramedic-device-app.jar" target="${INSTALL_PATH}/app.jar"/>
+            <singlefile src="dh-paramedic-device-app.jar" target="${INSTALL_PATH}/app.jar"/>
         </pack>
     </packs>
     <logging>

@@ -34,11 +34,10 @@ dependencies {
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:2.0.2")
     implementation("org.apache.pdfbox:pdfbox:2.0.17")
 
-/*    izpack("org.codehaus.izpack:izpack-compiler:5.1.3")
-    izpack("org.codehaus.izpack:izpack-ant:5.1.3")
-    izpack("org.codehaus.izpack:izpack-wrapper:5.1.3")
-    izpack("org.codehaus.izpack:izpack-installer:5.1.3")
-    izpack("org.codehaus.izpack:izpack-panel:5.1.3")*/
+    compileOnly("org.codehaus.izpack:izpack:5.1.3")
+    compileOnly("org.codehaus.izpack:izpack-ant:5.1.3")
+    compileOnly("org.codehaus.izpack:izpack-panel:5.1.3")
+
     izpack("org.codehaus.izpack:izpack:5.1.3")
     izpack("org.codehaus.izpack:izpack-compiler:5.1.3")
     izpack("org.codehaus.izpack:izpack-ant:5.1.3")
@@ -59,7 +58,17 @@ tasks {
         kotlinOptions.freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes")
     }
 
+    create("izpackJars", Jar::class) {
+
+        from("src/main/kotlin/") {
+            include("ru/viscur/dh/apps/paramedicdevice/installer/**")
+        }
+        archiveName = "izpack-add.jar"
+    }
+
     create("prepareInstaller") {
+        dependsOn("izpackJars")
+
         doLast {
             val izpackDir1 = File("$buildDir/izpack")
             if (izpackDir1.exists()) {
@@ -81,4 +90,9 @@ tasks {
         baseDir = File(buildDir, "izpack")
         dependsOn("bootJar", "prepareInstaller")
     }
+}
+
+sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+    kotlin.srcDir("src/main/kotlin")
+    kotlin.exclude("ru/viscur/dh/apps/paramedicdevice/installer/**")
 }
