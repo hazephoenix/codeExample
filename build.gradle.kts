@@ -43,20 +43,18 @@ fun isApplySpringBoot(project: Project): Boolean {
 }
 
 plugins {
-    kotlin("jvm") version "1.3.50"
-    kotlin("plugin.spring") version "1.3.50" apply false
-    kotlin("plugin.jpa") version "1.3.50" apply false
+    kotlin("jvm") version "1.3.61"
+    kotlin("plugin.spring") version "1.3.61" apply false
+    kotlin("plugin.jpa") version "1.3.61" apply false
     id("org.flywaydb.flyway") version "5.2.4" apply false
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
-    id("org.springframework.boot") version "2.2.0.RELEASE" apply false // TODO заменить как появится релиз
+    id("org.springframework.boot") version "2.2.0.RELEASE" apply false
 }
+
 
 allprojects {
     repositories {
         mavenCentral()
-        // TODO убрать milestone и snapshot как релизнится spring boot 2.2.0
-//        maven { url = uri("https://repo.spring.io/milestone") }
-//        maven { url = uri("https://repo.spring.io/snapshot") }
     }
     if (isBuildableProject(this)) {
         tasks.withType<KotlinCompile> {
@@ -100,11 +98,15 @@ subprojects {
         dependencies {
             implementation(kotlin("stdlib-jdk8"))
             implementation(kotlin("reflect"))
-            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
+            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0")
+            implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.0")
+            implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.0")
+            implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.0")
 
             if (applyBoot) {
                 implementation("org.springframework.boot:spring-boot-starter")
                 implementation("org.springframework.boot:spring-boot-starter-security")
+                implementation("org.springframework.boot:spring-boot-starter-actuator")
                 testImplementation("org.springframework.boot:spring-boot-starter-test") {
                     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }

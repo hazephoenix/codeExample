@@ -13,6 +13,5 @@ select resource_create('{"resourceType": "Questionnaire", "id": "Common_info", "
         {"valueCoding": {"code": "Sitting", "display": "Сидя", "system": "ValueSet/Transportation_types"}},
         {"valueCoding": {"code": "Lying", "display": "Лежа", "system": "ValueSet/Transportation_types"}}
     ]},
-    {"linkId": "Main_syndrome", "text": "Ведущий синдром", "type": "string"},
     {"linkId": "Pregnancy", "text": "Беременность", "type": "boolean"}
 ]}'::jsonb);

@@ -35,4 +35,9 @@ interface LocationService {
      * По типу места/кабинета [Location.type]
      */
     fun byLocationType(type: String): List<Location>
+
+    /**
+     * Все кабинеты
+     */
+    fun allLocations(): List<Location>
 }

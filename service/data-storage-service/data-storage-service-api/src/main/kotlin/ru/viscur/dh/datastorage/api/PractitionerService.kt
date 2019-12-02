@@ -12,8 +12,9 @@ interface PractitionerService {
     /**
      * Все мед. работники
      * @param withBlocked с заблокированными. иначе только активные/незаблокированные
+     * @param onWorkOnly только те, кто на работе
      */
-    fun all(withBlocked: Boolean = false): List<Practitioner>
+    fun all(withBlocked: Boolean = false, onWorkOnly: Boolean = false): List<Practitioner>
 
     /**
      * Создание мед. работника
@@ -45,4 +46,12 @@ interface PractitionerService {
      * Обновить значение поля Заблокирован [ru.viscur.dh.fhir.model.type.PractitionerExtension.blocked]
      */
     fun updateBlocked(practitionerId: String, value: Boolean): Practitioner
+
+    /**
+     * Мед. работник заступил на смену/ушел со смены
+     * Обновить значения полей
+     * [ru.viscur.dh.fhir.model.type.PractitionerExtension.onWork],
+     * [ru.viscur.dh.fhir.model.type.PractitionerExtension.onWorkInOfficeId]
+     */
+    fun updateOnWork(practitionerId: String, value: Boolean, officeId: String? = null): Practitioner
 }

@@ -28,7 +28,7 @@ class End2End {
     @Order(1)
     fun patientE2e() {
         QueRequests.deleteQue()
-        val observationOfSurgeonCode = "СтХир"
+        val observationOfSurgeonCode = "B01.057.001"
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeonCode)
         )
@@ -122,7 +122,7 @@ class End2End {
     fun patientAdditionalServRequestAdding() {
         QueRequests.deleteQue()
         val servRequests = listOf(
-                Helpers.createServiceRequestResource("СтХир")
+                Helpers.createServiceRequestResource("B01.057.001")
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         val office139 = "Office:139"
@@ -174,7 +174,7 @@ class End2End {
                 ))
         ))
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = "СтХир", locationId = office139),
+                ServiceRequestInfo(code = "B01.057.001", locationId = office139),
                 ServiceRequestInfo(code = "A04.16.001", locationId = office116),
                 ServiceRequestInfo(code = "B03.016.006", locationId = office104)
         ))

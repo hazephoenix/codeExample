@@ -50,8 +50,8 @@ class ObservationDurationAvgTest() {
 
     companion object {
 
-        private const val code1 = "СтХир"
-        private const val code2 = "СтТер"
+        private const val code1 = "B01.057.001"
+        private const val code2 = "B01.047.001"
         private const val diagnosis1 = "A00.1"
         private const val diagnosis2 = "A00.2"
         private val severity1 = Severity.RED.name

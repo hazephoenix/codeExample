@@ -100,18 +100,21 @@ class PatientServiceImpl(
         if (respPractitioners.isEmpty()) {
             throw Exception("ERROR. Can't find practitioners by qualifications: ${responsibleQualifications.joinToString()}")
         }
-        //todo смотреть кто на работе по локации
-        // practitionersId = practitionersId.filter кто на работе сейчас
+        val respPractitionersOnWork = respPractitioners.filter { it.extension.onWork }
+        //todo не понятно нужно ли это: если никого на смене нет, то это скорей всего ошибка в том, что никто не нажал "зайти на смену".
+        // такая ситуация не должна происходить. если все же произошла, то берем всех
+        val resultRespPractitioners = if (respPractitionersOnWork.isEmpty()) respPractitioners else respPractitionersOnWork
+        //todo смотреть кто в красной зоне по локации
+        // respPractitioners = respPractitioners.filter кто на работе сейчас
 
         //берем наименее загруженного врача
-        val responsiblePractitionerId = respPractitioners.map { practitioner ->
+        val responsiblePractitionerId = resultRespPractitioners.map { practitioner ->
             Pair(patientsToExamine(practitioner.id).sumBy { enumValueOf<Severity>(it.severity).workloadWeight }, practitioner)
         }.sortedWith(compareBy({ it.first }, { it.second.name.first().family })).first().second.id
         val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
 
-        val diagnosisConcept = conceptService.byCode(ValueSetName.ICD_10, diagnosis)
         val observationTypes =
-                (codeMapService.icdToObservationTypes(diagnosisConcept.parentCode!!) +
+                ((codeMapService.icdToObservationTypes(diagnosis) ?: listOf()) +
                         observationTypeOfResponsible).distinct()
 
         val serviceRequests = observationTypes.map { observationType ->
@@ -401,7 +404,7 @@ class PatientServiceImpl(
      */
     private fun observationTypeOfResponsiblePractitioner(responsiblePractitionerId: String): String {
         val responsiblePractitioner = practitionerService.byId(responsiblePractitionerId)
-        return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualification.code.code())
+        return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualificationCode())
     }
 
     private fun Query.patientsToExamine(): List<PatientToExamine> {

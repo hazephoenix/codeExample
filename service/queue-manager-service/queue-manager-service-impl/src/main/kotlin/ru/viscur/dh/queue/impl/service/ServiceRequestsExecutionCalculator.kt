@@ -5,6 +5,7 @@ import ru.viscur.dh.datastorage.api.*
 import ru.viscur.dh.datastorage.api.util.RECALC_NEXT_OFFICE_CONFIG_CODE
 import ru.viscur.dh.datastorage.api.util.RECEPTION
 import ru.viscur.dh.datastorage.api.util.allLocationIdsInGroup
+import ru.viscur.dh.datastorage.api.util.isInspection
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -66,20 +67,31 @@ class ServiceRequestsExecutionCalculator(
         return serviceRequests.map { serviceRequest ->
             val serviceRequestId = serviceRequest.id
             val officeIds =
-                    if (serviceRequest.isInspectionOfResp()) {
-                        val locationType = severity.zoneForInspectionOfResp
-                        locationService.byLocationType(locationType).map { it.id }
+                    if (serviceRequest.isInspection()) {
+                        locationIdsBySeverity(severity)
                     } else {
-                        locationService.byObservationType(serviceRequest.code.code())
+                        val byObservationType = locationService.byObservationType(serviceRequest.code.code())
+                        //если не получилось определить кабинет для какой-то услуги, то отправляем в зону по степени тяжести
+                        //это случай, например, осмотра анестезиолога - не привязан к кабинету, или если попала какая-то услуга, для которой нет соответсвия в кабинете
+                        if (byObservationType.isEmpty()) locationIdsBySeverity(severity) else byObservationType
                     }
             val locationInfos = officeIds.map { officeId ->
                 ServiceRequestExecLocationInfo(serviceRequestId, serviceRequest.code.code(), officeId, estWaitingInQueueWithType(officeId, severity))
             }
             if (locationInfos.isEmpty()) {
-                throw Exception("ERROR. Can't find opened office by observation type '${serviceRequest.code.code()}'")
+                throw Exception("ERROR. Can't find opened office for observation type '${serviceRequest.code.code()}'")
             }
             ServiceRequestExecInfo(serviceRequestId, priority(serviceRequest), locationInfos)
         }
+    }
+
+    /**
+     * Места в зависимости от степени тяжести.
+     * Для зеленых определяется зеленая зона, для красных - красная и т.д.
+     */
+    private fun locationIdsBySeverity(severity: Severity): List<String> {
+        val locationType = severity.zoneForInspections
+        return locationService.byLocationType(locationType).map { it.id }
     }
 
     fun calcNextOfficeId(patientId: String, prevOfficeId: String?, forQueueOnly: Boolean = false): String? {
@@ -92,7 +104,7 @@ class ServiceRequestsExecutionCalculator(
     fun recalcOfficeForInspectionOfResp(patientId: String, severity: Severity) {
         val inspectionOfResp = serviceRequestService.active(patientId).find { it.isInspectionOfResp() }
                 ?: throw Exception("not found inspection of responsible practitioner for patient with id '$patientId'")
-        val locationType = severity.zoneForInspectionOfResp
+        val locationType = severity.zoneForInspections
         val locationInfos = locationService.byLocationType(locationType).map {
             val officeId = it.id
             ServiceRequestExecLocationInfo(inspectionOfResp.id, inspectionOfResp.code.code(), officeId, estWaitingInQueueWithType(officeId, severity))
@@ -345,17 +357,17 @@ class ServiceRequestsExecutionCalculator(
 
     private fun List<ServiceRequestExecLocationInfo>.distinctLocationSize() = this.map { it.locationId }.distinct().size
 
-    private fun List<Pair<Double, ServiceRequestExecLocationInfo>>.filterWithMinFirstValue(): List<ServiceRequestExecLocationInfo>{
+    private fun List<Pair<Double, ServiceRequestExecLocationInfo>>.filterWithMinFirstValue(): List<ServiceRequestExecLocationInfo> {
         val minValue = this.map { it.first }.min()
         return this.filter { it.first == minValue }.map { it.second }
     }
 
-    private fun List<ServiceRequestExecLocationInfo>.filterWithMinEstWaiting(): List<ServiceRequestExecLocationInfo>{
+    private fun List<ServiceRequestExecLocationInfo>.filterWithMinEstWaiting(): List<ServiceRequestExecLocationInfo> {
         val minEstWaiting = this.map { it.estWaiting }.min()!!
         return this.filter { it.estWaiting == minEstWaiting }
     }
 
-    private fun List<ServiceRequestExecInfo>.filterWithMaxPriority(): List<ServiceRequestExecLocationInfo>{
+    private fun List<ServiceRequestExecInfo>.filterWithMaxPriority(): List<ServiceRequestExecLocationInfo> {
         val maxPriority = this.map { it.priority }.max()!!
         return this.filter { it.priority == maxPriority }.flatMap { it.locationInfos }
     }

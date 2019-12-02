@@ -1,13 +1,15 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
-import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.api.util.isInspectionQualification
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.genId
+import ru.viscur.dh.fhir.model.utils.qualificationCode
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -22,8 +24,10 @@ class PractitionerServiceImpl(
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    override fun all(withBlocked: Boolean): List<Practitioner> {
-        val whereClause = if(withBlocked) "" else "where (r.resource->'extension'->>'blocked')\\:\\:boolean = false"
+    override fun all(withBlocked: Boolean, onWorkOnly: Boolean): List<Practitioner> {
+        val whereClauses = if (withBlocked) mutableListOf() else listOf("(r.resource->'extension'->>'blocked')\\:\\:boolean = false").toMutableList()
+        if (onWorkOnly) whereClauses += "(r.resource->'extension'->>'onWork')\\:\\:boolean = true"
+        val whereClause = if (whereClauses.isEmpty()) "" else "where " + whereClauses.joinToString(" and ")
         val query = em.createNativeQuery("""
             select r.resource
             from practitioner r
@@ -69,4 +73,26 @@ class PractitionerServiceImpl(
             resourceService.update(ResourceType.Practitioner, practitionerId) {
                 extension.blocked = value
             }
+
+    override fun updateOnWork(practitionerId: String, value: Boolean, officeId: String?): Practitioner {
+        var officeIdIntr = officeId
+        if (value) {
+            //заступление на смену
+            val practitioner = byId(practitionerId)
+            //у врача, который производит осмотры кабинет не указывается
+            if (practitioner.isInspectionQualification()) {
+                officeIdIntr = null
+            } else if (officeIdIntr == null) {
+                throw Exception("error while updating onWork value for practitioner with id '$practitionerId':" +
+                        "for with qualification ${practitioner.qualificationCode()} officeId must be defined")
+            }
+        } else {
+            //уход со смены
+            officeIdIntr = null
+        }
+        return resourceService.update(ResourceType.Practitioner, practitionerId) {
+            extension.onWork = value
+            extension.onWorkInOfficeId = officeIdIntr
+        }
+    }
 }

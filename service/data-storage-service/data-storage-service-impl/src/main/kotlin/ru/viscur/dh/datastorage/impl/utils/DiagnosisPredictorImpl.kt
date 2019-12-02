@@ -30,26 +30,31 @@ class DiagnosisPredictorImpl(
     private val minimalProbability = 0.95
 
     override fun predict(bundle: Bundle, take: Int): PredictDiagnosisResponse {
-        val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse).first()
+        val questionnaireResponse = bundle.resources(ResourceType.QuestionnaireResponse)
+                .find { it.questionnaire == "Questionnaire/Severity_criteria" }
+                ?: throw Exception("Could not predict diagnosis: no severity criteria questionnaire response found ")
         val complaints = questionnaireResponse.item
                 .find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }
                 ?.answer?.mapNotNull { it.valueString }
                 ?: throw Exception("Could not predict diagnosis: no complaints provided")
 
-        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
+        // todo: debug byAlternativesOrCode
+        val complaintCodes = conceptService.byAlternativeOrDisplay(ValueSetName.COMPLAINTS, complaints)
         if (complaintCodes.isEmpty()) throw Error("Complaint codes not found")
 
-        val diagnosisCodes = codeMapService.icdByAllComplaints(complaintCodes,take)
-                .map { PredictedDiagnosis(code = it, system = "ValueSet/${ValueSetName.ICD_10}", probability = 1.0) }
+        val diagnosisCodesList = codeMapService.icdByAllComplaints(complaintCodes, take)
+        val diagnosisCodes = diagnosisCodesList.map { PredictedDiagnosis(code = it, system = "ValueSet/${ValueSetName.ICD_10}", probability = 1.0) }
         if (diagnosisCodes.size < take) {
-            val moreDiagnosisCodes = codeMapService.icdByAnyComplaints(complaintCodes, take - diagnosisCodes.size)
+            val moreDiagnosisCodes = codeMapService.icdByAnyComplaints(complaintCodes, diagnosisCodesList, take - diagnosisCodesList.size)
                     .mapNotNull {
                         PredictedDiagnosis(
                                 code = it!!.diagnosisCode,
                                 system = "ValueSet/${ValueSetName.ICD_10}",
-                                probability = it.complaintCodeCount.toDouble()/complaintCodes.size.toDouble())
+                                probability = it.complaintCodeCount.toDouble() / complaintCodes.size.toDouble()
+                        )
                     }
-            return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes).filter { it.probability > minimalProbability })
+            return PredictDiagnosisResponse((diagnosisCodes + moreDiagnosisCodes)
+                    .filter { it.probability > minimalProbability })
         }
         return PredictDiagnosisResponse(diagnosisCodes)
     }
@@ -66,7 +71,7 @@ class DiagnosisPredictorImpl(
      * содержащего ссылки на перечисленные ресурсы.
      *
      */
-    override fun saveTrainingSample(diagnosticReport: DiagnosticReport) {
+    override fun saveTrainingSample(diagnosticReport: DiagnosticReport): Long? {
         diagnosticReport.subject.id?.let { patientId ->
             patientService.byId(patientId).let { patient ->
                 clinicalImpressionService.active(patientId).let { clinicalImpression ->
@@ -86,8 +91,8 @@ class DiagnosisPredictorImpl(
 
                     // заключительный диагноз всегда один
                     val diagnosisCode = diagnosticReport.conclusionCode.first().code()
-                    codeMapService.icdToComplaints(diagnosisCode).let { sourceCodes ->
-                        val complaintCodes = conceptService.byAlternative(ValueSetName.COMPLAINTS, complaints)
+                    val complaintCodes = conceptService.byAlternativeOrDisplay(ValueSetName.COMPLAINTS, complaints)
+                    val codeMap = codeMapService.icdToComplaints(diagnosisCode)?.let { sourceCodes ->
                         val resultComplaints = mutableListOf<CodeMapTargetCode>()
                         complaintCodes.forEach { code ->
                             if (!sourceCodes.contains(code)) {
@@ -101,12 +106,25 @@ class DiagnosisPredictorImpl(
                             }
                         }
                     }
-
-                    toTrainingSample(observations, patient, diagnosticReport, questionnaireResponse)
-                        .let { trainingSampleRepository.save(it) }
+                    if (codeMap == null) {
+                        conceptService.byCode(ValueSetName.ICD_10, diagnosisCode).let {
+                            resourceService.create(
+                                CodeMap(
+                                    id = "ICD-10_to_Complaints:$diagnosisCode",
+                                    sourceUrl = "ValueSet/${ValueSetName.ICD_10.id}",
+                                    targetUrl = "ValueSet/${ValueSetName.COMPLAINTS.id}",
+                                    sourceCode = it.code,
+                                    targetCode = complaintCodes.map { code -> CodeMapTargetCode(code) }
+                                )
+                            )
+                        }
+                    }
+                    return toTrainingSample(observations, patient, diagnosticReport, questionnaireResponse)
+                        .let { trainingSampleRepository.save(it) }.id
                 }
             }
         }
+        return null
     }
 
     /**

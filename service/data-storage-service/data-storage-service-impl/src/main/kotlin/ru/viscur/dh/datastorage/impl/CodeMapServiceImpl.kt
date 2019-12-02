@@ -1,6 +1,5 @@
 package ru.viscur.dh.datastorage.impl
 
-import com.fasterxml.jackson.databind.node.*
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.*
@@ -10,9 +9,7 @@ import ru.viscur.dh.fhir.model.entity.CodeMap
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
-import java.util.*
 import javax.persistence.*
-import kotlin.reflect.jvm.internal.impl.load.kotlin.*
 
 /**
  * Created at 23.10.2019 16:07 by SherbakovaMA
@@ -25,7 +22,7 @@ class CodeMapServiceImpl(
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    override fun codeMap(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap {
+    override fun codeMapNullable(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap? {
         val query = em.createNativeQuery("""
             select cm.resource from
                 (with recursive r AS (
@@ -54,7 +51,6 @@ class CodeMapServiceImpl(
         query.setParameter("sourceUrl", "ValueSet/${sourceValueSet.id}")
         query.setParameter("targetUrl", "ValueSet/${targetValueSet.id}")
         return query.fetchResource()
-                ?: throw Exception("not found codeMap for sourceCode: $sourceCode (sourceValueSet: $sourceValueSet, targetValueSet: $targetValueSet)")
     }
 
     override fun all(sourceValueSet: ValueSetName, targetValueSet: ValueSetName): List<CodeMap> =
@@ -76,7 +72,7 @@ class CodeMapServiceImpl(
         return query.resultList as List<String>
     }
 
-    override fun icdByAnyComplaints(complaints: List<String>, take: Int): List<ComplaintOccurrence?> {
+    override fun icdByAnyComplaints(complaints: List<String>, exceptCodes: List<String>, take: Int): List<ComplaintOccurrence?> {
         // вместо оператора ?| для поиска вхождений используем свой оператор #-#, чтобы избежать
         // конфликтов с оператором ? для упорядоченных параметров Hibernate
         val query = em.createNativeQuery("""
@@ -84,19 +80,21 @@ class CodeMapServiceImpl(
                 --where x -> 'code' #-# cast(:codes as text[])
                 --and cm.resource ->> 'targetUrl' = :targetUrl
                 --limit :take
-            select cm.resource ->> 'sourceCode', count(x -> 'code') as codeCount
+            select distinct cm.resource ->> 'sourceCode', count(x -> 'code') as codeCount
                 from codemap cm, jsonb_array_elements(cm.resource -> 'targetCode') as x
                 where  x ->> 'code' = ANY(cast(:codes as text[]))
                 and cm.resource ->> 'id' in (
                         select cm.resource ->> 'id' from codemap cm
                         where cm.resource ->> 'targetUrl'= :targetUrl
                     )
+                and cm.resource ->> 'sourceCode' != ALL(cast(:exceptCodes as text[]))
                 group by cm.resource
                 order by codeCount desc
                 limit :take
         """)
         query.setParameter("codes", "{\"${complaints.joinToString("\", \"")}\"}")
         query.setParameter("targetUrl", "ValueSet/Complaints")
+        query.setParameter("exceptCodes", "{\"${exceptCodes.joinToString("\", \"")}\"}")
         query.setParameter("take", take)
 
         return query.resultList.mapNotNull {

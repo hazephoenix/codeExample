@@ -14,13 +14,13 @@ import ru.viscur.dh.fhir.model.valueSets.ZoneForInspectionOfResp.GREEN_ZONE_TYPE
  * Коды из system = 'ValueSet/Severity'
  *
  * @param display отображаемое название
- * @param zoneForInspectionOfResp зона для осмотров ответственными врачами
+ * @param zoneForInspections зона для осмотров врачами
  * @param configAutoCorrectionDuration код настройки автокорректировки регламентного времени обслуживания
  * @param workloadWeight "вес" нагрузки
  */
 enum class Severity(
         val display: String,
-        val zoneForInspectionOfResp: String,
+        val zoneForInspections: String,
         val configAutoCorrectionDuration: String,
         val workloadWeight: Int
 ) {

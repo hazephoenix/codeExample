@@ -1,9 +1,6 @@
 package ru.viscur.dh.fhir.model.utils
 
-import ru.viscur.dh.fhir.model.entity.BaseResource
-import ru.viscur.dh.fhir.model.entity.Bundle
-import ru.viscur.dh.fhir.model.entity.ClinicalImpression
-import ru.viscur.dh.fhir.model.entity.ServiceRequest
+import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.Identifier
@@ -164,6 +161,11 @@ fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execSt
  * Назначение является осмотром ответственного - если указан исполнитель
  */
 fun ServiceRequest.isInspectionOfResp() = !this.performer.isNullOrEmpty()
+
+/**
+ * Код специальности
+ */
+fun Practitioner.qualificationCode() = this.qualification.code.code()
 
 /**
  * Значение [BaseResource.identifier] определенного типа

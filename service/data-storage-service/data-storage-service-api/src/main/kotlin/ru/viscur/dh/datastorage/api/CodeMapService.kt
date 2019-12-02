@@ -12,11 +12,19 @@ import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 interface CodeMapService {
 
     /**
+     * see [codeMapNullable]
+     * если не найден код - падение
+     */
+    fun codeMap(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap =
+            codeMapNullable(sourceValueSet, targetValueSet, sourceCode)
+                    ?: throw Exception("not found codeMap for sourceCode: $sourceCode (sourceValueSet: $sourceValueSet, targetValueSet: $targetValueSet)")
+
+    /**
      * Получение [CodeMap]
      * В [sourceCode] можно указывать любой дочерний элемент.
      * например, для диагноз A50.9 найдется CodeMap для A50-A64, т к A50.9 входит в A50-A64
      */
-    fun codeMap(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap
+    fun codeMapNullable(sourceValueSet: ValueSetName, targetValueSet: ValueSetName, sourceCode: String): CodeMap?
 
     /**
      * Получение списка [CodeMap]
@@ -43,11 +51,11 @@ interface CodeMapService {
     /**
      * По коду диагноза [ValueSetName.ICD_10] коды услуг для маршрутного листа из [ValueSetName.OBSERVATION_TYPES]
      */
-    fun icdToObservationTypes(sourceCode: String) = codeMap(
+    fun icdToObservationTypes(sourceCode: String) = codeMapNullable(
             ValueSetName.ICD_10,
             ValueSetName.OBSERVATION_TYPES,
             sourceCode
-    ).targetCode.map { it.code }
+    )?.targetCode?.map { it.code }
 
     /**
      * Все сопоставления диагноза [ValueSetName.ICD_10] к услугам для маршрутного листа [ValueSetName.OBSERVATION_TYPES]
@@ -60,11 +68,11 @@ interface CodeMapService {
     /**
      * Найти список кодов жалоб, соответствующих коду МКБ-10
      */
-    fun icdToComplaints(sourceCode: String) = codeMap(
+    fun icdToComplaints(sourceCode: String) = codeMapNullable(
             ValueSetName.ICD_10,
             ValueSetName.COMPLAINTS,
             sourceCode
-    ).targetCode.map { it.code }
+    )?.targetCode?.map { it.code }
 
     /**
      * Найти код диагноза по всем жалобам из списка
@@ -81,10 +89,11 @@ interface CodeMapService {
      *
      * @param complaints Список кодов жалоб, найденных в справочнике и соответсвующих тем,
      *  что ввел фельдшер
+     * @param exceptCodes Список кодов диагнозов для исключения из выборки
      * @param take Сколько подходящих записей необходимо найти
      * @return Список кодов МКБ, подходящих по списку жалоб, и число вхождений искомых жалоб
      */
-    fun icdByAnyComplaints(complaints: List<String>, take: Int): List<ComplaintOccurrence?>
+    fun icdByAnyComplaints(complaints: List<String>, exceptCodes: List<String>, take: Int): List<ComplaintOccurrence?>
 
     /**
      * По коду специальности ответственного врача [ValueSetName.PRACTITIONER_QUALIFICATIONS] код выполняемой услуги из [ValueSetName.OBSERVATION_TYPES]
