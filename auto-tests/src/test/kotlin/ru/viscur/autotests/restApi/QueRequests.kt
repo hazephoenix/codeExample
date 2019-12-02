@@ -4,6 +4,7 @@ import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.dh.fhir.model.dto.PatientToExamine
 import ru.viscur.dh.fhir.model.entity.*
+import ru.viscur.dh.fhir.model.enums.ObservationStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.Reference
 
@@ -164,8 +165,14 @@ class QueRequests {
         fun observations(patientId: String? = null) =
                 Helpers.createRequestSpecWithoutBody().`when`().
                         get(Endpoints.OBSERVATIONS + "?patientId=$patientId").
-                        then().statusCode(200)
-                        .extract().response().`as`(ObservationsResponse::class.java)
+                        then().statusCode(200).
+                        extract().response().`as`(ObservationsResponse::class.java)
+
+        fun getPatientObservationsByStatus(patientId: String, observationStatus: ObservationStatus) =
+                Helpers.createRequestWithQuery(mapOf("patientId" to patientId, "status" to observationStatus)).`when`().
+                        get(Endpoints.OBSERVATIONS).
+                        then().statusCode(200).
+                        extract().response().`as`(ObservationsResponse::class.java)
 
         fun addServiceRequests(bundle: Bundle) =
                 Helpers.createRequestSpec(bundle).log().all().`when`().

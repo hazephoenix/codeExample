@@ -189,7 +189,8 @@ class Dictionaries {
     @Test
     fun getIcdList() {
         //получение списка кодов диагнозов
-        val icdListInfo = QueRequests.getCodeInfo("ICD-10")
+        val codeName = "ICD-10"
+        val icdListInfo = QueRequests.getCodeInfo(codeName)
 
         //проверка, что список не пустой
         assertFalse(icdListInfo.isEmpty())
