@@ -35,7 +35,7 @@ class DoctorCall (
      */
     @Column(name = "qualification")
     @Enumerated(STRING)
-    var qualification: CallableSpecialization = CallableSpecialization.Surgeon,
+    var qualification: CallableSpecialization = CallableSpecialization.Surgeon_category,
 
     /**
      * Врач которого вызывали

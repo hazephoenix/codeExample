@@ -50,18 +50,19 @@ class MisAuthenticationProvider(
         val name =
                 practitioner.firstOfficialName ?: practitioner.firstUsualName ?: createEmpty()
 
-        val qualification = conceptService.byCodeableConcept(practitioner.qualification.code)
-
         token.details = DhUserDetails(
                 practitioner.id,
                 login,
                 name.text,
                 name.family,
                 name.given,
-                listOf(DhUserDetails.Specialization(
-                        qualification.code,
-                        qualification.display
-                ))
+                practitioner.qualification.map {
+                    val qualification = conceptService.byCodeableConcept(it.code)
+                    DhUserDetails.Specialization(
+                            qualification.code,
+                            qualification.display
+                    )
+                }
         )
         return token
     }

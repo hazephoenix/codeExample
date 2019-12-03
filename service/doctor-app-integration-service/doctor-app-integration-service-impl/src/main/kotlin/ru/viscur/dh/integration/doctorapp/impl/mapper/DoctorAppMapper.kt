@@ -53,15 +53,11 @@ class DoctorAppMapper {
             CallableDoctor(
                     source.id,
                     source.fullName,
-                    source.qualification
-                            .code
-                            .coding.mapNotNull {
-                        try {
-                            CallableSpecialization.valueOf(it.code)
-                        } catch (ig: IllegalArgumentException) {
-                            null
-                        }
-                    },
+                    listOfNotNull(try {
+                        CallableSpecialization.valueOf(source.extension.qualificationCategory)
+                    } catch (ig: IllegalArgumentException) {
+                        null
+                    }),
                     false // TODO надо где-то взять
             )
 

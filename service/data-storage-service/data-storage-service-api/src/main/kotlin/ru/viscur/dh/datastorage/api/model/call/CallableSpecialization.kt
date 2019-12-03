@@ -4,25 +4,25 @@ enum class CallableSpecialization {
     /**
      * Хирург
      */
-    Surgeon,
+    Surgeon_category,
 
     /**
      * Терапевт
      */
-    Therapist,
+    Therapist_category,
 
     /**
      * Уролог
      */
-    Urologist,
+    Urologist_category,
 
     /**
      * Гинеколог
      */
-    Gynecologist,
+    Gynecologist_category,
 
     /**
      * Невролог
      */
-    Neurologist
+    Neurologist_category
 }

@@ -6,7 +6,7 @@ import ru.viscur.dh.fhir.model.enums.Severity
 
 class NewDoctorCallCmd {
     var doctorId: String = ""
-    var  specialization: CallableSpecialization = CallableSpecialization.Surgeon
+    var specialization: CallableSpecialization = CallableSpecialization.Surgeon_category
     var goal: CallGoal = CallGoal.Consultation
     var locationId: String = ""
     val patientSeverity: Severity = Severity.GREEN
