@@ -3,7 +3,6 @@ delete from concept r where r.resource ->> 'system' = 'ValueSet/Complaints';
 
 select resource_create('{"resourceType": "ValueSet", "id": "Complaints", "description": "Жалобы", "name": "Complaints", "title": "Коды жалоб", "status": "active", "url": "ValueSet/Complaints"}'::jsonb);
 
-select resource_create('{"resourceType": "Concept", "id": "Complaints:Increase_body_T_to_39", "code": "Increase_body_T_to_39", "system": "ValueSet/Complaints", "display": "Повышение Т тела до 39", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Sputum_cough", "code": "Sputum_cough", "system": "ValueSet/Complaints", "display": "Кашель с мокротой", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Chest_pain", "code": "Chest_pain", "system": "ValueSet/Complaints", "display": "Боль в грудной клетке", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Dyspnea", "code": "Dyspnea", "system": "ValueSet/Complaints", "display": "Одышка", "alternatives": []}'::jsonb);
@@ -133,7 +132,7 @@ select resource_create('{"resourceType": "Concept", "id": "Complaints:Hip_seal",
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Runny_nose", "code": "Runny_nose", "system": "ValueSet/Complaints", "display": "Насморк", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Cough", "code": "Cough", "system": "ValueSet/Complaints", "display": "Кашель", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Sore_throat", "code": "Sore_throat", "system": "ValueSet/Complaints", "display": "Боль в горле", "alternatives": []}'::jsonb);
-select resource_create('{"resourceType": "Concept", "id": "Complaints:Increase_body_T_to_39-40_degrees", "code": "Increase_body_T_to_39-40_degrees", "system": "ValueSet/Complaints", "display": "Повышение Т тела до 39-40 градусов", "alternatives": []}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Complaints:Increase_body_T_to_39-40_degrees", "code": "Increase_body_T_to_39-40_degrees", "system": "ValueSet/Complaints", "display": "Повышение Т тела до 39-40 градусов", "alternatives": ["Повышение Т тела до 39"]}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Chest_pain_when_inhaling", "code": "Chest_pain_when_inhaling", "system": "ValueSet/Complaints", "display": "Боль в грудной клетке при вдохе", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Dyspnea_alone", "code": "Dyspnea_alone", "system": "ValueSet/Complaints", "display": "Одышка в покое", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Chest_rales_when_breathing", "code": "Chest_rales_when_breathing", "system": "ValueSet/Complaints", "display": "Хрипы в груди при дыхании", "alternatives": []}'::jsonb);
@@ -175,7 +174,6 @@ select resource_create('{"resourceType": "Concept", "id": "Complaints:Jaundice_o
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Swelling_of_the_legs", "code": "Swelling_of_the_legs", "system": "ValueSet/Complaints", "display": "Отеки голеней", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:The_appearance_of_veins_on_the_stomach", "code": "The_appearance_of_veins_on_the_stomach", "system": "ValueSet/Complaints", "display": "Появление вен на животе", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Bitterness_in_the_mouth", "code": "Bitterness_in_the_mouth", "system": "ValueSet/Complaints", "display": "Горечь во рту", "alternatives": []}'::jsonb);
-select resource_create('{"resourceType": "Concept", "id": "Complaints:Yellowing_skin", "code": "Yellowing_skin", "system": "ValueSet/Complaints", "display": "Пожелтение кожи", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Light_feces", "code": "Light_feces", "system": "ValueSet/Complaints", "display": "Светлый кал", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Vomiting_for_relief", "code": "Vomiting_for_relief", "system": "ValueSet/Complaints", "display": "Рвота приносящая облегчение", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Pain_in_the_left_hypochondrium", "code": "Pain_in_the_left_hypochondrium", "system": "ValueSet/Complaints", "display": "Боли в левом подреберье", "alternatives": []}'::jsonb);
@@ -258,7 +256,7 @@ select resource_create('{"resourceType": "Concept", "id": "Complaints:Blackening
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Blackening_of_the_foot", "code": "Blackening_of_the_foot", "system": "ValueSet/Complaints", "display": "Почернение стопы", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Blackening_of_the_lower_leg", "code": "Blackening_of_the_lower_leg", "system": "ValueSet/Complaints", "display": "Почернение голени", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Inability_to_swallow_food", "code": "Inability_to_swallow_food", "system": "ValueSet/Complaints", "display": "Невозможность проглатывать пищу", "alternatives": []}'::jsonb);
-select resource_create('{"resourceType": "Concept", "id": "Complaints:Yellowing_of_the_skin", "code": "Yellowing_of_the_skin", "system": "ValueSet/Complaints", "display": "Пожелтение кожных покровов", "alternatives": []}'::jsonb);
+select resource_create('{"resourceType": "Concept", "id": "Complaints:Yellowing_of_the_skin", "code": "Yellowing_of_the_skin", "system": "ValueSet/Complaints", "display": "Пожелтение кожных покровов", "alternatives": ["Пожелтение кожи"]}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Yellowing_eyes", "code": "Yellowing_eyes", "system": "ValueSet/Complaints", "display": "Пожелтение глаз", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Whitening_feces", "code": "Whitening_feces", "system": "ValueSet/Complaints", "display": "Побеление кала", "alternatives": []}'::jsonb);
 select resource_create('{"resourceType": "Concept", "id": "Complaints:Dark_urine", "code": "Dark_urine", "system": "ValueSet/Complaints", "display": "Потемнение мочи", "alternatives": []}'::jsonb);

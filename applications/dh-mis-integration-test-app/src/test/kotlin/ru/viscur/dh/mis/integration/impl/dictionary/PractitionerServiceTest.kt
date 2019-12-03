@@ -13,11 +13,12 @@ import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.api.util.OFFICE_117
-import ru.viscur.dh.datastorage.api.util.QUALIFICATION_SURGEON
+import ru.viscur.dh.datastorage.api.util.QUALIFICATION_CATEGORY_SURGEON
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.enums.Gender
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.PractitionerExtension
+import ru.viscur.dh.fhir.model.utils.qualificationCategory
 
 /**
  * Created at 23.11.2019 12:28 by SherbakovaMA
@@ -45,21 +46,21 @@ class PractitionerServiceTest {
         val practitionerId = Helpers.surgeonId
         //предполагается, что изначально нет заблокированных
         val initAll = practitionerService.all()
-        val initAllByQualification = practitionerService.byQualification(QUALIFICATION_SURGEON)
+        val initAllByQualification = practitionerService.byQualification(QUALIFICATION_CATEGORY_SURGEON)
         assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = true).size)
         checkBlocked(practitionerId, false)
 
         //блокируем врача
         practitionerService.updateBlocked(practitionerId, true)
 
-        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_SURGEON).size + 1, "количество должно уменьшиться на 1 после блокировки")
+        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_CATEGORY_SURGEON).size + 1, "количество должно уменьшиться на 1 после блокировки")
         assertEquals(practitionerService.all().size + 1, practitionerService.all(withBlocked = true).size, "незаблокированных должно быть меньше чем всех на 1")
         checkBlocked(practitionerId, true)
 
         //разблокируем врача
         practitionerService.updateBlocked(practitionerId, false)
 
-        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_SURGEON).size, "количество должно совпадать с начальным")
+        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_CATEGORY_SURGEON).size, "количество должно совпадать с начальным")
         assertEquals(initAll.size, practitionerService.all().size, "количество должно совпадать с начальным")
         assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = true).size, "все должны быть незаблокированные")
         checkBlocked(practitionerId, false)
@@ -88,6 +89,7 @@ class PractitionerServiceTest {
         try {
             checkBlocked(practitionerId, false)
             assertEquals(initSize + 1, practitionerService.all().size, "количество врачей должно увеличиться после создания")
+            assertEquals(QUALIFICATION_CATEGORY_SURGEON, createdPractitioner.qualificationCategory(), "категория должна определиться как 'хирург'")
         } finally {
             resourceService.deleteById(ResourceType.Practitioner, practitionerId)
         }
@@ -107,7 +109,7 @@ class PractitionerServiceTest {
                     name = createdPractitioner.name,
                     gender = Gender.female,
                     qualification = createdPractitioner.qualification,
-                    extension = PractitionerExtension(blocked = true)
+                    extension = PractitionerExtension(blocked = true, qualificationCategory = createdPractitioner.extension.qualificationCategory)
             )
             val updatedPractitioner = practitionerService.update(newValues)
             val updatedPractitionerId = updatedPractitioner.id

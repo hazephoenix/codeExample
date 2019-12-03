@@ -36,7 +36,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -63,7 +63,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -90,7 +90,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -117,7 +117,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -144,7 +144,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -173,7 +173,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -189,7 +189,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/фельдшер_Колосова",
+        "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
         "type": "Practitioner"
       },
       "source": {
@@ -306,7 +306,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -333,7 +333,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -360,7 +360,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -387,7 +387,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -414,7 +414,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -443,7 +443,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -459,7 +459,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/фельдшер_Колосова",
+        "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
         "type": "Practitioner"
       },
       "source": {
@@ -564,7 +564,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -611,7 +611,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "A04.20.001.001",
+              "code": "B03.016.002",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -663,7 +663,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -690,7 +690,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -717,7 +717,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -746,7 +746,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -773,7 +773,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -802,7 +802,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -810,7 +810,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           "reference": "Patient/ignored",
           "type": "Patient"
         },
-        "valueInteger": 4
+        "valueInteger": 2
       }
     },
     {
@@ -823,7 +823,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -851,7 +851,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -911,7 +911,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             }
           },
           {
-            "value": "7878 11114",
+            "value": "7878 11116",
             "type": {
               "coding": [
                 {
@@ -985,8 +985,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "state": "TO",
             "country": "Russia"
           }
-        },
-        "age": 0
+        }
       }
     },
     { "resource": {
@@ -994,7 +993,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
       "author": {
-        "reference": "Practitioner/фельдшер_Колосова",
+        "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
         "type": "Practitioner"
       },
       "source": {
@@ -1086,7 +1085,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "resourceType": "QuestionnaireResponse",
         "status": "completed",
         "author": {
-          "reference": "Practitioner/фельдшер_Колосова",
+          "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
           "type": "Practitioner"
         },
         "source": {
@@ -1150,7 +1149,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "entry": [
           {
             "item": {
-              "reference": "Practitioner/хирург_Петров",
+              "reference": "Practitioner/Surgeon_Клиновицкий_Игорь_Юрьевич",
               "type": "Practitioner"
             }
           }
@@ -1181,7 +1180,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -1209,7 +1208,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         },
         "performer": [
           {
-            "reference": "Practitioner/фельдшер_Колосова",
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
             "type": "Practitioner"
           }
         ],
@@ -1232,7 +1231,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "id": "ignored",
         "identifier": [
           {
-            "value": "7878 11114",
+            "value": "7878 11115",
             "type": {
               "coding": [
                 {
@@ -1291,7 +1290,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "resourceType": "QuestionnaireResponse",
         "status": "completed",
         "author": {
-          "reference": "Practitioner/фельдшер_Колосова",
+          "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
           "type": "Practitioner"
         },
         "source": {

@@ -17,7 +17,7 @@ package ru.digitalhospital.dhdatastorage.dto
  * Без указания (по умолчанию) сортируется по id
  */
 class RequestBodyForResources(
-        val filter: Map<String, String?>,
+        val filter: Map<String, String?> = mapOf(),
         val filterLike: Boolean = false,
         val orderBy: List<String> = listOf("id")
 ){

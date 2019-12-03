@@ -11,9 +11,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @param blocked заблокирован
  * @param onWork на работе (на смене)
  * @param onWorkInOfficeId в каком кабинете на работе (на смене). заполняется для врачей-"диагностов" - кто работает в определенном кабинете. не для врачей по осмотрам
+ * @param qualificationCategory код категории специальности (корневое значение из справочника специальности врача)
  */
 class PractitionerExtension @JsonCreator constructor(
         @JsonProperty("blocked") var blocked: Boolean = false,
         @JsonProperty("onWork") var onWork: Boolean = false,
-        @JsonProperty("onWorkInOfficeId") var onWorkInOfficeId: String? = null
+        @JsonProperty("onWorkInOfficeId") var onWorkInOfficeId: String? = null,
+        @JsonProperty("qualificationCategory") var qualificationCategory: String
 )

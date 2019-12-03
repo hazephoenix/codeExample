@@ -47,15 +47,15 @@ class ResponsibleQualificationsPredictorTest {
                         diagnosis = "A50.9",
                         gender = Gender.male,
                         exp = listOf(
-                                QUALIFICATION_UROLOGIST
+                                QUALIFICATION_CATEGORY_UROLOGIST
                         )
                 ),
                 TestCase(desc = "По полу. Женщине может назначится уролог или гинеколог",
                         diagnosis = "A50.9",
                         gender = Gender.female,
                         exp = listOf(
-                                QUALIFICATION_UROLOGIST,
-                                QUALIFICATION_GYNECOLOGIST
+                                QUALIFICATION_CATEGORY_UROLOGIST,
+                                QUALIFICATION_CATEGORY_GYNECOLOGIST
                         )
                 ),
                 TestCase(desc = "Есть показательные жалобы для одного специалиста",
@@ -64,7 +64,7 @@ class ResponsibleQualificationsPredictorTest {
                                 "присутствует острая БОЛЬ"
                         ),
                         exp = listOf(
-                                QUALIFICATION_SURGEON
+                                QUALIFICATION_CATEGORY_SURGEON
                         )
                 ),
                 TestCase(desc = "Есть показательные жалобы для нескольких специалистов",
@@ -74,27 +74,27 @@ class ResponsibleQualificationsPredictorTest {
                                 "лихорадит"
                         ),
                         exp = listOf(
-                                QUALIFICATION_SURGEON,
-                                QUALIFICATION_THERAPIST
+                                QUALIFICATION_CATEGORY_SURGEON,
+                                QUALIFICATION_CATEGORY_THERAPIST
                         )
                 ),
                 TestCase(desc = "Нет показательных жалоб, есть специальность без показ. жалоб",
                         diagnosis = "M95.5",
                         complaints = listOf(
-                                "боль в правом подреберье"
+                                "немение конечностей"
                         ),
                         exp = listOf(
-                                QUALIFICATION_NEUROLOGIST
+                                QUALIFICATION_CATEGORY_NEUROLOGIST
                         )
                 ),
                 TestCase(desc = "Нет показательных жалоб, все специалисты с показ. жалобами",
                         diagnosis = "A00.1",
                         complaints = listOf(
-                                "боль в правом подреберье"
+                                "немение конечностей"
                         ),
                         exp = listOf(
-                                QUALIFICATION_THERAPIST,
-                                QUALIFICATION_SURGEON
+                                QUALIFICATION_CATEGORY_THERAPIST,
+                                QUALIFICATION_CATEGORY_SURGEON
                         )
                 )
         )

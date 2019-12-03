@@ -48,6 +48,8 @@ build:
       - applications/dh-central-server-app/build/libs/dh-central-server-app.jar
       - applications/dh-paramedic-device-app/build/libs/dh-paramedic-device-app.jar
     expire_in: 3 days
+  only:
+    - develop
 
 dh-stage-dev:
   stage: deploy

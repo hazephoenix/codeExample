@@ -83,3 +83,11 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 
 ###
+
+GET http://localhost:8080/Observation/start?serviceRequestId=68532bff-4233-4064-92cd-7213899d1f1d
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###

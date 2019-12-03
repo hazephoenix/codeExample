@@ -21,25 +21,30 @@ class Helpers {
         /**
          * id фельдшера
          */
-        const val paramedicId = "фельдшер_Колосова"
+        const val paramedicId = "Paramedic_Сейсенбекова_Алена_Нуржановна"
 
         /**
          * id мед работника в кабинете диагностики/анализов
          */
-        const val diagnosticAssistantId = "мед_работник_диагностики_Сидорова"
+        const val diagnosticAssistantId = "Ms_Аникина_Алена_Анатольевна"
+
+        /**
+         * id уролога
+         */
+        const val urologistId = "Urologist_Клюев_Михаил_Васильевич"
+        const val urologist2Id = "Urologist_Новиков_Сергей_Игоревич"
 
         /**
          * id хирурга
          */
-        const val surgeonId = "хирург_Иванов"
-        const val surgeon2Id = "хирург_Петров"
-        const val therapistId = "терапевт_Петров"
-        const val urologistId = "уролог_Петров"
+        const val surgeonId = "Surgeon_Баширов_Сергей_Рафаэльевич"
+        const val surgeon2Id = "Surgeon_Буркин_Максим_Викторович"
 
         /**
          * Квалификации
          */
         const val QUALIFICATION_SURGEON = "Surgeon"
+        const val QUALIFICATION_CATEGORY_SURGEON = "Surgeon_category"
 
         //создать спецификацию запроса RestApi
         fun createRequestSpec(body: Any): RequestSpecification {
@@ -293,66 +298,6 @@ class Helpers {
                 )
         )
 
-        fun createQuestResponseResourceDiagnosis(patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
-                id = id,
-                status = QuestionnaireResponseStatus.completed,
-                author = referenceToPractitioner("ignored"),
-                source = referenceToPatient(patientId),
-                questionnaire = "Questionnaire/Severity_criteria",
-                item = listOf(
-                        QuestionnaireResponseItem(
-                                linkId = "Questionnaire/paramedic-qa-form/complaints",
-                                text = "Жалобы пациента",
-                                answer = listOf(
-                                        QuestionnaireResponseItemAnswer(valueString = "Жар"),
-                                        QuestionnaireResponseItemAnswer(valueString = "Острая боль"),
-                                        QuestionnaireResponseItemAnswer(valueString = "Головная боль")
-                                )
-                        )
-                )
-        )
-
-        fun createQuestResponseSeverity(listOfValues: List<String>, patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
-            id = id,
-            status = QuestionnaireResponseStatus.completed,
-            author = referenceToPractitioner("ignored"),
-            source = referenceToPatient(patientId),
-            questionnaire = "Questionnaire/Severity_criteria",
-            item = listOf(
-                QuestionnaireResponseItem(
-                    linkId = "Upper_respiratory_airway",
-                    text = "Результат осмотра верхних дыхательных путей",
-                    answer = listOf(QuestionnaireResponseItemAnswer(
-                        valueCoding = Coding(code = listOfValues.first(), display = listOfValues.first(), system = ValueSetName.UPPER_RESPIRATORY_AIRWAY.id)
-                    ))
-                ),
-                QuestionnaireResponseItem(
-                    linkId = "Consciousness_assessment",
-                    text = "Сознание",
-                    answer = listOf(QuestionnaireResponseItemAnswer(
-                        valueCoding = Coding(code = listOfValues.get(1), display = listOfValues.get(1), system = ValueSetName.CONSCIOUSNESS_ASSESSMENT.id)
-                    ))
-                ),
-                QuestionnaireResponseItem(
-                    linkId = "Patient_can_stand",
-                    text = "Опорная функция",
-                    answer = listOf(QuestionnaireResponseItemAnswer(
-                        valueCoding = Coding(code = listOfValues.get(2), display = listOfValues.get(2), system = ValueSetName.PATIENT_CAN_STAND.id)
-                    ))
-                ),
-                QuestionnaireResponseItem(
-                    linkId = "Questionnaire/paramedic-qa-form/complaints",
-                    text = "Жалобы пациента",
-                    answer = listOf(
-                        QuestionnaireResponseItemAnswer(valueString = "Жар"),
-                        QuestionnaireResponseItemAnswer(valueString = "Острая боль"),
-                        QuestionnaireResponseItemAnswer(valueString = "Головная боль")
-                    )
-                )
-
-            )
-        )
-
         fun createQuestResponseResourceWithCommonInfo(patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
                 id = id,
                 status = QuestionnaireResponseStatus.completed,
@@ -441,7 +386,8 @@ class Helpers {
         fun createPractitioner() = Practitioner(
                 id = "ignored",
                 name = listOf(HumanName(text = "Петров Иван Алексеевич", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
-                qualification = PractitionerQualification(code = CodeableConcept(code = QUALIFICATION_SURGEON, systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+                qualification = listOf(PractitionerQualification(code = CodeableConcept(code = QUALIFICATION_SURGEON, systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))),
+                extension = PractitionerExtension(qualificationCategory = QUALIFICATION_CATEGORY_SURGEON)
         )
     }
 }

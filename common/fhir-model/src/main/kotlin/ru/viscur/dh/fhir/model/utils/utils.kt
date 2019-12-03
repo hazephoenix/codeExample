@@ -163,9 +163,9 @@ fun ServiceRequestExtension.execDuration(): Int? = if (execEnd != null && execSt
 fun ServiceRequest.isInspectionOfResp() = !this.performer.isNullOrEmpty()
 
 /**
- * Код специальности
+ * Код категории специальности
  */
-fun Practitioner.qualificationCode() = this.qualification.code.code()
+fun Practitioner.qualificationCategory() = this.extension.qualificationCategory
 
 /**
  * Значение [BaseResource.identifier] определенного типа

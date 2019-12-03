@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
-import ru.viscur.dh.apps.misintegrationtest.service.*
+import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
@@ -58,7 +58,7 @@ class AddToQueueTest {
                                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
                         )),
                         expOfficeId = OFFICE_101, expOnum = 0
-                ),
+                )/*,
                 TestCase(desc = "1 блок. Порядок по степени тяжести. Зеленые в очереди. Ставим желтого",
                         queue = listOf(QueueOfOfficeSimple(
                                 OFFICE_101, listOf(
@@ -334,7 +334,7 @@ class AddToQueueTest {
                                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130)
                         )),
                         expOfficeId = OFFICE_130, expOnum = 0
-                )
+                )*/
         )
 
         @JvmStatic

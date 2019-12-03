@@ -132,26 +132,24 @@ const val QUESTIONNAIRE_LINK_ID_TRANSPORTATION_TYPE = "Transportation_type"
 const val QUESTIONNAIRE_ID_COMMON_INFO = "Common_info"
 
 /**
- * Квалификации (специальности) врачей
+ * Категории квалификаций (специальностей) врачей
+ * Первый уровень в справочнике специальностей врачей
  */
-const val QUALIFICATION_THERAPIST = "Therapist"
-const val QUALIFICATION_SURGEON = "Surgeon"
-const val QUALIFICATION_NEUROLOGIST = "Neurologist"
-const val QUALIFICATION_UROLOGIST = "Urologist"
-const val QUALIFICATION_GYNECOLOGIST = "Gynecologist"
-const val QUALIFICATION_PARAMEDIC = "Paramedic"
-const val QUALIFICATION_DIAGNOSTIC_ASSISTANT = "Diagnostic_assistant"
+const val QUALIFICATION_CATEGORY_THERAPIST = "Therapist_category"
+const val QUALIFICATION_CATEGORY_SURGEON = "Surgeon_category"
+const val QUALIFICATION_CATEGORY_NEUROLOGIST = "Neurologist_category"
+const val QUALIFICATION_CATEGORY_UROLOGIST = "Urologist_category"
+const val QUALIFICATION_CATEGORY_GYNECOLOGIST = "Gynecologist_category"
 
 /**
- * Квалификации (специальности) врачей, которые проводят осмотры (осмотры, если они назначены отв. или осмотры при дообследовании)
- * Мед. персонал только этих специальностей м. б. назначены ответственными
+ * Категории квалификаций (специальностей) врачей, которые м. б. назначены ответственными
  */
-val INSPECTION_QUALIFICATIONS = listOf(
-        QUALIFICATION_THERAPIST,
-        QUALIFICATION_SURGEON,
-        QUALIFICATION_NEUROLOGIST,
-        QUALIFICATION_UROLOGIST,
-        QUALIFICATION_GYNECOLOGIST
+val INSPECTION_QUALIFICATION_CATEGORIES = listOf(
+        QUALIFICATION_CATEGORY_THERAPIST,
+        QUALIFICATION_CATEGORY_SURGEON,
+        QUALIFICATION_CATEGORY_NEUROLOGIST,
+        QUALIFICATION_CATEGORY_UROLOGIST,
+        QUALIFICATION_CATEGORY_GYNECOLOGIST
 )
 
 /**

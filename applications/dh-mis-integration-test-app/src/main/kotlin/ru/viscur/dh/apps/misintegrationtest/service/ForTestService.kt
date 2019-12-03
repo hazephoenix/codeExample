@@ -1,8 +1,7 @@
 package ru.viscur.dh.apps.misintegrationtest.service
 
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.viscur.autotests.utils.Helpers
@@ -20,6 +19,7 @@ import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.integration.mis.api.ReportService
+import ru.viscur.dh.integration.mis.api.dto.QueueInOfficeDto
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.QueueManagerService
 import kotlin.math.abs
@@ -279,12 +279,34 @@ class ForTestService {
         }
     }
 
+    fun checkQueueForPractitioner(practitionerId: String, queueItems: List<QueueItemSimple>, officeId: String? = null) {
+        val queueFromReport = reportService.queueOfPractitioner(practitionerId)
+
+        val itemsStr = itemsToStr(queueItems, queueFromReport)
+
+        assertEquals(queueItems.size, queueFromReport!!.items.size, "wrong items size. $itemsStr")
+        assertEquals(practitionerId, queueFromReport.practitioner!!.practitionerId, "wrong practitionerId. $itemsStr")
+        assertEquals(officeId, queueFromReport.officeId, "wrong officeId. $itemsStr")
+
+        queueItems.forEach { item ->
+            val foundInAct = queueFromReport.items.filter { it.patientId == item.patientId }
+            assertEquals(1, foundInAct.size, "not found (or found multiple items) of $item. $itemsStr")
+            val foundItem = foundInAct.first()
+            assertEquals(item.severity.name, foundItem.severity, "wrong severity of patient with id '${item.patientId}'. $itemsStr")
+        }
+    }
+
     /**
      * Проверка правильности назначений определенного пациента
      * (не полная проверка назначений всех пациентов, а только в разрезе одного пациента)
      */
     fun checkServiceRequestsOfPatient(patientId: String, servReqInfos: List<ServiceRequestSimple>, desc: String? = null) {
         val actServRequests = serviceRequestService.all(patientId)
+        checkServiceRequests(patientId, servReqInfos, actServRequests, desc)
+    }
+
+    fun checkActiveServiceRequestsOfPatient(patientId: String, servReqInfos: List<ServiceRequestSimple>, desc: String? = null) {
+        val actServRequests = serviceRequestService.active(patientId)
         checkServiceRequests(patientId, servReqInfos, actServRequests, desc)
     }
 
@@ -307,6 +329,22 @@ class ForTestService {
             servReqInfo.locationId?.run { assertEquals(servReqInfo.locationId, foundItem.locationReference?.first()?.id, "${descStr}wrong locationId of $servReqInfo. $servReqsStr") }
             assertEquals(index, foundItem.extension?.executionOrder, "${descStr}wrong executionOrder of $servReqInfo. $servReqsStr")
         }
+    }
+
+    private fun itemsToStr(expQueueItems: List<QueueItemSimple>, actQueue: QueueInOfficeDto?, expOfficeId: String? = null): String {
+        val expQueueStr = "\n\nexp queue:\n" +
+                "officeId: " + expOfficeId + ";\n" +
+                expQueueItems.mapIndexed { index, queueItemInfo ->
+                    "$index. $queueItemInfo"
+                }.joinToString("\n  ")
+        if (actQueue == null) {
+            return "$expQueueStr\nactQueue is null"
+        }
+        return expQueueStr +
+                "\n\nactual queue:\n" +
+                "officeId: " + actQueue.officeId + "; queueSize: " + actQueue.queueSize + ";\n" +
+                actQueue.items.sortedBy { it.onum }.joinToString("\n  ") +
+                "\n\n"
     }
 
     private fun itemsToStr(itemsByOffices: List<QueueOfOfficeSimple>, actQueueItems: List<QueueItem>): String {

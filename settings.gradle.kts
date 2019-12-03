@@ -15,13 +15,17 @@ include(
         "service:mis-integration-service:mis-integration-service-rest",
         "service:location-service:location-service-api",
         "service:location-service:location-service-impl",
+        "service:doctor-app-integration-service:doctor-app-integration-service-api",
+        "service:doctor-app-integration-service:doctor-app-integration-service-impl",
+        "service:doctor-app-integration-service:doctor-app-integration-service-rest",
         "applications:dh-central-server-app",
         "applications:dh-paramedic-device-app",
         "applications:dh-mis-integration-test-app",
         "auto-tests",
         "common:transaction-desc",
         "common:triton-monitor-sdk",
-        "common:dto"
+        "common:dto",
+        "common:security"
         /*TODO "applications:dh-rfid-location-device-app"*/
 )
 
@@ -29,8 +33,10 @@ include(
 pluginManagement {
     repositories {
         // TODO убрать milestone и snapshot как релизнится spring boot 2.2.0
-        maven { url = uri("https://repo.spring.io/milestone") }
-        maven { url = uri("https://repo.spring.io/snapshot") }
+//        maven { url = uri("https://repo.spring.io/milestone") }
+//        maven { url = uri("https://repo.spring.io/snapshot") }
+        mavenCentral()
+        jcenter()
         gradlePluginPortal()
     }
     resolutionStrategy {
