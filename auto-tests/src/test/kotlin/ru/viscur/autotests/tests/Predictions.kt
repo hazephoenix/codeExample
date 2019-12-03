@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
 import ru.viscur.autotests.utils.Constants.Companion.surgeon1Id
+import ru.viscur.autotests.utils.Constants.Companion.surgeon2Id
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForDiagnosis
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForSeverity
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForSurgeon2
-import ru.viscur.autotests.utils.Helpers.Companion.surgeon2Id
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.code

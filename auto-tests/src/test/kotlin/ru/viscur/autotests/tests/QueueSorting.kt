@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
@@ -31,7 +32,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
 import ru.viscur.dh.fhir.model.utils.*
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class QueueSorting {
 
     @BeforeEach
@@ -294,7 +295,7 @@ class QueueSorting {
     }
 
     @Test
-    fun lessQueueCountOfficeSorting() {
+    fun lessPatientsInQueueOfficeSorting() {
         //создание очереди для проверки сортировки в кабинет с меньшим количеством пациентов при равном времени ожидания
         val servRequests = listOf(createServiceRequestResource(observation1Office116))
         val bundleRed1 = bundle("1111", "RED", servRequests)
