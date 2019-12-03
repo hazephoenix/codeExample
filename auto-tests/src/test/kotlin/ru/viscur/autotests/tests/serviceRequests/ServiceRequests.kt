@@ -39,23 +39,6 @@ class ServiceRequests {
     }
 
     @Test
-    fun gettingServiceRequestsByDiagnosis () {
-        //создание диагноза
-        val diagnosisCode = "A16"
-        val diagnosis = mapOf(
-                "diagnosis" to diagnosisCode,
-                "complaints" to listOf("Сильная боль в правом подреберье", "Тошнит"),
-                "gender" to "male"
-        )
-
-        //получение предположительных Service Request по диагнозу
-        val servRequestsList = QueRequests.getSupposedServRequests(diagnosis)
-
-        //проверка количества предположительных Service Requests
-        assertEquals(18, servRequestsList.size, "wrong number of service requests for diagnosis: $diagnosisCode")
-    }
-
-    @Test
     fun serviceRequestAdding() {
         //создание пациента
         val servRequests = listOf(
