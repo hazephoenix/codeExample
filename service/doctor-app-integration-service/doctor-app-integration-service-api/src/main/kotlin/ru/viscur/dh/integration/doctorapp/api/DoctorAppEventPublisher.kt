@@ -37,7 +37,6 @@ interface DoctorAppEventPublisher {
     /**
      * Пациент ушел из очереди
      * @param targetPractitionersIds список ID врачей который интересует данное изменение в очереди
-     * @param clinicalImpression: текущее обследование
      * @param patientId ID пациента
      */
     fun publishQueuePatientRemoved(targetPractitionersIds: Set<String>, patientId: String)

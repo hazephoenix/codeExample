@@ -93,10 +93,11 @@ class DoctorAppEventPublisherImpl(
     override fun publishPatientServiceTimeElapsed(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression) {
         val practitioners = resourceService.classifiedByIds(ResourceType.Practitioner, targetPractitionersIds)
         targetPractitionersIds.forEach {
+            val practitioner = practitioners[it] ?: return@forEach
             val message = doctorMessageService.createMessage(DoctorMessage(
                     genId(),
                     Date(),
-                    practitioners[it] ?: return,
+                    practitioner,
                     clinicalImpression,
                     DoctorMessageType.ServiceTimeElapsed,
                     false
@@ -114,10 +115,11 @@ class DoctorAppEventPublisherImpl(
     override fun publishObservationReady(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression) {
         val practitioners = resourceService.classifiedByIds(ResourceType.Practitioner, targetPractitionersIds)
         targetPractitionersIds.forEach {
+            val practitioner = practitioners[it] ?: return@forEach
             val message = doctorMessageService.createMessage(DoctorMessage(
                     genId(),
                     Date(),
-                    practitioners[it] ?: return,
+                    practitioner,
                     clinicalImpression,
                     DoctorMessageType.ObservationReady,
                     false
