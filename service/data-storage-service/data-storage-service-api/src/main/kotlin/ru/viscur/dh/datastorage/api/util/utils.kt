@@ -3,7 +3,7 @@ package ru.viscur.dh.datastorage.api.util
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.entity.ServiceRequest
 import ru.viscur.dh.fhir.model.utils.code
-import ru.viscur.dh.fhir.model.utils.qualificationCode
+import ru.viscur.dh.fhir.model.utils.qualificationCategory
 
 /**
  * Created at 16.11.2019 17:02 by SherbakovaMA
@@ -28,7 +28,7 @@ fun allLocationIdsInGroup(locationId: String) = LOCATION_GROUPS.find { it.contai
 /**
  * Врач проводит осмотры (имеет соответствующую специальность)
  */
-fun Practitioner.isInspectionQualification() = this.qualificationCode() in INSPECTION_QUALIFICATIONS
+fun Practitioner.isInspectionQualification() = this.qualificationCategory() in INSPECTION_QUALIFICATION_CATEGORIES
 
 /**
  * Является ли назначение осмотром специалиста. Иначе - обследование

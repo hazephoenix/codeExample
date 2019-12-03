@@ -14,7 +14,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 {}
 ###
 
-GET http://localhost:8080/practitioner/byId?id=хирург_Петров
+GET http://localhost:8080/practitioner/byId?id=Surgeon_Клиновицкий_Игорь_Юрьевич
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -28,21 +28,21 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 {}
 ###
 
-POST http://localhost:8080/practitioner/blocked?practitionerId=хирург_Петров&value=false
+POST http://localhost:8080/practitioner/blocked?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=false
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-POST http://localhost:8080/practitioner/onWork?practitionerId=хирург_Петров&value=true
+POST http://localhost:8080/practitioner/onWork?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=true
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-POST http://localhost:8080/practitioner/onWork?practitionerId=мед_работник_диагностики_Сидорова&value=true&officeId=Office:101
+POST http://localhost:8080/practitioner/onWork?practitionerId=Ms_Аникина_Алена_Анатольевна&value=true&officeId=Office:101
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -74,7 +74,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     "code": {
       "coding": [
         {
-          "code": "Surgeon",
+          "code": "Surgeon_category",
           "system": "ValueSet/Practitioner_qualifications"
         }
       ]
@@ -91,7 +91,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "id": "хирург_Петров",
+  "id": "Surgeon_Клиновицкий_Игорь_Юрьевич",
   "resourceType": "Practitioner",
   "name": [
     {
@@ -111,7 +111,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
     "code": {
       "coding": [
         {
-          "code": "Surgeon",
+          "code": "Surgeon_category",
           "system": "ValueSet/Practitioner_qualifications"
         }
       ]

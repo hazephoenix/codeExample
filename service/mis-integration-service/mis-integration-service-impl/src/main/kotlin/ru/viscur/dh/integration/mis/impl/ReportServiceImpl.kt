@@ -57,7 +57,7 @@ class ReportServiceImpl(
     override fun queueOfPractitioner(practitionerId: String): QueueInOfficeDto? {
         val practitioner = practitionerService.byId(practitionerId)
         if (practitioner.isInspectionQualification()) {
-            val observationType = codeMapService.respQualificationToObservationTypes(practitioner.qualificationCode())
+            val observationType = codeMapService.respQualificationToObservationTypes(practitioner.qualificationCategory())
             val queueItems = queueService.queueItemsOfOffices(listOf(
                     RED_ZONE,
                     YELLOW_ZONE_SECTION_1,
@@ -195,7 +195,8 @@ class ReportServiceImpl(
                         age = patient.age,
                         estDuration = queueItem.estDuration,
                         queueCode = patientService.queueCode(patientId),
-                        patientId = patientId
+                        patientId = patientId,
+                        status = patient.extension.queueStatus!!.name
                 )
             }
     ).apply {

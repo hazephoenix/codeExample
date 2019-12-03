@@ -20,13 +20,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:116",
+        "reference": "Location/Office:101",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/dfdd7016-ec6e-47fb-ab10-f57d9cb6b2bc",
+        "reference": "Patient/eb4a11fb-d35f-4f7c-aa38-72134f6f423c",
         "type": "Patient"
       }
     }
@@ -112,13 +112,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                                Отменить "вход" пациента в кабинет
 ###
-POST http://localhost:8080/queue/office/cancelEntering
+POST http://84.201.154.121:8080/queue/office/cancelEntering
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:101",
-  "type": "Location"
+  "reference": "Patient/a93b73cf-3165-4702-a69c-06ca74cd7d51",
+  "type": "Patient"
 }
 ###                                                                                Кабинет готов принять пациента
 POST http://localhost:8080/queue/office/ready
@@ -126,7 +126,7 @@ Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {
-  "reference": "Location/Office:116",
+  "reference": "Location/Office:101",
   "type": "Location"
 }
 ###

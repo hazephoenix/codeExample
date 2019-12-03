@@ -404,7 +404,7 @@ class PatientServiceImpl(
      */
     private fun observationTypeOfResponsiblePractitioner(responsiblePractitionerId: String): String {
         val responsiblePractitioner = practitionerService.byId(responsiblePractitionerId)
-        return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualificationCode())
+        return codeMapService.respQualificationToObservationTypes(responsiblePractitioner.qualificationCategory())
     }
 
     private fun Query.patientsToExamine(): List<PatientToExamine> {

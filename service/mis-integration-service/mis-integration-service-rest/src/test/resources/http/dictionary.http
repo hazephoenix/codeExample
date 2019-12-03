@@ -68,3 +68,11 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 {}
 
 ###
+###                                                                                Organizations
+GET http://localhost:8080/dictionary/organizations
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###

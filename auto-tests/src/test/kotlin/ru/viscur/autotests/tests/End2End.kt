@@ -57,7 +57,7 @@ class End2End {
         checkServiceRequestsOfPatient(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id)))
         checkObservationsOfPatient(patientId, listOf())
         checkPatientsOfResp(listOf(
-                PatientsOfRespInfo("фельдшер_Колосова", listOf(
+                PatientsOfRespInfo("Paramedic_Сейсенбекова_Алена_Нуржановна", listOf(
                         PatientOfRespInfo(patientId, Severity.RED)
                 ))
         ))

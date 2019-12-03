@@ -27,6 +27,6 @@ class Practitioner @JsonCreator constructor(
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Practitioner.id,
         @JsonProperty("name") var name: List<HumanName>,
         @JsonProperty("gender") var gender: Gender = Gender.unknown,
-        @JsonProperty("qualification") var qualification: PractitionerQualification,
-        @JsonProperty("extension") var extension: PractitionerExtension = PractitionerExtension()
+        @JsonProperty("qualification") var qualification: List<PractitionerQualification>,
+        @JsonProperty("extension") var extension: PractitionerExtension
 ) : BaseResource(id, identifier, resourceType)

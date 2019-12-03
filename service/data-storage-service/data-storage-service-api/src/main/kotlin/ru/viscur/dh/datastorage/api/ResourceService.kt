@@ -39,7 +39,7 @@ interface ResourceService {
      * @param resourceType тип ресурса
      * @param requestBody запрос на поиск
      */
-    fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources): List<T>
+    fun <T> all(resourceType: ResourceType<T>, requestBody: RequestBodyForResources = RequestBodyForResources()): List<T>
             where T : BaseResource
 
     /**

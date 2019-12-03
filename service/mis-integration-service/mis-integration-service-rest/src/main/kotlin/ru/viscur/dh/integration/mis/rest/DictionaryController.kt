@@ -1,8 +1,11 @@
 package ru.viscur.dh.integration.mis.rest
 
 import org.springframework.web.bind.annotation.*
+import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.CodeMapService
 import ru.viscur.dh.datastorage.api.ConceptService
+import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.valueSetNameById
 import ru.viscur.dh.queue.api.OfficeService
 
@@ -16,7 +19,8 @@ import ru.viscur.dh.queue.api.OfficeService
 class DictionaryController(
         private val codeMapService: CodeMapService,
         private val officeService: OfficeService,
-        private val conceptService: ConceptService
+        private val conceptService: ConceptService,
+        private val resourceService: ResourceService
 ) {
 
     /**
@@ -52,4 +56,7 @@ class DictionaryController(
      */
     @GetMapping("/offices")
     fun offices() = officeService.all()
+
+    @GetMapping("/organizations")
+    fun organizations() = resourceService.all(ResourceType.Organization)
 }

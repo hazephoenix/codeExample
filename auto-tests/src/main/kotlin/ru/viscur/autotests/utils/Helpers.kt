@@ -21,23 +21,30 @@ class Helpers {
         /**
          * id фельдшера
          */
-        const val paramedicId = "фельдшер_Колосова"
+        const val paramedicId = "Paramedic_Сейсенбекова_Алена_Нуржановна"
 
         /**
          * id мед работника в кабинете диагностики/анализов
          */
-        const val diagnosticAssistantId = "мед_работник_диагностики_Сидорова"
+        const val diagnosticAssistantId = "Ms_Аникина_Алена_Анатольевна"
+
+        /**
+         * id уролога
+         */
+        const val urologistId = "Urologist_Клюев_Михаил_Васильевич"
+        const val urologist2Id = "Urologist_Новиков_Сергей_Игоревич"
 
         /**
          * id хирурга
          */
-        const val surgeonId = "хирург_Иванов"
-        const val surgeon2Id = "хирург_Петров"
+        const val surgeonId = "Surgeon_Баширов_Сергей_Рафаэльевич"
+        const val surgeon2Id = "Surgeon_Буркин_Максим_Викторович"
 
         /**
          * Квалификации
          */
         const val QUALIFICATION_SURGEON = "Surgeon"
+        const val QUALIFICATION_CATEGORY_SURGEON = "Surgeon_category"
 
         //создать спецификацию запроса RestApi
         fun createRequestSpec(body: Any): RequestSpecification {
@@ -301,7 +308,8 @@ class Helpers {
         fun createPractitioner() = Practitioner(
                 id = "ignored",
                 name = listOf(HumanName(text = "Петров Иван Алексеевич", family = "Петров", given = listOf("Иван"), suffix = listOf("Алексеевич"))),
-                qualification = PractitionerQualification(code = CodeableConcept(code = QUALIFICATION_SURGEON, systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+                qualification = listOf(PractitionerQualification(code = CodeableConcept(code = QUALIFICATION_SURGEON, systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))),
+                extension = PractitionerExtension(qualificationCategory = QUALIFICATION_CATEGORY_SURGEON)
         )
     }
 }
