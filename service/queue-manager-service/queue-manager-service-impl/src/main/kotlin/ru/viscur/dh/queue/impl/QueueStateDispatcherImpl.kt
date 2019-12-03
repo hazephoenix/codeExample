@@ -14,6 +14,6 @@ class QueueStateDispatcherImpl(
 ) : QueueStateDispatcher {
 
     override fun add(locationMonitorDto: LocationMonitorDto) {
-        //jmsTemplate.convertAndSend("location-monitor", locationMonitorDto)
+        jmsTemplate.convertAndSend("location-monitor", locationMonitorDto)
     }
 }
