@@ -23,6 +23,7 @@ class CloseOffice {
     fun init() {
         QueRequests.deleteQue()
     }
+
     @Test
     fun closingOfficeGoingToObservation() {
         //создание очереди

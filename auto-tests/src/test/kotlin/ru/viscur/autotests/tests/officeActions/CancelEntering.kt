@@ -26,7 +26,7 @@ class CancelEntering {
     }
 
     @Test
-    fun cancelFirstPatientEntering() {
+    fun cancelFirstPatientOnObservationEntering() {
         //создание очереди
         val servReq1 = listOf(Helpers.createServiceRequestResource(observation1Office101))
         val bundleRed1 = Helpers.bundle("1111", "RED", servReq1)
@@ -55,7 +55,7 @@ class CancelEntering {
     }
 
     @Test
-    fun cancelSecondPatientEntering() {
+    fun cancelSecondPatientOnObservationEntering() {
         //создание очереди
         val servReq1 = listOf(Helpers.createServiceRequestResource(observation1Office101))
         val bundleRed1 = Helpers.bundle("1111", "RED", servReq1)
@@ -91,34 +91,92 @@ class CancelEntering {
     }
 
     @Test
-    fun cancelInQueuePatientEntering() {
+    fun cancelFirstPatientGoingToObservationEntering() {
+        //создание очереди
+        val servReq1 = listOf(Helpers.createServiceRequestResource(observation1Office101))
+        val bundleRed1 = Helpers.bundle("1111", "RED", servReq1)
+        val bundleRed2 = Helpers.bundle("1112", "RED", servReq1)
+
+        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
+
+        //пациент идет на обследование
+        checkQueueItems(listOf(
+            QueueItemsOfOffice(office101Id, listOf(
+                QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
+                QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+            ))
+        ))
+        //отмена входа пациента, пациент должен вернуться первым в очередь
+        QueRequests.cancelEntering(referenceToPatient(patientId1))
+        checkQueueItems(listOf(
+            QueueItemsOfOffice(office101Id, listOf(
+                QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
+                QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
+            ))
+        ))
+    }
+
+    @Test
+    fun cancelSecondPatientGoingToObservationEntering() {
         //создание очереди
         val servReq1 = listOf(Helpers.createServiceRequestResource(observation1Office101))
         val bundleRed1 = Helpers.bundle("1111", "RED", servReq1)
         val bundleRed2 = Helpers.bundle("1112", "RED", servReq1)
         val bundleRed3 = Helpers.bundle("1113", "RED", servReq1)
+
         QueRequests.officeIsReady(referenceToLocation(office101Id))
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed3).resources(ResourceType.ServiceRequest))
 
-        //пациент вошел в кабинет
-        QueRequests.patientEntered(Helpers.createListResource(patientId1, office101Id))
+        //второй пациент идет на обследование
+        QueRequests.inviteNextPatientToOffice(referenceToLocation(office101Id))
+        checkQueueItems(listOf(
+            QueueItemsOfOffice(office101Id, listOf(
+                QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
+                QueueItemInfo(patientId2, PatientQueueStatus.GOING_TO_OBSERVATION),
+                QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
+            ))
+        ))
+
+        //отмена входа пациента, пациент должен вернуться первым в очередь
+        QueRequests.cancelEntering(referenceToPatient(patientId2))
+        checkQueueItems(listOf(
+            QueueItemsOfOffice(office101Id, listOf(
+                QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
+                QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
+                QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
+            ))
+        ))
+    }
+
+    @Test
+    fun cancelWrongStatusPatientEntering() {
+        //создание очереди
+        val servReq1 = listOf(Helpers.createServiceRequestResource(observation1Office101))
+        val bundleRed1 = Helpers.bundle("1111", "RED", servReq1)
+        val bundleRed2 = Helpers.bundle("1112", "RED", servReq1)
+        QueRequests.officeIsBusy(referenceToLocation(office101Id))
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed2).resources(ResourceType.ServiceRequest))
+        QueRequests.deletePatientFromQueue(referenceToPatient(patientId2))
+
+        //проверка состояния очереди
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101Id, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.ON_OBSERVATION),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
 
-        //ничего не происходит, т.к. пациент еще не входил в кабинет
+        //проврека, чтоничего не происходит, т.к. нельзя отменить вход пациента со статусов IN_QUEUE, READY
+        QueRequests.cancelEntering(referenceToPatient(patientId1))
         QueRequests.cancelEntering(referenceToPatient(patientId2))
+
         checkQueueItems(listOf(
                 QueueItemsOfOffice(office101Id, listOf(
-                        QueueItemInfo(patientId1, PatientQueueStatus.ON_OBSERVATION),
-                        QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
-                        QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE)
+                        QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
     }
