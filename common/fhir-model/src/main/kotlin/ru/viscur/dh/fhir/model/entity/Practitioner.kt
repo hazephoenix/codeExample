@@ -3,6 +3,7 @@ package ru.viscur.dh.fhir.model.entity
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import ru.viscur.dh.fhir.model.enums.Gender
+import ru.viscur.dh.fhir.model.enums.HumanNameUse
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.HumanName
 import ru.viscur.dh.fhir.model.type.Identifier
@@ -29,4 +30,12 @@ class Practitioner @JsonCreator constructor(
         @JsonProperty("gender") var gender: Gender = Gender.unknown,
         @JsonProperty("qualification") var qualification: PractitionerQualification,
         @JsonProperty("extension") var extension: PractitionerExtension = PractitionerExtension()
-) : BaseResource(id, identifier, resourceType)
+) : BaseResource(id, identifier, resourceType) {
+    val firstOfficialName: HumanName?
+        get() = name.firstOrNull { it.use == HumanNameUse.official }
+    val firstUsualName: HumanName?
+        get() = name.firstOrNull { it.use == HumanNameUse.usual }
+    val fullName =
+            (firstOfficialName ?: firstUsualName)
+                    ?.text ?: ""
+}
