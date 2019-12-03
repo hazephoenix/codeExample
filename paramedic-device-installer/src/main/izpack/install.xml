@@ -14,32 +14,11 @@
     </locale>
     <guiprefs width="640" height="480" resizable="yes"/>
 
-    <jar src="../libs/paramedic-device-installer-all.jar"/>
-
-    <resources>
-        <res src="../resources/main/izpack/config.input.xml" id="userInputSpec.xml" parse="yes" type="xml" />
-    </resources>
-
-    <dynamicvariables>
-        <variable name="arm.uuid" value="${COMPUTERNAME}" type="environment"/>
-    </dynamicvariables>
-
     <panels>
         <panel classname="HelloPanel"/>
         <panel classname="TargetPanel"/>
         <panel classname="PacksPanel"/>
-        <panel classname="InstallPanel">
-            <actions>
-                <action stage="postvalidate"
-                        classname="installer.InstallStuff"/>
-            </actions>
-        </panel>
-        <panel classname="UserInputPanel" id="configPanel">
-            <actions>
-                <action stage="postvalidate" classname="installer.ConfigPanelAction"/>
-            </actions>
-        </panel>
-
+        <panel classname="InstallPanel"/>
         <panel classname="FinishPanel"/>
     </panels>
 
@@ -59,7 +38,4 @@
             <singlefile src="dh-paramedic-device-app.jar" target="${INSTALL_PATH}/app.jar"/>
         </pack>
     </packs>
-    <logging>
-        <log-file append="true" level="ALL"/>
-    </logging>
 </izpack:installation>

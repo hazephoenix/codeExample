@@ -2,10 +2,12 @@
                    xmlns:izpack="http://izpack.org/schema/processing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://izpack.org/schema/processing http://izpack.org/schema/5.0/izpack-processing-5.0.xsd">
 
+    <logfiledir>$INSTALL_PATH</logfiledir>
     <job name="Install Regula Driver">
-        <executefile name="msiexec">
+        <executeForPack name="stuff"/>
+        <executefile name="msiexec" workingDir="$INSTALL_PATH">
             <arg>/i</arg>
-            <arg>${INSTALL_PATH}/stuff/regula/Regula Reader Drivers (x64).msi</arg>
+            <arg>"${INSTALL_PATH}/stuff/regula/Regula Reader Drivers (x64).msi"</arg>
             <arg>/quiet</arg>
         </executefile>
     </job>
