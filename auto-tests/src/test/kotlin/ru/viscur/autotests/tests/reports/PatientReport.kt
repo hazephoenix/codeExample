@@ -63,8 +63,9 @@ class PatientReport {
         //получение истории очереди пациента за последние сутки
         val patientQueueHistory = QueRequests.getPatientQueueHistory(patientId)
 
-        //проверка, что в истории пациента за последние сутки есть запись о том, что он был в статусе Ready, что он стоял в 149
-        assertEquals(expectedStatusInQueue, patientQueueHistory.find{it.officeId == office149Id}!!.status, "wrong status of patient in queue history")
-        assertEquals(expectedStatusRdy, patientQueueHistory.find{it.officeId == null}!!.status, "wrong status of patient in queue")
+        //проверка, что в истории пациента есть записи о продолжительности нахождения в очереди по статусам
+        assertNotNull(patientQueueHistory.find{it.status == expectedStatusRdy}!!.duration, "patient status ready duration is null")
+        assertNotNull(patientQueueHistory.find{it.status == expectedStatusInQueue}!!.duration, "patient status inqueue duration is null")
+        assertNotNull(patientQueueHistory.find{it.officeId == office149Id}!!.duration, "patient queue for $office149Id duration is null")
     }
 }

@@ -213,8 +213,8 @@ class QueRequests {
                         `when`().log().all().post(Endpoints.CANCEL_OFFICE_SERVICE_REQUEST).
                         then().statusCode(200)
 
-        fun getDiagnosis(bundle: Bundle, diagnosisCount: String) =
-                Helpers.createRequestWithQueryAndBody(bundle, mapOf("take" to diagnosisCount)).
+        fun getDiagnosis(bundle: Bundle, diagnosisNumber: String) =
+                Helpers.createRequestWithQueryAndBody(bundle, mapOf("take" to diagnosisNumber)).
                         `when`().log().all().post(Endpoints.GET_DIAGNOSIS).
                         then().log().all().statusCode(200).extract().response().`as`(DiagnosesListInfo::class.java)
 
