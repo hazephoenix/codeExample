@@ -15,6 +15,7 @@ import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
 import ru.viscur.autotests.utils.Constants.Companion.observationUrineOffice104
 import ru.viscur.autotests.utils.Constants.Companion.office101Id
 import ru.viscur.autotests.utils.Constants.Companion.office104Id
+import ru.viscur.autotests.utils.Constants.Companion.office116Id
 import ru.viscur.autotests.utils.Constants.Companion.office140Id
 import ru.viscur.autotests.utils.Constants.Companion.redZoneId
 import ru.viscur.autotests.utils.Helpers
@@ -29,7 +30,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class ServiceRequests {
 
     @BeforeEach
@@ -90,22 +91,26 @@ class ServiceRequests {
         //создание пациента
         val servRequests = listOf(
                 Helpers.createServiceRequestResource(observationOfSurgeon),
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(observation1Office101),
+                Helpers.createServiceRequestResource(observation2Office101)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         val serviceRequests= QueRequests.createPatient(bundle).resources(ResourceType.ServiceRequest)
-        val serviceRequestId = serviceRequests.get(0).id
+        val serviceRequestId = serviceRequests.find {it.code.code()== observation1Office101}!!.id
         val patientId = patientIdFromServiceRequests(serviceRequests)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId),
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id)
+                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.active)
+
         ))
 
         //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelServiceRequest(serviceRequestId)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId),
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled)
+                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled),
+                ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.active)
         ))
     }
 
@@ -160,6 +165,33 @@ class ServiceRequests {
                 ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled),
                 ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled),
                 ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId)
+        ))
+    }
+
+    @Test
+    fun ServiceRequestWrongOfficeCancelling () {
+        //создание пациента
+        val servRequests = listOf(
+            Helpers.createServiceRequestResource(observation1Office101),
+            Helpers.createServiceRequestResource(observation2Office101)
+        )
+        val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
+
+        val serviceRequests= QueRequests.createPatient(bundle).resources(ResourceType.ServiceRequest)
+        val patientId = patientIdFromServiceRequests(serviceRequests)
+
+        checkServiceRequestsOfPatient(patientId, listOf(
+            ServiceRequestInfo(code = observation1Office101, locationId = office101Id),
+            ServiceRequestInfo(code = observation2Office101, locationId = office101Id),
+            ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId)
+        ))
+
+        //отмена сервис реквестов в неверный офис и проверка что ничего не происходит
+        QueRequests.cancelOfficeServiceRequests(patientId, office116Id)
+        checkServiceRequestsOfPatient(patientId, listOf(
+            ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.active),
+            ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.active),
+            ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId, status = ServiceRequestStatus.active)
         ))
     }
 

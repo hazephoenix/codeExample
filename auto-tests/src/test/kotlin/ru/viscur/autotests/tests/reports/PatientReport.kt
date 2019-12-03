@@ -8,6 +8,7 @@ import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Constants.Companion.observation1Office149
 import ru.viscur.autotests.utils.Constants.Companion.observation1Office202
 import ru.viscur.autotests.utils.Constants.Companion.office149Id
+import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createObservation
 import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
@@ -18,7 +19,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.referenceToLocation
 import ru.viscur.dh.fhir.model.utils.resources
 
-@Disabled("Debug purposes only")
+//@Disabled("Debug purposes only")
 class PatientReport {
 
     @Test
@@ -46,7 +47,9 @@ class PatientReport {
     @Test
     fun patientQueueHistory() {
         //регистрация пациента и создание истории очереди
-        val expectedQueueStatus = "IN_QUEUE"
+        val expectedStatusRdy = "READY"
+        val expectedStatusInQueue = "IN_QUEUE"
+
         QueRequests.deleteQue()
         QueRequests.officeIsBusy(referenceToLocation(office149Id))
         val servRequests = listOf(
@@ -57,10 +60,11 @@ class PatientReport {
         QueRequests.officeIsReady(referenceToLocation(office149Id))
         val patientId = patientIdFromServiceRequests(responseBundle)
 
-        //получение истории очереди
+        //получение истории очереди пациента за последние сутки
         val patientQueueHistory = QueRequests.getPatientQueueHistory(patientId)
 
-        //проверка, что в истории пациента за последние сутки есть запись о том, что он стоял в 149
-        assertEquals(expectedQueueStatus, patientQueueHistory.find{it.officeId == office149Id}!!.status, "wrong status of patient in queue history")
+        //проверка, что в истории пациента за последние сутки есть запись о том, что он был в статусе Ready, что он стоял в 149
+        assertEquals(expectedStatusInQueue, patientQueueHistory.find{it.officeId == office149Id}!!.status, "wrong status of patient in queue history")
+        assertEquals(expectedStatusRdy, patientQueueHistory.find{it.officeId == null}!!.status, "wrong status of patient in queue")
     }
 }
