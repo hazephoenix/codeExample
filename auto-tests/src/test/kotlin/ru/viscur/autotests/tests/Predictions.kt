@@ -10,6 +10,7 @@ import ru.viscur.autotests.utils.Constants.Companion.surgeon1Id
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForDiagnosis
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForSeverity
+import ru.viscur.autotests.utils.Helpers.Companion.bundleForSurgeon2
 import ru.viscur.autotests.utils.Helpers.Companion.surgeon2Id
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -81,5 +82,40 @@ class Predictions {
 
         //проверка, что в полученном списке предположительный ответственный - surgeon2, менее занятый
         assertEquals(surgeon2Id, predictedResp.performer!!.first().id, "wrong performer predicted")
+    }
+
+    @Test
+    fun predictRespWithSameWorkload(){
+        QueRequests.cancelAllActivePatient()
+        val diagnosisCode = "Q11"
+        val diagnosis = mapOf(
+            "diagnosis" to diagnosisCode,
+            "complaints" to listOf("Сильная боль в правом подреберье", "Тошнит"),
+            "gender" to "male"
+        )
+
+        //2 хирурга активны
+        QueRequests.setPractitionerActivityAndLocation(surgeon1Id, true)
+        QueRequests.setPractitionerActivityAndLocation(surgeon2Id, true)
+
+        //создаем пациента на ответственность surgeon1
+        val bundle1 = bundle("1120", "RED")
+        val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
+
+        //создаем пациента на ответственность surgeon2
+        val bundle2 = bundleForSurgeon2("1121", "RED")
+        val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
+
+        //проверка, что у surgeon1 и у surgeon2 есть по одному пациенту на ответственности
+        val respOfSurgeon1 = QueRequests.getPatientsOfResponsable(surgeon1Id)
+        val respOfSurgeon2 = QueRequests.getPatientsOfResponsable(surgeon2Id)
+        assertEquals(1, respOfSurgeon1.patients.size, "wrong numbers of patient for $surgeon1Id" )
+        assertEquals(1, respOfSurgeon2.patients.size, "wrong numbers of patient for $surgeon2Id" )
+
+        //получаем предположительный список ServiceRequest для следующего пациента
+        val predictedResp = QueRequests.getSupposedServRequests(diagnosis).filter {it.code.code() == observationOfSurgeon}.first()
+
+        //проверка, что в полученном списке предположительный ответственный - surgeon1, выбранный по алфавиту
+        assertEquals(surgeon1Id, predictedResp.performer!!.first().id, "wrong performer predicted")
     }
 }

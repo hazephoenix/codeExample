@@ -20,6 +20,6 @@ class DeviceRequests {
         fun getTaskResult(taskId: String) =
                 Helpers.createRequestSpecWithoutBody().`when`().
                         get(Endpoints.GET_TASK_RESULT + "/$taskId").
-                        then().statusCode(200)
+                        then().statusCode(200).log().all()
     }
 }
