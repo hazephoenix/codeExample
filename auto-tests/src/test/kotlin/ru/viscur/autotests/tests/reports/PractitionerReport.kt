@@ -17,6 +17,7 @@ import ru.viscur.autotests.utils.Constants.Companion.surgeon1Id
 import ru.viscur.autotests.utils.Constants.Companion.surgeon2Id
 import ru.viscur.autotests.utils.Constants.Companion.urologist1Id
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
+import ru.viscur.autotests.utils.Helpers.Companion.bundleForSurgeon2
 import ru.viscur.autotests.utils.Helpers.Companion.bundleForUrologist
 import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
@@ -60,7 +61,7 @@ class PractitionerReport {
         //получение отчета о полном состоянии очередей в кабинеты
         val queueItemForPractitioners = QueRequests.getAllPractitionersWorkload()
 
-        //проверка отчета по состоянию очереди
+        //проверка, что отчет содержит очередь для каждого специалиста
         assertEquals(3, queueItemForPractitioners.size, "wrong office number in report for practitioner")
     }
 
@@ -89,7 +90,8 @@ class PractitionerReport {
 
         //проверка отчета по состоянию очереди для practitioner
         assertEquals(1, queueItems.items.size, "wrong number of patients for $practitioner1Office101")
-        assertEquals(patientId1, queueItems.items.first().patientId,  "wrong patient in queue to practitioner $practitioner1Office101")
+        assertEquals(patientId1, queueItems.items.first().patientId,  "wrong patient in queue for practitioner $practitioner1Office101")
+        assertEquals(office101Id, queueItems.officeId,  "wrong office for practitioner $practitioner1Office101")
     }
 
     @Test
@@ -123,17 +125,14 @@ class PractitionerReport {
 
     @Test
     fun gettingPatientsOfResponsablePractitioner() {
-        //создание пациентов
-        val servRequests = listOf(
-                createServiceRequestResource(observation1Office101)
-        )
-        val bundle1 = bundle("1120", "YELLOW", servRequests)
-        val bundle2 = bundle("1121", "YELLOW", servRequests)
+        //создание пациентов на ответственности surgeon2
+        val bundle1 = bundleForSurgeon2("1120", "YELLOW")
+        val bundle2 = bundleForSurgeon2("1121", "YELLOW")
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
-        val surgeonPatients =  QueRequests.getPatientsOfResponsable(surgeon1Id).patients
+        val surgeon2Patients =  QueRequests.getPatientsOfResponsable(surgeon2Id).patients
 
-        //проверка, что у хирурга 2 пациента на ответственности
-        assertEquals(2, surgeonPatients.size,"wrong patient number for practitioner: $surgeon1Id")
+        //проверка, что у surgeon2 2 пациента на ответственности
+        assertEquals(2, surgeon2Patients.size,"wrong patient number for practitioner: $surgeon2Id")
     }
 }
