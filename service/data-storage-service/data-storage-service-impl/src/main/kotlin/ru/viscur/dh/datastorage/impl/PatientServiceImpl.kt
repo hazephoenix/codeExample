@@ -100,11 +100,15 @@ class PatientServiceImpl(
         if (respPractitioners.isEmpty()) {
             throw Exception("ERROR. Can't find practitioners by qualifications: ${responsibleQualifications.joinToString()}")
         }
-        //todo смотреть кто на работе по локации
-        // practitionersId = practitionersId.filter кто на работе сейчас
+        val respPractitionersOnWork = respPractitioners.filter { it.extension.onWork }
+        //todo не понятно нужно ли это: если никого на смене нет, то это скорей всего ошибка в том, что никто не нажал "зайти на смену".
+        // такая ситуация не должна происходить. если все же произошла, то берем всех
+        val resultRespPractitioners = if (respPractitionersOnWork.isEmpty()) respPractitioners else respPractitionersOnWork
+        //todo смотреть кто в красной зоне по локации
+        // respPractitioners = respPractitioners.filter кто на работе сейчас
 
         //берем наименее загруженного врача
-        val responsiblePractitionerId = respPractitioners.map { practitioner ->
+        val responsiblePractitionerId = resultRespPractitioners.map { practitioner ->
             Pair(patientsToExamine(practitioner.id).sumBy { enumValueOf<Severity>(it.severity).workloadWeight }, practitioner)
         }.sortedWith(compareBy({ it.first }, { it.second.name.first().family })).first().second.id
         val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
@@ -113,18 +117,8 @@ class PatientServiceImpl(
                 ((codeMapService.icdToObservationTypes(diagnosis) ?: listOf()) +
                         observationTypeOfResponsible).distinct()
 
-//        val serviceRequests = observationTypes.map { observationType ->
-//            ServiceRequest(code = observationType)
-//        }
-        //todo вернуть вариант выше. это сделано т к в V20191017113521__CreateCodeMapIcdToObservationType.sql еще есть типы обследований,
-        // которых в базе нет, их нужно заменить как только врачи скажут на что заменить или добавить недостающие в базу
-        val serviceRequests = observationTypes.mapNotNull { observationType ->
-            try {
-                conceptService.byCode(ValueSetName.OBSERVATION_TYPES, observationType)
-                ServiceRequest(code = observationType)
-            } catch (e: Exception) {
-                null
-            }
+        val serviceRequests = observationTypes.map { observationType ->
+            ServiceRequest(code = observationType)
         }
         serviceRequests.find { it.code.code() == observationTypeOfResponsible }!!.apply { performer = listOf(referenceToPractitioner(responsiblePractitionerId)) }
 

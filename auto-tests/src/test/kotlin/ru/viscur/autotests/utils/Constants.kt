@@ -30,12 +30,12 @@ class Constants {
 
         //practitioners
         const val practitioner1Office101 = "фельдшер_Колосова"
-        const val practitioner2Office101 = "мед_работник_диагностики_Иванова"
+        const val practitioner2Office101 = "Ms_Аникина_Алена_Анатольевна"
         const val practitioner1Office116 = "мед_работник_диагностики_Сидорова"
 
-        const val surgeon1Id = "хирург_Иванов"
-        const val surgeon2Id = "хирург_Петров"
-        const val urologist1Id = "уролог_Петров"
+        const val surgeon1Id = "Surgeon_Баширов_Сергей_Рафаэльевич"
+        const val surgeon2Id = "Surgeon_Буркин_Максим_Викторович"
+        const val urologist1Id = "Urologist_Клюев_Михаил_Васильевич"
 
     }
 }

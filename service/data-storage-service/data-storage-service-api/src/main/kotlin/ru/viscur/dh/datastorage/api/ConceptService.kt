@@ -41,10 +41,12 @@ interface ConceptService {
 
     /**
      * Поиск концепта по совпадениям в [Concept.alternatives]
+     * или со значением display
+     *
      * Пример:
      * В [realAlternatives] м б "Выраженная СИЛЬНАЯ боль по утрам"
      * В коде Violent_pain (острая боль) указаны альтернативы "острая боль", "сильная боль"
      * В результате будет найден код "Violent_pain"
      */
-    fun byAlternative(valueSet: ValueSetName, realAlternatives: List<String>): List<String>
+    fun byAlternativeOrDisplay(valueSet: ValueSetName, realAlternatives: List<String>): List<String>
 }
