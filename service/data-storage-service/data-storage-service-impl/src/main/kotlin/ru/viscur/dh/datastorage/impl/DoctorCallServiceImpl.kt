@@ -44,7 +44,7 @@ class DoctorCallServiceImpl(
                 id = genId(),
                 dateTime = call.dateTime,
                 callerId = call.caller.id,
-                qualification = call.specialization,
+                specializationCategory = call.specializationCategory,
                 doctorId = call.doctor.id,
                 goal = call.goal,
                 patientSeverity = call.patientSeverity,
@@ -64,7 +64,7 @@ class DoctorCallServiceImpl(
                 call.id
         ) ?: throw EntityNotFoundException(call.id)
         entity.callerId = call.caller.id
-        entity.qualification = call.specialization
+        entity.specializationCategory = call.specializationCategory
         entity.doctorId = call.doctor.id
         entity.goal = call.goal
         entity.patientSeverity = call.patientSeverity
@@ -141,7 +141,7 @@ class DoctorCallServiceImpl(
                 else
                     practitioners[entity.callerId]
                             ?: error("Not found practitioner by id '${entity.callerId}'"),
-                specialization = entity.qualification,
+                specializationCategory = entity.specializationCategory,
                 doctor = if (practitioners == null)
                     resourceService.byId(ResourceType.Practitioner, entity.doctorId)
                 else

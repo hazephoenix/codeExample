@@ -10,9 +10,7 @@ import ru.viscur.dh.datastorage.api.criteria.CriteriaOrderBy
 import ru.viscur.dh.datastorage.api.criteria.DoctorCallCriteria
 import ru.viscur.dh.datastorage.api.criteria.DoctorMessageCriteria
 import ru.viscur.dh.datastorage.api.model.call.CallStatus
-import ru.viscur.dh.datastorage.api.model.call.CallableSpecialization
-import ru.viscur.dh.datastorage.api.model.message.DoctorMessage
-import ru.viscur.dh.datastorage.api.request.PagedCriteriaRequest
+import ru.viscur.dh.datastorage.api.model.call.CallableSpecializationCategory
 import ru.viscur.dh.datastorage.api.request.PagedRequest
 import ru.viscur.dh.datastorage.api.response.PagedResponse
 import ru.viscur.dh.integration.doctorapp.api.DoctorAppService
@@ -22,13 +20,10 @@ import ru.viscur.dh.integration.doctorapp.api.event.DoctorCallAcceptedEvent
 import ru.viscur.dh.integration.doctorapp.api.event.DoctorCallCreatedEvent
 import ru.viscur.dh.integration.doctorapp.api.event.DoctorCallDeclinedEvent
 import ru.viscur.dh.integration.doctorapp.api.model.*
-import ru.viscur.dh.integration.doctorapp.api.request.DoctorCallsRequest
-import ru.viscur.dh.integration.doctorapp.api.response.DoctorCallsResponse
 import ru.viscur.dh.integration.doctorapp.impl.mapper.DoctorAppMapper
 import ru.viscur.dh.integration.mis.api.ReportService
 import ru.viscur.dh.security.ForbiddenException
 import ru.viscur.dh.security.currentUserDetails
-import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import java.util.*
 
 @Service
@@ -47,7 +42,7 @@ class DoctorAppServiceImpl(
                 id = "",
                 dateTime = Date(),
                 caller = practitionerService.byId(user.id),
-                specialization = cmd.specialization,
+                specializationCategory = cmd.specializationCategory,
                 doctor = practitionerService.byId(cmd.doctorId),
                 goal = cmd.goal,
                 patientSeverity = cmd.patientSeverity,
@@ -104,9 +99,9 @@ class DoctorAppServiceImpl(
 
     override fun findCallableDoctors(): List<CallableDoctor> {
         return practitionerService.byQualifications(
-                CallableSpecialization
+                CallableSpecializationCategory
                         .values()
-                        .map { it.name }
+                        .map { it.fhirId }
         ).map(doctorAppMapper::mapPractitionerToCallableDoctor)
     }
 
