@@ -3,6 +3,7 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.digitalhospital.dhdatastorage.dto.RequestBodyForResources
 import ru.viscur.dh.datastorage.api.ResourceService
+import ru.viscur.dh.datastorage.api.ResourceService.ResourceNotFoundException
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.entity.BaseResource
@@ -25,7 +26,29 @@ class ResourceServiceImpl : ResourceService {
                 .setParameter(1, resourceType.id.toString())
                 .setParameter(2, id)
                 .singleResult.toResourceEntity()
-                ?: throw Exception("Not found ${resourceType.id} with id = '$id'")
+                ?: throw ResourceNotFoundException(
+                        "Not found ${resourceType.id} with id = '$id'"
+                )
+    }
+
+    override fun <T : BaseResource> byIds(resourceType: ResourceType<T>, ids: List<String>): List<T> {
+        if (ids.isEmpty()) {
+            return listOf()
+        }
+        return em.createNativeQuery(
+                "select r.resource from ${resourceType.id.name} r where r.id in (?1)"
+        )
+                .setParameter(1, ids)
+                .fetchResourceList()
+    }
+
+    override fun <T : BaseResource> classifiedByIds(resourceType: ResourceType<T>, ids: Collection<String>): Map<String, T> {
+        val map = mutableMapOf<String, T>()
+        val items = byIds(resourceType, ids.toList());
+        items.forEach {
+            map[it.id] = it
+        }
+        return map
     }
 
     override fun <T : BaseResource> byIdentifier(resourceType: ResourceType<T>, type: IdentifierType, value: String): T? {
@@ -117,7 +140,7 @@ class ResourceServiceImpl : ResourceService {
                 .setParameter(2, id)
                 .singleResult
                 .toResourceEntity()
-                ?: throw Exception("Not found ${resourceType.id} with id = '$id' for deleting")
+                ?: throw ResourceNotFoundException("Not found ${resourceType.id} with id = '$id' for deleting")
     }
 
     @Tx
