@@ -6,8 +6,8 @@ import ru.viscur.dh.datastorage.api.util.INSPECTION_TYPES
 import ru.viscur.dh.fhir.model.entity.ClinicalImpression
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.isInspectionOfResp
-import ru.viscur.dh.integration.doctorapp.api.DoctorAppEventPublisher
-import ru.viscur.dh.integration.doctorapp.api.model.QueuePatientAppDto
+import ru.viscur.dh.integration.practitioner.app.api.PractitionerAppEventPublisher
+import ru.viscur.dh.integration.practitioner.app.api.model.QueuePatientAppDto
 import ru.viscur.dh.queue.api.QueueForPractitionersInformService
 
 /**
@@ -21,7 +21,7 @@ class QueueForPractitionersInformServiceImpl(
         private val locationService: LocationService,
         private val patientService: PatientService,
         private val observationDurationService: ObservationDurationEstimationService,
-        private val doctorAppEventPublisher: DoctorAppEventPublisher,
+        private val practitionerAppEventPublisher: PractitionerAppEventPublisher,
         private val codeMapService: CodeMapService
 ) : QueueForPractitionersInformService {
 
@@ -45,7 +45,7 @@ class QueueForPractitionersInformServiceImpl(
 
     override fun patientDeletedFromOfficeQueue(patientId: String, officeId: String) {
         //все привязанные к кабинету. в зонах мониторится по проведению обследований
-        doctorAppEventPublisher.publishQueuePatientRemoved(
+        practitionerAppEventPublisher.publishQueuePatientRemoved(
                 targetPractitionersIds = practitionerService.all(onWorkInOfficeId = officeId).map { it.id }.toSet(),
                 patientId = patientId
         )
@@ -60,7 +60,7 @@ class QueueForPractitionersInformServiceImpl(
     }
 
     override fun patientDeletedFromPractitionerQueue(patientId: String, practitionerId: String) {
-        doctorAppEventPublisher.publishQueuePatientRemoved(setOf(practitionerId), patientId)
+        practitionerAppEventPublisher.publishQueuePatientRemoved(setOf(practitionerId), patientId)
     }
 
     override fun patientIsReadyForObservations(patientId: String, observationTypes: List<String>) {
@@ -80,19 +80,19 @@ class QueueForPractitionersInformServiceImpl(
     override fun patientDontNeedInspectionAnymore(patientId: String, observationTypes: List<String>) {
         inspectionQualificationCategories(observationTypes)?.run {
             val targetPractitionersIds = practitionerService.byQualificationCategories(this).map { it.id }.toSet()
-            doctorAppEventPublisher.publishQueuePatientRemoved(targetPractitionersIds, patientId)
+            practitionerAppEventPublisher.publishQueuePatientRemoved(targetPractitionersIds, patientId)
         }
     }
 
     override fun resultsAreReadyInCarePlan(patientId: String, clinicalImpression: ClinicalImpression) {
         clinicalImpression.assessor?.run {
-            doctorAppEventPublisher.publishObservationsResultsAreReady(setOf(this.id!!), clinicalImpression)
+            practitionerAppEventPublisher.publishObservationsResultsAreReady(setOf(this.id!!), clinicalImpression)
         }
     }
 
     private fun informPractitionersAboutPatientAdded(targetPractitionersIds: Set<String>, patientId: String, estDuration: Int, onum: Int? = null) {
         val clinicalImpression = clinicalImpressionService.active(patientId)
-        doctorAppEventPublisher.publishNewQueuePatient(
+        practitionerAppEventPublisher.publishNewQueuePatient(
                 targetPractitionersIds,
                 clinicalImpression,
                 QueuePatientAppDto(

@@ -3,12 +3,13 @@ package ru.viscur.dh.datastorage.impl
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.PractitionerCallStorageService
 import ru.viscur.dh.datastorage.api.ResourceService
-import ru.viscur.dh.datastorage.api.criteria.DoctorCallCriteria
+import ru.viscur.dh.datastorage.api.criteria.PractitionerCallCriteria
 import ru.viscur.dh.datastorage.api.exception.EntityNotFoundException
 import ru.viscur.dh.datastorage.api.request.PagedCriteriaRequest
 import ru.viscur.dh.datastorage.api.response.PagedResponse
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
-import ru.viscur.dh.datastorage.impl.criteria.DoctorCallCriteriaQueryBuilder
+import ru.viscur.dh.datastorage.impl.criteria.PractitionerCallCriteriaQueryBuilder
+import ru.viscur.dh.datastorage.impl.entity.PractitionerCallAwaitingRefEntity
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.entity.Practitioner
@@ -24,7 +25,7 @@ import kotlin.math.ceil
 @Service
 class PractitionerCallStorageServiceImpl(
         val resourceService: ResourceService,
-        val doctorCallCriteriaQueryBuilder: DoctorCallCriteriaQueryBuilder
+        val practitionerCallCriteriaQueryBuilder: PractitionerCallCriteriaQueryBuilder
 ) : PractitionerCallStorageService {
 
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
@@ -33,7 +34,7 @@ class PractitionerCallStorageServiceImpl(
     @Tx
     override fun byId(id: String): PractitionerCall {
         val entity = em.find(
-                ru.viscur.dh.datastorage.impl.entity.DoctorCall::class.java,
+                ru.viscur.dh.datastorage.impl.entity.PractitionerCallEntity::class.java,
                 id
         ) ?: throw EntityNotFoundException(id)
         return toApi(entity, null, null)
@@ -41,12 +42,12 @@ class PractitionerCallStorageServiceImpl(
 
     @Tx
     override fun createCall(call: PractitionerCall): PractitionerCall {
-        val entity = ru.viscur.dh.datastorage.impl.entity.DoctorCall(
+        val entity = ru.viscur.dh.datastorage.impl.entity.PractitionerCallEntity(
                 id = genId(),
                 dateTime = call.dateTime,
                 callerId = call.caller.id,
                 specializationCategory = call.specializationCategory,
-                doctorId = call.practitioner.id,
+                practitionerId = call.practitioner.id,
                 goal = call.goal,
                 patientSeverity = call.patientSeverity,
                 locationId = call.location.id,
@@ -62,12 +63,12 @@ class PractitionerCallStorageServiceImpl(
     @Tx
     override fun updateCall(call: PractitionerCall): PractitionerCall {
         val entity = em.find(
-                ru.viscur.dh.datastorage.impl.entity.DoctorCall::class.java,
+                ru.viscur.dh.datastorage.impl.entity.PractitionerCallEntity::class.java,
                 call.id
         ) ?: throw EntityNotFoundException(call.id)
         entity.callerId = call.caller.id
         entity.specializationCategory = call.specializationCategory
-        entity.doctorId = call.practitioner.id
+        entity.practitionerId = call.practitioner.id
         entity.goal = call.goal
         entity.patientSeverity = call.patientSeverity
         entity.locationId = call.location.id
@@ -77,28 +78,52 @@ class PractitionerCallStorageServiceImpl(
         return toApi(entity, null, null)
     }
 
-
+    @Tx
     override fun createAwaitingRef(ref: AwaitingPractitionerCallRef) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val entity = PractitionerCallAwaitingRefEntity()
+        entity.callId = ref.callId
+        entity.lastStageDateTime = ref.lastStageDateTime
+        entity.awaitingCallStatusStage = ref.awaitingCallStatusStage
+        entity.voiceCallCount = ref.voiceCallCount
+        em.persist(entity)
     }
 
+    @Tx
     override fun updateAwaitingRef(ref: AwaitingPractitionerCallRef) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val entity = em.find(PractitionerCallAwaitingRefEntity::class.java, ref.callId)
+                ?: throw EntityNotFoundException(ref.callId)
+        entity.lastStageDateTime = ref.lastStageDateTime
+        entity.awaitingCallStatusStage = ref.awaitingCallStatusStage
+        entity.voiceCallCount = ref.voiceCallCount
     }
 
+    @Tx
     override fun removeAwaitingRef(callId: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val entity = em.find(PractitionerCallAwaitingRefEntity::class.java, callId)
+        if (entity != null) {
+            em.remove(entity)
+        }
     }
 
     override fun getAllAwaitingRef(): List<AwaitingPractitionerCallRef> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return em
+                .createQuery("select it from PractitionerCallAwaitingRefEntity it", PractitionerCallAwaitingRefEntity::class.java)
+                .resultList
+                .map {
+                    AwaitingPractitionerCallRef(
+                            it.callId,
+                            it.lastStageDateTime,
+                            it.awaitingCallStatusStage,
+                            it.voiceCallCount
+                    )
+                }
     }
 
-    override fun findCalls(request: PagedCriteriaRequest<DoctorCallCriteria>): PagedResponse<PractitionerCall> {
+    override fun findCalls(request: PagedCriteriaRequest<PractitionerCallCriteria>): PagedResponse<PractitionerCall> {
         val requestCriteria = request.criteria
-        val countCriteria = doctorCallCriteriaQueryBuilder
+        val countCriteria = practitionerCallCriteriaQueryBuilder
                 .buildTotalCountQuery(requestCriteria)
-        val dataCriteria = doctorCallCriteriaQueryBuilder
+        val dataCriteria = practitionerCallCriteriaQueryBuilder
                 .buildQuery(requestCriteria)
 
         val pageSize = request.pageSize ?: 20
@@ -116,7 +141,7 @@ class PractitionerCallStorageServiceImpl(
         val locationIds = mutableListOf<String>()
         for (it in data) {
             practitionerIds.add(it.callerId)
-            practitionerIds.add(it.doctorId)
+            practitionerIds.add(it.practitionerId)
             locationIds.add(it.locationId)
         }
 
@@ -146,7 +171,7 @@ class PractitionerCallStorageServiceImpl(
     }
 
     private fun toApi(
-            entity: ru.viscur.dh.datastorage.impl.entity.DoctorCall,
+            entity: ru.viscur.dh.datastorage.impl.entity.PractitionerCallEntity,
             practitioners: Map<String, Practitioner>?,
             locations: Map<String, Location>?
     ): PractitionerCall {
@@ -161,10 +186,10 @@ class PractitionerCallStorageServiceImpl(
                             ?: error("Not found practitioner by id '${entity.callerId}'"),
                 specializationCategory = entity.specializationCategory,
                 practitioner = if (practitioners == null)
-                    resourceService.byId(ResourceType.Practitioner, entity.doctorId)
+                    resourceService.byId(ResourceType.Practitioner, entity.practitionerId)
                 else
-                    practitioners[entity.doctorId]
-                            ?: error("Not found practitioner by id '${entity.doctorId}'"),
+                    practitioners[entity.practitionerId]
+                            ?: error("Not found practitioner by id '${entity.practitionerId}'"),
 
                 goal = entity.goal,
                 patientSeverity = entity.patientSeverity,

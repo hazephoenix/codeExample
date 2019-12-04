@@ -8,10 +8,7 @@ import ru.viscur.dh.datastorage.api.util.CLINICAL_IMPRESSION
 import ru.viscur.dh.fhir.model.utils.SECONDS_IN_MINUTE
 import ru.viscur.dh.fhir.model.utils.durationInSeconds
 import ru.viscur.dh.fhir.model.utils.now
-import ru.viscur.dh.fhir.model.utils.toStringFmt
-import ru.viscur.dh.integration.doctorapp.api.DoctorAppEventPublisher
-import ru.viscur.dh.queue.api.QueueManagerService
-import ru.viscur.dh.transaction.desc.config.annotation.Tx
+import ru.viscur.dh.integration.practitioner.app.api.PractitionerAppEventPublisher
 
 /**
  * Created at 15.11.2019 14:51 by SherbakovaMA
@@ -20,7 +17,7 @@ import ru.viscur.dh.transaction.desc.config.annotation.Tx
  */
 @Component
 class CheckClinicalDurationExceededScheduler(
-        private val doctorAppEventPublisher: DoctorAppEventPublisher,
+        private val practitionerAppEventPublisher: PractitionerAppEventPublisher,
         private val observationDurationService: ObservationDurationEstimationService,
         private val clinicalImpressionService: ClinicalImpressionService
 ) {
@@ -41,7 +38,7 @@ class CheckClinicalDurationExceededScheduler(
             //т к шедулер раз в минуту, то в проверку должны попадать превышения от 0 до 59, чтобы после превышения оповещение сработало ровно 1 раз
             if (timeAfterDefaultPassed in 0 until SECONDS_IN_MINUTE) {
                 it.assessor?.run {
-                    doctorAppEventPublisher.publishPatientServiceTimeElapsed(setOf(this.id!!), it)
+                    practitionerAppEventPublisher.publishPatientServiceTimeElapsed(setOf(this.id!!), it)
                 }
             }
         }

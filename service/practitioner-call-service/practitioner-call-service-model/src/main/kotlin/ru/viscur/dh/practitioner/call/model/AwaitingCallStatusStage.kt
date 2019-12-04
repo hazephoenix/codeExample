@@ -6,7 +6,7 @@ enum class AwaitingCallStatusStage {
     /**
      * Оповещен (наверно) через мобильное приложение
      */
-    DoctorAppCall,
+    PractitionerAppCall,
 
     /**
      * Оповещен через динамики

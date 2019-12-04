@@ -1,16 +1,16 @@
 package ru.viscur.dh.datastorage.impl
 
 import org.springframework.stereotype.Service
-import ru.viscur.dh.datastorage.api.DoctorMessageService
+import ru.viscur.dh.datastorage.api.PractitionerMessageService
 import ru.viscur.dh.datastorage.api.ResourceService
-import ru.viscur.dh.datastorage.api.criteria.DoctorMessageCriteria
+import ru.viscur.dh.datastorage.api.criteria.PractitionerMessageCriteria
 import ru.viscur.dh.datastorage.api.exception.EntityNotFoundException
-import ru.viscur.dh.datastorage.api.model.message.DoctorMessage as ApiMessage
+import ru.viscur.dh.datastorage.api.model.message.PractitionerMessage as ApiMessage
 import ru.viscur.dh.datastorage.api.request.PagedCriteriaRequest
 import ru.viscur.dh.datastorage.api.response.PagedResponse
 import ru.viscur.dh.datastorage.impl.config.PERSISTENCE_UNIT_NAME
-import ru.viscur.dh.datastorage.impl.criteria.DoctorMessageCriteriaQueryBuilder
-import ru.viscur.dh.datastorage.impl.entity.DoctorMessage
+import ru.viscur.dh.datastorage.impl.criteria.PractitionerMessageCriteriaQueryBuilder
+import ru.viscur.dh.datastorage.impl.entity.PractitionerMessageEntity
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.genId
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
@@ -22,25 +22,25 @@ import kotlin.math.ceil
 @Service
 class DoctorMessageServiceImpl(
         val resourceService: ResourceService,
-        val queryBuilder: DoctorMessageCriteriaQueryBuilder
-) : DoctorMessageService {
+        val queryBuilder: PractitionerMessageCriteriaQueryBuilder
+) : PractitionerMessageService {
 
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
     @Tx(readOnly = true)
     override fun byId(id: String): ApiMessage {
-        val entity = em.find(DoctorMessage::class.java, id)
+        val entity = em.find(PractitionerMessageEntity::class.java, id)
                 ?: throw EntityNotFoundException(id)
         return mapToApiMessage(entity)
     }
 
     @Tx
     override fun createMessage(message: ApiMessage): ApiMessage {
-        val entity = DoctorMessage(
+        val entity = PractitionerMessageEntity(
                 genId(),
                 message.dateTime,
-                message.doctor.id,
+                message.practitioner.id,
                 message.clinicalImpression.id,
                 message.messageType,
                 message.hidden
@@ -51,7 +51,7 @@ class DoctorMessageServiceImpl(
 
     @Tx
     override fun updateMessage(message: ApiMessage): ApiMessage {
-        val entity = em.find(DoctorMessage::class.java, message.id)
+        val entity = em.find(PractitionerMessageEntity::class.java, message.id)
                 ?: throw EntityNotFoundException(message.id)
         entity.hidden = message.hidden
         return mapToApiMessage(entity)
@@ -59,7 +59,7 @@ class DoctorMessageServiceImpl(
 
 
     @Tx(readOnly = true)
-    override fun findMessages(request: PagedCriteriaRequest<DoctorMessageCriteria>): PagedResponse<ApiMessage> {
+    override fun findMessages(request: PagedCriteriaRequest<PractitionerMessageCriteria>): PagedResponse<ApiMessage> {
         val requestCriteria = request.criteria
         val countCriteria = queryBuilder
                 .buildTotalCountQuery(requestCriteria)
@@ -85,17 +85,17 @@ class DoctorMessageServiceImpl(
     }
 
 
-    private fun mapToApiMessage(source: DoctorMessage): ApiMessage {
+    private fun mapToApiMessage(source: PractitionerMessageEntity): ApiMessage {
         return mapToApiMessages(listOf(source))
                 .first()
     }
 
-    private fun mapToApiMessages(source: List<DoctorMessage>): List<ApiMessage> {
+    private fun mapToApiMessages(source: List<PractitionerMessageEntity>): List<ApiMessage> {
         val practitionerIds = mutableListOf<String>()
         val clinicalImpressionIds = mutableListOf<String>()
 
         for (it in source) {
-            practitionerIds.add(it.doctorId)
+            practitionerIds.add(it.practitionerId)
             clinicalImpressionIds.add(it.clinicalImpressionId)
         }
 
@@ -110,9 +110,9 @@ class DoctorMessageServiceImpl(
             ApiMessage(
                     it.id,
                     it.dateTime,
-                    practitionersByIds[it.doctorId]
+                    practitionersByIds[it.practitionerId]
                             ?.firstOrNull()
-                            ?: throw EntityNotFoundException(it.doctorId),
+                            ?: throw EntityNotFoundException(it.practitionerId),
                     clinicalImpressionsByIds[it.clinicalImpressionId]
                             ?.firstOrNull()
                             ?: throw EntityNotFoundException(it.clinicalImpressionId),

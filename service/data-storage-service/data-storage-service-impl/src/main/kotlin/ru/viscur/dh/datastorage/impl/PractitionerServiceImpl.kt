@@ -12,7 +12,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.genId
 import ru.viscur.dh.fhir.model.utils.qualificationCategory
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
-import ru.viscur.dh.integration.doctorapp.api.DoctorAppEventPublisher
+import ru.viscur.dh.integration.practitioner.app.api.PractitionerAppEventPublisher
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -23,7 +23,7 @@ import javax.persistence.PersistenceContext
 class PractitionerServiceImpl(
         private val resourceService: ResourceService,
         private val conceptService: ConceptService,
-        private val doctorAppEventPublisher: DoctorAppEventPublisher
+        private val practitionerAppEventPublisher: PractitionerAppEventPublisher
 ) : PractitionerService {
 
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
@@ -80,7 +80,7 @@ class PractitionerServiceImpl(
 
     override fun updateBlocked(practitionerId: String, value: Boolean): Practitioner {
         if (!value) {
-            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
+            practitionerAppEventPublisher.publishPractitionerRemoved(practitionerId)
         }
         return resourceService.update(ResourceType.Practitioner, practitionerId) {
             extension.blocked = value
@@ -112,10 +112,9 @@ class PractitionerServiceImpl(
             extension.onWorkInOfficeId = officeIdIntr
         }
         if (value) {
-//            todo нужно вернуть
-//            doctorAppEventPublisher.publishPractitionerCreated(updatedPractitioner)
+            practitionerAppEventPublisher.publishPractitionerCreated(updatedPractitioner)
         } else {
-            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
+            practitionerAppEventPublisher.publishPractitionerRemoved(practitionerId)
         }
         return updatedPractitioner
     }

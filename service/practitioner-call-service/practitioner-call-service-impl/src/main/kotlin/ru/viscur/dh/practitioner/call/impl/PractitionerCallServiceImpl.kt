@@ -1,6 +1,9 @@
 package ru.viscur.dh.practitioner.call.impl
 
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.DependsOn
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import ru.viscur.dh.datastorage.api.LocationService
@@ -25,6 +28,9 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
 
 @Service
+@Order(Ordered.LOWEST_PRECEDENCE)
+
+@DependsOn("dsFlyway")
 class PractitionerCallServiceImpl(
         val practitionerService: PractitionerService,
         val practitionerCallStorageService: PractitionerCallStorageService,
@@ -42,7 +48,10 @@ class PractitionerCallServiceImpl(
     private fun postConstruct() {
         practitionerCallStorageService.getAllAwaitingRef()
                 .forEach {
-                    declineCall(DeclinePractitionerCallCmd(it.callId, CommandInitiator.System))
+                    var call = practitionerCallStorageService.byId(it.callId)
+                    call.status = CallStatus.Declined
+                    call = practitionerCallStorageService.updateCall(call)
+                    eventPublisher.publishEvent(PractitionerCallDeclinedEvent(call.id))
                 }
     }
 
@@ -69,7 +78,7 @@ class PractitionerCallServiceImpl(
         )
         val ref =
                 AwaitingPractitionerCallRef(
-                        call.id, call.dateTime, AwaitingCallStatusStage.DoctorAppCall
+                        call.id, call.dateTime, AwaitingCallStatusStage.PractitionerAppCall
                 )
         practitionerCallStorageService.createAwaitingRef(ref)
         awaitingRefs[call.id] = AwaitingPractitionerCallRefEntry(
@@ -146,7 +155,7 @@ class PractitionerCallServiceImpl(
      * Запускаем каждые 40 секунд и продвигаем ожидающие вызовы по стадиям ожидвния
      */
     @Scheduled(fixedDelay = 40_000)
-    private fun handleAwaitingCalls() {
+    protected fun handleAwaitingCalls() {
         val items = awaitingRefs.values.toList()
         for (awaitingRef in items) {
             if (!awaitingRef.awaiting) {
