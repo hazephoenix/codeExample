@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
-import ru.viscur.autotests.utils.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
@@ -28,29 +28,29 @@ class PatientLeft {
     @Test
     fun firstOnObservationPatientLeft() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle1 = Helpers.bundle("1111", "YELLOW", servRequests)
         val bundle2 = Helpers.bundle("1112", "GREEN", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
 
-        QueRequests.patientEntered(Helpers.createListResource(patientId1, office101Id))
+        QueRequests.patientEntered(Helpers.createListResource(patientId1, OFFICE_101_ID))
 
         //проверка, что в кабинете пациент на обследовании
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.ON_OBSERVATION),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
 
         //проверка, что пациент вышел из кабинета и его снова поставило в очередь в этот же кабинет, т.к. не пройдено обследование
-        QueRequests.patientLeft(Helpers.createListResource(patientId1, office101Id))
+        QueRequests.patientLeft(Helpers.createListResource(patientId1, OFFICE_101_ID))
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
@@ -60,31 +60,31 @@ class PatientLeft {
     @Test
     fun secondOnObservationPatientLeft() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-            Helpers.createServiceRequestResource(observation1Office101)
+            Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle1 = Helpers.bundle("1111", "YELLOW", servRequests)
         val bundle2 = Helpers.bundle("1112", "GREEN", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
 
-        QueRequests.patientEntered(Helpers.createListResource(patientId1, office101Id))
-        QueRequests.inviteNextPatientToOffice(referenceToLocation(office101Id))
-        QueRequests.patientEntered(Helpers.createListResource(patientId2, office101Id))
+        QueRequests.patientEntered(Helpers.createListResource(patientId1, OFFICE_101_ID))
+        QueRequests.inviteNextPatientToOffice(referenceToLocation(OFFICE_101_ID))
+        QueRequests.patientEntered(Helpers.createListResource(patientId2, OFFICE_101_ID))
 
         //проверка, что в кабинете пациенты на обследовании
         checkQueueItems(listOf(
-            QueueItemsOfOffice(office101Id, listOf(
+            QueueItemsOfOffice(OFFICE_101_ID, listOf(
                 QueueItemInfo(patientId1, PatientQueueStatus.ON_OBSERVATION),
                 QueueItemInfo(patientId2, PatientQueueStatus.ON_OBSERVATION)
             ))
         ))
 
         //проверка, что пациент второй пациент вышел из кабинета и его снова поставило в очередь в этот же кабинет, т.к. не пройдено обследование
-        QueRequests.patientLeft(Helpers.createListResource(patientId2, office101Id))
+        QueRequests.patientLeft(Helpers.createListResource(patientId2, OFFICE_101_ID))
         checkQueueItems(listOf(
-            QueueItemsOfOffice(office101Id, listOf(
+            QueueItemsOfOffice(OFFICE_101_ID, listOf(
                 QueueItemInfo(patientId1, PatientQueueStatus.ON_OBSERVATION),
                 QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
             ))
@@ -94,9 +94,9 @@ class PatientLeft {
     @Test
     fun wrongStatusPatientLeft() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle1 = Helpers.bundle("1111", "YELLOW", servRequests)
         val bundle2 = Helpers.bundle("1112", "GREEN", servRequests)
@@ -108,19 +108,19 @@ class PatientLeft {
 
         //проверка, что в кабинет есть очередь
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
 
         //проверка, что ничего не происходит, нельзя выйти из кабинета со статусов IN_QUEUE, GOING_TO_OBSERVATION, READY
-        QueRequests.patientLeft(Helpers.createListResource(patientId1, office101Id))
-        QueRequests.patientLeft(Helpers.createListResource(patientId2, office101Id))
-        QueRequests.patientLeft(Helpers.createListResource(patientId3, office101Id))
+        QueRequests.patientLeft(Helpers.createListResource(patientId1, OFFICE_101_ID))
+        QueRequests.patientLeft(Helpers.createListResource(patientId2, OFFICE_101_ID))
+        QueRequests.patientLeft(Helpers.createListResource(patientId3, OFFICE_101_ID))
 
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))

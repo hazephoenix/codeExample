@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
@@ -32,7 +32,7 @@ class ClinicalImpressionDuration {
         //создание пациента
         QueRequests.deleteQue()
         val servRequests = listOf(
-                createServiceRequestResource(observation1Office101)
+                createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle1 = bundle("1120", "GREEN", servRequests)
 

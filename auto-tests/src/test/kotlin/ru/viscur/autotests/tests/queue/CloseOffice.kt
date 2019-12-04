@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
-import ru.viscur.autotests.utils.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
@@ -27,9 +27,9 @@ class CloseOffice {
     @Test
     fun closingOfficeGoingToObservation() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundleRed1 = Helpers.bundle("1111", "RED", servRequests)
         val bundleRed2 = Helpers.bundle("1112", "RED", servRequests)
@@ -38,16 +38,16 @@ class CloseOffice {
 
         //проверка, что пациент на статусе GOING_TO_OBSERVATION
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
 
         //проверка, что кабинет не закрыть со статуса WAITING_PATIENT
-        QueRequests.officeIsClosed(referenceToLocation(office101Id))
+        QueRequests.officeIsClosed(referenceToLocation(OFFICE_101_ID))
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
                 ))
@@ -57,48 +57,48 @@ class CloseOffice {
     @Test
     fun closingOfficeInQueue() {
         //создание очереди
-        QueRequests.officeIsBusy(referenceToLocation(office101Id))
+        QueRequests.officeIsBusy(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundleRed1 = Helpers.bundle("1111", "RED", servRequests)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
 
         //проверка, что в кабинет стоит пациент
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
                 ))
         ))
 
         //проверка, что кабинет закрыт, очередь расформирована
-        QueRequests.officeIsClosed(referenceToLocation(office101Id))
+        QueRequests.officeIsClosed(referenceToLocation(OFFICE_101_ID))
         checkQueueItems(listOf())
     }
 
     @Test
     fun closingOfficeOnObservation() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundleRed1 = Helpers.bundle("1111", "RED", servRequests)
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundleRed1).resources(ResourceType.ServiceRequest))
-        QueRequests.patientEntered(Helpers.createListResource(patientId, office101Id))
-        QueRequests.officeIsClosed(referenceToLocation(office101Id))
+        QueRequests.patientEntered(Helpers.createListResource(patientId, OFFICE_101_ID))
+        QueRequests.officeIsClosed(referenceToLocation(OFFICE_101_ID))
 
         //проверка, что в кабинет стоит пациент
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
                 ))
         ))
 
         //проверка, что кабинет не закрыть со статуса ON_OBSERVATION
-        QueRequests.officeIsClosed(referenceToLocation(office101Id))
+        QueRequests.officeIsClosed(referenceToLocation(OFFICE_101_ID))
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
                 ))
         ))

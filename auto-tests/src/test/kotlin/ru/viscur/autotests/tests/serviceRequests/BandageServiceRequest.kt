@@ -7,8 +7,8 @@ import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.bandageOffice128
-import ru.viscur.autotests.utils.Constants.Companion.office128Id
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION_BANDAGE_OFFICE_128
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_128_ID
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.autotests.utils.checkServiceRequestsOfPatient
@@ -26,7 +26,7 @@ class BandageServiceRequest {
     @BeforeEach
     fun prepare() {
         QueRequests.deleteQue()
-        QueRequests.officeIsReady(referenceToLocation(office128Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_128_ID))
     }
 
     @Test
@@ -38,18 +38,18 @@ class BandageServiceRequest {
 
         //проверка, что у пациента только один Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = bandageOffice128, locationId = office128Id, status = ServiceRequestStatus.active)
+                ServiceRequestInfo(code = OBSERVATION_BANDAGE_OFFICE_128, locationId = OFFICE_128_ID, status = ServiceRequestStatus.active)
         ))
 
         //проверка, что пациента отправляет в кабинет для перевязки
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office128Id, listOf(
+                QueueItemsOfOffice(OFFICE_128_ID, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.GOING_TO_OBSERVATION)
                 ))
         ))
 
         //пациент вошел в кабинет
-        val bandageServRequestId = QueRequests.patientEntered(Helpers.createListResource(patientId, office128Id)).first().id
+        val bandageServRequestId = QueRequests.patientEntered(Helpers.createListResource(patientId, OFFICE_128_ID)).first().id
 
         //перевязка выполнена
         val observationBandage = Helpers.createObservation(

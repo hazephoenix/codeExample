@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.office101Id
-import ru.viscur.autotests.utils.Constants.Companion.practitioner1Office101
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
+import ru.viscur.autotests.utils.Constants.Companion.PRACTITIONER1_OFFICE_101
 import ru.viscur.autotests.utils.Helpers.Companion.surgeonId
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.type.CodeableConcept
@@ -45,20 +45,20 @@ class Dictionaries {
     @Test
     fun setPractitionerOnWork () {
         //practitioner не на работе
-        QueRequests.setPractitionerActivityAndLocation(practitioner1Office101, false)
+        QueRequests.setPractitionerActivityAndLocation(PRACTITIONER1_OFFICE_101, false)
 
         //проверка, что значения установлены
-        var practitionerInfo = QueRequests.getPractitionerById(practitioner1Office101)
-        assertEquals(false, practitionerInfo.extension.onWork, "wrong OnWork value for $practitioner1Office101")
-        assertNull(practitionerInfo.extension.onWorkInOfficeId, "wrong OnWorkInOfficeId value for $practitioner1Office101")
+        var practitionerInfo = QueRequests.getPractitionerById(PRACTITIONER1_OFFICE_101)
+        assertEquals(false, practitionerInfo.extension.onWork, "wrong OnWork value for $PRACTITIONER1_OFFICE_101")
+        assertNull(practitionerInfo.extension.onWorkInOfficeId, "wrong OnWorkInOfficeId value for $PRACTITIONER1_OFFICE_101")
 
         //practitioner на работе
-        QueRequests.setPractitionerActivityAndLocation(practitioner1Office101, true, office101Id)
+        QueRequests.setPractitionerActivityAndLocation(PRACTITIONER1_OFFICE_101, true, OFFICE_101_ID)
 
         //проверка, что значения установлены
-        practitionerInfo = QueRequests.getPractitionerById(practitioner1Office101)
-        assertEquals(true, practitionerInfo.extension.onWork, "wrong OnWork value for $practitioner1Office101")
-        assertEquals(office101Id, practitionerInfo.extension.onWorkInOfficeId, "wrong OnWorkInOfficeId value for $practitioner1Office101")
+        practitionerInfo = QueRequests.getPractitionerById(PRACTITIONER1_OFFICE_101)
+        assertEquals(true, practitionerInfo.extension.onWork, "wrong OnWork value for $PRACTITIONER1_OFFICE_101")
+        assertEquals(OFFICE_101_ID, practitionerInfo.extension.onWorkInOfficeId, "wrong OnWorkInOfficeId value for $PRACTITIONER1_OFFICE_101")
     }
 
     @Test

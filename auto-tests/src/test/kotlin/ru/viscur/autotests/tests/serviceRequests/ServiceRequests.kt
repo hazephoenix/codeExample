@@ -8,16 +8,16 @@ import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office116
-import ru.viscur.autotests.utils.Constants.Companion.observation2Office101
-import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
-import ru.viscur.autotests.utils.Constants.Companion.observationUrineOffice104
-import ru.viscur.autotests.utils.Constants.Companion.office101Id
-import ru.viscur.autotests.utils.Constants.Companion.office104Id
-import ru.viscur.autotests.utils.Constants.Companion.office116Id
-import ru.viscur.autotests.utils.Constants.Companion.office140Id
-import ru.viscur.autotests.utils.Constants.Companion.redZoneId
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_116
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION2_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION_OF_SURGEON
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION_URINE_OFFICE_104
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_104_ID
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_116_ID
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_140_ID
+import ru.viscur.autotests.utils.Constants.Companion.RED_ZONE_ID
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.Helpers.Companion.createListResource
 import ru.viscur.autotests.utils.checkQueueItems
@@ -42,19 +42,19 @@ class ServiceRequests {
     fun serviceRequestAdding() {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeon)
+                Helpers.createServiceRequestResource(OBSERVATION_OF_SURGEON)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
 
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId)
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID)
         ))
 
         //создание дополнительного Service Request
         val additionalServiceRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101, patientId)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101, patientId)
         )
         val bundleForExamin = Bundle(
                 entry = additionalServiceRequests.map { BundleEntry(it) }
@@ -64,8 +64,8 @@ class ServiceRequests {
         //проверка, что в в CarePlan добавлен новый ServiceRequest
         assertEquals(2, updatedCarePlan.activity.size, "wrong care plan activities")
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId, status = ServiceRequestStatus.active),
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.active)
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.active)
         ))
     }
 
@@ -73,27 +73,27 @@ class ServiceRequests {
     fun activeServiceRequestCancellingById () {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeon),
-                Helpers.createServiceRequestResource(observation1Office101),
-                Helpers.createServiceRequestResource(observation2Office101)
+                Helpers.createServiceRequestResource(OBSERVATION_OF_SURGEON),
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101),
+                Helpers.createServiceRequestResource(OBSERVATION2_OFFICE_101)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
         val serviceRequests= QueRequests.createPatient(bundle).resources(ResourceType.ServiceRequest)
-        val serviceRequestId = serviceRequests.find {it.code.code()== observation1Office101}!!.id
+        val serviceRequestId = serviceRequests.find {it.code.code()== OBSERVATION1_OFFICE_101}!!.id
         val patientId = patientIdFromServiceRequests(serviceRequests)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId, status = ServiceRequestStatus.active),
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.active),
-                ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.active)
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = OBSERVATION2_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.active)
 
         ))
 
         //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelServiceRequest(serviceRequestId)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId, status = ServiceRequestStatus.active),
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled),
-                ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.active)
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.cancelled),
+                ServiceRequestInfo(code = OBSERVATION2_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.active)
         ))
     }
 
@@ -101,11 +101,11 @@ class ServiceRequests {
     fun WaitingResultServiceRequestCancellingById () {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeon),
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION_OF_SURGEON),
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val serviceRequests= QueRequests.createPatient(bundle).resources(ResourceType.ServiceRequest)
         val serviceRequest = serviceRequests.get(0)
         val patientId = patientIdFromServiceRequests(serviceRequests)
@@ -119,8 +119,8 @@ class ServiceRequests {
         //отмена и проверка что отменные Service Request перешли статус cancelled
         QueRequests.cancelServiceRequest(serviceRequest.id)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(observationOfSurgeon, locationId = redZoneId),
-                ServiceRequestInfo(observation1Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled)
+                ServiceRequestInfo(OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID),
+                ServiceRequestInfo(OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.cancelled)
         ))
     }
 
@@ -128,8 +128,8 @@ class ServiceRequests {
     fun ServiceRequestByOfficeCancelling () {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101),
-                Helpers.createServiceRequestResource(observation2Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101),
+                Helpers.createServiceRequestResource(OBSERVATION2_OFFICE_101)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
 
@@ -137,17 +137,17 @@ class ServiceRequests {
         val patientId = patientIdFromServiceRequests(serviceRequests)
 
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id),
-                ServiceRequestInfo(code = observation2Office101, locationId = office101Id),
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId)
+                ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID),
+                ServiceRequestInfo(code = OBSERVATION2_OFFICE_101, locationId = OFFICE_101_ID),
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID)
         ))
 
         //отмена и проверка что отменные Service Request перешли статус cancelled
-        QueRequests.cancelOfficeServiceRequests(patientId, office101Id)
+        QueRequests.cancelOfficeServiceRequests(patientId, OFFICE_101_ID)
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled),
-                ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.cancelled),
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId)
+                ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.cancelled),
+                ServiceRequestInfo(code = OBSERVATION2_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.cancelled),
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID)
         ))
     }
 
@@ -155,8 +155,8 @@ class ServiceRequests {
     fun ServiceRequestWrongOfficeCancelling () {
         //создание пациента
         val servRequests = listOf(
-            Helpers.createServiceRequestResource(observation1Office101),
-            Helpers.createServiceRequestResource(observation2Office101)
+            Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101),
+            Helpers.createServiceRequestResource(OBSERVATION2_OFFICE_101)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
 
@@ -164,17 +164,17 @@ class ServiceRequests {
         val patientId = patientIdFromServiceRequests(serviceRequests)
 
         checkServiceRequestsOfPatient(patientId, listOf(
-            ServiceRequestInfo(code = observation1Office101, locationId = office101Id),
-            ServiceRequestInfo(code = observation2Office101, locationId = office101Id),
-            ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId)
+            ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID),
+            ServiceRequestInfo(code = OBSERVATION2_OFFICE_101, locationId = OFFICE_101_ID),
+            ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID)
         ))
 
         //отмена сервис реквестов в неверный офис и проверка что ничего не происходит
-        QueRequests.cancelOfficeServiceRequests(patientId, office116Id)
+        QueRequests.cancelOfficeServiceRequests(patientId, OFFICE_116_ID)
         checkServiceRequestsOfPatient(patientId, listOf(
-            ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.active),
-            ServiceRequestInfo(code = observation2Office101, locationId = office101Id, status = ServiceRequestStatus.active),
-            ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId, status = ServiceRequestStatus.active)
+            ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.active),
+            ServiceRequestInfo(code = OBSERVATION2_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.active),
+            ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID, status = ServiceRequestStatus.active)
         ))
     }
 
@@ -182,38 +182,38 @@ class ServiceRequests {
     fun gettingRightServiceRequestsInOffice() {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101),
-                Helpers.createServiceRequestResource(observation1Office116),
-                Helpers.createServiceRequestResource(observation2Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101),
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_116),
+                Helpers.createServiceRequestResource(OBSERVATION2_OFFICE_101)
         )
         val bundle1 = Helpers.bundle("1122", "RED", servRequests)
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
 
         //вход в кабинет
-        val servRequestsInOffice = QueRequests.patientEntered(Helpers.createListResource(patientId, office101Id))
+        val servRequestsInOffice = QueRequests.patientEntered(createListResource(patientId, OFFICE_101_ID))
 
         //проверка, что в кабинете соответствующие Service Requests
-        assertEquals(2, servRequestsInOffice.size, "wrong number of service requests in $office101Id")
-        assertEquals(observation1Office101, servRequestsInOffice.find{it.code.code() == observation1Office101 }?.code!!.code() , "wrong service request in office")
-        assertEquals(observation2Office101, servRequestsInOffice.find{it.code.code() == observation2Office101 }?.code!!.code(), "wrong service request in office")
+        assertEquals(2, servRequestsInOffice.size, "wrong number of service requests in $OFFICE_101_ID")
+        assertEquals(OBSERVATION1_OFFICE_101, servRequestsInOffice.find{it.code.code() == OBSERVATION1_OFFICE_101 }?.code!!.code() , "wrong service request in office")
+        assertEquals(OBSERVATION2_OFFICE_101, servRequestsInOffice.find{it.code.code() == OBSERVATION2_OFFICE_101 }?.code!!.code(), "wrong service request in office")
     }
 
     @Test
     fun gettingAllServiceRequestsWhenEnteredWrongOffice() {
         //создание пациента
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101),
-                Helpers.createServiceRequestResource(observation1Office116),
-                Helpers.createServiceRequestResource(observation2Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101),
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_116),
+                Helpers.createServiceRequestResource(OBSERVATION2_OFFICE_101)
         )
         val bundle1 = Helpers.bundle("1111", "GREEN", servRequests)
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
 
         //пациент вошел в офис, в котором у него не назначены обследования
-        QueRequests.invitePatientToOffice(createListResource(patientId, office140Id))
-        val allActServRequest = QueRequests.patientEntered(createListResource(patientId, office140Id))
+        QueRequests.invitePatientToOffice(createListResource(patientId, OFFICE_140_ID))
+        val allActServRequest = QueRequests.patientEntered(createListResource(patientId, OFFICE_140_ID))
 
         //проверка, что в офисе, в котором не назначены обследования получаем список всех Service Request пациента
         assertEquals(4, allActServRequest.size, "wrong service requests for patient $patientId")
@@ -223,22 +223,22 @@ class ServiceRequests {
     fun urineServiceRequestIgnoring() {
         //создание пациента с обследованиям мочи и приёмом ответственного
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeon),
-                Helpers.createServiceRequestResource(observationUrineOffice104)
+                Helpers.createServiceRequestResource(OBSERVATION_OF_SURGEON),
+                Helpers.createServiceRequestResource(OBSERVATION_URINE_OFFICE_104)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-        QueRequests.officeIsBusy(referenceToLocation(redZoneId))
+        QueRequests.officeIsBusy(referenceToLocation(RED_ZONE_ID))
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle).resources(ResourceType.ServiceRequest))
 
         //проверка, что анализ мочи есть в Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationUrineOffice104, locationId = office104Id, status = ServiceRequestStatus.active),
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId)
+                ServiceRequestInfo(code = OBSERVATION_URINE_OFFICE_104, locationId = OFFICE_104_ID, status = ServiceRequestStatus.active),
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID)
         ))
 
         //проверка, что анализ мочи игнорируется и пациента сразу отправляет на приём к ответственному
         checkQueueItems(listOf(
-                QueueItemsOfOffice(redZoneId, listOf(
+                QueueItemsOfOffice(RED_ZONE_ID, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
                 ))
         ))

@@ -1,15 +1,13 @@
 package ru.viscur.autotests.tests.reports
 
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office149
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office202
-import ru.viscur.autotests.utils.Constants.Companion.office149Id
-import ru.viscur.autotests.utils.Helpers
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_149
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_202
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_149_ID
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createObservation
 import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
@@ -27,15 +25,15 @@ class PatientReport {
     fun patientObservationHistory() {
         //регистрация пациента и создание истории обследований
         val servRequests = listOf(
-                createServiceRequestResource(observation1Office202),
-                createServiceRequestResource(observation1Office101)
+                createServiceRequestResource(OBSERVATION1_OFFICE_202),
+                createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle = bundle("9999", Severity.RED.toString(), servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
         val serviceRequestsFromResponse = responseBundle.resources(ResourceType.ServiceRequest)
         val patientId = patientIdFromServiceRequests(serviceRequestsFromResponse)
-        val xrayServiceRequestId = serviceRequestsFromResponse.find{it.code.code() == observation1Office202}!!.id
-        val bloodServiceRequestId = serviceRequestsFromResponse.find{it.code.code() == observation1Office101}!!.id
+        val xrayServiceRequestId = serviceRequestsFromResponse.find{it.code.code() == OBSERVATION1_OFFICE_202}!!.id
+        val bloodServiceRequestId = serviceRequestsFromResponse.find{it.code.code() == OBSERVATION1_OFFICE_101}!!.id
 
         //создание информации о длительности проведения обследований
         QueRequests.startObservation(xrayServiceRequestId)
@@ -46,10 +44,10 @@ class PatientReport {
         val observationsOfPatient = QueRequests.getPatientObservationHistory(patientId)
 
         //проверка, что обледования попали в историю обследований пациента за последние сутки
-        assertNotNull(observationsOfPatient.find{it.code == observation1Office202}?.code, "no $observation1Office202 in history")
-        assertNotNull(observationsOfPatient.find{it.code == observation1Office202}?.duration, "patient $observation1Office202 duration in history is null")
-        assertNotNull(observationsOfPatient.find{it.code == observation1Office101}?.code, "no $observation1Office101 in history")
-        assertNotNull(observationsOfPatient.find{it.code == observation1Office101}?.duration, "patient $observation1Office101 duration in history is null")
+        assertNotNull(observationsOfPatient.find{it.code == OBSERVATION1_OFFICE_202}?.code, "no $OBSERVATION1_OFFICE_202 in history")
+        assertNotNull(observationsOfPatient.find{it.code == OBSERVATION1_OFFICE_202}?.duration, "patient $OBSERVATION1_OFFICE_202 duration in history is null")
+        assertNotNull(observationsOfPatient.find{it.code == OBSERVATION1_OFFICE_101}?.code, "no $OBSERVATION1_OFFICE_101 in history")
+        assertNotNull(observationsOfPatient.find{it.code == OBSERVATION1_OFFICE_101}?.duration, "patient $OBSERVATION1_OFFICE_101 duration in history is null")
     }
 
     @Test
@@ -59,13 +57,13 @@ class PatientReport {
         val expectedStatusInQueue = "IN_QUEUE"
 
         QueRequests.deleteQue()
-        QueRequests.officeIsBusy(referenceToLocation(office149Id))
+        QueRequests.officeIsBusy(referenceToLocation(OFFICE_149_ID))
         val servRequests = listOf(
-                createServiceRequestResource(observation1Office149)
+                createServiceRequestResource(OBSERVATION1_OFFICE_149)
         )
         val bundle = bundle("9998", Severity.RED.toString(), servRequests)
         val responseBundle = QueRequests.createPatient(bundle).resources(ResourceType.ServiceRequest)
-        QueRequests.officeIsReady(referenceToLocation(office149Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_149_ID))
         val patientId = patientIdFromServiceRequests(responseBundle)
 
         //получение истории очереди пациента за последние сутки
@@ -74,6 +72,6 @@ class PatientReport {
         //проверка, что в истории пациента есть записи о продолжительности нахождения в очереди по статусам
         assertNotNull(patientQueueHistory.find{it.status == expectedStatusRdy}!!.duration, "patient status ready duration is null")
         assertNotNull(patientQueueHistory.find{it.status == expectedStatusInQueue}!!.duration, "patient status inqueue duration is null")
-        assertNotNull(patientQueueHistory.find{it.officeId == office149Id}!!.duration, "patient queue for $office149Id duration is null")
+        assertNotNull(patientQueueHistory.find{it.officeId == OFFICE_149_ID}!!.duration, "patient queue for $OFFICE_149_ID duration is null")
     }
 }

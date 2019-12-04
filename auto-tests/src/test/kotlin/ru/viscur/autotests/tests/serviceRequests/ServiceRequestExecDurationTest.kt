@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
-import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
-import ru.viscur.autotests.utils.Constants.Companion.office101Id
-import ru.viscur.autotests.utils.Constants.Companion.redZoneId
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION_OF_SURGEON
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
+import ru.viscur.autotests.utils.Constants.Companion.RED_ZONE_ID
 import ru.viscur.autotests.utils.*
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.ServiceRequestStatus
@@ -28,12 +28,12 @@ class ServiceRequestExecDurationTest {
 
         QueRequests.deleteQue()
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
 
-        QueRequests.officeIsBusy(referenceToLocation(office101Id))
-        QueRequests.officeIsBusy(referenceToLocation(redZoneId))
+        QueRequests.officeIsBusy(referenceToLocation(OFFICE_101_ID))
+        QueRequests.officeIsBusy(referenceToLocation(RED_ZONE_ID))
 
         //регистрация пациента
         val responseBundle = QueRequests.createPatient(bundle)
@@ -42,14 +42,14 @@ class ServiceRequestExecDurationTest {
         val patientId = patientIdFromServiceRequests(serviceRequestsFromResponse)
 
         //кабинет READY
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
 
         //пациент вошел в кабинет
-        val patientEnteredListResource = Helpers.createListResource(patientId, office101Id)
+        val patientEnteredListResource = Helpers.createListResource(patientId, OFFICE_101_ID)
         var actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
 
         //началась услуга
-        val bloodServiceRequestId = serviceRequestsFromResponse.find { it.code.code() == observation1Office101 }!!.id
+        val bloodServiceRequestId = serviceRequestsFromResponse.find { it.code.code() == OBSERVATION1_OFFICE_101 }!!.id
         QueRequests.startObservation(bloodServiceRequestId)
 
         //время выполнения 3 сек
@@ -60,8 +60,8 @@ class ServiceRequestExecDurationTest {
 
         //проверка, что услуга сохранилась длительностью 3 сек
         checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = observationOfSurgeon, locationId = redZoneId),
-                ServiceRequestInfo(code = observation1Office101, locationId = office101Id, status = ServiceRequestStatus.waiting_result, execDuration = 3)
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID),
+                ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID, status = ServiceRequestStatus.waiting_result, execDuration = 3)
         ))
     }
 }

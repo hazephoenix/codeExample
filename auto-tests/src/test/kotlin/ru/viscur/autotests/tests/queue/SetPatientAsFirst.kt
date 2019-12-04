@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.QueueItemInfo
 import ru.viscur.autotests.dto.QueueItemsOfOffice
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
-import ru.viscur.autotests.utils.Constants.Companion.office101Id
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
 import ru.viscur.autotests.utils.Helpers
 import ru.viscur.autotests.utils.checkQueueItems
 import ru.viscur.autotests.utils.patientIdFromServiceRequests
@@ -27,9 +27,9 @@ class SetPatientAsFirst {
     @Test
     fun settingPatientAsFirstOnlyInQueue () {
         //создание очереди
-        QueRequests.officeIsBusy(referenceToLocation(office101Id))
+        QueRequests.officeIsBusy(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle1 = Helpers.bundle("1111", "GREEN", servRequests)
         val bundle2 = Helpers.bundle("1112", "YELLOW", servRequests)
@@ -40,7 +40,7 @@ class SetPatientAsFirst {
 
         //проверка, что в кабинет есть очередь
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE)
@@ -48,9 +48,9 @@ class SetPatientAsFirst {
         ))
 
         //проверка, что зеленый пациент поставлен первым в очереди
-        QueRequests.setPatientFirst(Helpers.createListResource(patientId1, office101Id))
+        QueRequests.setPatientFirst(Helpers.createListResource(patientId1, OFFICE_101_ID))
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId3, PatientQueueStatus.IN_QUEUE),
                         QueueItemInfo(patientId2, PatientQueueStatus.IN_QUEUE)
@@ -61,9 +61,9 @@ class SetPatientAsFirst {
     @Test
     fun settingPatientAsFirstWithGoingToObservationAndOnObservation() {
         //создание очереди
-        QueRequests.officeIsReady(referenceToLocation(office101Id))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
         val servRequests = listOf(
-                Helpers.createServiceRequestResource(observation1Office101)
+                Helpers.createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle1 = Helpers.bundle("1111", "GREEN", servRequests)
         val bundle2 = Helpers.bundle("1112", "YELLOW", servRequests)
@@ -73,13 +73,13 @@ class SetPatientAsFirst {
         val patientId2 = patientIdFromServiceRequests(QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest))
         val patientId3 = patientIdFromServiceRequests(QueRequests.createPatient(bundle3).resources(ResourceType.ServiceRequest))
         val patientId4 = patientIdFromServiceRequests(QueRequests.createPatient(bundle4).resources(ResourceType.ServiceRequest))
-        QueRequests.inviteNextPatientToOffice(referenceToLocation(office101Id))
-        QueRequests.patientEntered(Helpers.createListResource(patientId1, office101Id))
+        QueRequests.inviteNextPatientToOffice(referenceToLocation(OFFICE_101_ID))
+        QueRequests.patientEntered(Helpers.createListResource(patientId1, OFFICE_101_ID))
 
         //проверка, что зеленый пациент поставлен первым в очередь после ON_OBSERVATION, GOING_TO_OBSERVATION
-        QueRequests.setPatientFirst(Helpers.createListResource(patientId4, office101Id))
+        QueRequests.setPatientFirst(Helpers.createListResource(patientId4, OFFICE_101_ID))
         checkQueueItems(listOf(
-                QueueItemsOfOffice(office101Id, listOf(
+                QueueItemsOfOffice(OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId1, PatientQueueStatus.ON_OBSERVATION),
                         QueueItemInfo(patientId3, PatientQueueStatus.GOING_TO_OBSERVATION),
                         QueueItemInfo(patientId4, PatientQueueStatus.IN_QUEUE),

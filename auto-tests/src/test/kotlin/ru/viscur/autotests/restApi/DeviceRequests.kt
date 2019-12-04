@@ -16,8 +16,7 @@ class DeviceRequests {
         fun getTaskStatus(taskId: String) =
                 Helpers.createRequestSpecWithoutBody().`when`().get(Endpoints.GET_TASK_STATUS + "/$taskId").
                         then().statusCode(200).log().all().
-                        extract().response().`as`(TaskInfo::class.java)
-
+                        extract().response().asString()
         fun getTaskResult(taskId: String) =
                 Helpers.createRequestSpecWithoutBody().`when`().
                         get(Endpoints.GET_TASK_RESULT + "/$taskId").

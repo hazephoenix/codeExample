@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.ServiceRequestInfo
 import ru.viscur.autotests.restApi.QueRequests
-import ru.viscur.autotests.utils.Constants.Companion.observation1Office101
-import ru.viscur.autotests.utils.Constants.Companion.observationOfSurgeon
-import ru.viscur.autotests.utils.Constants.Companion.office101Id
-import ru.viscur.autotests.utils.Constants.Companion.redZoneId
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION_OF_SURGEON
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
+import ru.viscur.autotests.utils.Constants.Companion.RED_ZONE_ID
 import ru.viscur.autotests.utils.*
 import ru.viscur.autotests.utils.Helpers.Companion.bundle
 import ru.viscur.autotests.utils.Helpers.Companion.createDiagnosticReportResource
@@ -71,7 +71,7 @@ class Examinations {
     fun addingExaminationWithActiveObservation() {
         //создание пациента
         val servRequests = listOf(
-                createServiceRequestResource(observation1Office101)
+                createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle = bundle("7879", Severity.RED.toString(), servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
@@ -108,7 +108,7 @@ class Examinations {
     fun cancelingClinicalImpression() {
         //создание пациента
         val servRequests = listOf(
-                createServiceRequestResource(observation1Office101)
+                createServiceRequestResource(OBSERVATION1_OFFICE_101)
         )
         val bundle = bundle("7879", "RED", servRequests)
         val responseBundle = QueRequests.createPatient(bundle)
@@ -117,13 +117,13 @@ class Examinations {
         //проверка наличия активных Service Request
         checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestInfo(
-                        code = observationOfSurgeon,
-                        locationId = redZoneId,
+                        code = OBSERVATION_OF_SURGEON,
+                        locationId = RED_ZONE_ID,
                         status = ServiceRequestStatus.active
                 ),
                 ServiceRequestInfo(
-                        code = observation1Office101,
-                        locationId = office101Id,
+                        code = OBSERVATION1_OFFICE_101,
+                        locationId = OFFICE_101_ID,
                         status = ServiceRequestStatus.active
                 )
         ))
