@@ -1,4 +1,4 @@
-package ru.viscur.autotests.tests
+package ru.viscur.autotests.tests.queue
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
