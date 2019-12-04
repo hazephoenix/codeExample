@@ -9,7 +9,6 @@ import javax.persistence.*
  * Продолжительность проведения обследований/услуг по умолчанию
  *
  * @param code код услуги из [ru.viscur.dh.fhir.model.valueSets.ValueSetName.OBSERVATION_TYPES]
- * @param diagnosis код диагноза из [ru.viscur.dh.fhir.model.valueSets.ValueSetName.ICD_10]
  * @param severity степень тяжести пациента, [Severity]
  * @param duration продолжительность, в секундах
  */
@@ -22,8 +21,6 @@ data class ObservationDefaultDuration(
         var id: Long = 0L,
         @Column
         var code: String? = null,
-        @Column
-        var diagnosis: String? = null,
         @Column
         var severity: String? = null,
         @Column

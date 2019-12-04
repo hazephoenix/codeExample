@@ -67,7 +67,7 @@ class ObservationDurationEstimationServiceImpl(
 
     override fun estimate(code: String, diagnosis: String, severity: Severity): Int {
         return (avgByHistory(code, diagnosis, severity)
-                ?: defaultDurationRepository.findFirstByCodeIsAndDiagnosisIsAndSeverityIs(code, diagnosis, severity.name)?.duration)
+                ?: defaultDurationRepository.findFirstByCodeIsAndSeverityIs(code, severity.name)?.duration)
                 ?: 10 * SECONDS_IN_MINUTE
     }
 
