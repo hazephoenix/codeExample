@@ -15,7 +15,7 @@ interface DoctorAppEventPublisher {
 
     /**
      * Врач удален (один из доступных для выбора)
-     * @param ID врача ([Practitioner.id])
+     * @param practitionerId ID врача ([Practitioner.id])
      */
     fun publishDoctorRemoved(practitionerId: String);
 
