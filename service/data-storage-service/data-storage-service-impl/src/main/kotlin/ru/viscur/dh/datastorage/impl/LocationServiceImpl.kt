@@ -9,6 +9,7 @@ import ru.viscur.dh.fhir.model.entity.Location
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.utils.criticalTimeForDeletingNextOfficeForPatientsInfo
+import ru.viscur.dh.fhir.model.valueSets.LocationType
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -85,5 +86,11 @@ class LocationServiceImpl(
             from location r 
         """.trimIndent())
         return query.fetchResourceList()
+    }
+
+    override fun isZone(locationId: String): Boolean {
+        val location = byId(locationId)
+        val locationType = location.type()
+        return locationType in listOf(LocationType.GREEN_ZONE.id, LocationType.YELLOW_ZONE.id, LocationType.RED_ZONE.id)
     }
 }

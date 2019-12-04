@@ -62,7 +62,7 @@ class DurationControlTest {
     lateinit var durationEstimationService: ObservationDurationEstimationService
 
     @Test
-    fun `cancel by id, multiple servReqs in office with waiting result`() {
+    fun test() {
         forTestService.cleanDb()
         durationEstimationService.deleteAllHistory()
         queueManagerService.recalcNextOffice(false)

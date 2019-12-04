@@ -8,10 +8,13 @@ import ru.viscur.dh.datastorage.api.util.CLINICAL_IMPRESSION
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.isInspectionOfResp
 import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.utils.resources
 import ru.viscur.dh.integration.mis.api.ExaminationService
 import ru.viscur.dh.integration.mis.api.ObservationInCarePlanService
+import ru.viscur.dh.queue.api.QueueForPractitionersInformService
 import ru.viscur.dh.queue.api.QueueManagerService
 
 /**
@@ -27,7 +30,8 @@ class ExaminationServiceImpl(
         private val observationService: ObservationService,
         private val observationInCarePlanService: ObservationInCarePlanService,
         private val diagnosisPredictor: DiagnosisPredictor,
-        private val observationDurationService: ObservationDurationEstimationService
+        private val observationDurationService: ObservationDurationEstimationService,
+        private val queueForPractitionersInformService: QueueForPractitionersInformService
 ) : ExaminationService {
 
     @Tx
@@ -43,6 +47,9 @@ class ExaminationServiceImpl(
         queueManagerService.deleteFromQueue(patientId)
         queueManagerService.calcServiceRequestExecOrders(patientId, prevOfficeId)
         queueManagerService.addToQueue(patientId, prevOfficeId)
+        carePlan.author?.run {
+            queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.id!!)
+        }
         return carePlan
     }
 
@@ -76,6 +83,13 @@ class ExaminationServiceImpl(
     @Tx
     override fun cancelClinicalImpression(patientId: String) {
         queueManagerService.deleteFromQueue(patientId)
+        clinicalImpressionService.hasActive(patientId)?.run {
+            this.assessor?.run {
+                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.id!!)
+            }
+            val serviceRequestsWillBeCancelled = serviceRequestService.active(patientId)
+            informAboutCancellingServiceRequests(patientId, serviceRequestsWillBeCancelled)
+        }
         clinicalImpressionService.cancelActive(patientId)
     }
 
@@ -85,12 +99,14 @@ class ExaminationServiceImpl(
         val cancelledServiceRequests = serviceRequestService.cancelServiceRequests(patientId, officeId)
         if (cancelledServiceRequests.isNotEmpty()) {
             queueManagerService.rebasePatientIfNeeded(patientId, officeId)
+            informAboutCancellingServiceRequests(patientId, cancelledServiceRequests)
         }
     }
 
     @Tx
     override fun cancelServiceRequest(id: String) {
         val cancelledServiceRequest = serviceRequestService.cancelServiceRequest(id)
+        informAboutCancellingServiceRequests(cancelledServiceRequest.subject!!.id!!, listOf(cancelledServiceRequest))
         observationService.cancelByBaseOnServiceRequestId(id)
         val officeId = cancelledServiceRequest.locationReference?.first()?.id
         officeId?.run {
@@ -103,6 +119,21 @@ class ExaminationServiceImpl(
         val updated = patientService.updateSeverity(patientId, severity)
         if (updated) {
             queueManagerService.severityUpdated(patientId, severity)
+        }
+    }
+
+    /**
+     * Информирование о том, что назначения отменяются
+     */
+    private fun informAboutCancellingServiceRequests(patientId: String, cancelledServiceRequests: List<ServiceRequest>) {
+        cancelledServiceRequests.find { it.isInspectionOfResp() }?.run {
+            if (this.performer != null) {
+                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.performer!!.first().id!!)
+            }
+        }
+        val cancelledServiceRequestsInspectionNotResp = cancelledServiceRequests.filter { it.isInspection() && !it.isInspectionOfResp() }
+        if (cancelledServiceRequestsInspectionNotResp.isNotEmpty()) {
+            queueForPractitionersInformService.patientDontNeedInspectionAnymore(patientId, cancelledServiceRequestsInspectionNotResp.map { it.code.code() })
         }
     }
 }

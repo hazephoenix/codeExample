@@ -17,6 +17,8 @@ import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.entity.Bundle
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.BundleEntry
+import ru.viscur.dh.fhir.model.utils.code
+import ru.viscur.dh.fhir.model.utils.isInspectionOfResp
 import ru.viscur.dh.integration.mis.api.ExaminationService
 import ru.viscur.dh.integration.mis.api.ObservationInCarePlanService
 import ru.viscur.dh.integration.mis.api.ReceptionService
@@ -51,6 +53,9 @@ class QueueOfPractitionerTest {
     lateinit var observationInCarePlanService: ObservationInCarePlanService
 
     @Autowired
+    lateinit var serviceRequestService: ServiceRequestService
+
+    @Autowired
     lateinit var practitionerService: PractitionerService
 
     @Test
@@ -60,14 +65,16 @@ class QueueOfPractitionerTest {
         forTestService.updateOfficeStatuses()
         queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
 
+        val practitionerId = Helpers.diagnosticAssistantId
+        practitionerService.updateOnWork(practitionerId, true, OFFICE_101)
+        practitionerService.updateOnWork(Helpers.surgeonId, true)
+        practitionerService.updateOnWork(Helpers.urologistId, true)
+        practitionerService.updateOnWork(Helpers.urologist2Id, true)
+
         val servReqsFromRegister = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
         val patientId = servReqsFromRegister.first().subject!!.id!!
-
-        val practitionerId = Helpers.diagnosticAssistantId
-        practitionerService.updateOnWork(practitionerId, true, OFFICE_101)
-
 
         forTestService.checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),
@@ -132,10 +139,59 @@ class QueueOfPractitionerTest {
         forTestService.checkQueueForPractitioner(Helpers.urologist2Id, queueItems = listOf(
                 QueueItemSimple(patientId = patientId)
         ))
+
+        //уролог1 проводит осмотр. например, прям в зоне, зная id назначения
+        var servReqId = serviceRequestService.active(patientId).find { it.code.code() == INSPECTION_OF_UROLOGIST }!!.id
+        observationService.start(servReqId)
+        val observation = Helpers.createObservation(
+                basedOnServiceRequestId = servReqId,
+                status = ObservationStatus.final,
+                practitionerId = Helpers.urologistId
+        )
+        observationInCarePlanService.create(observation)
+
+        //у урологов нет очереди
+        forTestService.checkQueueForPractitioner(Helpers.urologistId, queueItems = listOf(
+        ))
+        forTestService.checkQueueForPractitioner(Helpers.urologist2Id, queueItems = listOf(
+        ))
+
+        //пациент снова попадает в очередь к отв.
+        forTestService.checkQueueForPractitioner(Helpers.surgeonId, queueItems = listOf(
+                QueueItemSimple(patientId = patientId)
+        ))
+
+        //отв. завершает обращение
+        servReqId = serviceRequestService.active(patientId).find { it.code.code() == INSPECTION_OF_SURGEON && it.isInspectionOfResp() }!!.id
+        val obsOfRespPract = Helpers.createObservation(
+                valueString = "состояние удовлетворительное",
+                practitionerId = Helpers.surgeonId,
+                basedOnServiceRequestId = servReqId,
+                status = ObservationStatus.final
+        )
+        val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
+                diagnosisCode = "A00.0",
+                practitionerId = Helpers.surgeonId,
+                status = DiagnosticReportStatus.final
+        )
+        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму")
+        val bundleForExamination = Bundle(entry = listOf(
+                BundleEntry(obsOfRespPract),
+                BundleEntry(diagnosticReportOfResp),
+                BundleEntry(encounter)
+        ))
+        examinationService.completeExamination(bundleForExamination)
+
+        //у отв. нет очереди
+        forTestService.checkQueueForPractitioner(Helpers.surgeonId, queueItems = listOf(
+        ))
     }
 
     @AfterEach
     fun after() {
         practitionerService.updateOnWork(Helpers.diagnosticAssistantId, false)
+        practitionerService.updateOnWork(Helpers.surgeonId, false)
+        practitionerService.updateOnWork(Helpers.urologistId, false)
+        practitionerService.updateOnWork(Helpers.urologist2Id, false)
     }
 }

@@ -17,6 +17,7 @@ import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.utils.*
 import ru.viscur.dh.queue.api.LocationMonitorInformService
 import ru.viscur.dh.queue.api.OfficeService
+import ru.viscur.dh.queue.api.QueueForPractitionersInformService
 import ru.viscur.dh.queue.impl.SEVERITY_WITH_PRIORITY
 import ru.viscur.dh.transaction.desc.config.annotation.Tx
 
@@ -26,7 +27,8 @@ class OfficeServiceImpl(
         private val patientService: PatientService,
         private val resourceService: ResourceService,
         private val queueService: QueueService,
-        private val locationMonitorInformService: LocationMonitorInformService
+        private val locationMonitorInformService: LocationMonitorInformService,
+        private val queueForPractitionersInformService: QueueForPractitionersInformService
 ) : OfficeService {
 
     override fun all() = resourceService.all(ResourceType.Location, RequestBodyForResources(
@@ -60,7 +62,7 @@ class OfficeServiceImpl(
                 estDuration = estDuration,
                 queueCode = patientService.queueCode(patientId)
         )
-        val queue = queueService.queueItemsOfOffice(officeId)
+        var queue = queueService.queueItemsOfOffice(officeId)
         if (toIndex != null) {
             queue.add(queue.indexOfLast { it.patientQueueStatus in listOf(PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.ON_OBSERVATION) } + 1 + toIndex, queueItem)
         } else {
@@ -84,7 +86,8 @@ class OfficeServiceImpl(
                 }
             }
         }
-        saveQueue(officeId, queue)
+        queue = saveQueue(officeId, queue)
+        queueForPractitionersInformService.patientAddedToOfficeQueue(patientId, officeId, queue.find { it.subject.id == patientId }!!.onum!!, estDuration)
     }
 
     @Tx
@@ -92,18 +95,11 @@ class OfficeServiceImpl(
             queueService.queueItemsOfOffice(officeId).filter { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }.firstOrNull()?.subject?.id
 
     @Tx
-    override fun deleteFirstPatientFromQueue(officeId: String) {
-        val queue = queueService.queueItemsOfOffice(officeId)
-        if (queue.isEmpty()) return
-        queue.removeAt(0)
-        saveQueue(officeId, queue)
-    }
-
-    @Tx
     override fun deletePatientFromQueue(officeId: String, patientId: String) {
         val queue = queueService.queueItemsOfOffice(officeId)
         queue.removeAt(queue.indexOfFirst { it.subject.id == patientId })
         saveQueue(officeId, queue)
+        queueForPractitionersInformService.patientDeletedFromOfficeQueue(patientId, officeId)
     }
 
     @Tx
@@ -132,8 +128,8 @@ class OfficeServiceImpl(
     }
 
     @Tx
-    private fun saveQueue(officeId: String, queue: MutableList<QueueItem>) {
+    private fun saveQueue(officeId: String, queue: MutableList<QueueItem>): MutableList<QueueItem> {
         queueService.deleteQueueItemsOfOffice(officeId)
-        queue.forEachIndexed { index, it -> resourceService.create(it.apply { onum = index }) }
+        return queue.mapIndexed { index, it -> resourceService.create(it.apply { onum = index }) }.toMutableList()
     }
 }

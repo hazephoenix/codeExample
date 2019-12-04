@@ -31,11 +31,6 @@ interface OfficeService {
     fun firstPatientIdInQueue(officeId: String): String?
 
     /**
-     * Удаление первого пациента из очереди в кабинет
-     */
-    fun deleteFirstPatientFromQueue(officeId: String)
-
-    /**
      * Удаление пациента из очереди
      */
     fun deletePatientFromQueue(officeId: String, patientId: String)

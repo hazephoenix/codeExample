@@ -96,7 +96,7 @@ class PatientServiceImpl(
         //определяем отв. специальности -> врачей данной специальностей -> самый "свободный" на рабочем месте будет отв.
         //услуги в маршрутном листе определяются по диагнозу + осмотр отв.
         val responsibleQualifications = responsibleQualificationsPredictor.predict(diagnosis, gender, complaints)
-        val respPractitioners = practitionerService.byQualifications(responsibleQualifications)
+        val respPractitioners = practitionerService.byQualificationCategories(responsibleQualifications)
         if (respPractitioners.isEmpty()) {
             throw Exception("ERROR. Can't find practitioners by qualifications: ${responsibleQualifications.joinToString()}")
         }
