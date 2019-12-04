@@ -197,18 +197,13 @@ class Helpers {
                                 ))
                         ),
                         QuestionnaireResponseItem(
-                                linkId = "Questionnaire/paramedic-qa-form/complaints",
+                                linkId = "Complaints",
                                 text = "Жалобы пациента",
                                 answer = listOf(
                                         QuestionnaireResponseItemAnswer(valueString = "Озноб"),
                                         QuestionnaireResponseItemAnswer(valueString = "Слабость"),
                                         QuestionnaireResponseItemAnswer(valueString = "Недомогание")
                                 )
-                        ),
-                        QuestionnaireResponseItem(
-                                linkId = "Questionnaire/paramedic-qa-form/base-syndrom",
-                                text = "Ведущий синдром",
-                                answer = listOf(QuestionnaireResponseItemAnswer(valueString = "Высокая температура"))
                         ),
                         QuestionnaireResponseItem(
                                 linkId = "Severity",
