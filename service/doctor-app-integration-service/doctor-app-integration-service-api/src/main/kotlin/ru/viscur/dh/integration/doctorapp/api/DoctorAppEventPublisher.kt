@@ -11,47 +11,47 @@ interface DoctorAppEventPublisher {
      * Создан врач (один из доступных для выбора)
      * @param practitioner созданный врач
      */
-    fun publishDoctorCreated(practitioner: Practitioner);
+    fun publishPractitionerCreated(practitioner: Practitioner);
 
     /**
      * Врач удален (один из доступных для выбора)
-     * @param ID врача ([Practitioner.id])
+     * @param practitionerId ID врача ([Practitioner.id])
      */
-    fun publishDoctorRemoved(practitionerId: String);
+    fun publishPractitionerRemoved(practitionerId: String);
 
     /**
      * Изменился статус врача доступного для выбора (стал доступен/недоступен для выбора)
      * @param practitionerId ID врача ([Practitioner.id])
      * @param disabled доступен или нет в данный момент врач для выбора
      */
-    fun publishDoctorStatusChanged(practitionerId: String, disabled: Boolean);
+    fun publishPractitionerStatusChanged(practitionerId: String, disabled: Boolean);
 
     /**
-     * Новый пациент в
+     * Новый пациент в очереди для врачей
      * @param targetPractitionersIds список ID врачей который интересует данное изменение в очереди
-     * @param clinicalImpression: текущее обследование
+     * @param clinicalImpression текущее обращение
      * @param patient новый пациент в очереди
      */
     fun publishNewQueuePatient(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression, patient: QueuePatient)
 
     /**
      * Пациент ушел из очереди
-     * @param targetPractitionersIds список ID врачей который интересует данное изменение в очереди
+     * @param targetPractitionersIds список ID врачей которых интересует данное изменение в очереди
      * @param patientId ID пациента
      */
     fun publishQueuePatientRemoved(targetPractitionersIds: Set<String>, patientId: String)
 
     /**
-     * Превышено время обслуживания пациента
-     * @param targetPractitionersIds список ID врачей который интересует данное изменение в очереди
-     * @param clinicalImpression: текущее обследование
+     * Превышено регламентное время обслуживания обращения пациента
+     * @param targetPractitionersIds список ID врачей которых интересует данное изменение в очереди
+     * @param clinicalImpression текущее обращение
      */
     fun publishPatientServiceTimeElapsed(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression)
 
     /**
-     * Обследование завершено (прошел всех диагностов)
-     * @param targetPractitionersIds список ID врачей который интересует данное изменение в очереди
-     * @param clinicalImpression: текущее обследование
+     * Результаты всех обследований готовы, можно проводить осмотр ответственного
+     * @param targetPractitionersIds список ID врачей которых интересует данное изменение в очереди
+     * @param clinicalImpression текущее обращение
      */
-    fun publishObservationReady(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression)
+    fun publishObservationsResultsAreReady(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression)
 }

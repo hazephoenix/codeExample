@@ -79,12 +79,14 @@ class ObservationDurationEstimationServiceImpl(
                 ?: throw Exception("not found ObservationDefaultDuration with code '$code' and severity '$severity'")
     }
 
+    override fun severitiesToDefaultDuration(code: String): Map<String, Int> = Severity.values().associate { it.name to defaultDuration(code, it) }
+
     @Tx
     override fun updateDefaultDuration(code: String, severity: Severity, duration: Int) {
         val item = (defaultDurationRepository.findFirstByCodeIsAndSeverityIs(code, severity.name)
                 ?: ObservationDefaultDuration(code = code, severity = severity.name)).apply {
-                    this.duration = duration
-                }
+            this.duration = duration
+        }
         defaultDurationRepository.save(item)
     }
 

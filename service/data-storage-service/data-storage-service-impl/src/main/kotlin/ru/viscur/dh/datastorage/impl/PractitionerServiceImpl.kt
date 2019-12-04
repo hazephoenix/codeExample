@@ -12,6 +12,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.genId
 import ru.viscur.dh.fhir.model.utils.qualificationCategory
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
+import ru.viscur.dh.integration.doctorapp.api.DoctorAppEventPublisher
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -21,7 +22,8 @@ import javax.persistence.PersistenceContext
 @Service
 class PractitionerServiceImpl(
         private val resourceService: ResourceService,
-        private val conceptService: ConceptService
+        private val conceptService: ConceptService,
+        private val doctorAppEventPublisher: DoctorAppEventPublisher
 ) : PractitionerService {
 
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
@@ -76,10 +78,18 @@ class PractitionerServiceImpl(
         return q.fetchResourceList()
     }
 
-    override fun updateBlocked(practitionerId: String, value: Boolean): Practitioner =
-            resourceService.update(ResourceType.Practitioner, practitionerId) {
-                extension.blocked = value
+    override fun updateBlocked(practitionerId: String, value: Boolean): Practitioner {
+        if (!value) {
+            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
+        }
+        return resourceService.update(ResourceType.Practitioner, practitionerId) {
+            extension.blocked = value
+            if (!value) {
+                extension.onWork = false
+                extension.onWorkInOfficeId = null
             }
+        }
+    }
 
     override fun updateOnWork(practitionerId: String, value: Boolean, officeId: String?): Practitioner {
         var officeIdIntr = officeId
@@ -97,10 +107,16 @@ class PractitionerServiceImpl(
             //уход со смены
             officeIdIntr = null
         }
-        return resourceService.update(ResourceType.Practitioner, practitionerId) {
+        val updatedPractitioner = resourceService.update(ResourceType.Practitioner, practitionerId) {
             extension.onWork = value
             extension.onWorkInOfficeId = officeIdIntr
         }
+        if (value) {
+            doctorAppEventPublisher.publishPractitionerCreated(updatedPractitioner)
+        } else {
+            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
+        }
+        return updatedPractitioner
     }
 
     /**

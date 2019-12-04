@@ -49,6 +49,13 @@ interface ObservationDurationEstimationService {
     fun defaultDuration(code: String, severity: Severity): Int
 
     /**
+     * Поиск дефолтных значений для указанной услуги
+     * Определяется для всех степеней тяжести
+     * Если не найдено для какой-либо, то это исключение
+     */
+    fun severitiesToDefaultDuration(code: String): Map<String, Int>
+
+    /**
      * Среднее по истории для заданного кода и степени тяжести
      * Ищется полное соответствие
      */
