@@ -158,10 +158,9 @@ class ReportServiceImpl(
                         .mapIndexed { index, locationIdWithOrder ->
                             val locationId = locationIdWithOrder.first!!
                             val location = locationService.byId(locationId)
-                            val locationType = location.type()
                             //для кабинетов указываем номер кабинета, для зон их тип: Зеленая зона/Желтая зона/Красная зона
-                            val locationStr = if (locationType in listOf(LocationType.GREEN_ZONE.id, LocationType.YELLOW_ZONE.id, LocationType.RED_ZONE.id)) {
-                                conceptService.byCode(ValueSetName.LOCATION_TYPE, locationType).display
+                            val locationStr = if (locationService.isZone(locationId)) {
+                                conceptService.byCode(ValueSetName.LOCATION_TYPE, location.type()).display
                             } else {
                                 location.identifierValue(IdentifierType.OFFICE_NUMBER)
                             }

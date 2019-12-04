@@ -46,21 +46,21 @@ class PractitionerServiceTest {
         val practitionerId = Helpers.surgeonId
         //предполагается, что изначально нет заблокированных
         val initAll = practitionerService.all()
-        val initAllByQualification = practitionerService.byQualification(QUALIFICATION_CATEGORY_SURGEON)
+        val initAllByQualification = practitionerService.byQualificationCategory(QUALIFICATION_CATEGORY_SURGEON)
         assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = true).size)
         checkBlocked(practitionerId, false)
 
         //блокируем врача
         practitionerService.updateBlocked(practitionerId, true)
 
-        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_CATEGORY_SURGEON).size + 1, "количество должно уменьшиться на 1 после блокировки")
+        assertEquals(initAllByQualification.size, practitionerService.byQualificationCategory(QUALIFICATION_CATEGORY_SURGEON).size + 1, "количество должно уменьшиться на 1 после блокировки")
         assertEquals(practitionerService.all().size + 1, practitionerService.all(withBlocked = true).size, "незаблокированных должно быть меньше чем всех на 1")
         checkBlocked(practitionerId, true)
 
         //разблокируем врача
         practitionerService.updateBlocked(practitionerId, false)
 
-        assertEquals(initAllByQualification.size, practitionerService.byQualification(QUALIFICATION_CATEGORY_SURGEON).size, "количество должно совпадать с начальным")
+        assertEquals(initAllByQualification.size, practitionerService.byQualificationCategory(QUALIFICATION_CATEGORY_SURGEON).size, "количество должно совпадать с начальным")
         assertEquals(initAll.size, practitionerService.all().size, "количество должно совпадать с начальным")
         assertEquals(practitionerService.all().size, practitionerService.all(withBlocked = true).size, "все должны быть незаблокированные")
         checkBlocked(practitionerId, false)

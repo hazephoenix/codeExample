@@ -11,11 +11,19 @@ GET http://localhost:8080/examination/patients?practitionerId=37030497-7d8b-48ec
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
+{}
 ###
 GET http://localhost:8080/examination/patients
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
+{}
+###
+GET http://localhost:8080/examination/cancel?patientId=3c497f2e-beee-43cc-bdb3-da8786c3537b
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
 ###        все назначения пациента
 ###
 

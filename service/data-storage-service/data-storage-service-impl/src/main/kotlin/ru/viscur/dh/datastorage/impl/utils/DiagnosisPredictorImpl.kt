@@ -34,7 +34,7 @@ class DiagnosisPredictorImpl(
                 .find { it.questionnaire == "Questionnaire/Severity_criteria" }
                 ?: throw Exception("Could not predict diagnosis: no severity criteria questionnaire response found ")
         val complaints = questionnaireResponse.item
-                .find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }
+                .find { it.linkId == "Complaints" }
                 ?.answer?.mapNotNull { it.valueString }
                 ?: throw Exception("Could not predict diagnosis: no complaints provided")
 
@@ -85,7 +85,7 @@ class DiagnosisPredictorImpl(
                             .find { it.questionnaire == "Questionnaire/Severity_criteria" }
 
                     val complaints = questionnaireResponse?.item
-                            ?.find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }
+                            ?.find { it.linkId == "Complaints" }
                             ?.answer?.mapNotNull { it.valueString }
                             ?: throw Exception("Could not predict diagnosis: no complaints provided")
 
@@ -155,7 +155,7 @@ class DiagnosisPredictorImpl(
             upperRespiratoryAirway = questionnaireResponse?.item?.find { it.linkId == "Upper_respiratory_airway" }?.answer?.first()?.valueCoding?.code,
             painIntensity = observations.find { it.code.code() == ObservationType.PAIN_INTENSITY.id }?.valueInteger,
             patientCanStand = questionnaireResponse?.item?.find { it.linkId == "Patient_can_stand" }?.answer?.first()?.valueCoding?.code,
-            complaints = questionnaireResponse?.item?.find { it.linkId == "Questionnaire/paramedic-qa-form/complaints" }?.answer?.mapNotNull { it.valueString }?.joinToString(", "),
+            complaints = questionnaireResponse?.item?.find { it.linkId == "Complaints" }?.answer?.mapNotNull { it.valueString }?.joinToString(", "),
             severity = questionnaireResponse?.item?.find { it.linkId == "Severity" }?.answer?.first()?.valueCoding?.code,
             diagnosis = diagnosticReport.conclusionCode.first().code()
     )

@@ -46,13 +46,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:119",
+        "reference": "Location/Office:101",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/b1ed1ac7-ff57-4b5d-95a3-230f560b5fe3",
+        "reference": "Patient/769812d0-c6de-4861-872a-73637284eb72",
         "type": "Patient"
       }
     }

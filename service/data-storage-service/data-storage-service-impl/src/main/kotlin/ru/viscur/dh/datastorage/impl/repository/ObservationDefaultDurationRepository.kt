@@ -13,11 +13,6 @@ import ru.viscur.dh.datastorage.impl.entity.ObservationDefaultDuration
 interface ObservationDefaultDurationRepository : CrudRepository<ObservationDefaultDuration, Long> {
 
     /**
-     * Поиск значения по коду услуги, диагнозу, степени тяжести
-     */
-    fun findFirstByCodeIsAndDiagnosisIsAndSeverityIs(code: String, diagnosis: String, severity: String): ObservationDefaultDuration?
-
-    /**
      * Поиск значения по коду услуги, степени тяжести
      */
     fun findFirstByCodeIsAndSeverityIs(code: String, severity: String): ObservationDefaultDuration?

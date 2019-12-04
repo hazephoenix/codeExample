@@ -7,7 +7,6 @@ create table observation_default_duration
 (
     id         bigint not null default nextval('pk_seq') constraint observation_default_duration_pkey primary key,
     code       text not null,
-    diagnosis  text,
     severity   text not null,
     duration   integer not null
 );
@@ -15,7 +14,6 @@ create table observation_default_duration
 comment on table observation_default_duration is 'Продолжительности проведения услуг по умолчанию';
 comment on column observation_default_duration.id is 'id';
 comment on column observation_default_duration.code is 'код услуги';
-comment on column observation_default_duration.diagnosis is 'код диагноза';
 comment on column observation_default_duration.severity is 'степень тяжести';
 comment on column observation_default_duration.duration is 'продолжительность, в секундах';
 

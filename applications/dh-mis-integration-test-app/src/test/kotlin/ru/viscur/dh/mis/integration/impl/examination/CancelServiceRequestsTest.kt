@@ -1,5 +1,7 @@
 package ru.viscur.dh.mis.integration.impl
 
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,6 +12,7 @@ import ru.viscur.dh.apps.misintegrationtest.config.MisIntegrationTestConfig
 import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.PatientService
+import ru.viscur.dh.datastorage.api.PractitionerService
 import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.enums.LocationStatus
 import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
@@ -47,7 +50,23 @@ class CancelServiceRequestsTest {
     lateinit var observationInCarePlanService: ObservationInCarePlanService
 
     @Autowired
-    lateinit var patientService: PatientService
+    lateinit var practitionerService: PractitionerService
+
+    @BeforeEach
+    fun before() {
+        practitionerService.updateOnWork(Helpers.diagnosticAssistantId, true, OFFICE_101)
+        practitionerService.updateOnWork(Helpers.surgeonId, true)
+        practitionerService.updateOnWork(Helpers.urologistId, true)
+        practitionerService.updateOnWork(Helpers.urologist2Id, true)
+    }
+
+    @AfterEach
+    fun after() {
+        practitionerService.updateOnWork(Helpers.diagnosticAssistantId, false)
+        practitionerService.updateOnWork(Helpers.surgeonId, false)
+        practitionerService.updateOnWork(Helpers.urologistId, false)
+        practitionerService.updateOnWork(Helpers.urologist2Id, false)
+    }
 
     @Test
     fun `cancel by officeId, in queue`() {

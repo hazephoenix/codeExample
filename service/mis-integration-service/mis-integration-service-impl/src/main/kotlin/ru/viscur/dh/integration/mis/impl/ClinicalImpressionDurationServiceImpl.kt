@@ -37,7 +37,7 @@ class ClinicalImpressionDurationServiceImpl(
     }
 
     override fun currentDurations(): List<ClinicalImpressionDurationDto> {
-        val severityToDefaultDuration = Severity.values().associate { it.name to observationDurationService.defaultDuration(CLINICAL_IMPRESSION, it) }
+        val severityToDefaultDuration = observationDurationService.severitiesToDefaultDuration(CLINICAL_IMPRESSION)
         val allActive = clinicalImpressionService.allActive()
         val now = now()
         return allActive.map {

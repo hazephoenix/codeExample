@@ -238,7 +238,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           ]
         },
         {
-          "linkId": "Questionnaire/paramedic-qa-form/complaints",
+          "linkId": "Complaints",
           "text": "Жалобы пациента",
           "answer": [
             {
@@ -249,15 +249,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             },
             {
               "valueString": "Недомогание"
-            }
-          ]
-        },
-        {
-          "linkId": "Questionnaire/paramedic-qa-form/base-syndrom",
-          "text": "Ведущий синдром",
-          "answer": [
-            {
-              "valueString": "Высокая температура"
             }
           ]
         }
@@ -508,7 +499,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           ]
         },
         {
-          "linkId": "Questionnaire/paramedic-qa-form/complaints",
+          "linkId": "Complaints",
           "text": "Жалобы пациента",
           "answer": [
             {
@@ -519,15 +510,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             },
             {
               "valueString": "Недомогание"
-            }
-          ]
-        },
-        {
-          "linkId": "Questionnaire/paramedic-qa-form/base-syndrom",
-          "text": "Ведущий синдром",
-          "answer": [
-            {
-              "valueString": "Высокая температура"
             }
           ]
         }
@@ -1054,7 +1036,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           ]
         },
         {
-          "linkId": "Questionnaire/paramedic-qa-form/complaints",
+          "linkId": "Complaints",
           "text": "Жалобы пациента",
           "answer": [
             {
@@ -1065,15 +1047,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             },
             {
               "valueString": "Недомогание"
-            }
-          ]
-        },
-        {
-          "linkId": "Questionnaire/paramedic-qa-form/base-syndrom",
-          "text": "Ведущий синдром",
-          "answer": [
-            {
-              "valueString": "Высокая температура"
             }
           ]
         }

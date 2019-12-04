@@ -40,4 +40,9 @@ interface LocationService {
      * Все кабинеты
      */
     fun allLocations(): List<Location>
+
+    /**
+     * Является ли кабинет зоной (зел, жел, кр) - по типу
+     */
+    fun isZone(locationId: String): Boolean
 }

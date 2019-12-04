@@ -12,6 +12,7 @@ import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.genId
 import ru.viscur.dh.fhir.model.utils.qualificationCategory
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
+import ru.viscur.dh.integration.doctorapp.api.DoctorAppEventPublisher
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -21,15 +22,17 @@ import javax.persistence.PersistenceContext
 @Service
 class PractitionerServiceImpl(
         private val resourceService: ResourceService,
-        private val conceptService: ConceptService
+        private val conceptService: ConceptService,
+        private val doctorAppEventPublisher: DoctorAppEventPublisher
 ) : PractitionerService {
 
     @PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
     private lateinit var em: EntityManager
 
-    override fun all(withBlocked: Boolean, onWorkOnly: Boolean): List<Practitioner> {
+    override fun all(withBlocked: Boolean, onWorkOnly: Boolean, onWorkInOfficeId: String?): List<Practitioner> {
         val whereClauses = if (withBlocked) mutableListOf() else listOf("(r.resource->'extension'->>'blocked')\\:\\:boolean = false").toMutableList()
         if (onWorkOnly) whereClauses += "(r.resource->'extension'->>'onWork')\\:\\:boolean = true"
+        if (onWorkInOfficeId != null) whereClauses += "r.resource->'extension'->>'onWorkInOfficeId' = '$onWorkInOfficeId'"
         val whereClause = if (whereClauses.isEmpty()) "" else "where " + whereClauses.joinToString(" and ")
         val query = em.createNativeQuery("""
             select r.resource
@@ -57,9 +60,9 @@ class PractitionerServiceImpl(
 
     override fun byId(id: String): Practitioner = resourceService.byId(ResourceType.Practitioner, id)
 
-    override fun byQualifications(codes: List<String>): List<Practitioner> {
-        if (codes.isEmpty()) return listOf()
-        val codesStr = codes.mapIndexed { index, code -> "(?${index + 1})" }.joinToString(", ")
+    override fun byQualificationCategories(categoryCodes: List<String>): List<Practitioner> {
+        if (categoryCodes.isEmpty()) return listOf()
+        val codesStr = categoryCodes.mapIndexed { index, code -> "(?${index + 1})" }.joinToString(", ")
         val q = em.createNativeQuery("""
             select resource from
             (select * from (values $codesStr) q (qual)) q
@@ -71,14 +74,22 @@ class PractitionerServiceImpl(
             ) pr
             on q.qual = pr.pr_qual
         """.trimIndent())
-        q.setParameters(codes)
+        q.setParameters(categoryCodes)
         return q.fetchResourceList()
     }
 
-    override fun updateBlocked(practitionerId: String, value: Boolean): Practitioner =
-            resourceService.update(ResourceType.Practitioner, practitionerId) {
-                extension.blocked = value
+    override fun updateBlocked(practitionerId: String, value: Boolean): Practitioner {
+        if (!value) {
+            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
+        }
+        return resourceService.update(ResourceType.Practitioner, practitionerId) {
+            extension.blocked = value
+            if (!value) {
+                extension.onWork = false
+                extension.onWorkInOfficeId = null
             }
+        }
+    }
 
     override fun updateOnWork(practitionerId: String, value: Boolean, officeId: String?): Practitioner {
         var officeIdIntr = officeId
@@ -96,10 +107,16 @@ class PractitionerServiceImpl(
             //уход со смены
             officeIdIntr = null
         }
-        return resourceService.update(ResourceType.Practitioner, practitionerId) {
+        val updatedPractitioner = resourceService.update(ResourceType.Practitioner, practitionerId) {
             extension.onWork = value
             extension.onWorkInOfficeId = officeIdIntr
         }
+        if (value) {
+            doctorAppEventPublisher.publishPractitionerCreated(updatedPractitioner)
+        } else {
+            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
+        }
+        return updatedPractitioner
     }
 
     /**
