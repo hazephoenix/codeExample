@@ -7,7 +7,7 @@ import ru.viscur.dh.fhir.model.entity.ClinicalImpression
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.isInspectionOfResp
 import ru.viscur.dh.integration.doctorapp.api.DoctorAppEventPublisher
-import ru.viscur.dh.integration.doctorapp.api.model.QueuePatient
+import ru.viscur.dh.integration.doctorapp.api.model.QueuePatientAppDto
 import ru.viscur.dh.queue.api.QueueForPractitionersInformService
 
 /**
@@ -95,7 +95,7 @@ class QueueForPractitionersInformServiceImpl(
         doctorAppEventPublisher.publishNewQueuePatient(
                 targetPractitionersIds,
                 clinicalImpression,
-                QueuePatient(
+                QueuePatientAppDto(
                         id = patientId,
                         orderInQueue = onum,
                         severity = clinicalImpression.extension.severity,

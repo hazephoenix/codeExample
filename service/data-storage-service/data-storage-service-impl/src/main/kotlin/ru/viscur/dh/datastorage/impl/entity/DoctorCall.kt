@@ -1,9 +1,9 @@
 package ru.viscur.dh.datastorage.impl.entity
 
-import ru.viscur.dh.datastorage.api.model.call.CallGoal
-import ru.viscur.dh.datastorage.api.model.call.CallStatus
-import ru.viscur.dh.datastorage.api.model.call.CallableSpecializationCategory
 import ru.viscur.dh.fhir.model.enums.Severity
+import ru.viscur.dh.practitioner.call.model.CallGoal
+import ru.viscur.dh.practitioner.call.model.CallStatus
+import ru.viscur.dh.practitioner.call.model.CallableSpecializationCategory
 import java.util.*
 import javax.persistence.*
 import javax.persistence.EnumType.STRING
