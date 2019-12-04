@@ -80,7 +80,7 @@ class PractitionerServiceImpl(
 
     override fun updateBlocked(practitionerId: String, value: Boolean): Practitioner {
         if (!value) {
-            doctorAppEventPublisher.publishDoctorRemoved(practitionerId)
+            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
         }
         return resourceService.update(ResourceType.Practitioner, practitionerId) {
             extension.blocked = value
@@ -112,9 +112,9 @@ class PractitionerServiceImpl(
             extension.onWorkInOfficeId = officeIdIntr
         }
         if (value) {
-            doctorAppEventPublisher.publishDoctorCreated(updatedPractitioner)
+            doctorAppEventPublisher.publishPractitionerCreated(updatedPractitioner)
         } else {
-            doctorAppEventPublisher.publishDoctorRemoved(practitionerId)
+            doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
         }
         return updatedPractitioner
     }

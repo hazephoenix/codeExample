@@ -86,7 +86,7 @@ class QueueForPractitionersInformServiceImpl(
 
     override fun resultsAreReadyInCarePlan(patientId: String, clinicalImpression: ClinicalImpression) {
         clinicalImpression.assessor?.run {
-            doctorAppEventPublisher.publishObservationReady(setOf(this.id!!), clinicalImpression)
+            doctorAppEventPublisher.publishObservationsResultsAreReady(setOf(this.id!!), clinicalImpression)
         }
     }
 

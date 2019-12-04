@@ -24,7 +24,7 @@ class DoctorAppEventPublisherImpl(
         val resourceService: ResourceService
 
 ) : DoctorAppEventPublisher {
-    override fun publishDoctorCreated(practitioner: Practitioner) {
+    override fun publishPractitionerCreated(practitioner: Practitioner) {
         // отправляем клиентам чтобы обновили UI, кэш
         eventPublisher.publishEvent(
                 DoctorAppEvent(
@@ -35,7 +35,7 @@ class DoctorAppEventPublisherImpl(
         )
     }
 
-    override fun publishDoctorRemoved(practitionerId: String) {
+    override fun publishPractitionerRemoved(practitionerId: String) {
         // отправляем клиентам чтобы обновили UI, кэш
         eventPublisher.publishEvent(
                 DoctorAppEvent(
@@ -44,7 +44,7 @@ class DoctorAppEventPublisherImpl(
         )
     }
 
-    override fun publishDoctorStatusChanged(practitionerId: String, disabled: Boolean) {
+    override fun publishPractitionerStatusChanged(practitionerId: String, disabled: Boolean) {
         // отправляем клиентам чтобы обновили UI, кэш
         eventPublisher.publishEvent(
                 DoctorAppEvent(
@@ -112,7 +112,7 @@ class DoctorAppEventPublisherImpl(
         }
     }
 
-    override fun publishObservationReady(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression) {
+    override fun publishObservationsResultsAreReady(targetPractitionersIds: Set<String>, clinicalImpression: ClinicalImpression) {
         val practitioners = resourceService.classifiedByIds(ResourceType.Practitioner, targetPractitionersIds)
         targetPractitionersIds.forEach {
             val practitioner = practitioners[it] ?: return@forEach
