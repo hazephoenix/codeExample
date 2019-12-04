@@ -1,7 +1,7 @@
 package ru.viscur.dh.integration.doctorapp.impl.mapper
 
 import org.springframework.stereotype.Component
-import ru.viscur.dh.datastorage.api.model.call.CallableSpecialization
+import ru.viscur.dh.datastorage.api.model.call.CallableSpecializationCategory
 import ru.viscur.dh.datastorage.api.model.call.DoctorCall
 import ru.viscur.dh.datastorage.api.model.message.DoctorMessage
 import ru.viscur.dh.fhir.model.entity.Practitioner
@@ -12,7 +12,7 @@ import ru.viscur.dh.integration.mis.api.dto.QueueItemDto
 @Component
 class DoctorAppMapper {
     fun mapCallStorageToApi(storageValue: DoctorCall): ru.viscur.dh.integration.doctorapp.api.model.DoctorCall {
-        return ru.viscur.dh.integration.doctorapp.api.model.DoctorCall(
+        return DoctorCall(
                 id = storageValue.id,
                 dateTime = storageValue.dateTime,
                 caller = Person(
@@ -21,12 +21,12 @@ class DoctorAppMapper {
                                 ?: storageValue.caller.firstUsualName)?.text
                                 ?: ""
                 ),
-                specialization = storageValue.specialization,
+                specializationCategory = storageValue.specializationCategory,
                 doctor = CallableDoctor(
                         storageValue.doctor.id,
                         (storageValue.doctor.firstOfficialName ?: storageValue.doctor.firstUsualName)?.text
                                 ?: "",
-                        specializations = listOf(),//storageValue.doctor.qualification.code.coding.
+                        specializationCategories = listOf(),//storageValue.doctor.qualification.code.coding.
                         disabled = false
                 ),
                 goal = storageValue.goal,
@@ -54,7 +54,7 @@ class DoctorAppMapper {
                     source.id,
                     source.fullName,
                     listOfNotNull(try {
-                        CallableSpecialization.valueOf(source.extension.qualificationCategory)
+                        CallableSpecializationCategory.byFhirId(source.extension.qualificationCategory)
                     } catch (ig: IllegalArgumentException) {
                         null
                     }),

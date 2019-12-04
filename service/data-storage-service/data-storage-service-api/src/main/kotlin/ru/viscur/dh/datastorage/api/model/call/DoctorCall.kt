@@ -24,7 +24,7 @@ class DoctorCall(
          * (у врача может быть несколько специализаций, это специализация которая была выбрана
          * вызывающим врачем)
          */
-        var specialization: CallableSpecialization,
+        var specializationCategory: CallableSpecializationCategory,
 
         /**
          * Врач которого вызывали
