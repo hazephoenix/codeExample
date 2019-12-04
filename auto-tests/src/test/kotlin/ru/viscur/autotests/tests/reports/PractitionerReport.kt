@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests.  reports
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -59,10 +60,16 @@ class PractitionerReport {
         QueRequests.setPractitionerActivityAndLocation(practitioner1Office116, true, office116Id)
 
         //получение отчета о полном состоянии очередей в кабинеты
-        val queueItemForPractitioners = QueRequests.getAllPractitionersWorkload()
+        val queueItemsForPractitioners = QueRequests.getAllPractitionersWorkload()
+        val patientsForPractitioner1Office101 = queueItemsForPractitioners.find {it.practitioner!!.practitionerId == practitioner1Office101}!!.items
+        val patientsForPractitioner2Office101 = queueItemsForPractitioners.find {it.practitioner!!.practitionerId == practitioner2Office101}!!.items
+        val patientsForPractitioner1Office116 = queueItemsForPractitioners.find {it.practitioner!!.practitionerId == practitioner1Office116}!!.items
 
         //проверка, что отчет содержит очередь для каждого специалиста
-        assertEquals(3, queueItemForPractitioners.size, "wrong office number in report for practitioner")
+        assertEquals(3, queueItemsForPractitioners.size, "wrong office number in report for practitioner")
+        assertEquals(patientId1, patientsForPractitioner1Office101.first().patientId, "wrong patient for $practitioner1Office101")
+        assertEquals(patientId1, patientsForPractitioner2Office101.first().patientId, "wrong patient for $practitioner2Office101")
+        assertEquals(patientId2, patientsForPractitioner1Office116.first().patientId, "wrong patient for $practitioner1Office101")
     }
 
     @Test
@@ -79,8 +86,8 @@ class PractitionerReport {
         val bundle1 = bundle("1120", "GREEN", servRequests)
         val bundle2 = bundle("1121", "YELLOW", servRequests2)
         val patientId1 = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
-        val patientServ = QueRequests.createPatient(bundle2).resources(ResourceType.ServiceRequest)
-        val patientId2 = patientIdFromServiceRequests(patientServ)
+        QueRequests.createPatient(bundle2)
+
 
         //привязка practitioner к кабинету
         QueRequests.setPractitionerActivityAndLocation(practitioner1Office101,true, office101Id)
@@ -116,10 +123,13 @@ class PractitionerReport {
         val patientsOfSurgeon2 = QueRequests.getPractitionersWorkloadById(surgeon2Id)
         val patientsOfUrologist1 = QueRequests.getPractitionersWorkloadById(urologist1Id)
 
-        //проверка пациентов на ответственности у хирургов и уролога, у хирурга1 есть пациент на ответственности и пациент для осмотра, у 2 хирурга только на осмотр
-        //у уролога есть пациент на ответственности, но он не отображается в очереди к нему, пока не пройдет назначенный осмотр у хирурга
+        //проверка пациентов на ответственности у хирургов и уролога, у surgeon1Id есть patientId1 на ответственности и patientId2 для осмотра, у 2 хирурга только patientId2 на осмотр
+        //у уролога есть patientId2 на ответственности, но он не отображается в очереди к нему, пока не пройдет назначенный осмотр у хирурга
         assertEquals(2, patientsOfSurgeon1.items.size, "wrong patient number for $surgeon1Id")
+        assertNotNull(patientsOfSurgeon1.items.find {it.patientId == patientId1} )
+        assertNotNull(patientsOfSurgeon1.items.find {it.patientId == patientId2} )
         assertEquals(1, patientsOfSurgeon2.items.size, "wrong patient number for $surgeon1Id")
+        assertNotNull(patientsOfSurgeon2.items.find {it.patientId == patientId2} )
         assertEquals(0, patientsOfUrologist1.items.size, "wrong patient number for $surgeon1Id")
     }
 

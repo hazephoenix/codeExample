@@ -29,9 +29,9 @@ class Constants {
         const val bandageOffice128 = "Перевязка"
 
         //practitioners
-        const val practitioner1Office101 = "фельдшер_Колосова"
-        const val practitioner2Office101 = "Ms_Аникина_Алена_Анатольевна"
-        const val practitioner1Office116 = "мед_работник_диагностики_Сидорова"
+        const val practitioner1Office101 = "Ms_Аникина_Алена_Анатольевна"
+        const val practitioner2Office101 = "Ms_Байгулова_Ольга_Валерьевна"
+        const val practitioner1Office116 = "Ms_Сусиква_Рената_Викторовна"
 
         const val surgeon1Id = "Surgeon_Баширов_Сергей_Рафаэльевич"
         const val surgeon2Id = "Surgeon_Буркин_Максим_Викторович"

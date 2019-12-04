@@ -304,19 +304,19 @@ class QueRequests {
                 Helpers.createRequestSpecWithoutBody().`when`().
                         get(Endpoints.GET_PRACTITIONERS + if (withBlocked == null) "" else "?withBlocked=$withBlocked").
                         then().statusCode(200).
-                        extract().response().`as`(Array<Practitioner>::class.java)
+                        extract().response().`as`(Array<PractitionersInfo>::class.java)
 
         fun createPractitioner(practitioner: Practitioner) =
                 Helpers.createRequestSpec(practitioner).`when`().
                         post(Endpoints.GET_PRACTITIONERS).
                         then().statusCode(200).
-                        extract().response().`as`(Practitioner::class.java)
+                        extract().response().`as`(PractitionersInfo::class.java)
 
         fun updatePractitioner(practitioner: Practitioner) =
                 Helpers.createRequestSpec(practitioner).`when`().
                         put(Endpoints.GET_PRACTITIONERS).
                         then().statusCode(200).
-                        extract().response().`as`(Practitioner::class.java)
+                        extract().response().`as`(PractitionersInfo::class.java)
 
         fun blockPractitioner(practitionerId: String, value: Boolean) =
                 Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId, "value" to value)).`when`().
@@ -327,7 +327,7 @@ class QueRequests {
                 Helpers.createRequestWithQuery(mapOf("id" to practitionerId)).`when`().
                         get(Endpoints.GET_PRACTITIONER_BY_ID).
                         then().statusCode(200).
-                        extract().response().`as`(Practitioner::class.java)
+                        extract().response().`as`(PractitionersInfo::class.java)
 
         fun setPractitionerActivityAndLocation(practitionerId: String, onWorkValue: Boolean, officeId: String? = null) =
                 Helpers.createRequestWithQuery(mapOf("practitionerId" to practitionerId, "value" to onWorkValue) + if (officeId == null) mapOf() else mapOf("officeId" to officeId)).`when`().

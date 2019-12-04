@@ -16,5 +16,6 @@ data class Item(
         val age: Int,
         val estDuration: String,
         val queueCode: String,
-        val patientId: String
+        val patientId: String,
+        val status: String
 )

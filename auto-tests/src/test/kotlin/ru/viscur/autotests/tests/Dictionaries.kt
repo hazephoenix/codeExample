@@ -1,6 +1,7 @@
 package ru.viscur.autotests.tests
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.QueRequests
 import ru.viscur.autotests.utils.Constants.Companion.office101Id
@@ -9,11 +10,12 @@ import ru.viscur.autotests.utils.Helpers.Companion.surgeonId
 import ru.viscur.dh.fhir.model.entity.Practitioner
 import ru.viscur.dh.fhir.model.type.CodeableConcept
 import ru.viscur.dh.fhir.model.type.HumanName
+import ru.viscur.dh.fhir.model.type.PractitionerExtension
 import ru.viscur.dh.fhir.model.type.PractitionerQualification
 import ru.viscur.dh.fhir.model.utils.now
 import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class Dictionaries {
 
     @Test
@@ -65,9 +67,21 @@ class Dictionaries {
         //создание practitioner
         val practitionerName = "Тест " + now()
         val practitioner = Practitioner(
-                id = "ignored",
-                name = listOf(HumanName(text = practitionerName, family = practitionerName, given = listOf("Иван"), suffix = listOf("Алексеевич"))),
-                qualification = PractitionerQualification(code = CodeableConcept(code = "Test", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+            id = "ignored",
+            name = listOf(
+                HumanName(
+                    text = practitionerName,
+                    family = practitionerName,
+                    given = listOf("Иван"),
+                    suffix = listOf("Алексеевич")
+                )
+            ),
+            qualification = listOf(
+                PractitionerQualification(
+                    code = CodeableConcept(code = "Ultrasound_doctor", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id)
+                )
+            ),
+            extension = PractitionerExtension(qualificationCategory = "Test qualification")
         )
 
         QueRequests.createPractitioner(practitioner)
@@ -83,19 +97,42 @@ class Dictionaries {
         val practitionerName = "Тест " + now()
         val practitionerUpdatedName = practitionerName + "Updated"
         val practitioner = Practitioner(
-                id = "ignored",
-                name = listOf(HumanName(text = practitionerName, family = practitionerName, given = listOf("Иван"), suffix = listOf("Алексеевич"))),
-                qualification = PractitionerQualification(code = CodeableConcept(code = "Test", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+            id = "ignored",
+            name = listOf(
+                HumanName(
+                    text = practitionerName,
+                    family = practitionerName,
+                    given = listOf("Иван"),
+                    suffix = listOf("Алексеевич")
+                )
+            ),
+            qualification = listOf(
+                PractitionerQualification(
+                    code = CodeableConcept(code = "Ultrasound_doctor", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id)
+                )
+            ),
+            extension = PractitionerExtension(qualificationCategory = "Test qualification")
         )
 
         val createdPractitioner = QueRequests.createPractitioner(practitioner)
 
         //обновление информации о practitioner
         val practitionerNewInfo = Practitioner(
-                id = createdPractitioner.id,
-                name = listOf(HumanName(text = practitionerUpdatedName, family = practitionerUpdatedName, given = listOf(practitionerUpdatedName), suffix = listOf(practitionerUpdatedName))),
-                qualification =  PractitionerQualification(code = CodeableConcept(code = "TestUpdated", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id))
+            id = createdPractitioner.id,
+            name = listOf(
+                HumanName(
+                    text = practitionerUpdatedName,
+                    family = practitionerUpdatedName,
+                    given = listOf(practitionerUpdatedName),
+                    suffix = listOf(practitionerUpdatedName))),
+            qualification = listOf(
+                PractitionerQualification(
+                    code = CodeableConcept(code = "Ultrasound_doctor", systemId = ValueSetName.PRACTITIONER_QUALIFICATIONS.id)
+                )
+            ),
+            extension = PractitionerExtension(qualificationCategory = "Test qualification")
         )
+
         val updatedPractitioner = QueRequests.updatePractitioner(practitionerNewInfo)
 
         //проверка, что информация о practitioner изменена
