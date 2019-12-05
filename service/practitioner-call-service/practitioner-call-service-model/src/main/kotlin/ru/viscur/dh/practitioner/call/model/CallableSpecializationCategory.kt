@@ -32,10 +32,19 @@ enum class CallableSpecializationCategory(
 
 
     companion object {
-        fun byFhirId(fhirId: String): CallableSpecializationCategory {
+        fun byFhirIdOpt(fhirId: String): CallableSpecializationCategory? {
             return values().find { it.fhirId == fhirId }
+        }
+
+        fun byFhirId(fhirId: String): CallableSpecializationCategory? {
+            return byFhirIdOpt(fhirId)
                     ?: throw IllegalStateException("Can't find CallableSpecializationCategory by fhirId $fhirId");
         }
+
+        fun hasFhirId(fhirId: String): Boolean {
+            return byFhirIdOpt(fhirId) != null
+        }
+
     }
 
 }

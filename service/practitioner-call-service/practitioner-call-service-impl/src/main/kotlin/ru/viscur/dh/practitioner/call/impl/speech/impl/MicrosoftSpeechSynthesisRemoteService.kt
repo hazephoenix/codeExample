@@ -10,7 +10,7 @@ import ru.viscur.dh.practitioner.call.impl.speech.SpeechSynthesisService
 import java.io.ByteArrayInputStream
 
 /**
- * Реализация [SpeechSynthesisService] которая использует [TODO gitlab link] для синтеза речи
+ * Реализация [SpeechSynthesisService] которая использует [https://gitlab.com/digital-hospital/speech-synthesis-service] для синтеза речи
  */
 @Service
 class MicrosoftSpeechSynthesisRemoteService(

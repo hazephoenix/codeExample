@@ -18,6 +18,7 @@ import ru.viscur.dh.integration.practitioner.app.impl.mapper.PractitionerAppMapp
 import ru.viscur.dh.practitioner.call.api.event.PractitionerCallAcceptedEvent
 import ru.viscur.dh.practitioner.call.api.event.PractitionerCallCreatedEvent
 import ru.viscur.dh.practitioner.call.api.event.PractitionerCallDeclinedEvent
+import ru.viscur.dh.practitioner.call.model.CallableSpecializationCategory
 import java.util.*
 
 @Component
@@ -29,6 +30,9 @@ class PractitionerAppEventPublisherImpl(
 
 ) : PractitionerAppEventPublisher {
     override fun publishPractitionerCreated(practitioner: Practitioner) {
+        if (!CallableSpecializationCategory.hasFhirId(practitioner.extension.qualificationCategory)) {
+            return
+        }
         // отправляем клиентам чтобы обновили UI, кэш
         eventPublisher.publishEvent(
                 PractitionerAppEvent(
