@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<izpack:userinput version="5.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:izpack="http://izpack.org/schema/userinput"
+                  xsi:schemaLocation="http://izpack.org/schema/userinput http://izpack.org/schema/5.0/izpack-userinput-5.0.xsd">
+
+    <panel id="configPanel">
+        <field type="title" txt="Dratuti!"/>
+        <field type="text" variable="arm.uuid">
+            <spec txt="ARM UUID:" id="input.uuid" size="25">
+                <processor class="installer.ArmUUIDProcessor"/>
+            </spec>
+            <validator class="com.izforge.izpack.panels.userinput.validator.NotEmptyValidator" txt="UUID is required!"/>
+        </field>
+        <field type="text" variable="arm.artemis.host">
+            <spec txt="Artemis host:" id="input.artemis.host" set="" size="20"/>
+        </field>
+        <field type="text" variable="arm.artemis.port">
+            <spec txt="Artemis port:" id="input.artemis.port" set="61616" size="5"/>
+        </field>
+        <field type="text" variable="arm.artemis.user">
+            <spec txt="Artemis user:" id="input.artemis.user" set="artemiz" size="15"/>
+        </field>
+        <field type="text" variable="arm.artemis.password">
+            <spec size="20" txt="Artemis Password:" id="input.artemis.password">
+                <pwd size="20" txt="Artemis Password:"/>
+            </spec>
+        </field>
+    </panel>
+</izpack:userinput>
