@@ -62,7 +62,7 @@ class Helpers {
 
         //создание bundle для пациента
         fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>? = null): Bundle {
-            val patient = createPatientResource(enp = enp)
+            val patient = createPatientResource(enp = enp, severity = enumValueOf(severity))
             val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
             val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
             val personalDataConsent = createConsentResource()
@@ -152,7 +152,7 @@ class Helpers {
         }
 
         //создание ресурсов
-        fun createPatientResource(enp: String, queueStatus: PatientQueueStatus = PatientQueueStatus.READY) = Patient(
+        fun createPatientResource(enp: String, queueStatus: PatientQueueStatus = PatientQueueStatus.READY, severity: Severity = Severity.GREEN) = Patient(
                 identifier = listOf(
                         Identifier(
                                 value = "7878 77521487",//серия номер
@@ -178,7 +178,7 @@ class Helpers {
                                 type = IdentifierType.SNILS
                         ),
                         Identifier(
-                                value = "З-018",//номер
+                                value = "${severity.name.substring(0, 1)}-$enp",//номер
                                 type = IdentifierType.QUEUE_CODE
                         )
                 ),
@@ -275,18 +275,13 @@ class Helpers {
                                 ))
                         ),
                         QuestionnaireResponseItem(
-                                linkId = "Questionnaire/paramedic-qa-form/complaints",
+                                linkId = "Complaints",
                                 text = "Жалобы пациента",
                                 answer = listOf(
                                         QuestionnaireResponseItemAnswer(valueString = "лихорадка"),
                                         QuestionnaireResponseItemAnswer(valueString = "Слабость"),
                                         QuestionnaireResponseItemAnswer(valueString = "острая боль")
                                 )
-                        ),
-                        QuestionnaireResponseItem(
-                                linkId = "Questionnaire/paramedic-qa-form/base-syndrom",
-                                text = "Ведущий синдром",
-                                answer = listOf(QuestionnaireResponseItemAnswer(valueString = "высокая температура"))
                         ),
                         QuestionnaireResponseItem(
                                 linkId = "Severity",
@@ -306,7 +301,7 @@ class Helpers {
             questionnaire = "Questionnaire/Severity_criteria",
             item = listOf(
                 QuestionnaireResponseItem(
-                    linkId = "Questionnaire/paramedic-qa-form/complaints",
+                    linkId = "Complaints",
                     text = "Жалобы пациента",
                     answer = listOf(
                         QuestionnaireResponseItemAnswer(valueString = "Жар"),
@@ -346,7 +341,7 @@ class Helpers {
                     ))
                 ),
                 QuestionnaireResponseItem(
-                    linkId = "Questionnaire/paramedic-qa-form/complaints",
+                    linkId = "Complaints",
                     text = "Жалобы пациента",
                     answer = listOf(
                         QuestionnaireResponseItemAnswer(valueString = "Жар"),
