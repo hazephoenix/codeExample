@@ -18,6 +18,8 @@ import ru.viscur.dh.practitioner.call.api.event.PractitionerCallAcceptedEvent
 import ru.viscur.dh.practitioner.call.api.event.PractitionerCallCreatedEvent
 import ru.viscur.dh.practitioner.call.api.event.PractitionerCallDeclinedEvent
 import ru.viscur.dh.practitioner.call.api.exception.PractitionerCallWrongStatusException
+import ru.viscur.dh.practitioner.call.impl.loudspeaker.LoudspeakerService
+import ru.viscur.dh.practitioner.call.impl.speech.SpeechSynthesisService
 import ru.viscur.dh.practitioner.call.model.AwaitingCallStatusStage
 import ru.viscur.dh.practitioner.call.model.AwaitingPractitionerCallRef
 import ru.viscur.dh.practitioner.call.model.CallStatus
@@ -35,7 +37,9 @@ class PractitionerCallServiceImpl(
         val practitionerService: PractitionerService,
         val practitionerCallStorageService: PractitionerCallStorageService,
         val locationService: LocationService,
-        val eventPublisher: ApplicationEventPublisher
+        val speechSynthesisService: SpeechSynthesisService,
+        val eventPublisher: ApplicationEventPublisher,
+        val loudspeakerService: LoudspeakerService
 ) : PractitionerCallService {
 
     /**
@@ -154,7 +158,7 @@ class PractitionerCallServiceImpl(
     /**
      * Запускаем каждые 40 секунд и продвигаем ожидающие вызовы по стадиям ожидвния
      */
-    @Scheduled(fixedDelay = 40_000)
+    @Scheduled(fixedDelay = 10_000)
     protected fun handleAwaitingCalls() {
         val items = awaitingRefs.values.toList()
         for (awaitingRef in items) {
@@ -186,7 +190,7 @@ class PractitionerCallServiceImpl(
                     // Еще можем сделать вызов голосом
                     if (timeFromLastAction >= DELAY_BEFORE_VOICE_CALL) {
                         // Время вызова пришло, вызовим
-                        //TODO Do voice call
+                        doVoiceCall(ref)
                         ref.awaitingCallStatusStage = AwaitingCallStatusStage.VoiceCall
                         ref.voiceCallCount = (ref.voiceCallCount ?: 0) + 1
                         ref.lastStageDateTime = Date()
@@ -195,6 +199,14 @@ class PractitionerCallServiceImpl(
                 }
             }
         }
+    }
+
+    private fun doVoiceCall(ref: AwaitingPractitionerCallRef) {
+        val call = practitionerCallStorageService.byId(ref.callId)
+        val fullName = call.practitioner.fullName
+        val location = call.location.officeNumber() ?: call.location.name
+        val speech = speechSynthesisService.textToSpeech("$fullName, пройдите в кабинет $location")
+        loudspeakerService.play(call, speech)
     }
 
 
