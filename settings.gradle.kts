@@ -26,7 +26,8 @@ include(
         "common:transaction-desc",
         "common:triton-monitor-sdk",
         "common:dto",
-        "common:security"
+        "common:security",
+        "paramedic-device-installer"
         /*TODO "applications:dh-rfid-location-device-app"*/
 )
 
@@ -48,3 +49,4 @@ pluginManagement {
         }
     }
 }
+include("paramedic-device-installer")

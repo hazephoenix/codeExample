@@ -17,6 +17,7 @@ class CentralServerApplication : WebSecurityConfigurerAdapter() {
         // TODO временное решение для закрытия стенда
         http
                 .csrf().disable()
+                .cors().disable()
                 .authorizeRequests()
                 .anyRequest()
                 .hasRole("ROOT_APP")
