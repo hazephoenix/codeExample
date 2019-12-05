@@ -3,11 +3,12 @@ package ru.viscur.autotests.tests.devices
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Disabled
 import ru.viscur.autotests.restApi.DeviceRequests
 import ru.viscur.autotests.utils.Constants.Companion.DOCUMENT_TASK
 import ru.viscur.autotests.utils.Constants.Companion.TEST_DESKTOP_UID
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class DocumentTask {
 
     companion object {

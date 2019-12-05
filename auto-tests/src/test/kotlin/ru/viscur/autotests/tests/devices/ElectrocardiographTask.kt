@@ -4,10 +4,11 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import ru.viscur.autotests.restApi.DeviceRequests
+import org.junit.jupiter.api.Disabled
 import ru.viscur.autotests.utils.Constants.Companion.ELETROCARDIOGRAPH_TASK
 import ru.viscur.autotests.utils.Constants.Companion.TEST_DESKTOP_UID
 
-//@Disabled("Debug purposes only")
+@Disabled("Debug purposes only")
 class ElectrocardiographTask {
 
     companion object {
