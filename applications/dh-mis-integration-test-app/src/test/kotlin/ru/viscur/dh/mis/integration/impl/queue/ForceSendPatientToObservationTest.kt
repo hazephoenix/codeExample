@@ -10,6 +10,7 @@ import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.ResourceService
 import ru.viscur.dh.datastorage.api.ServiceRequestService
+import ru.viscur.dh.datastorage.api.util.OFFICE_101
 import ru.viscur.dh.datastorage.api.util.OFFICE_130
 import ru.viscur.dh.datastorage.api.util.OFFICE_202
 import ru.viscur.dh.fhir.model.enums.LocationStatus
@@ -70,7 +71,7 @@ class ForceSendPatientToObservationTest {
     }
 
     @Test
-    fun `in queue, on observation, force to another offce`() {
+    fun `in queue, on observation, force to another office`() {
         forTestService.cleanDb()
         var i = 0
         val officeId = OFFICE_130
@@ -96,7 +97,7 @@ class ForceSendPatientToObservationTest {
     }
 
     @Test
-    fun `in queue, he is single, on observation, force to another offce`() {
+    fun `in queue, he is single, on observation, force to another office`() {
         forTestService.cleanDb()
         var i = 0
         val officeId = OFFICE_130
@@ -141,7 +142,48 @@ class ForceSendPatientToObservationTest {
                 QueueItemSimple(patientId = going1, status = ON_OBSERVATION),
                 QueueItemSimple(patientId = checkP, status = GOING_TO_OBSERVATION),
                 QueueItemSimple(patientId = inQue1, status = IN_QUEUE)
+        )), QueueOfOfficeSimple(officeId = OFFICE_202, officeStatus = LocationStatus.BUSY, items = listOf(
         ))))
+    }
+
+    @Test
+    fun `in queue, 2 patients going to observation`() {
+        forTestService.cleanDb()
+        var i = 0
+        val officeId = OFFICE_130
+        val officeId2 = OFFICE_101
+        val going1 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
+        val going2 = forTestService.createPatientWithQueueItem(officeId = officeId, queueStatus = GOING_TO_OBSERVATION, index = i++)
+        forTestService.updateOfficeStatuses()
+
+        forTestService.checkQueueItems(listOf(
+                QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                        QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
+                        QueueItemSimple(patientId = going2, status = GOING_TO_OBSERVATION)
+                ))
+        ))
+
+        queueManagerService.forceSendPatientToObservation(going1, officeId2)
+
+        forTestService.checkQueueItems(listOf(
+                QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                        QueueItemSimple(patientId = going2, status = GOING_TO_OBSERVATION)
+                )),
+                QueueOfOfficeSimple(officeId = officeId2, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                        QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION)
+                ))
+        ))
+
+        queueManagerService.forceSendPatientToObservation(going2, officeId2)
+
+        forTestService.checkQueueItems(listOf(
+                QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.BUSY, items = listOf(
+                )),
+                QueueOfOfficeSimple(officeId = officeId2, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                        QueueItemSimple(patientId = going1, status = GOING_TO_OBSERVATION),
+                        QueueItemSimple(patientId = going2, status = GOING_TO_OBSERVATION)
+                ))
+        ))
     }
 
     @Test

@@ -392,7 +392,7 @@ class QueueManagerServiceImpl(
     }
 
     private fun changeOfficeStatusNotReadyToProper(officeId: String) {
-        val queueItems = queueService.queueItems()
+        val queueItems = queueService.queueItemsOfOffice(officeId)
         val officeStatus =
                 when {
                     queueItems.any { it.patientQueueStatus == PatientQueueStatus.ON_OBSERVATION } -> LocationStatus.OBSERVATION
