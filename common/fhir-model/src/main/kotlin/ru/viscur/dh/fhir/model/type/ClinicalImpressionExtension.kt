@@ -15,6 +15,6 @@ import ru.viscur.dh.fhir.model.enums.Severity
  */
 class ClinicalImpressionExtension @JsonCreator constructor(
         @JsonProperty("severity") var severity: Severity,
-        @JsonProperty("queueCode") val queueCode: String,
+        @JsonProperty("queueCode") var queueCode: String,
         @JsonProperty("forBandageOnly") val forBandageOnly: Boolean? = null
 )

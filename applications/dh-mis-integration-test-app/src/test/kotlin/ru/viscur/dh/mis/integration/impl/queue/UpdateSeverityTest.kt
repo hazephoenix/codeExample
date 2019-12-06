@@ -64,6 +64,7 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = gre2)
         ))))
         assertEquals(Severity.RED, patientService.severity(checking))
+        assertEquals(Severity.RED.display.substring(0, 1) + "-", patientService.queueCode(checking).substring(0, 2))
 
         //поменяли на зеленый, должен встать в конец,
         // не меняя кабинета, хоть и рядом пустой
@@ -77,6 +78,7 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = gre2),
                 QueueItemSimple(patientId = checking)
         ))))
+        assertEquals(Severity.GREEN.display.substring(0, 1) + "-", patientService.queueCode(checking).substring(0, 2))
     }
 
     @Test
@@ -102,6 +104,7 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = gre2)
         ))))
         assertEquals(Severity.RED, patientService.severity(checking))
+        assertEquals(Severity.RED.display.substring(0, 1) + "-", patientService.queueCode(checking).substring(0, 2))
 
         //поменяли на желтый, должен встать после желтых
         examinationService.updateSeverity(checking, Severity.YELLOW)
@@ -114,6 +117,7 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2)
         ))))
+        assertEquals(Severity.YELLOW.display.substring(0, 1) + "-", patientService.queueCode(checking).substring(0, 2))
     }
 
     @Test
@@ -139,6 +143,8 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = gre2)
         ))))
         assertEquals(Severity.RED, patientService.severity(checking))
+        val queueCodeBefore = patientService.queueCode(checking)
+        assertEquals(Severity.RED.display.substring(0, 1) + "-", queueCodeBefore.substring(0, 2))
 
         //ничего не должно поменяться - с красного на красный
         examinationService.updateSeverity(checking, Severity.RED)
@@ -151,6 +157,7 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = gre1),
                 QueueItemSimple(patientId = gre2)
         ))))
+        assertEquals(queueCodeBefore, patientService.queueCode(checking))
     }
 
     @Test
@@ -176,6 +183,7 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = gre2)
         ))))
         assertEquals(Severity.GREEN, patientService.severity(checking))
+        assertEquals(Severity.GREEN.display.substring(0, 1) + "-", patientService.queueCode(checking).substring(0, 2))
 
         //после красных
         examinationService.updateSeverity(checking, Severity.RED)
@@ -188,6 +196,7 @@ class UpdateSeverityTest {
                 QueueItemSimple(patientId = yel2),
                 QueueItemSimple(patientId = gre2)
         ))))
+        assertEquals(Severity.RED.display.substring(0, 1) + "-", patientService.queueCode(checking).substring(0, 2))
     }
 
     @Test

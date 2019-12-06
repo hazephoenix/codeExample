@@ -435,7 +435,7 @@ class Helpers {
                 supportingInfo = supportingInfo,
                 extension = ClinicalImpressionExtension(
                         severity = severity,
-                        queueCode = severity.display.substring(0, 1) + "00" + counter++
+                        queueCode = severity.display.substring(0, 1) + "-00" + counter++
                 )
         )
 

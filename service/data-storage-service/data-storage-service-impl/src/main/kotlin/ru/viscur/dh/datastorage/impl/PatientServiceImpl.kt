@@ -61,6 +61,7 @@ class PatientServiceImpl(
         resourceService.update(ResourceType.ClinicalImpression, activeClinicalImpression.id) {
             if (extension.severity.name != severity.name) {
                 extension.severity = severity
+                extension.queueCode = severity.display.substring(0, 1) + extension.queueCode.substring(1)
                 updated = true
             }
         }
