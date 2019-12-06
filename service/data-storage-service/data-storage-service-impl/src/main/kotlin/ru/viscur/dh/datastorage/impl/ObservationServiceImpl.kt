@@ -50,7 +50,7 @@ class ObservationServiceImpl(
                     select
                         jsonb_array_elements(cp.resource -> 'activity') -> 'outcomeReference' ->> 'reference'
                     from CarePlan cp
-                    where 'CarePlan/' || r.id in (
+                    where 'CarePlan/' || cp.id in (
                         select jsonb_array_elements(ci.resource -> 'supportingInfo') ->> 'reference'
                         from clinicalImpression ci
                         where ci.resource -> 'subject' ->> 'reference' = ?1

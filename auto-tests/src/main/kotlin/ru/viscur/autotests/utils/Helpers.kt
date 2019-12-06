@@ -54,30 +54,105 @@ class Helpers {
         fun createRequestSpecWithoutBody(): RequestSpecification =
                 RestAssured.given().header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
 
+        fun createRequestWithQuery(paramsMap: Map <String, Any>): RequestSpecification =
+                RestAssured.given().queryParams(paramsMap).header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
+
+        fun createRequestWithQueryAndBody(body: Any, paramsMap: Map <String, Any>): RequestSpecification =
+                RestAssured.given().queryParams(paramsMap).body(body).header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
+
         //создание bundle для пациента
-        fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>): Bundle {
-            val patient = createPatientResource(enp = enp)
+        fun bundle(enp: String, severity: String, servRequests: List<ServiceRequest>? = null): Bundle {
+            val patient = createPatientResource(enp = enp, severity = enumValueOf(severity))
             val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
             val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
             val personalDataConsent = createConsentResource()
             val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
+            val diagnostiReportMainSyndrome = createDiagnosticReportResource(diagnosisCode = "A00.1", practitionerId = paramedicId, status = DiagnosticReportStatus.mainSyndrome)
             val list = createPractitionerListResource(surgeonId)
             val claim = createClaimResource()
 
             val bundle = Bundle(entry = listOf(
                     BundleEntry(patient),
                     BundleEntry(diagnosticReport),
+                    BundleEntry(diagnostiReportMainSyndrome),
                     BundleEntry(bodyWeight),
                     BundleEntry(personalDataConsent),
                     BundleEntry(list),
                     BundleEntry(claim),
                     BundleEntry(questionnaireResponseSeverityCriteria)
-            ) + servRequests.map { BundleEntry(it) })
+            ) + (servRequests?.map { BundleEntry(it) } ?: emptyList()))
+            return bundle
+        }
+
+        fun bundleForSurgeon2(enp: String, severity: String, servRequests: List<ServiceRequest>? = null): Bundle {
+            val patient = createPatientResource(enp = enp)
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
+            val personalDataConsent = createConsentResource()
+            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
+            val diagnostiReportMainSyndrome = createDiagnosticReportResource(diagnosisCode = "A00.1", practitionerId = paramedicId, status = DiagnosticReportStatus.mainSyndrome)
+            val list = createPractitionerListResource(surgeon2Id)
+            val claim = createClaimResource()
+
+            val bundle = Bundle(entry = listOf(
+                BundleEntry(patient),
+                BundleEntry(diagnosticReport),
+                BundleEntry(diagnostiReportMainSyndrome),
+                BundleEntry(bodyWeight),
+                BundleEntry(personalDataConsent),
+                BundleEntry(list),
+                BundleEntry(claim),
+                BundleEntry(questionnaireResponseSeverityCriteria)
+            ) + (servRequests?.map { BundleEntry(it) } ?: emptyList()))
+            return bundle
+        }
+
+        fun bundleForUrologist(enp: String, severity: String, servRequests: List<ServiceRequest>? = null): Bundle {
+            val patient = createPatientResource(enp = enp)
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseResource(severity)
+            val personalDataConsent = createConsentResource()
+            val diagnosticReport = createDiagnosticReportResource(diagnosisCode = "A00.0", practitionerId = paramedicId)
+            val diagnostiReportMainSyndrome = createDiagnosticReportResource(diagnosisCode = "A00.1", practitionerId = paramedicId, status = DiagnosticReportStatus.mainSyndrome)
+            val list = createPractitionerListResource(urologistId)
+            val claim = createClaimResource()
+
+            val bundle = Bundle(entry = listOf(
+                    BundleEntry(patient),
+                    BundleEntry(diagnosticReport),
+                    BundleEntry(diagnostiReportMainSyndrome),
+                    BundleEntry(bodyWeight),
+                    BundleEntry(personalDataConsent),
+                    BundleEntry(list),
+                    BundleEntry(claim),
+                    BundleEntry(questionnaireResponseSeverityCriteria)
+            ) + (servRequests?.map { BundleEntry(it) } ?: emptyList()))
+            return bundle
+        }
+
+
+        fun bundleForDiagnosis(): Bundle {
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseDiagnosis()
+            val bundle = Bundle(entry = listOf(
+                    BundleEntry(bodyWeight),
+                    BundleEntry(questionnaireResponseSeverityCriteria)
+            ))
+            return bundle
+        }
+
+        fun bundleForSeverity(listOfValues: List<String>): Bundle {
+            val bodyWeight = createObservation(code = "Weight", valueInt = 90, patientId = "ignored", practitionerId = paramedicId)
+            val questionnaireResponseSeverityCriteria = Helpers.createQuestResponseSeverity(listOfValues)
+            val bundle = Bundle(entry = listOf(
+                    BundleEntry(bodyWeight),
+                    BundleEntry(questionnaireResponseSeverityCriteria)
+            ))
             return bundle
         }
 
         //создание ресурсов
-        fun createPatientResource(enp: String, queueStatus: PatientQueueStatus = PatientQueueStatus.READY) = Patient(
+        fun createPatientResource(enp: String, queueStatus: PatientQueueStatus = PatientQueueStatus.READY, severity: Severity = Severity.GREEN) = Patient(
                 identifier = listOf(
                         Identifier(
                                 value = "7878 77521487",//серия номер
@@ -103,7 +178,7 @@ class Helpers {
                                 type = IdentifierType.SNILS
                         ),
                         Identifier(
-                                value = "З-018",//номер
+                                value = "${severity.name.substring(0, 1)}-$enp",//номер
                                 type = IdentifierType.QUEUE_CODE
                         )
                 ),
@@ -131,6 +206,9 @@ class Helpers {
         fun createClaimResource(patientId: String = "ignore", id: String = genId()): Claim {
             return Claim(
                     id = id,
+                    identifier = listOf(
+                            Identifier("ignored", IdentifierType.CLAIM_NUMBER)
+                    ),
                     patient = referenceToPatient(patientId),
                     accident = ClaimAccident(
                             date = Date(), //дата и время происшествия
@@ -200,9 +278,9 @@ class Helpers {
                                 linkId = "Complaints",
                                 text = "Жалобы пациента",
                                 answer = listOf(
-                                        QuestionnaireResponseItemAnswer(valueString = "Озноб"),
+                                        QuestionnaireResponseItemAnswer(valueString = "лихорадка"),
                                         QuestionnaireResponseItemAnswer(valueString = "Слабость"),
-                                        QuestionnaireResponseItemAnswer(valueString = "Недомогание")
+                                        QuestionnaireResponseItemAnswer(valueString = "острая боль")
                                 )
                         ),
                         QuestionnaireResponseItem(
@@ -214,6 +292,67 @@ class Helpers {
                         )
                 )
         )
+
+        fun createQuestResponseDiagnosis(patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
+            id = id,
+            status = QuestionnaireResponseStatus.completed,
+            author = referenceToPractitioner("ignored"),
+            source = referenceToPatient(patientId),
+            questionnaire = "Questionnaire/Severity_criteria",
+            item = listOf(
+                QuestionnaireResponseItem(
+                    linkId = "Complaints",
+                    text = "Жалобы пациента",
+                    answer = listOf(
+                        QuestionnaireResponseItemAnswer(valueString = "Жар"),
+                        QuestionnaireResponseItemAnswer(valueString = "Острая боль"),
+                        QuestionnaireResponseItemAnswer(valueString = "Головная боль")
+                    )
+                )
+            )
+        )
+
+        fun createQuestResponseSeverity(listOfValues: List<String>, patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
+            id = id,
+            status = QuestionnaireResponseStatus.completed,
+            author = referenceToPractitioner("ignored"),
+            source = referenceToPatient(patientId),
+            questionnaire = "Questionnaire/Severity_criteria",
+            item = listOf(
+                QuestionnaireResponseItem(
+                    linkId = "Upper_respiratory_airway",
+                    text = "Результат осмотра верхних дыхательных путей",
+                    answer = listOf(QuestionnaireResponseItemAnswer(
+                        valueCoding = Coding(code = listOfValues.first(), display = listOfValues.first(), system = ValueSetName.UPPER_RESPIRATORY_AIRWAY.id)
+                    ))
+                ),
+                QuestionnaireResponseItem(
+                    linkId = "Consciousness_assessment",
+                    text = "Сознание",
+                    answer = listOf(QuestionnaireResponseItemAnswer(
+                        valueCoding = Coding(code = listOfValues.get(1), display = listOfValues.get(1), system = ValueSetName.CONSCIOUSNESS_ASSESSMENT.id)
+                    ))
+                ),
+                QuestionnaireResponseItem(
+                    linkId = "Patient_can_stand",
+                    text = "Опорная функция",
+                    answer = listOf(QuestionnaireResponseItemAnswer(
+                        valueCoding = Coding(code = listOfValues.get(2), display = listOfValues.get(2), system = ValueSetName.PATIENT_CAN_STAND.id)
+                    ))
+                ),
+                QuestionnaireResponseItem(
+                    linkId = "Complaints",
+                    text = "Жалобы пациента",
+                    answer = listOf(
+                        QuestionnaireResponseItemAnswer(valueString = "Жар"),
+                        QuestionnaireResponseItemAnswer(valueString = "Острая боль"),
+                        QuestionnaireResponseItemAnswer(valueString = "Головная боль")
+                    )
+                )
+
+            )
+        )
+
 
         fun createQuestResponseResourceWithCommonInfo(patientId: String = "ignore", id: String = genId()) = QuestionnaireResponse(
                 id = id,

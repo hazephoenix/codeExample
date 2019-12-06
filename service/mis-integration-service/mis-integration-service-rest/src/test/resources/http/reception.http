@@ -814,7 +814,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           {
             "coding": [
               {
-                "code": "A00.0",
+                "code": "D50.1",
                 "system": "ValueSet/ICD-10"
               }
             ]

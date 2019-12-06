@@ -1,12 +1,24 @@
 package ru.viscur.autotests.tests
 
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
 import ru.viscur.autotests.dto.*
 import ru.viscur.autotests.restApi.QueRequests
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_101
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION1_OFFICE_116
+import ru.viscur.autotests.utils.Constants.Companion.OBSERVATION_OF_SURGEON
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_101_ID
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_116_ID
+import ru.viscur.autotests.utils.Constants.Companion.OFFICE_139_ID
+import ru.viscur.autotests.utils.Constants.Companion.RED_ZONE_ID
 import ru.viscur.autotests.utils.*
+import ru.viscur.autotests.utils.Helpers.Companion.bundle
+import ru.viscur.autotests.utils.Helpers.Companion.createDiagnosticReportResource
+import ru.viscur.autotests.utils.Helpers.Companion.createEncounter
+import ru.viscur.autotests.utils.Helpers.Companion.createListResource
+import ru.viscur.autotests.utils.Helpers.Companion.createObservation
+import ru.viscur.autotests.utils.Helpers.Companion.createServiceRequestResource
+import ru.viscur.autotests.utils.Helpers.Companion.surgeonId
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
 import ru.viscur.dh.fhir.model.type.*
@@ -15,120 +27,16 @@ import ru.viscur.dh.fhir.model.utils.*
 @Disabled("Debug purposes only")
 class End2End {
 
-    companion object {
-        //фельдшер
-        const val paramedicId = Helpers.paramedicId
-        //кто делает все observation
-        const val diagnosticAssistantId = Helpers.diagnosticAssistantId
-        //ответсвенный
-        const val respPractitionerId = Helpers.surgeonId
+    @BeforeEach
+    fun init() {
+        QueRequests.deleteQue()
     }
 
     @Test
-    @Order(1)
-    fun patientE2e() {
-        QueRequests.deleteQue()
-        val observationOfSurgeonCode = "B01.057.001"
-        val servRequests = listOf(
-                Helpers.createServiceRequestResource(observationOfSurgeonCode)
-        )
-        val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-        val office139Id = "Office:139"
+    fun patientServiceRequestAddingCycle() {
 
-        QueRequests.officeIsBusy(referenceToLocation(office139Id))
-        val responseBundle = QueRequests.createPatient(bundle)
-
-        //проверка наличия и количества Service Request
-        assertEquals(1, responseBundle.entry.size, "number of servicerequests in response")
-        assertEquals(ResourceType.ServiceRequest.id, responseBundle.entry.first().resource.resourceType, "")
-
-        val serviceRequestsFromResponse = responseBundle.resources(ResourceType.ServiceRequest)
-        val patientId = patientIdFromServiceRequests(serviceRequestsFromResponse)
-
-        //проверка Service Request-ов из ответа
-        compareServiceRequests(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id)), serviceRequestsFromResponse)
-
-        //проверка состояний в базе: состояние очереди, назначения, обследования
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office139Id, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-        checkServiceRequestsOfPatient(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id)))
-        checkObservationsOfPatient(patientId, listOf())
-        checkPatientsOfResp(listOf(
-                PatientsOfRespInfo("Paramedic_Сейсенбекова_Алена_Нуржановна", listOf(
-                        PatientOfRespInfo(patientId, Severity.RED)
-                ))
-        ))
-
-        //кабинет READY
-        QueRequests.officeIsReady(referenceToLocation(office139Id))
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office139Id, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.GOING_TO_OBSERVATION)
-                ))
-        ))
-
-        //пациент вошел в кабинет
-        val patientEnteredListResource = Helpers.createListResource(patientId, office139Id)
-        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
-
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office139Id, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
-                ))
-        ))
-        val actPatient = QueRequests.resource(ResourceType.Patient, patientId)
-
-        //проверка что в кабинете необходимые обследования и пациент
-        compareServiceRequests(patientId, listOf(ServiceRequestInfo(code = observationOfSurgeonCode, locationId = office139Id)), serviceRequestsFromResponse)
-
-        //т к единственное обследование - осмотр отв. - завершение обследования:
-        val actServiceInOffice = actServicesInOffice.first()
-        val obsOfRespPract = Helpers.createObservation(code = actServiceInOffice.code.code(),
-                valueString = "состояние удовлетворительное",
-                practitionerId = actServiceInOffice.performer?.first()?.id!!,
-                basedOnServiceRequestId = actServiceInOffice.id,
-                status = ObservationStatus.final
-        )
-        val diagnosticReportOfResp = Helpers.createDiagnosticReportResource(
-                diagnosisCode = "A00.0",
-                practitionerId = respPractitionerId,
-                status = DiagnosticReportStatus.final
-        )
-        val encounter = Helpers.createEncounter(hospitalizationStr = "Клиники СибГму")
-        val bundleForExamination = Bundle(entry = listOf(
-                BundleEntry(obsOfRespPract),
-                BundleEntry(diagnosticReportOfResp),
-                BundleEntry(encounter)
-        ))
-        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
-        assertEquals(ClinicalImpressionStatus.completed, completedClinicalImpression.status, "wrong status completed ClinicalImpression")
-        checkQueueItems(listOf())
-        checkServiceRequestsOfPatient(patientId, listOf())
-        checkObservationsOfPatient(patientId, listOf())
-    }
-
-    private fun patientIdFromServiceRequests(serviceRequestsFromResponse: List<ServiceRequest>): String {
-        assertTrue(serviceRequestsFromResponse.size > 0, "list of service requests can't be empty")
-        assertNotNull(serviceRequestsFromResponse.first().subject?.id, "wrong id patient")
-        val patientId = serviceRequestsFromResponse.first().subject?.id!!
-        return patientId
-    }
-
-    @Test
-    @Order(1)
-    fun patientAdditionalServRequestAdding() {
-        QueRequests.deleteQue()
-        val servRequests = listOf(
-                Helpers.createServiceRequestResource("B01.057.001")
-        )
-        val bundle = Helpers.bundle("7879", Severity.RED.toString(), servRequests)
-        val office139 = "Office:139"
-        val office104 = "Office:104"
-        val office116 = "Office:116"
-        QueRequests.officeIsBusy(referenceToLocation(office139))
+        val bundle = bundle("7879", "RED")
+        QueRequests.officeIsBusy(referenceToLocation(OFFICE_139_ID))
         val responseBundle = QueRequests.createPatient(bundle)
 
         //проверка наличия и количества Service Request
@@ -137,88 +45,177 @@ class End2End {
 
         val actServiceRequests = responseBundle.resources(ResourceType.ServiceRequest)
         val patientId = patientIdFromServiceRequests(actServiceRequests)
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office139, listOf(
-                        QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-        var actPatient = QueRequests.resource(ResourceType.Patient, patientId)
-        assertEquals(PatientQueueStatus.IN_QUEUE, actPatient.extension.queueStatus, "wrong status of patient ... ")
+        QueRequests.invitePatientToOffice(createListResource(patientId, OFFICE_139_ID))
+
+        checkQueueItems(
+            listOf(
+                QueueItemsOfOffice(
+                    OFFICE_139_ID, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.GOING_TO_OBSERVATION)
+                    )
+                )
+            )
+        )
 
         //пациент вошел в кабинет
-        QueRequests.officeIsReady(referenceToLocation(office139))
-        val patientEnteredListResource = Helpers.createListResource(patientId, office139)
-        val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
-        actPatient = QueRequests.resource(ResourceType.Patient, patientId)
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_139_ID))
+        val patientEnteredListResource = createListResource(patientId, OFFICE_139_ID)
+        QueRequests.patientEntered(patientEnteredListResource)
 
-        //проверка что в кабинете необходимые обследования и пациент
-        assertEquals(1, actServicesInOffice.size, "wrong number of office's service requests")
-        assertEquals(PatientQueueStatus.ON_OBSERVATION, actPatient.extension.queueStatus, "wrong patient status")
-
+        //добавление ответственным дополнительного Service Request
         val additionalServiceRequests = listOf(
-                Helpers.createServiceRequestResource("A04.16.001", patientId),
-                Helpers.createServiceRequestResource("B03.016.006", patientId)
+            createServiceRequestResource(OBSERVATION1_OFFICE_101, patientId)
         )
-
         val bundleForExamin = Bundle(
-                entry = additionalServiceRequests.map { BundleEntry(it) }
+            entry = additionalServiceRequests.map { BundleEntry(it) }
         )
-        QueRequests.officeIsBusy(referenceToLocation(office104))
+        QueRequests.officeIsBusy(referenceToLocation(OFFICE_101_ID))
         val updatedCarePlan = QueRequests.addServiceRequests(bundleForExamin)
 
-        //в CarePlan должны быть добавленные ServiceRequests и осмотр ответственного, пациент должен встать в очередь в другой кабинет
-        assertEquals(3, updatedCarePlan.activity.size, "wrong care plan activities")
-        checkQueueItems(listOf(
-                QueueItemsOfOffice(office104, listOf(
+        //проверка, что в CarePlan добавлен ServiceRequest, пациент должен снова встать в очередь в другой кабинет
+        assertEquals(2, updatedCarePlan.activity.size, "wrong care plan activities")
+        checkQueueItems(
+            listOf(
+                QueueItemsOfOffice(
+                    OFFICE_101_ID, listOf(
                         QueueItemInfo(patientId, PatientQueueStatus.IN_QUEUE)
-                ))
-        ))
-        checkServiceRequestsOfPatient(patientId, listOf(
-                ServiceRequestInfo(code = "B01.057.001", locationId = office139),
-                ServiceRequestInfo(code = "A04.16.001", locationId = office116),
-                ServiceRequestInfo(code = "B03.016.006", locationId = office104)
-        ))
+                    )
+                )
+            )
+        )
+        checkServiceRequestsOfPatient(
+            patientId, listOf(
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID),
+                ServiceRequestInfo(code = OBSERVATION1_OFFICE_101, locationId = OFFICE_101_ID)
+            )
+        )
         checkObservationsOfPatient(patientId, listOf())
     }
 
     @Test
-    @Order(1)
-    fun fullPositiveE2ePatient() {
-        QueRequests.deleteQue()
+    fun patientClaimCompletingFullCycle() {
+        //создание пациента с 3 разными по приоритету обследованиями
         val patientServiceRequests = listOf(
-                Helpers.createServiceRequestResource("A09.05.010"),
-                Helpers.createServiceRequestResource("A09.20.003"),
-                Helpers.createServiceRequestResource("A04.16.001")
+            createServiceRequestResource(OBSERVATION1_OFFICE_101),
+            createServiceRequestResource(OBSERVATION1_OFFICE_116)
         )
-        val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
+        val patientBundle = bundle("1333", "RED", patientServiceRequests)
         val responseBundle = QueRequests.createPatient(patientBundle)
-        assertEquals(4, responseBundle.entry.size, "wrong number of service request")
+        val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_101_ID))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_116_ID))
+        QueRequests.officeIsReady(referenceToLocation(OFFICE_139_ID))
 
-    }
+        assertEquals(3, responseBundle.entry.size, "wrong number of service request")
 
-    @Test
-    @Order(1)
-    fun fullPositiveE2ePatient2() {
-        QueRequests.deleteQue()
-        val patientServiceRequests = listOf(
-                Helpers.createServiceRequestResource("A09.05.010"),
-                Helpers.createServiceRequestResource("A09.20.003"),
-                Helpers.createServiceRequestResource("A04.16.001")
+        //прохождение всех обследований поочередно
+        //office101
+        val servRequestOf101office = QueRequests.patientEntered(
+            createListResource(
+                patientId,
+                OFFICE_101_ID
+            )
+        ).find { it.code.code() == OBSERVATION1_OFFICE_101 } as ServiceRequest
+        checkQueueItems(
+            listOf(
+                QueueItemsOfOffice(
+                    OFFICE_101_ID, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                    )
+                )
+            )
         )
-        val patientBundle = Helpers.bundle("1001", "RED", patientServiceRequests)
-        val responseBundle = QueRequests.createPatient(Helpers.bundle("1001", "RED", patientServiceRequests))
-        val responseBundle2 = QueRequests.createPatient(Helpers.bundle("1002", "RED", patientServiceRequests))
-        val responseBundle3 = QueRequests.createPatient(Helpers.bundle("1003", "RED", patientServiceRequests))
-        val responseBundle4 = QueRequests.createPatient(Helpers.bundle("1004", "RED", patientServiceRequests))
-        val responseBundle5 = QueRequests.createPatient(Helpers.bundle("1005", "RED", patientServiceRequests))
-        val responseBundle6 = QueRequests.createPatient(Helpers.bundle("1006", "RED", patientServiceRequests))
-        val responseBundle7 = QueRequests.createPatient(Helpers.bundle("1007", "RED", patientServiceRequests))
-        val responseBundle8 = QueRequests.createPatient(Helpers.bundle("1008", "RED", patientServiceRequests))
-        val responseBundle9 = QueRequests.createPatient(Helpers.bundle("1009", "RED", patientServiceRequests))
-        val responseBundle10 = QueRequests.createPatient(Helpers.bundle("1010", "RED", patientServiceRequests))
-        val responseBundle11 = QueRequests.createPatient(Helpers.bundle("1011", "RED", patientServiceRequests))
-        val responseBundle12 = QueRequests.createPatient(Helpers.bundle("1012", "RED", patientServiceRequests))
-        val responseBundle13 = QueRequests.createPatient(Helpers.bundle("1013", "RED", patientServiceRequests))
-    }
+        val obs = createObservation(
+            code = OBSERVATION1_OFFICE_101,
+            status = ObservationStatus.final,
+            basedOnServiceRequestId = servRequestOf101office.id,
+            valueString = "результат анализа"
+        )
+        QueRequests.createObservation(obs)
+        QueRequests.patientLeft(createListResource(patientId, OFFICE_101_ID))
 
+        //office116
+        val servRequestOf116office = QueRequests.patientEntered(
+            createListResource(
+                patientId,
+                OFFICE_116_ID
+            )
+        ).find { it.code.code() == OBSERVATION1_OFFICE_116 } as ServiceRequest
+        checkQueueItems(
+            listOf(
+                QueueItemsOfOffice(
+                    OFFICE_116_ID, listOf(
+                        QueueItemInfo(patientId, PatientQueueStatus.ON_OBSERVATION)
+                    )
+                )
+            )
+        )
+        val obs3 = createObservation(
+            code = OBSERVATION1_OFFICE_116,
+            status = ObservationStatus.final,
+            basedOnServiceRequestId = servRequestOf116office.id,
+            valueString = "результат анализа"
+        )
+        QueRequests.createObservation(obs3)
+        QueRequests.patientLeft(createListResource(patientId, OFFICE_116_ID))
+
+        //проверка что все обследования, кроме ответственного пройдены
+        checkServiceRequestsOfPatient(
+            patientId, listOf(
+                ServiceRequestInfo(
+                    code = OBSERVATION1_OFFICE_101,
+                    locationId = OFFICE_101_ID,
+                    status = ServiceRequestStatus.completed
+                ),
+                ServiceRequestInfo(
+                    code = OBSERVATION1_OFFICE_116,
+                    locationId = OFFICE_116_ID,
+                    status = ServiceRequestStatus.completed
+                ),
+                ServiceRequestInfo(code = OBSERVATION_OF_SURGEON, locationId = RED_ZONE_ID)
+            )
+        )
+
+        //office 139 осмотр ответственного и завершение маршрутного листа с госпитализацией
+        QueRequests.invitePatientToOffice(createListResource(patientId, OFFICE_139_ID))
+        val servRequestOfResp = QueRequests.patientEntered(
+            createListResource(
+                patientId,
+                OFFICE_139_ID
+            )
+        ).find { it.code.code() == OBSERVATION_OF_SURGEON } as ServiceRequest
+        val obsOfRespPract = createObservation(
+            code = OBSERVATION_OF_SURGEON,
+            valueString = "состояние удовлетворительное",
+            practitionerId = servRequestOfResp.performer?.first()?.id!!,
+            basedOnServiceRequestId = servRequestOfResp.id,
+            status = ObservationStatus.final,
+            patientId = patientId
+        )
+        val diagnosticReportOfResp = createDiagnosticReportResource(
+            diagnosisCode = "A16",
+            practitionerId = surgeonId,
+            status = DiagnosticReportStatus.final,
+            patientId = patientId
+        )
+        val encounter = createEncounter(hospitalizationStr = "Клиники СибГму", patientId = patientId)
+        val bundleForExamination = Bundle(
+            entry = listOf(
+                BundleEntry(obsOfRespPract),
+                BundleEntry(diagnosticReportOfResp),
+                BundleEntry(encounter)
+            )
+        )
+        val completedClinicalImpression = QueRequests.completeExamination(bundleForExamination)
+
+        //проверка, что маршрутный лист пациента завершен и он удален из системы очередь
+        assertEquals(
+            ClinicalImpressionStatus.completed,
+            completedClinicalImpression.status,
+            "wrong status of ClinicalImpression"
+        )
+        checkQueueItems(listOf())
+        checkServiceRequestsOfPatient(patientId, listOf())
+        checkObservationsOfPatient(patientId, listOf())
+    }
 }
