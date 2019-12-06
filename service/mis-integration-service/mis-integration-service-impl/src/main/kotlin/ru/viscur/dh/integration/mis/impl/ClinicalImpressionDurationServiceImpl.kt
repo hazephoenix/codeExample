@@ -41,7 +41,7 @@ class ClinicalImpressionDurationServiceImpl(
         val allActive = clinicalImpressionService.allActive()
         val now = now()
         return allActive.map {
-            val patientId = it.subject.id!!
+            val patientId = it.subject.id()
             val severity = patientService.severity(patientId)
             ClinicalImpressionDurationDto(
                     patientId = patientId,

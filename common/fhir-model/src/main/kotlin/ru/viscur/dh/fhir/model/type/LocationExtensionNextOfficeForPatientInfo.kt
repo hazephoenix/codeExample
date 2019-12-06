@@ -29,6 +29,6 @@ class LocationExtensionNextOfficeForPatientInfo @JsonCreator constructor(
         @JsonProperty("nextOffice") var nextOffice: Reference
 ) {
     override fun toString(): String {
-        return "LocationExtensionNextOfficeForPatientInfo(fireDate=$fireDate, patientId=${subject.id}, severity=$severity, queueCode='$queueCode', nextOfficeId=${nextOffice.id})"
+        return "LocationExtensionNextOfficeForPatientInfo(fireDate=$fireDate, patientId=${subject.id()}, severity=$severity, queueCode='$queueCode', nextOfficeId=${nextOffice.id()})"
     }
 }

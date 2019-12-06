@@ -57,7 +57,7 @@ class QueueManagerServiceImpl(
     override fun registerPatient(patientId: String): List<ServiceRequest> {
         val serviceRequests = calcServiceRequestExecOrders(patientId)
         deleteFromQueue(patientId)//на случай пересоздания маршрутного листа
-        addToOfficeQueue(patientId, serviceRequests.filterForQueue().first().locationReference?.first()?.id
+        addToOfficeQueue(patientId, serviceRequests.filterForQueue().first().locationReference?.first()?.id()
                 ?: throw Exception("not defined location for service request with id '${serviceRequests.first().id}'"))
         return serviceRequests
     }
@@ -243,7 +243,7 @@ class QueueManagerServiceImpl(
             officeService.changeStatus(officeId, LocationStatus.CLOSED)
             val queue = queueService.queueItemsOfOffice(officeId)
             queue.forEach {
-                val patientId = it.subject.id
+                val patientId = it.subject.id()
                 patientStatusService.changeStatus(patientId!!, PatientQueueStatus.READY)
                 addToQueue(patientId, officeId)
             }
@@ -308,7 +308,7 @@ class QueueManagerServiceImpl(
             if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
                 str.add("  nextOfficeForPatientsInfo:")
                 office.extension.nextOfficeForPatientsInfo.forEach {
-                    str.add("    " + it.subject.id + " (${it.severity}, ${it.queueCode}) to " + it.nextOffice.id)
+                    str.add("    " + it.subject.id() + " (${it.severity}, ${it.queueCode}) to " + it.nextOffice.id())
                 }
             }
 
@@ -320,7 +320,7 @@ class QueueManagerServiceImpl(
                 return@forEach
             }
 
-            val firstPatientId = queue.first().subject.id
+            val firstPatientId = queue.first().subject.id()
             val firstPatient = patientService.byId(firstPatientId!!)
             //статус первого в очереди
             if (firstPatient.extension.queueStatus !in listOf(PatientQueueStatus.ON_OBSERVATION, PatientQueueStatus.GOING_TO_OBSERVATION, PatientQueueStatus.IN_QUEUE)) {
@@ -330,13 +330,13 @@ class QueueManagerServiceImpl(
             //это первый со статусом IN_QUEUE
             val firstPatientInQueueId = officeService.firstPatientIdInQueue(office.id)
             firstPatientInQueueId?.run {
-                val firstPatientInQueueIndex = queue.find { it.subject.id!! == firstPatientInQueueId }?.onum!!
+                val firstPatientInQueueIndex = queue.find { it.subject.id() == firstPatientInQueueId }?.onum!!
                 if (queue.filterIndexed { i, _ -> i >= firstPatientInQueueIndex }.any { it.patientQueueStatus != PatientQueueStatus.IN_QUEUE }) {
                     str.add("ERROR. all patients except several first patients must have status IN_QUEUE. Office with error: ${office.id}")
                 }
             }
             //один пациент не может стоять в очереди несколько раз в один офис
-            queue.groupBy { it.subject.id }.forEach { (patientId, queueItems) ->
+            queue.groupBy { it.subject.id() }.forEach { (patientId, queueItems) ->
                 if (queueItems.size > 1) {
                     str.add("ERROR. patient with id $patientId is in several queue items to ${office.id}")
                 }
@@ -365,13 +365,13 @@ class QueueManagerServiceImpl(
         }
         //один пациент не может стоять в несколько очередей в разные кабинеты
         val allQueueItems = resourceService.all(ResourceType.QueueItem, RequestBodyForResources(filter = mapOf()))
-        allQueueItems.groupBy { it.subject.id }.forEach { (patientId, queueItems) ->
+        allQueueItems.groupBy { it.subject.id() }.forEach { (patientId, queueItems) ->
             if (queueItems.size > 1) {
                 str.add("ERROR. patient with id $patientId is in several office queues")
             }
         }
         //один пациент не должен отображаться в информации о посл пациенте в неск кабинетах
-        offices.map { it.extension.nextOfficeForPatientsInfo }.flatten().groupBy { it.subject.id }.forEach { (patientId, offices) ->
+        offices.map { it.extension.nextOfficeForPatientsInfo }.flatten().groupBy { it.subject.id() }.forEach { (patientId, offices) ->
             if (offices.size > 1) {
                 str.add("ERROR. patient with id $patientId is in several nextOfficeForPatientsInfo $offices")
             }
@@ -463,7 +463,7 @@ class QueueManagerServiceImpl(
      */
     private fun nextOfficeId(patientId: String, prevOfficeId: String?): String? =
             if (needRecalcNextOffice()) serviceRequestsExecutionCalculator.calcNextOfficeId(patientId, prevOfficeId)
-            else serviceRequestService.activeForQueue(patientId).firstOrNull()?.locationReference?.first()?.id
+            else serviceRequestService.activeForQueue(patientId).firstOrNull()?.locationReference?.first()?.id()
 
     /**
      * Непройденные назначения, которые могут быть пройдены в этом кабинете

@@ -38,7 +38,7 @@ class TemperatureTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseTemperature.id!!
+        val taskId = responseTemperature.id
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 

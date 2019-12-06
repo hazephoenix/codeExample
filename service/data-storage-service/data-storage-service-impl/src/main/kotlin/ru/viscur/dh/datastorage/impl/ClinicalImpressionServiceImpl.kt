@@ -151,9 +151,9 @@ class ClinicalImpressionServiceImpl(
                     .find { it.questionnaire == "Questionnaire/$questionnaireId" }
                     ?.item?.find { it.linkId == linkId }?.answer?.first()?.valueCoding?.code
                     ?: throw Exception("not found answer for questionnaire $questionnaireId and linkId $linkId for" +
-                            " patient with id '${clinicalImpression.subject.id}' (clinicalImpressionId: '${clinicalImpression.id}')")
+                            " patient with id '${clinicalImpression.subject.id()}' (clinicalImpressionId: '${clinicalImpression.id}')")
 
     private fun <T> getResources(references: List<Reference>, resourceType: ResourceType<T>): List<T>
             where T : BaseResource =
-            references.filter { it.type == resourceType.id }.map { resourceService.byId(resourceType, it.id!!) }
+            references.filter { it.type == resourceType.id }.map { resourceService.byId(resourceType, it.id()) }
 }

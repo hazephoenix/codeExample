@@ -166,7 +166,7 @@ class PatientServiceImpl(
                 .firstOrNull()
                 ?.entry?.find { it.item.type == ResourceType.ResourceTypeId.Practitioner }?.item
                 ?: throw Error("No responsible practitioner provided")
-        val responsiblePractitionerId = responsiblePractitionerRef.id!!
+        val responsiblePractitionerId = responsiblePractitionerRef.id()
         val observationTypeOfResponsible = observationTypeOfResponsiblePractitioner(responsiblePractitionerId)
         val serviceRequestOfResponsiblePr = (serviceRequests.find { it.code.code() == observationTypeOfResponsible }
                 ?: ServiceRequest(code = observationTypeOfResponsible))

@@ -73,7 +73,7 @@ class DurationControlTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val patientId = servReqsFromRegister.first().subject!!.id!!
+        val patientId = servReqsFromRegister.first().subject!!.id()
 
         listOf(OFFICE_101, OFFICE_202).forEach { officeId ->
             Thread.sleep(1000)

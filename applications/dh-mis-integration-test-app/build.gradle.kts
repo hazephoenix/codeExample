@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":service:location-service:location-service-api"))
     implementation(project(":service:mis-integration-service:mis-integration-service-api"))
     implementation(project(":service:practitioner-app-integration-service:practitioner-app-integration-service-api"))
+    implementation(project(":service:practitioner-call-service:practitioner-call-service-api"))
     implementation(project(":auto-tests"))
 
     implementation(project(":service:data-storage-service:data-storage-service-impl"))
@@ -21,6 +22,7 @@ dependencies {
     runtime(project(":service:location-service:location-service-impl"))
     (project(":service:mis-integration-service:mis-integration-service-impl"))
     runtime(project(":service:practitioner-app-integration-service:practitioner-app-integration-service-impl"))
+    runtime(project(":service:practitioner-call-service:practitioner-call-service-impl"))
     runtime(project(":service:mis-integration-service:mis-integration-service-rest"))
 }
 

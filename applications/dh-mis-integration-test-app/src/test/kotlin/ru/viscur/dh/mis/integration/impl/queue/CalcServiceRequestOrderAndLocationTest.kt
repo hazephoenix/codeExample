@@ -456,7 +456,7 @@ class CalcServiceRequestOrderAndLocationTest {
 
         queueManagerService.recalcNextOffice(case.recalcNextOffice)
         val receivedServReqs = forTestService.registerPatient(case.carePlan.servReqs)
-        val patientId = receivedServReqs.first().subject!!.id!!
+        val patientId = receivedServReqs.first().subject!!.id()
         forTestService.checkServiceRequestsOfPatient(patientId, case.expServReqs, case.desc)
     }
 }

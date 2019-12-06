@@ -48,7 +48,7 @@ class ResponsiblePractitionerPredictorTest {
         val gender = Gender.male
         var predictedServRequests = patientService.predictServiceRequests(diagnosisCode, gender.name, listOf())
         var actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }
-                .find { it.isInspectionOfResp() }!!.performer!!.first().id
+                .find { it.isInspectionOfResp() }!!.performer!!.first().id()
         Assertions.assertEquals(Helpers.surgeonId, actual)
 
         val pSr1 = forTestService.registerPatient(
@@ -59,13 +59,13 @@ class ResponsiblePractitionerPredictorTest {
                         ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
                 )
         )
-        val pId1 = pSr1.first().subject!!.id!!
+        val pId1 = pSr1.first().subject!!.id()
         val patientToExamineForSurgeon1 = patientService.patientsToExamine(Helpers.surgeonId)
         forTestService.compareListOfString(listOf(pId1), patientToExamineForSurgeon1.map { it.patientId }, "должен быть один пациент в ответственности у ${Helpers.surgeonId}")
 
         predictedServRequests = patientService.predictServiceRequests(diagnosisCode, gender.name, listOf())
         actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }
-                .find { it.isInspectionOfResp() }!!.performer!!.first().id
+                .find { it.isInspectionOfResp() }!!.performer!!.first().id()
         Assertions.assertEquals(Helpers.surgeon2Id, actual)
     }
 
@@ -80,7 +80,7 @@ class ResponsiblePractitionerPredictorTest {
         val gender = Gender.male
         val predictedServRequests = patientService.predictServiceRequests(diagnosisCode, gender.name, listOf())
         val actual = predictedServRequests.entry.filter { it.resource is ServiceRequest }.map { it.resource as ServiceRequest }
-                .find { it.isInspectionOfResp() }!!.performer!!.first().id
+                .find { it.isInspectionOfResp() }!!.performer!!.first().id()
         Assertions.assertEquals(Helpers.surgeon2Id, actual)
 
         practitionerService.updateBlocked(Helpers.surgeonId, false)

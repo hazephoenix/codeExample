@@ -42,7 +42,7 @@ class LocationMonitorInformServiceImpl(
                 items = queueService.queueItemsOfOffice(officeId).map { queueItem ->
                     LocationMonitorQueueItemDto(
                             onum = queueItem.onum!!,
-                            patientId = queueItem.subject.id!!,
+                            patientId = queueItem.subject.id(),
                             status = queueItem.patientQueueStatus!!.name,
                             severity = queueItem.severity!!.name,
                             queueCode = queueItem.queueCode
@@ -50,10 +50,10 @@ class LocationMonitorInformServiceImpl(
                 },
                 nextOfficeForPatientsInfo = office.extension.nextOfficeForPatientsInfo.map { nextOfficeForPatientInfo ->
                     LocationMonitorNextOfficeForPatientInfoDto(
-                            patientId = nextOfficeForPatientInfo.subject.id!!,
+                            patientId = nextOfficeForPatientInfo.subject.id(),
                             severity = nextOfficeForPatientInfo.severity.name,
                             queueCode = nextOfficeForPatientInfo.queueCode,
-                            nextOfficeId = nextOfficeForPatientInfo.nextOffice.id!!
+                            nextOfficeId = nextOfficeForPatientInfo.nextOffice.id()
                     )
                 }
         )

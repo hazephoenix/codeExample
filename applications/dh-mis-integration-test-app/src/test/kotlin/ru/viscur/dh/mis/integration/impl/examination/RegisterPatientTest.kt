@@ -45,7 +45,7 @@ class RegisterPatientTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -73,7 +73,7 @@ class RegisterPatientTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -101,7 +101,7 @@ class RegisterPatientTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -133,7 +133,7 @@ class RegisterPatientTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
 
         //проверка после
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
@@ -156,7 +156,7 @@ class RegisterPatientTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
                 QueueItemSimple(patientId = checkP, status = PatientQueueStatus.GOING_TO_OBSERVATION)
         ))))
@@ -167,7 +167,7 @@ class RegisterPatientTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP2 = checkSr2.first().subject!!.id!!
+        val checkP2 = checkSr2.first().subject!!.id()
 
         //проверка после
         forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(

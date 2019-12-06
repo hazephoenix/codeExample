@@ -39,14 +39,14 @@ class ReportServiceImpl(
         val periodEnd = now()
         val periodStart = periodEnd.plusDays(-1)
         return queueService.queueHistoryOfPatient(patientId, periodStart, periodEnd).map {
-            QueueStatusDuration(it.subject.id!!, it.fireDate, it.status.name, it.location?.id, it.duration)
+            QueueStatusDuration(it.subject.id(), it.fireDate, it.status.name, it.location?.id(), it.duration)
         }
     }
 
     override fun observationHistoryOfPatient(patientId: String): List<ObservationDuration> =
             observationDurationService.recentObservationsByPatientId(patientId)
 
-    override fun queueInOffices(): List<QueueInOfficeDto> = queueService.queueItems().groupBy { it.location.id!! }.map {
+    override fun queueInOffices(): List<QueueInOfficeDto> = queueService.queueItems().groupBy { it.location.id() }.map {
         val officeId = it.key
         val items = it.value
         queueInOfficeDto(officeId = officeId, items = items)
@@ -68,10 +68,10 @@ class ReportServiceImpl(
                     YELLOW_ZONE_SECTION_6,
                     GREEN_ZONE
             )).filter { queueItem ->
-                val patientId = queueItem.subject.id!!
+                val patientId = queueItem.subject.id()
                 val activeServiceRequests = serviceRequestService.active(patientId)
                 activeServiceRequests.any { it.code.code() == observationType && !it.isInspectionOfResp() }
-                        || activeServiceRequests.all { it.code.code() == observationType && it.isInspectionOfResp() && practitionerId in (it.performer!!.map { it.id }) }
+                        || activeServiceRequests.all { it.code.code() == observationType && it.isInspectionOfResp() && practitionerId in (it.performer!!.map { it.id() }) }
             }
             return queueInOfficeDto(items = queueItems, practitionerInOffice = practitioner)
         } else {
@@ -97,11 +97,11 @@ class ReportServiceImpl(
         //берем обследования за период. разбиваем по исполнителям (где 2 исполнителя, там дублируется на 2х)
         //группируем по исполнителю, суммируем нагрузку
         return observations.map { observation ->
-            val patientId = observation.subject.id!!
-            val clinicalImpression = clinicalImpressionService.byServiceRequest(observation.basedOn!!.id!!)
+            val patientId = observation.subject.id()
+            val clinicalImpression = clinicalImpressionService.byServiceRequest(observation.basedOn!!.id())
             val workload = clinicalImpression.extension.severity.workloadWeight
             val observationInfo = ObservationInfo(patientId = patientId, workload = workload)
-            observation.performer.map { it.id!! to observationInfo }
+            observation.performer.map { it.id() to observationInfo }
         }.flatten().groupBy { it.first }.map {
             val practitionerId = it.key
             val observationsOfPractitioner = it.value.map { it.second }
@@ -119,7 +119,7 @@ class ReportServiceImpl(
 
     override fun queueHistory(start: Date, end: Date): List<QueueInOfficeHistoryDto> {
         val queueItems = queueService.queueHistoryByPeriod(start, end)
-        return queueItems.groupBy { it.location!!.id!! }.map {
+        return queueItems.groupBy { it.location!!.id() }.map {
             val officeId = it.key
             val items = it.value
             QueueInOfficeHistoryDto(
@@ -134,7 +134,7 @@ class ReportServiceImpl(
         val patient = patientService.byId(patientId)
         val clinicalImpression = clinicalImpressionService.active(patientId)
         val mainSyndrome = patientService.mainSyndrome(patientId)
-        val practitionerId = mainSyndrome.performer.first().id!!
+        val practitionerId = mainSyndrome.performer.first().id()
         val transportationType = clinicalImpressionService.transportationType(clinicalImpression)
         val transportationTypeConcept = conceptService.byCode(ValueSetName.TRANSPORTATION_TYPES, transportationType)
         val entryType = clinicalImpressionService.entryType(clinicalImpression)
@@ -153,10 +153,10 @@ class ReportServiceImpl(
                 locations = serviceRequestService.active(patientId).asSequence().filterNot { it.locationReference.isNullOrEmpty() }
                         //не можем использовать нумерацию назначений для нумерации кабинетов, т к множество назначений в один кабинет
                         //конвертим в кабинетId + любой номер назначения в этот кабинет - этого достаточно для определния порядка прохождения кабинетов
-                        .groupBy { it.locationReference!!.first().id }.map { Pair(it.key, it.value.first().extension!!.executionOrder) }
+                        .groupBy { it.locationReference!!.first().id() }.map { Pair(it.key, it.value.first().extension!!.executionOrder) }
                         .sortedBy { it.second }
                         .mapIndexed { index, locationIdWithOrder ->
-                            val locationId = locationIdWithOrder.first!!
+                            val locationId = locationIdWithOrder.first
                             val location = locationService.byId(locationId)
                             //для кабинетов указываем номер кабинета, для зон их тип: Зеленая зона/Желтая зона/Красная зона
                             val locationStr = if (locationService.isZone(locationId)) {
@@ -184,7 +184,7 @@ class ReportServiceImpl(
             queueWaitingSum = items.sumBy { it.estDuration },
             queueWorkload = items.sumBy { it.severity!!.workloadWeight },
             items = items.mapIndexed { index, queueItem ->
-                val patientId = queueItem.subject.id!!
+                val patientId = queueItem.subject.id()
                 val patient = patientService.byId(patientId)
                 QueueItemDto(
                         onum = queueItem.onum!! + 1,

@@ -64,7 +64,7 @@ class QueueServiceImpl(
             where r.resource -> 'subject' ->> 'reference' = :patientRef
             """)
         query.setParameter("patientRef", "Patient/$patientId")
-        return query.fetchResource<QueueItem>()?.location?.id
+        return query.fetchResource<QueueItem>()?.location?.id()
     }
 
     override fun involvedOffices(): List<Location> {
@@ -92,9 +92,9 @@ class QueueServiceImpl(
             resourceService.all(ResourceType.QueueItem, RequestBodyForResources(filter = mapOf())).fillExtraFields()
 
     fun List<QueueItem>.fillExtraFields() = this.map { queueItem ->
-        val patientId = queueItem.subject.id
+        val patientId = queueItem.subject.id()
         queueItem.apply {
-            severity = patientService.severity(patientId!!)
+            severity = patientService.severity(patientId)
             patientQueueStatus = patientService.byId(patientId).extension.queueStatus
         }
     }

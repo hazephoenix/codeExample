@@ -39,7 +39,7 @@ class ExaminationServiceImpl(
         val patientId = bundle.entry.first { it.resource.resourceType == ResourceType.ResourceTypeId.ServiceRequest }
                 .let {
                     val req = it.resource as ServiceRequest
-                    patientService.byId(req.subject?.id!!).id
+                    patientService.byId(req.subject!!.id()).id
                 }
 
         val carePlan = serviceRequestService.add(patientId, bundle.entry.map { it.resource as ServiceRequest })
@@ -48,7 +48,7 @@ class ExaminationServiceImpl(
         queueManagerService.calcServiceRequestExecOrders(patientId, prevOfficeId)
         queueManagerService.addToQueue(patientId, prevOfficeId)
         carePlan.author?.run {
-            queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.id!!)
+            queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.id())
         }
         return carePlan
     }
@@ -62,7 +62,7 @@ class ExaminationServiceImpl(
 
         val createdObservation = observationInCarePlanService.create(observation)
 
-        val patientId = createdObservation.subject.id!!
+        val patientId = createdObservation.subject.id()
         val diagnosis = patientService.preliminaryDiagnosticConclusion(patientId)
         val severity = patientService.severity(patientId)
 
@@ -85,7 +85,7 @@ class ExaminationServiceImpl(
         queueManagerService.deleteFromQueue(patientId)
         clinicalImpressionService.hasActive(patientId)?.run {
             this.assessor?.run {
-                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.id!!)
+                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.id())
             }
             val serviceRequestsWillBeCancelled = serviceRequestService.active(patientId)
             informAboutCancellingServiceRequests(patientId, serviceRequestsWillBeCancelled)
@@ -106,11 +106,11 @@ class ExaminationServiceImpl(
     @Tx
     override fun cancelServiceRequest(id: String) {
         val cancelledServiceRequest = serviceRequestService.cancelServiceRequest(id)
-        informAboutCancellingServiceRequests(cancelledServiceRequest.subject!!.id!!, listOf(cancelledServiceRequest))
+        informAboutCancellingServiceRequests(cancelledServiceRequest.subject!!.id(), listOf(cancelledServiceRequest))
         observationService.cancelByBaseOnServiceRequestId(id)
-        val officeId = cancelledServiceRequest.locationReference?.first()?.id
+        val officeId = cancelledServiceRequest.locationReference?.first()?.id()
         officeId?.run {
-            queueManagerService.rebasePatientIfNeeded(cancelledServiceRequest.subject!!.id!!, officeId)
+            queueManagerService.rebasePatientIfNeeded(cancelledServiceRequest.subject!!.id(), officeId)
         }
     }
 
@@ -128,7 +128,7 @@ class ExaminationServiceImpl(
     private fun informAboutCancellingServiceRequests(patientId: String, cancelledServiceRequests: List<ServiceRequest>) {
         cancelledServiceRequests.find { it.isInspectionOfResp() }?.run {
             if (this.performer != null) {
-                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.performer!!.first().id!!)
+                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, this.performer!!.first().id())
             }
         }
         val cancelledServiceRequestsInspectionNotResp = cancelledServiceRequests.filter { it.isInspection() && !it.isInspectionOfResp() }

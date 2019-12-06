@@ -87,17 +87,17 @@ class OfficeServiceImpl(
             }
         }
         queue = saveQueue(officeId, queue)
-        queueForPractitionersInformService.patientAddedToOfficeQueue(patientId, officeId, queue.find { it.subject.id == patientId }!!.onum!!, estDuration)
+        queueForPractitionersInformService.patientAddedToOfficeQueue(patientId, officeId, queue.find { it.subject.id() == patientId }!!.onum!!, estDuration)
     }
 
     @Tx
     override fun firstPatientIdInQueue(officeId: String): String? =
-            queueService.queueItemsOfOffice(officeId).filter { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }.firstOrNull()?.subject?.id
+            queueService.queueItemsOfOffice(officeId).filter { it.patientQueueStatus == PatientQueueStatus.IN_QUEUE }.firstOrNull()?.subject?.id()
 
     @Tx
     override fun deletePatientFromQueue(officeId: String, patientId: String) {
         val queue = queueService.queueItemsOfOffice(officeId)
-        queue.removeAt(queue.indexOfFirst { it.subject.id == patientId })
+        queue.removeAt(queue.indexOfFirst { it.subject.id() == patientId })
         saveQueue(officeId, queue)
         queueForPractitionersInformService.patientDeletedFromOfficeQueue(patientId, officeId)
     }
@@ -107,7 +107,7 @@ class OfficeServiceImpl(
         locationService.withPatientInNextOfficeForPatientsInfo(patientId).forEach {
             val officeId = it.id
             resourceService.update(ResourceType.Location, officeId) {
-                extension.nextOfficeForPatientsInfo = extension.nextOfficeForPatientsInfo.filterNot { it.subject.id!! == patientId }
+                extension.nextOfficeForPatientsInfo = extension.nextOfficeForPatientsInfo.filterNot { it.subject.id() == patientId }
             }
             locationMonitorInformService.queueChanged(listOf(officeId))
         }

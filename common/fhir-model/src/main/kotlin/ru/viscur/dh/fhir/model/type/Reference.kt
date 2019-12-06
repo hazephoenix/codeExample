@@ -32,8 +32,8 @@ class Reference @JsonCreator constructor(
             type = resourceType
     )
 
-    @JsonIgnore
-    val id: String? = reference?.substringAfter("/")
+    fun id(): String = reference?.substringAfter("/")
+            ?: throw Exception("can't extract id from reference '$reference'. Acceptable format: 'ResourceType/id'")
 
     override fun toString(): String {
         return "Ref(reference='$reference', type=$type${display?.let { ", display=$display" } ?: ""})"

@@ -54,12 +54,12 @@ class DelayGoingToObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkingPId = checkingPSr.first().subject!!.id!!
+        val checkingPId = checkingPSr.first().subject!!.id()
         val pSr1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = pSr1.first().subject!!.id!!
+        val pId1 = pSr1.first().subject!!.id()
 
         val officeId = OFFICE_101
         queueManagerService.officeIsReady(officeId)
@@ -95,17 +95,17 @@ class DelayGoingToObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkingPId = checkingPSr.first().subject!!.id!!
+        val checkingPId = checkingPSr.first().subject!!.id()
         val pSr1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = pSr1.first().subject!!.id!!
+        val pId1 = pSr1.first().subject!!.id()
         val pSr2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId2 = pSr2.first().subject!!.id!!
+        val pId2 = pSr2.first().subject!!.id()
 
         val officeId = OFFICE_101
         queueManagerService.officeIsReady(officeId)
@@ -142,12 +142,12 @@ class DelayGoingToObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkingPId = checkingPSr.first().subject!!.id!!
+        val checkingPId = checkingPSr.first().subject!!.id()
         val pSr1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = pSr1.first().subject!!.id!!
+        val pId1 = pSr1.first().subject!!.id()
 
         val officeId = OFFICE_101
         queueManagerService.officeIsReady(officeId)
@@ -178,12 +178,12 @@ class DelayGoingToObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkingPId = checkingPSr.first().subject!!.id!!
+        val checkingPId = checkingPSr.first().subject!!.id()
         val pSr1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = pSr1.first().subject!!.id!!
+        val pId1 = pSr1.first().subject!!.id()
 
         val officeId = OFFICE_101
         queueManagerService.officeIsReady(officeId)
@@ -214,7 +214,7 @@ class DelayGoingToObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkingPId = checkingPSr.first().subject!!.id!!
+        val checkingPId = checkingPSr.first().subject!!.id()
 
         val officeId = OFFICE_101
         queueManagerService.officeIsReady(officeId)
@@ -242,7 +242,7 @@ class DelayGoingToObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkingPId = checkingPSr.first().subject!!.id!!
+        val checkingPId = checkingPSr.first().subject!!.id()
 
         val officeId = OFFICE_101
         queueManagerService.deleteFromQueue(checkingPId)
@@ -268,7 +268,7 @@ class DelayGoingToObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkingPId = checkingPSr.first().subject!!.id!!
+        val checkingPId = checkingPSr.first().subject!!.id()
 
         val officeId = OFFICE_101
 

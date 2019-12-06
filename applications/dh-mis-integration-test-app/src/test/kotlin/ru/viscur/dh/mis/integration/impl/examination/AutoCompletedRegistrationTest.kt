@@ -71,7 +71,7 @@ class AutoCompletedRegistrationTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
 
         val officeId = OFFICE_101
 

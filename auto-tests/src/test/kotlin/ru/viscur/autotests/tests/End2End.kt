@@ -187,7 +187,7 @@ class End2End {
         val obsOfRespPract = createObservation(
             code = OBSERVATION_OF_SURGEON,
             valueString = "состояние удовлетворительное",
-            practitionerId = servRequestOfResp.performer?.first()?.id!!,
+            practitionerId = servRequestOfResp.performer?.first()?.id,
             basedOnServiceRequestId = servRequestOfResp.id,
             status = ObservationStatus.final,
             patientId = patientId

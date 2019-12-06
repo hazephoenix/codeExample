@@ -20,16 +20,12 @@ class ReceptionServiceImpl(
     @Tx
     override fun registerPatient(bundle: Bundle): List<ServiceRequest> {
         val patientId = patientService.saveFinalPatientData(bundle)
-        val serviceRequests = queueManagerService.registerPatient(patientId)
-        queueManagerService.loqAndValidate()//todo del after
-        return serviceRequests
+        return queueManagerService.registerPatient(patientId)
     }
 
     @Tx
     override fun registerPatientForBandage(bundle: Bundle): List<ServiceRequest> {
         val patientId = patientService.saveFinalPatientDataForBandage(bundle)
-        val serviceRequests = queueManagerService.registerPatient(patientId)
-        queueManagerService.loqAndValidate()//todo del after
-        return serviceRequests
+        return queueManagerService.registerPatient(patientId)
     }
 }

@@ -252,7 +252,7 @@ class UpdateSeverityTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_130),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val patientId = servReqsFromRegister.first().subject!!.id!!
+        val patientId = servReqsFromRegister.first().subject!!.id()
         forTestService.checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_130, locationId = OFFICE_130),
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),

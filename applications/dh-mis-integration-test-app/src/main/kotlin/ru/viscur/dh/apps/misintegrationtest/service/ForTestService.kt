@@ -110,7 +110,7 @@ class ForTestService {
                 extension.nextOfficeForPatientsInfo = listOf()
             }
         }
-        queueManagerService.queueItems().groupBy { it.location.id!! }.forEach { officeId, items ->
+        queueManagerService.queueItems().groupBy { it.location.id() }.forEach { officeId, items ->
             val officeStatus =
                     when {
                         items.any { it.patientQueueStatus == PatientQueueStatus.ON_OBSERVATION } -> LocationStatus.OBSERVATION
@@ -125,8 +125,8 @@ class ForTestService {
 
     fun formQueueInfo(): String {
         val queueItems = queueManagerService.queueItems()
-        return queueItems.sortedBy { it.location.id }.groupBy { it.location.id }.map { (locationId, items) ->
-            "$locationId:\n  ${items.sortedBy { it.onum }.joinToString("\n  ") { "${it.onum}. ${it.patientQueueStatus}, ${it.severity}, ${it.estDuration}, ${it.subject.id}" }}"
+        return queueItems.sortedBy { it.location.id() }.groupBy { it.location.id() }.map { (locationId, items) ->
+            "$locationId:\n  ${items.sortedBy { it.onum }.joinToString("\n  ") { "${it.onum}. ${it.patientQueueStatus}, ${it.severity}, ${it.estDuration}, ${it.subject.id()}" }}"
         }.joinToString("\n")
     }
 
@@ -254,7 +254,7 @@ class ForTestService {
             assertEquals(byOffice.officeStatus, office.status, "wrong status of office $officeId. $itemsStr")
             byOffice.items.forEachIndexed { index, queueItemInfo ->
                 //поиск соответствующего элемента в текущих
-                val foundInAct = actQueueItems.filter { it.subject.id == queueItemInfo.patientId && it.location.id == officeId }
+                val foundInAct = actQueueItems.filter { it.subject.id() == queueItemInfo.patientId && it.location.id() == officeId }
                 assertEquals(1, foundInAct.size, "not found (or found multiple items) of $queueItemInfo. $itemsStr")
                 val foundItem = foundInAct.first()
                 //проверка правильности данных в найденном
@@ -269,11 +269,11 @@ class ForTestService {
                 assertEquals(this.size, office.extension.nextOfficeForPatientsInfo.size, "wrong number of nextOfficeForPatientsInfo for '$officeId' (${office.extension.nextOfficeForPatientsInfo}). $itemsStr")
                 this.map { nextOfficeForPatientInfo ->
                     val actNextOfficeForPatientsInfo = office.extension.nextOfficeForPatientsInfo
-                    val foundInAct = actNextOfficeForPatientsInfo.filter { it.subject.id!! == nextOfficeForPatientInfo.patientId }
+                    val foundInAct = actNextOfficeForPatientsInfo.filter { it.subject.id() == nextOfficeForPatientInfo.patientId }
                     assertEquals(1, foundInAct.size, "not found (or found multiple items) of $nextOfficeForPatientInfo. $itemsStr")
                     val foundItem = foundInAct.first()
                     //проверка правильности данных в найденном
-                    assertEquals(nextOfficeForPatientInfo.nextOfficeId, foundItem.nextOffice.id!!, "wrong nextOfficeId of $nextOfficeForPatientInfo. $itemsStr")
+                    assertEquals(nextOfficeForPatientInfo.nextOfficeId, foundItem.nextOffice.id(), "wrong nextOfficeId of $nextOfficeForPatientInfo. $itemsStr")
                 }
             }
         }
@@ -324,9 +324,9 @@ class ForTestService {
             assertEquals(1, foundInAct.size, "${descStr}not found (or found multiple items) with code '${servReqInfo.code}' of $servReqInfo. $servReqsStr")
             val foundItem = foundInAct.first()
             //проверка правильности данных в найденном
-            assertEquals(patientId, foundItem.subject?.id, "${descStr}wrong patientId of $servReqInfo. $servReqsStr")
+            assertEquals(patientId, foundItem.subject?.id(), "${descStr}wrong patientId of $servReqInfo. $servReqsStr")
             assertEquals(servReqInfo.status, foundItem.status, "${descStr}wrong status of $servReqInfo. $servReqsStr")
-            servReqInfo.locationId?.run { assertEquals(servReqInfo.locationId, foundItem.locationReference?.first()?.id, "${descStr}wrong locationId of $servReqInfo. $servReqsStr") }
+            servReqInfo.locationId?.run { assertEquals(servReqInfo.locationId, foundItem.locationReference?.first()?.id(), "${descStr}wrong locationId of $servReqInfo. $servReqsStr") }
             assertEquals(index, foundItem.extension?.executionOrder, "${descStr}wrong executionOrder of $servReqInfo. $servReqsStr")
         }
     }
@@ -348,7 +348,7 @@ class ForTestService {
     }
 
     private fun itemsToStr(itemsByOffices: List<QueueOfOfficeSimple>, actQueueItems: List<QueueItem>): String {
-        val actByOffices = actQueueItems.groupBy { it.location.id!! }
+        val actByOffices = actQueueItems.groupBy { it.location.id() }
         val offices = officeService.all().filter { it.id in actByOffices.map { it.key } || it.extension.nextOfficeForPatientsInfo.isNotEmpty() }
         return "\n\nexp queue:\n" +
                 itemsByOffices.joinToString("\n") { byOffice ->
@@ -373,7 +373,7 @@ class ForTestService {
         return "\n\nfor patient '$patientId'\nexp servRequests:\n  " +
                 servReqs.joinToString("\n  ") { it.toString() } +
                 "\n\nactual:\n  " +
-                actServRequests.joinToString("\n  ") { "code: " + it.code.code() + ", status: " + it.status + ", locationId: " + it.locationReference?.first()?.id } +
+                actServRequests.joinToString("\n  ") { "code: " + it.code.code() + ", status: " + it.status + ", locationId: " + it.locationReference?.first()?.id() } +
                 "\n\n"
     }
 

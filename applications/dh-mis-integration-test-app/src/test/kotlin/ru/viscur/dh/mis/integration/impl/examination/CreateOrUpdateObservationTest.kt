@@ -55,11 +55,11 @@ class CreateOrUpdateObservationTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_104)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -113,11 +113,11 @@ class CreateOrUpdateObservationTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_104)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 

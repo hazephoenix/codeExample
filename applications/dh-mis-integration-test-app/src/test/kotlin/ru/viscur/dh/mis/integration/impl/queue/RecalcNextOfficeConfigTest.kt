@@ -96,10 +96,10 @@ class RecalcNextOfficeConfigTest {
 
         val queueStr = forTestService.formQueueInfo()
         val queueItems = queueManagerService.queueItems()
-        val foundQueueItem = queueItems.find { it.subject.id == patientId }
+        val foundQueueItem = queueItems.find { it.subject.id() == patientId }
         assertNotNull(foundQueueItem, "${case.desc}. not found queueItem of patient with id '$patientId'. actual queue:\n$queueStr\n")
         foundQueueItem?.let {
-            assertEquals(case.expOfficeId, it.location.id, "${case.desc}. wrong location of patientId '$patientId'. actual queue:\n$queueStr\n")
+            assertEquals(case.expOfficeId, it.location.id(), "${case.desc}. wrong location of patientId '$patientId'. actual queue:\n$queueStr\n")
             assertEquals(case.expOnum, it.onum, "${case.desc}. wrong onum of patientId '$patientId'. actual queue:\n$queueStr\n")
         }
     }

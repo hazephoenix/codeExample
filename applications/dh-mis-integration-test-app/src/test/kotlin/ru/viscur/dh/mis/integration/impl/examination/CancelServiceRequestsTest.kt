@@ -77,17 +77,17 @@ class CancelServiceRequestsTest {
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p1 = servReqs1.first().subject!!.id!!
+        val p1 = servReqs1.first().subject!!.id()
         val checkSr = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -131,17 +131,17 @@ class CancelServiceRequestsTest {
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p1 = servReqs1.first().subject!!.id!!
+        val p1 = servReqs1.first().subject!!.id()
         val checkSr = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -184,17 +184,17 @@ class CancelServiceRequestsTest {
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p1 = servReqs1.first().subject!!.id!!
+        val p1 = servReqs1.first().subject!!.id()
         val checkSr = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -237,16 +237,16 @@ class CancelServiceRequestsTest {
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p1 = servReqs1.first().subject!!.id!!
+        val p1 = servReqs1.first().subject!!.id()
         val checkSr = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -288,17 +288,17 @@ class CancelServiceRequestsTest {
         val servReqs1 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p1 = servReqs1.first().subject!!.id!!
+        val p1 = servReqs1.first().subject!!.id()
         val checkSr = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -343,11 +343,11 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -397,11 +397,11 @@ class CancelServiceRequestsTest {
                 ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val checkP = checkSr.first().subject!!.id!!
+        val checkP = checkSr.first().subject!!.id()
         val servReqs2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val p2 = servReqs2.first().subject!!.id!!
+        val p2 = servReqs2.first().subject!!.id()
 
         val officeId = OFFICE_101
 

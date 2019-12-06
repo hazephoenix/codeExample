@@ -74,7 +74,7 @@ class QueueOfPractitionerTest {
         val servReqsFromRegister = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101)
         ))
-        val patientId = servReqsFromRegister.first().subject!!.id!!
+        val patientId = servReqsFromRegister.first().subject!!.id()
 
         forTestService.checkServiceRequestsOfPatient(patientId, listOf(
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_101, locationId = OFFICE_101),

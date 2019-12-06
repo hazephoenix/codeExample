@@ -52,7 +52,7 @@ class ClinicalImpressionForBandageTest {
     fun test() {
         forTestService.cleanDb()
         val servReqs = forTestService.registerPatientForBandage()
-        val patientId = servReqs.first().subject!!.id!!
+        val patientId = servReqs.first().subject!!.id()
 
         val officeId = OFFICE_128
         forTestService.checkServiceRequestsOfPatient(patientId, listOf(

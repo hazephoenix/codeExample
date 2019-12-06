@@ -101,7 +101,7 @@ class ObservationServiceImpl(
      */
     override fun update(patientId: String, observation: Observation): Observation {
         val updatedObservation = resourceService.update(ResourceType.Observation, observation.id) {
-            performer = (performer + observation.performer).distinctBy { item -> item.id }
+            performer = (performer + observation.performer).distinctBy { item -> item.id() }
             status = observation.status
             valueBoolean = observation.valueBoolean
             valueInteger = observation.valueInteger

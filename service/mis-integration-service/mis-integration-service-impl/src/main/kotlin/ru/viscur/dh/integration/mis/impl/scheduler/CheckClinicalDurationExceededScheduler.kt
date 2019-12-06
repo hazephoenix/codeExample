@@ -38,7 +38,7 @@ class CheckClinicalDurationExceededScheduler(
             //т к шедулер раз в минуту, то в проверку должны попадать превышения от 0 до 59, чтобы после превышения оповещение сработало ровно 1 раз
             if (timeAfterDefaultPassed in 0 until SECONDS_IN_MINUTE) {
                 it.assessor?.run {
-                    practitionerAppEventPublisher.publishPatientServiceTimeElapsed(setOf(this.id!!), it)
+                    practitionerAppEventPublisher.publishPatientServiceTimeElapsed(setOf(this.id()), it)
                 }
             }
         }

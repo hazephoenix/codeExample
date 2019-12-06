@@ -40,7 +40,7 @@ class Examinations {
         val patientId = patientIdFromServiceRequests(responseBundle.resources(ResourceType.ServiceRequest))
         val obsOfRespPract = createObservation(code = serviceRequest.code.code(),
                 valueString = "состояние удовлетворительное",
-                practitionerId = serviceRequest.performer?.first()?.id!!,
+                practitionerId = serviceRequest.performer?.first()?.id,
                 basedOnServiceRequestId = serviceRequest.id,
                 status = ObservationStatus.final,
                 patientId = patientId

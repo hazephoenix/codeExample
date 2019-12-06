@@ -72,16 +72,16 @@ class DiagnosisPredictorImpl(
      *
      */
     override fun saveTrainingSample(diagnosticReport: DiagnosticReport): Long? {
-        diagnosticReport.subject.id?.let { patientId ->
+        diagnosticReport.subject.id()?.let { patientId ->
             patientService.byId(patientId).let { patient ->
                 clinicalImpressionService.active(patientId).let { clinicalImpression ->
                     val observations = clinicalImpression.supportingInfo
                             .filter { it.type == ResourceType.ResourceTypeId.Observation }
-                            .map { resourceService.byId(ResourceType.Observation, it.id!!) }
+                            .map { resourceService.byId(ResourceType.Observation, it.id()) }
 
                     val questionnaireResponse = clinicalImpression.supportingInfo
                             .filter { it.type == ResourceType.ResourceTypeId.QuestionnaireResponse }
-                            .map { resourceService.byId(ResourceType.QuestionnaireResponse, it.id!!) }
+                            .map { resourceService.byId(ResourceType.QuestionnaireResponse, it.id()) }
                             .find { it.questionnaire == "Questionnaire/Severity_criteria" }
 
                     val complaints = questionnaireResponse?.item

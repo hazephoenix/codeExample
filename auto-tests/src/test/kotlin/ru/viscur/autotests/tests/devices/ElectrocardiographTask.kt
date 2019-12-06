@@ -38,7 +38,7 @@ class ElectrocardiographTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseElectrocardiograph.id!!
+        val taskId = responseElectrocardiograph.id
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 

@@ -38,7 +38,7 @@ class WeightTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseWeight.id!!
+        val taskId = responseWeight.id
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 

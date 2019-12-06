@@ -36,7 +36,7 @@ class ObservationInCarePlanServiceImpl(
         val patientId = patientIdByObservation(observation)
         val diagnosis = patientService.preliminaryDiagnosticConclusion(patientId)
         val severity = patientService.severity(patientId)
-        val updatedServiceRequest = observation.basedOn?.id?.let {
+        val updatedServiceRequest = observation.basedOn?.id()?.let {
             val updatedServiceRequest = resourceService.update(ResourceType.ServiceRequest, it) {
                 extension = extension?.apply { execEnd = now() }
                         ?: ServiceRequestExtension(execEnd = now())
@@ -53,7 +53,7 @@ class ObservationInCarePlanServiceImpl(
         if (observationType in INSPECTION_TYPES) {
             //проведено обсл-е отв-го, оповещаем отв.
             if (updatedServiceRequest.isInspectionOfResp()) {
-                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, updatedServiceRequest.performer!!.first().id!!)
+                queueForPractitionersInformService.patientDeletedFromPractitionerQueue(patientId, updatedServiceRequest.performer!!.first().id())
             } else {
                 //проведен осмотр не по отв., оповещаем всех заинтересованных, всех кто мог этот осмотр произвести теперь не должен видеть этого пациента
                 queueForPractitionersInformService.patientWasInspected(patientId, observationType)
@@ -61,11 +61,11 @@ class ObservationInCarePlanServiceImpl(
         }
 
         //осталось одно обсл-е - осмотр отв-ого - оповещаем отв-ого
-        if(!updatedServiceRequest.isInspectionOfResp()) {
+        if (!updatedServiceRequest.isInspectionOfResp()) {
             val activeServiceRequests = serviceRequestService.active(patientId)
             if (activeServiceRequests.isNotEmpty() && activeServiceRequests.all { it.isInspectionOfResp() }) {
                 val serviceRequestOfResp = activeServiceRequests.first()
-                queueForPractitionersInformService.patientAddedToPractitionerQueue(patientId, serviceRequestOfResp.performer!!.first().id!!, serviceRequestOfResp.code.code())
+                queueForPractitionersInformService.patientAddedToPractitionerQueue(patientId, serviceRequestOfResp.performer!!.first().id(), serviceRequestOfResp.code.code())
             }
         }
         return observationService.create(patientId, observation, diagnosis, severity)
@@ -81,12 +81,9 @@ class ObservationInCarePlanServiceImpl(
     }
 
     private fun patientIdByObservation(observation: Observation): String = clinicalImpressionService.byServiceRequest(
-            observation.basedOn?.id
+            observation.basedOn?.id()
                     ?: throw Exception("Error. Not defined serviceRequestId in basedOn field of Observation with id = '${observation.id}'")
-    ).let {
-        it.subject.id
-                ?: throw Exception("Error. Not defined patientId in subject field of ClinicalImpression with id = '${it.id}'")
-    }
+    ).subject.id()
 
     /**
      * Обновить связанные ресурсы

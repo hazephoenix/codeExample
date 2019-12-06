@@ -38,7 +38,7 @@ class TonometerTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseTonometer.id!!
+        val taskId = responseTonometer.id
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 

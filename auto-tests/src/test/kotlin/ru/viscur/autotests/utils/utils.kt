@@ -53,11 +53,11 @@ fun checkQueueItems(itemsByOffices: List<QueueItemsOfOffice>) {
 private fun itemsToStr(itemsByOffices: List<QueueItemsOfOffice>, actQueueItems: List<QueueItem>): String {
     actQueueItems.forEach {
         it.apply {
-            val patient = QueRequests.resource(ResourceType.Patient, subject.id!!)
+            val patient = QueRequests.resource(ResourceType.Patient, subject.id)
             patientQueueStatus = patient.extension.queueStatus
         }
     }
-    val actByOffices = actQueueItems.groupBy { it.location.id!! }
+    val actByOffices = actQueueItems.groupBy { it.location.id }
     return "\n\nexp queue:\n" +
             itemsByOffices.joinToString("\n") { byOffice -> byOffice.officeId + ":\n  " + byOffice.items.mapIndexed { index, queueItemInfo -> "$index. $queueItemInfo" }.joinToString("\n  ") } +
             "\n\nactual queue:\n" +
@@ -173,5 +173,5 @@ fun observationsToString(patientId: String, servReqInfos: List<ObservationInfo>,
 fun patientIdFromServiceRequests(serviceRequestsFromResponse: List<ServiceRequest>): String {
     Assertions.assertTrue(serviceRequestsFromResponse.size > 0, "list of service requests can't be empty")
     Assertions.assertNotNull(serviceRequestsFromResponse.first().subject?.id, "wrong id patient")
-    return serviceRequestsFromResponse.first().subject?.id!!
+    return serviceRequestsFromResponse.first().subject?.id
 }

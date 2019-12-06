@@ -155,14 +155,14 @@ class ServiceRequestServiceImpl(
 
     @Tx
     override fun updateStatusByObservation(observation: Observation): ServiceRequest =
-            observation.basedOn?.id?.let { serviceRequestId ->
+            observation.basedOn?.id()?.let { serviceRequestId ->
                 resourceService.update(ResourceType.ServiceRequest, serviceRequestId) {
                     status = when (observation.status) {
                         ObservationStatus.final -> ServiceRequestStatus.completed
                         else -> ServiceRequestStatus.waiting_result
                     }
                 }
-            } ?: throw Error("Not found ServiceRequest by Observation.basedOn.id: '${observation.basedOn?.id}'")
+            } ?: throw Error("Not found ServiceRequest by Observation.basedOn.id: '${observation.basedOn?.id()}'")
 
     @Tx
     override fun cancelServiceRequests(patientId: String, officeId: String): List<ServiceRequest> {

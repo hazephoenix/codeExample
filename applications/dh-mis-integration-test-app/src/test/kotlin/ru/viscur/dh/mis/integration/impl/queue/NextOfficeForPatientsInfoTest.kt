@@ -61,7 +61,7 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -93,12 +93,12 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
         val p2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId2 = p2.first().subject!!.id!!
+        val pId2 = p2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -134,7 +134,7 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -163,7 +163,7 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -195,7 +195,7 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -227,12 +227,12 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
         val p2 = forTestService.registerPatient(servReqs = listOf(
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId2 = p2.first().subject!!.id!!
+        val pId2 = p2.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -264,7 +264,7 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
 
         val officeId = OFFICE_101
 
@@ -296,7 +296,7 @@ class NextOfficeForPatientsInfoTest {
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
                 ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
         ))
-        val pId1 = p1.first().subject!!.id!!
+        val pId1 = p1.first().subject!!.id()
 
         var officeId = OFFICE_101
         patientDoneSingleServiceRequestInOffice(officeId, pId1, p1)

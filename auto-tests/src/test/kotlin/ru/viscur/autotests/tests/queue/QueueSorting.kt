@@ -409,7 +409,7 @@ class QueueSorting {
         val patientId = patientIdFromServiceRequests(QueRequests.createPatient(bundle1).resources(ResourceType.ServiceRequest))
         val patientEnteredListResource = createListResource(patientId, OFFICE_101_ID)
         val actServicesInOffice = QueRequests.patientEntered(patientEnteredListResource)
-        val servRequstId = actServicesInOffice.find { it.code.code() == OBSERVATION1_OFFICE_101 }?.id!!
+        val servRequstId = actServicesInOffice.find { it.code.code() == OBSERVATION1_OFFICE_101 }?.id
 
         //создание Observation
         val obs = createObservation(
