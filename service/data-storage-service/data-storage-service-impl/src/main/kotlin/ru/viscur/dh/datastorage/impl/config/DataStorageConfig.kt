@@ -14,6 +14,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.*
 import org.springframework.context.annotation.ComponentScan.Filter
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.scheduling.TaskScheduler
@@ -68,13 +70,8 @@ class DataStorageConfig {
             .type(HikariDataSource::class.java)
             .build()!!
 
- /*   @ConditionalOnProperty(
-            prefix = "$PROPERTIES_PREFIX.flyway",
-            name = ["enabled"],
-            havingValue = "true",
-            matchIfMissing = false
-    )*/
     @Bean(name = ["dsFlyway"], initMethod = "migrate")
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     fun flyway() = Flyway(
             FluentConfiguration()
                     .dataSource(dataSource())

@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.viscur.dh.integration.doctorapp.impl.config.DoctorAppConfig
