@@ -8,6 +8,7 @@ import org.springframework.web.client.RestTemplate
 import ru.viscur.dh.practitioner.call.impl.speech.Speech
 import ru.viscur.dh.practitioner.call.impl.speech.SpeechSynthesisService
 import java.io.ByteArrayInputStream
+import java.lang.Exception
 
 /**
  * Реализация [SpeechSynthesisService] которая использует [https://gitlab.com/digital-hospital/speech-synthesis-service] для синтеза речи
@@ -46,7 +47,11 @@ class MicrosoftSpeechSynthesisRemoteService(
                             Charsets.UTF_8
                     )
                 })
-        val wave = template.getForEntity("$microsoftSpeechSynthesisRemoteUrl/speech-synthesis?text=$text", ByteArray::class.java)
+        val wave = try {
+            template.getForEntity("$microsoftSpeechSynthesisRemoteUrl/speech-synthesis?text=$text", ByteArray::class.java)
+        } catch (e: Exception) {
+            throw SpeechSynthesisService.SpeechSynthesisTemporaryNotAvailableException(e.message, e)
+        }
         return StreamSpeech(
                 ByteArrayInputStream(wave.body)
         )

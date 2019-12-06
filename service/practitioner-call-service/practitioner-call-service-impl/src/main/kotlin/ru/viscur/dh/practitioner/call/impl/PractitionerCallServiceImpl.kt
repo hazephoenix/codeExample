@@ -1,5 +1,6 @@
 package ru.viscur.dh.practitioner.call.impl
 
+import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.DependsOn
 import org.springframework.core.Ordered
@@ -202,11 +203,17 @@ class PractitionerCallServiceImpl(
     }
 
     private fun doVoiceCall(ref: AwaitingPractitionerCallRef) {
-        val call = practitionerCallStorageService.byId(ref.callId)
-        val fullName = call.practitioner.fullName
-        val location = call.location.officeNumber() ?: call.location.name
-        val speech = speechSynthesisService.textToSpeech("$fullName, пройдите в кабинет $location")
-        loudspeakerService.play(call, speech)
+        try {
+            val call = practitionerCallStorageService.byId(ref.callId)
+            val fullName = call.practitioner.fullName
+            val location = call.location.officeNumber() ?: call.location.name
+            val speech = speechSynthesisService.textToSpeech("$fullName, пройдите в кабинет $location")
+            loudspeakerService.play(call, speech)
+        } catch (e: SpeechSynthesisService.SpeechSynthesisTemporaryNotAvailableException) {
+            log.error("Speech synthesis temporary not availableException: {}", e.message, e)
+        } catch (e: Throwable) {
+            log.error("{}", e.message, e)
+        }
     }
 
 
@@ -243,6 +250,8 @@ class PractitionerCallServiceImpl(
         const val MAX_VOICE_CALL_COUNT = 2
         const val DELAY_BEFORE_VOICE_CALL = 30 * 1000
         const val DELAY_BEFORE_AUTO_DECLINE = 60 * 1000
+
+        private val log = LoggerFactory.getLogger(PractitionerCallServiceImpl::class.java)
     }
 
 }
