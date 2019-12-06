@@ -26,7 +26,7 @@ class TonometerTask {
         )
 
         //проверка ответа
-        assertNotNull(responseTonometer.id, "task id is null")
+        assertNotNull(responseTonometer.id!!, "task id is null")
         assertNotNull(responseTonometer.desktopId, "desktopId is null")
         assertEquals(taskType, responseTonometer.type, "wrong task type")
     }
@@ -38,7 +38,7 @@ class TonometerTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseTonometer.id
+        val taskId = responseTonometer.id!!
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 

@@ -42,7 +42,7 @@ class ResponsablePrediction {
         val predictedResp = QueRequests.getSupposedServRequests(diagnosisForSurgeon).filter {it.code.code() == Constants.OBSERVATION_OF_SURGEON }.first()
 
         //проверка, что в полученном списке предположительный ответственный - surgeon2, менее занятый
-        Assertions.assertEquals(Constants.SURGEON2_ID, predictedResp.performer!!.first().id, "wrong performer predicted")
+        Assertions.assertEquals(Constants.SURGEON2_ID, predictedResp.performer!!.first().id(), "wrong performer predicted")
     }
 
     @Test
@@ -77,6 +77,6 @@ class ResponsablePrediction {
         val predictedResp = QueRequests.getSupposedServRequests(diagnosisForSurgeon).filter {it.code.code() == Constants.OBSERVATION_OF_SURGEON }.first()
 
         //проверка, что в полученном списке предположительный ответственный - surgeon1, выбранный по алфавиту
-        Assertions.assertEquals(Constants.SURGEON1_ID, predictedResp.performer!!.first().id, "wrong performer predicted")
+        Assertions.assertEquals(Constants.SURGEON1_ID, predictedResp.performer!!.first().id(), "wrong performer predicted")
     }
 }

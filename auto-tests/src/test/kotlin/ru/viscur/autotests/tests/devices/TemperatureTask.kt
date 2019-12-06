@@ -26,7 +26,7 @@ class TemperatureTask {
         )
 
         //проверка ответа
-        assertNotNull(responseTemperature.id, "task id is null")
+        assertNotNull(responseTemperature.id!!, "task id is null")
         assertNotNull(responseTemperature.desktopId, "desktopId is null")
         assertEquals(taskType, responseTemperature.type, "wrong task type")
     }
@@ -38,7 +38,7 @@ class TemperatureTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseTemperature.id
+        val taskId = responseTemperature.id!!
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 

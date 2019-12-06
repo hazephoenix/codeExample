@@ -26,7 +26,7 @@ class WeightTask {
         )
 
         //проверка ответа
-        assertNotNull(responseWeight.id, "task id is null")
+        assertNotNull(responseWeight.id!!, "task id is null")
         assertNotNull(responseWeight.desktopId, "desktopId is null")
         assertEquals(taskType, responseWeight.type, "wrong task type")
     }
@@ -38,7 +38,7 @@ class WeightTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseWeight.id
+        val taskId = responseWeight.id!!
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 

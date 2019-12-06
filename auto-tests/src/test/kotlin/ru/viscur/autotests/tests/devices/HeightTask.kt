@@ -26,7 +26,7 @@ class HeightTask {
         )
 
         //проверка ответа
-        assertNotNull(responseHeight.id, "task id is null")
+        assertNotNull(responseHeight.id!!, "task id is null")
         assertNotNull(responseHeight.desktopId, "desktopId is null")
         assertEquals(taskType, responseHeight.type, "wrong task type")
     }
@@ -38,7 +38,7 @@ class HeightTask {
             taskType = taskType,
             desktopUid = desktopUid
         )
-        val taskId = responseHeight.id
+        val taskId = responseHeight.id!!
         //получение статуса Document task
         val responseTaskStatus = DeviceRequests.getTaskStatus(taskId)
 
