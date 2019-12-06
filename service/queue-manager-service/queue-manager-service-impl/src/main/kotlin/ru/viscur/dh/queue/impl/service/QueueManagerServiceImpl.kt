@@ -248,6 +248,7 @@ class QueueManagerServiceImpl(
                 addToQueue(patientId, officeId)
             }
             queueService.deleteQueueItemsOfOffice(officeId)
+            locationMonitorInformService.queueChanged(listOf(officeId))
         }
     }
 
