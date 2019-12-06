@@ -40,6 +40,6 @@ class QueueItem @JsonCreator constructor(
     @JsonIgnore var patientQueueStatus: PatientQueueStatus? = null
 
     override fun toString(): String {
-        return """  QueueItem($onum, $estDuration, $patientQueueStatus, $severity, patientId=${subject.id}, officeId=${location.id})""".trimMargin()
+        return """  QueueItem($onum, $estDuration, $patientQueueStatus, $severity, $queueCode, patientId=${subject.id}, officeId=${location.id})""".trimMargin()
     }
 }

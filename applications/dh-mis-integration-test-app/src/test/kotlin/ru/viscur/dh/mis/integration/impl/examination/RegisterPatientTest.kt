@@ -10,6 +10,7 @@ import ru.viscur.dh.apps.misintegrationtest.service.ForTestService
 import ru.viscur.dh.apps.misintegrationtest.util.*
 import ru.viscur.dh.datastorage.api.util.*
 import ru.viscur.dh.fhir.model.enums.LocationStatus
+import ru.viscur.dh.fhir.model.enums.PatientQueueStatus
 import ru.viscur.dh.fhir.model.enums.Severity
 import ru.viscur.dh.integration.mis.api.ReceptionService
 import ru.viscur.dh.queue.api.QueueManagerService
@@ -114,5 +115,64 @@ class RegisterPatientTest {
                 ServiceRequestSimple(code = OBSERVATION_IN_OFFICE_202, locationId = OFFICE_202),
                 ServiceRequestSimple(code = OBSERVATION_OF_SURGEON, locationId = YELLOW_ZONE_SECTION_1)
         ))
+    }
+
+    @Test
+    fun `check reg when office is ready, test for queue`() {
+        forTestService.cleanDb()
+        forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
+
+        val officeId = OFFICE_101
+
+        queueManagerService.officeIsReady(officeId)
+
+        //проверяемые действия
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val checkP = checkSr.first().subject!!.id!!
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                QueueItemSimple(patientId = checkP, status = PatientQueueStatus.GOING_TO_OBSERVATION)
+        ))))
+    }
+
+    @Test
+    fun `check reg when office is waiting, test for queue`() {
+        forTestService.cleanDb()
+        forTestService.updateOfficeStatuses()
+        queueManagerService.officeIsClosed(OFFICE_119)//закрываем 2й кабинет рентгена
+
+        val officeId = OFFICE_101
+
+        queueManagerService.officeIsReady(officeId)
+
+        val checkSr = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val checkP = checkSr.first().subject!!.id!!
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                QueueItemSimple(patientId = checkP, status = PatientQueueStatus.GOING_TO_OBSERVATION)
+        ))))
+
+        //проверяемые действия
+        val checkSr2 = forTestService.registerPatient(servReqs = listOf(
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION2_IN_OFFICE_101),
+                ServiceRequestSimple(OBSERVATION_IN_OFFICE_202)
+        ))
+        val checkP2 = checkSr2.first().subject!!.id!!
+
+        //проверка после
+        forTestService.checkQueueItems(listOf(QueueOfOfficeSimple(officeId = officeId, officeStatus = LocationStatus.WAITING_PATIENT, items = listOf(
+                QueueItemSimple(patientId = checkP, status = PatientQueueStatus.GOING_TO_OBSERVATION),
+                QueueItemSimple(patientId = checkP2, status = PatientQueueStatus.IN_QUEUE)
+        ))))
     }
 }

@@ -303,7 +303,7 @@ class QueueManagerServiceImpl(
             if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
                 str.add("  nextOfficeForPatientsInfo:")
                 office.extension.nextOfficeForPatientsInfo.forEach {
-                    str.add("    " + it.subject.id + " (${it.severity}) to " + it.nextOffice.id)
+                    str.add("    " + it.subject.id + " (${it.severity}, ${it.queueCode}) to " + it.nextOffice.id)
                 }
             }
 
