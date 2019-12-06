@@ -5,14 +5,14 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
-GET http://localhost:8080/mis-integration/hello
+GET {{host}}/mis-integration/hello
 Accept: application/json
 
 ###
 
 ###
 
-POST http://localhost:8080/reception/severity?takeSyndromes=5
+POST {{host}}/reception/severity?takeSyndromes=5
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -261,7 +261,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/reception/serviceRequests
+POST {{host}}/reception/serviceRequests
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -273,7 +273,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/reception/diagnostic?take=5
+POST {{host}}/reception/diagnostic?take=5
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -522,7 +522,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/reception/patient
+POST http://84.201.154.121:8080/reception/patient
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -569,55 +569,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "code": {
           "coding": [
             {
-              "code": "B03.016.006",
-              "system": "ValueSet/Observation_types"
-            }
-          ]
-        },
-        "locationReference": [
-          {
-            "reference": "Location/Office:ignored"
-          }
-        ]
-      }
-    },
-    {
-      "resource": {
-        "id": "ignored",
-        "resourceType": "ServiceRequest",
-        "status": "active",
-        "subject": {
-          "reference": "Patient/ignored",
-          "type": "Patient"
-        },
-        "code": {
-          "coding": [
-            {
-              "code": "B03.016.002",
-              "system": "ValueSet/Observation_types"
-            }
-          ]
-        },
-        "locationReference": [
-          {
-            "reference": "Location/Office:ignored"
-          }
-        ]
-      }
-    },
-    {
-      "resource": {
-        "id": "ignored",
-        "resourceType": "ServiceRequest",
-        "status": "active",
-        "subject": {
-          "reference": "Patient/ignored",
-          "type": "Patient"
-        },
-        "code": {
-          "coding": [
-            {
-              "code": "A04.28.002.004",
+              "code": "A06.28.002",
               "system": "ValueSet/Observation_types"
             }
           ]
@@ -814,7 +766,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
           {
             "coding": [
               {
-                "code": "A00.0",
+                "code": "D50.1",
                 "system": "ValueSet/ICD-10"
               }
             ]
@@ -893,7 +845,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             }
           },
           {
-            "value": "7878 11116",
+            "value": "{{$randomInt}}",
             "type": {
               "coding": [
                 {
@@ -917,7 +869,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "use": "official"
           },
           {
-            "value": "З-012",
+            "value": "G-{{$randomInt}}",
             "type": {
               "coding": [
                 {
@@ -1135,7 +1087,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/reception/patientForBandage
+POST {{host}}/reception/patientForBandage
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -1204,7 +1156,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
         "id": "ignored",
         "identifier": [
           {
-            "value": "7878 11115",
+            "value": "{{$randomInt}}",
             "type": {
               "coding": [
                 {
@@ -1216,7 +1168,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
             "use": "official"
           },
           {
-            "value": "З-012",
+            "value": "З-{{$randomInt}}",
             "type": {
               "coding": [
                 {

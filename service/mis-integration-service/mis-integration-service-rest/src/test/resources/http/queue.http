@@ -8,7 +8,7 @@
 
 ###                                                                                Пациент зашел в кабинет
 ###
-POST http://localhost:8080/queue/office/patientEntered
+POST {{host}}/queue/office/patientEntered
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -20,13 +20,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:101",
+        "reference": "Location/Office:128",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/eb4a11fb-d35f-4f7c-aa38-72134f6f423c",
+        "reference": "Patient/bfe9a174-5f56-4e91-88f3-c00831776a75",
         "type": "Patient"
       }
     }
@@ -34,7 +34,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                                Пригласить любого пациента в кабинет
 ###
-POST http://localhost:8080/queue/office/forceSendPatientToObservation
+POST {{host}}/queue/office/forceSendPatientToObservation
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -46,13 +46,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:101",
+        "reference": "Location/Office:120",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/769812d0-c6de-4861-872a-73637284eb72",
+        "reference": "Patient/4ddfe1e6-2afd-4ae2-8e27-0c35907ec976",
         "type": "Patient"
       }
     }
@@ -60,7 +60,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                                Поставить пациента первым в очередь в кабинет
 ###
-POST http://localhost:8080/queue/office/setAsFirst
+POST {{host}}/queue/office/setAsFirst
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -86,7 +86,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                                Обследования в кабинете завершено
 ###
-POST http://localhost:8080/queue/office/patientLeft
+POST {{host}}/queue/office/patientLeft
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -121,7 +121,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "type": "Patient"
 }
 ###                                                                                Кабинет готов принять пациента
-POST http://localhost:8080/queue/office/ready
+POST http://84.201.154.121:8080/queue/office/ready
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -130,7 +130,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "type": "Location"
 }
 ###
-POST http://localhost:8080/queue/office/ready
+POST {{host}}/queue/office/ready
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -141,7 +141,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 ###
 ###                                                                                Кабинет busy
 ###
-POST http://localhost:8080/queue/office/busy
+POST {{host}}/queue/office/busy
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -151,7 +151,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                                Кабинет closed
 ###
-POST http://localhost:8080/queue/office/closed
+POST {{host}}/queue/office/closed
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -161,7 +161,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                                Отложить прием ожидаемого пациента в кабинет
 ###
-POST http://localhost:8080/queue/office/delayGoingToObservation
+POST {{host}}/queue/office/delayGoingToObservation
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -172,7 +172,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 ###
 ###                                                                                Убрать пациента из очереди
 ###
-DELETE http://localhost:8080/queue/patient
+DELETE {{host}}/queue/patient
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -182,14 +182,14 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###
 ###
-DELETE http://localhost:8080/queue
+DELETE {{host}}/queue
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                                                                Поставить пациента в очередь
 ###
-POST http://localhost:8080/queue/patient/addToQueue
+POST {{host}}/queue/patient/addToQueue
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -199,7 +199,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                              Информация об очереди в кабинет
 ###
-GET http://localhost:8080/queue
+GET {{host}}/queue
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -209,21 +209,21 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                              Информация для монитора для отображения очереди/приема в кабинет/зоне
 ###
-GET http://localhost:8080/queue/locationMonitor?officeId=Office:202
+GET {{host}}/queue/locationMonitor?officeId=Office:202
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                                                              Информация об очереди в целом
 ###
-GET http://localhost:8080/queue/info
+GET {{host}}/queue/info
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                                                              Информация об очереди в формате QueueItems
 ###
-GET http://localhost:8080/queue/queueItems
+GET {{host}}/queue/queueItems
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -237,7 +237,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###                                                                                Непройденные обследования в очереди
 ###
-GET http://localhost:8080/queue/surveys?surveyTypeId=3
+GET {{host}}/queue/surveys?surveyTypeId=3
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -245,7 +245,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 ###
 ####                                                                                Удалить очередь
 ####
-DELETE http://localhost:8080/queue
+DELETE {{host}}/queue
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -253,16 +253,10 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 ###
 ###                                                                                Удалить историю
 ###
-DELETE http://localhost:8080/queue/history
+DELETE {{host}}/queue/history
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
-###
-###
-GET http://localhost:8080/mis-integration/hello
-Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
-Content-Type: application/json
 
-{}
 ###

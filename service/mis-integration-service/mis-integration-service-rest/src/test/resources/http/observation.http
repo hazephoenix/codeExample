@@ -5,19 +5,19 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
-GET http://localhost:8080/Observation?status=final&patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
+GET {{host}}/Observation?status=final&patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-GET http://localhost:8080/Observation?patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
+GET {{host}}/Observation?patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/Observation
+POST http://84.201.154.121:8080/Observation
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -46,13 +46,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   },
   "valueInteger": 110,
   "basedOn" : {
-    "reference": "ServiceRequest/4a61c6fc-fe03-4eed-861a-85ad9d1982db"
+    "reference": "ServiceRequest/af6c165c-7989-49a0-a779-344981ad9337"
   }
 }
 
 ###
 
-PUT http://localhost:8080/Observation
+PUT {{host}}/Observation
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -84,7 +84,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-GET http://localhost:8080/Observation/start?serviceRequestId=68532bff-4233-4064-92cd-7213899d1f1d
+GET {{host}}/Observation/start?serviceRequestId=68532bff-4233-4064-92cd-7213899d1f1d
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

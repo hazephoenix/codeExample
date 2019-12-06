@@ -112,7 +112,8 @@ class PractitionerServiceImpl(
             extension.onWorkInOfficeId = officeIdIntr
         }
         if (value) {
-            doctorAppEventPublisher.publishPractitionerCreated(updatedPractitioner)
+//            todo нужно вернуть
+//            doctorAppEventPublisher.publishPractitionerCreated(updatedPractitioner)
         } else {
             doctorAppEventPublisher.publishPractitionerRemoved(practitionerId)
         }

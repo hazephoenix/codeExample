@@ -303,7 +303,7 @@ class QueueManagerServiceImpl(
             if (office.extension.nextOfficeForPatientsInfo.isNotEmpty()) {
                 str.add("  nextOfficeForPatientsInfo:")
                 office.extension.nextOfficeForPatientsInfo.forEach {
-                    str.add("    " + it.subject.id + " (${it.severity}) to " + it.nextOffice.id)
+                    str.add("    " + it.subject.id + " (${it.severity}, ${it.queueCode}) to " + it.nextOffice.id)
                 }
             }
 
@@ -392,7 +392,7 @@ class QueueManagerServiceImpl(
     }
 
     private fun changeOfficeStatusNotReadyToProper(officeId: String) {
-        val queueItems = queueService.queueItems()
+        val queueItems = queueService.queueItemsOfOffice(officeId)
         val officeStatus =
                 when {
                     queueItems.any { it.patientQueueStatus == PatientQueueStatus.ON_OBSERVATION } -> LocationStatus.OBSERVATION

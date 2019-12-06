@@ -370,7 +370,7 @@ class PatientServiceImpl(
             where (r.resource->'extension'->>'queueStatusUpdatedAt')\:\:bigint <= :criticalTime
                 and r.resource->'extension'->>'queueStatus' = '${PatientQueueStatus.GOING_TO_OBSERVATION}'
         """)
-        query.setParameter("criticalTime", criticalTimeForDeletingNextOfficeForPatientsInfo().time)
+        query.setParameter("criticalTime", criticalTimeForDelayGoingToObservation().time)
         return query.resultList.map { it as String }
     }
 
