@@ -1,7 +1,7 @@
+import org.apache.commons.codec.binary.Base64
+import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.gradle.tooling.BuildException
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -26,37 +26,35 @@ fun isBuildableProject(project: Project) = project.childProjects.isEmpty()
  */
 fun isExecutableProject(project: Project) = project.path.startsWith(":applications:")
 
+
 /**
  * Подключать ли автоматически SpringBoot
  */
 fun isApplySpringBoot(project: Project): Boolean {
     if (project.path.startsWith(":common:")) {
         // Если какому-то модулю в common нужен boot, подключаем в самом модуле
-        return false;
+        return false
     }
     if (project.path.endsWith("-api")) {
         // В api не нужен boot (бесполезная или даже вредная зависимость)
-        return false;
+        return false
     }
     return true
 }
 
 plugins {
-    kotlin("jvm") version "1.3.50"
-    kotlin("plugin.spring") version "1.3.50" apply false
-    kotlin("plugin.jpa") version "1.3.50" apply false
+    kotlin("jvm") version "1.3.61"
+    kotlin("plugin.spring") version "1.3.61" apply false
+    kotlin("plugin.jpa") version "1.3.61" apply false
     id("org.flywaydb.flyway") version "5.2.4" apply false
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
-    id("org.springframework.boot") version "2.2.0.BUILD-SNAPSHOT" apply false // TODO заменить как появится релиз
+    id("org.springframework.boot") version "2.2.0.RELEASE" apply false
 }
 
 
 allprojects {
     repositories {
         mavenCentral()
-        // TODO убрать milestone и snapshot как релизнится spring boot 2.2.0
-        maven { url = uri("https://repo.spring.io/milestone") }
-        maven { url = uri("https://repo.spring.io/snapshot") }
     }
     if (isBuildableProject(this)) {
         tasks.withType<KotlinCompile> {
@@ -65,7 +63,7 @@ allprojects {
             kotlinOptions.freeCompilerArgs = listOf("-Xjsr305=strict")
         }
         tasks.withType<Test> {
-            useJUnitPlatform();
+            useJUnitPlatform()
         }
     } else {
         tasks.forEach {
@@ -100,10 +98,15 @@ subprojects {
         dependencies {
             implementation(kotlin("stdlib-jdk8"))
             implementation(kotlin("reflect"))
-            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
+            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0")
+            implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.0")
+            implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.0")
+            implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.0")
 
             if (applyBoot) {
                 implementation("org.springframework.boot:spring-boot-starter")
+                implementation("org.springframework.boot:spring-boot-starter-security")
+                implementation("org.springframework.boot:spring-boot-starter-actuator")
                 testImplementation("org.springframework.boot:spring-boot-starter-test") {
                     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }
@@ -139,9 +142,15 @@ task("waitForHttpEndpoint") {
                 .createDefault()
                 .use { client ->
                     val request = HttpGet(project.properties["endpoint"] as String)
+
+                    // TODO т.к. решение временное не стал выносить в настройки
+                    val auth = "test:testGGhdJpldczxcnasw8745"
+                    val encodedAuth = Base64.encodeBase64(auth.toByteArray(Charsets.ISO_8859_1))
+                    val authHeader = "Basic " + String(encodedAuth)
+                    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader)
+
                     val waitFor = (project.properties["waitFor"] as String).toLong()
                     var waited = 0L
-
                     do {
                         val start = System.currentTimeMillis()
                         try {

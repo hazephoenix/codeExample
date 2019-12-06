@@ -17,6 +17,8 @@ import ru.viscur.dh.fhir.model.utils.genId
  * @param system ссылка на справочник, к которому принадлежит код, совпадает с [ValueSet.url], например, "ValueSet/ICD-10"
  * @param priority приоритет выполнения услуги в очереди (0..1)
  * @param additionalInfo дополнительная информация
+ * @param alternatives строчные альтернативы
+ * @param relativeGender относится к полу, код [ru.viscur.dh.fhir.model.enums.Gender]
  */
 class Concept @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
@@ -27,5 +29,7 @@ class Concept @JsonCreator constructor(
         @JsonProperty("display") val display: String,
         @JsonProperty("system") val system: String,
         @JsonProperty("priority") val priority: Double? = null,
-        @JsonProperty("additionalInfo") val additionalInfo: String? = null
+        @JsonProperty("additionalInfo") val additionalInfo: String? = null,
+        @JsonProperty("alternatives") val alternatives: List<String>? = null,
+        @JsonProperty("relativeGender") val relativeGender: String? = null
 ) : BaseResource(id, identifier, resourceType)

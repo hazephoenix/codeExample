@@ -1,6 +1,7 @@
 package ru.viscur.dh.fhir.model.type
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import ru.viscur.dh.fhir.model.entity.BaseResource
 import ru.viscur.dh.fhir.model.enums.ResourceType
@@ -21,5 +22,20 @@ class Reference @JsonCreator constructor(
         @JsonProperty("identifier") val identifier: Identifier? = null,
         @JsonProperty("display") val display: String? = null
 ) {
-    constructor(res: BaseResource) : this(reference = "${res.resourceType}/${res.id}", type = res.resourceType)
+    constructor(res: BaseResource) : this(
+            reference = "${res.resourceType}/${res.id}",
+            type = res.resourceType
+    )
+
+    constructor(resourceType: ResourceType.ResourceTypeId, id: String) : this(
+            reference = "${resourceType}/$id",
+            type = resourceType
+    )
+
+    fun id(): String = reference?.substringAfter("/")
+            ?: throw Exception("can't extract id from reference '$reference'. Acceptable format: 'ResourceType/id'")
+
+    override fun toString(): String {
+        return "Ref(reference='$reference', type=$type${display?.let { ", display=$display" } ?: ""})"
+    }
 }

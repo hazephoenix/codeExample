@@ -23,6 +23,7 @@ private constructor(
         val ChargeItem = createType<ChargeItem>(ResourceTypeId.ChargeItem)
         val Claim = createType<Claim>(ResourceTypeId.Claim)
         val ClinicalImpression = createType<ClinicalImpression>(ResourceTypeId.ClinicalImpression)
+        val CodeMap = createType<CodeMap>(ResourceTypeId.CodeMap)
         val Concept = createType<Concept>(ResourceTypeId.Concept)
         val Consent = createType<Consent>(ResourceTypeId.Consent)
         val DiagnosticReport = createType<DiagnosticReport>(ResourceTypeId.DiagnosticReport)
@@ -38,6 +39,9 @@ private constructor(
         val Procedure = createType<Procedure>(ResourceTypeId.Procedure)
         val Questionnaire = createType<Questionnaire>(ResourceTypeId.Questionnaire)
         val QuestionnaireResponse = createType<QuestionnaireResponse>(ResourceTypeId.QuestionnaireResponse)
+        val QueueHistoryOfOffice = createType<QueueHistoryOfOffice>(ResourceTypeId.QueueHistoryOfOffice)
+        val QueueHistoryOfPatient = createType<QueueHistoryOfPatient>(ResourceTypeId.QueueHistoryOfPatient)
+        val QueueItem = createType<QueueItem>(ResourceTypeId.QueueItem)
         val ServiceRequest = createType<ServiceRequest>(ResourceTypeId.ServiceRequest)
         val Specimen = createType<Specimen>(ResourceTypeId.Specimen)
         val ValueSet = createType<ValueSet>(ResourceTypeId.ValueSet)
@@ -67,6 +71,7 @@ private constructor(
         ChargeItem,
         Claim,
         ClinicalImpression,
+        CodeMap,
         Concept,
         Consent,
         DiagnosticReport,
@@ -82,6 +87,9 @@ private constructor(
         Procedure,
         Questionnaire,
         QuestionnaireResponse,
+        QueueHistoryOfOffice,
+        QueueHistoryOfPatient,
+        QueueItem,
         ServiceRequest,
         Specimen,
         ValueSet

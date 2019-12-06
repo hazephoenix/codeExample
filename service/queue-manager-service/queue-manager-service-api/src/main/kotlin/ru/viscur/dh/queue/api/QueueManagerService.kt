@@ -1,10 +1,10 @@
 package ru.viscur.dh.queue.api
 
-import ru.viscur.dh.queue.api.cmd.RegisterUserCMD
-import ru.viscur.dh.queue.api.model.Office
-import ru.viscur.dh.queue.api.model.RouteSheet
-import ru.viscur.dh.queue.api.model.SurveyType
-import ru.viscur.dh.queue.api.model.User
+import ru.viscur.dh.fhir.model.dto.LocationMonitorDto
+import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.QueueItem
+import ru.viscur.dh.fhir.model.entity.ServiceRequest
+import ru.viscur.dh.fhir.model.enums.Severity
 
 /**
  * Сервис управления очередью пациентов
@@ -12,92 +12,138 @@ import ru.viscur.dh.queue.api.model.User
 interface QueueManagerService {
 
     /**
-     * Кабинет по id
+     * Значение настройки Пересчитывать следующий кабинет в очереди
      */
-    fun officeById(officeId: Long): Office
+    fun needRecalcNextOffice(): Boolean
 
     /**
-     * Пациент по id
+     * Задать значение настройки Пересчитывать следующий кабинет в очереди
      */
-    fun userById(userId: Long): User
-
-    /**
-     * Тип обследования по id
-     */
-    fun surveyTypeById(surveyTypeId: Long): SurveyType
-
+    fun recalcNextOffice(value: Boolean)
 
     /**
      * Пациент получил маршрутный лист: вносим в систему
+     * Возвращаем список обследований с заполненными №пп [ru.viscur.dh.fhir.model.type.ServiceRequestExtension.executionOrder]
      */
-    fun registerUser(cmd: RegisterUserCMD): RouteSheet
+    fun registerPatient(patientId: String): List<ServiceRequest>
+
+    /**
+     * Проставление/перепроставление порядка у невыполненных назначений в маршрутном листе пациента
+     */
+    fun calcServiceRequestExecOrders(patientId: String, prevOfficeId: String? = null): List<ServiceRequest>
 
     /**
      * Поставить пациента в очередь
-     *
-     * TODO moveUserToNextQueue?
-     * TODO pass only userId?
+     * У пациента может быть незавершенный маршрутный лист, но его удалили из очереди по какой-либо причине,
+     * этой функцией мы снова добавляем его в очередь
+     * Если пациент уже в очереди, то ничего не происходит
      */
-    fun addToOfficeQueue(user: User, validate: Boolean = true)
+    fun addToQueue(patientId: String, prevOfficeId: String? = null)
+
+    /**
+     * Добавление пациента в очередь в указанный кабинет
+     */
+    fun addToOfficeQueue(patientId: String, officeId: String)
+
+    /**
+     * Вызов пациента на обследование в кабинет (принудительно, в обход очереди, где бы он не стоял)
+     */
+    fun forceSendPatientToObservation(patientId: String, officeId: String): List<ServiceRequest>
+
+    /**
+     * Поставить пациента первым в очередь в кабинет
+     */
+    fun setAsFirst(patientId: String, officeId: String)
+
+    /**
+     * Отложить прием ожидаемого пациента в кабинет
+     * @param onlyIfFirstInQueueIsLongWaiting только если первый в очереди долго ожидает
+     *  Необоходимо для различия кейсов:
+     *  1) если врач в кабинете сама принудительно вызывает эту функцию, то мы не проверяем сколько ждет первый в очереди
+     *  2) если вызов функции происходит по шедулеру нужно проверять сколько ждет первый в очереди, т к
+     *   2.а) если на момент приглашения первого за ним был пациент, то по истечению 30 сек нужно отложить первого, пригласить второго
+     *   2.б) если на момент приглашения никого больше не было, то мы его не откладываем, т к некого приглашать
+     *     а как только приходит следующий за ним, то мы опять засекаем 30 сек и только после этого откладываем первого
+     *     вот в этом случае эта проверка не даст отложить пациента, если первый в очереди ожидает не долго
+     */
+    fun delayGoingToObservation(patientId: String, onlyIfFirstInQueueIsLongWaiting: Boolean = true)
+
+    /**
+     * Переставить пациента если необходимо:
+     * проверяет, актуально ли еще то, что пациент стоит в указанный кабинет - есть ли там назначения
+     * Иначе передвигает в след. кабинет
+     */
+    fun rebasePatientIfNeeded(patientId: String, officeId: String)
 
     /**
      * Убрать пациента из очереди
-     * Перевод пациента в статус [ru.viscur.dh.queue.api.model.UserInQueueStatus.READY]
+     * Перевод пациента в статус [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.READY] - поставить пациента "вне очередей"
      *
-     * TODO поговорить с Машей что это за метод и что он делает
-     * TODO pass only userId?
+     * Используется, например, на тот случай если его очередь настала, но он отошел - его не нужно исключать вообще из системы,
+     * но и ждать не имеет смысла.
+     * Или если даже он начал обследование, но выяснялось, что по каким-то причинам сейчас осмотр нельзя проводить.
+     * Кабинет переводим в статус BUSY, если очередь пациента настала или шло обследование
      */
-    fun deleteFromOfficeQueue(user: User)
+    fun deleteFromQueue(patientId: String)
 
     /**
-     * Обследование началось
-     *
-     * TODO pass only userId and officeId? (or create cmd)
+     * Пациент зашел в кабинет
      */
-    fun surveyStarted(user: User, office: Office);
+    fun patientEntered(patientId: String, officeId: String): List<ServiceRequest>
 
     /**
-     * Обследование закончилось
-     *
-     * TODO pass only officeId?
+     * Пациент выходит из кабинета (все обследования в этом кабинете, которые есть в маршрутном листе проведены)
      */
-    fun surveyFinished(office: Office)
+    fun patientLeft(patientId: String, officeId: String)
 
     /**
-     * Кабинет готов принять пациента: смена статуса с [OfficeStatus.CLOSED], [OfficeStatus.BUSY] на [OfficeStatus.READY]
+     * Аналог [patientLeft]
+     */
+    fun patientLeftByPatientId(patientId: String)
+
+    /**
+     * Отменить "вход" пациента в кабинет
+     * Если статус пациента [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.GOING_TO_OBSERVATION] или [ru.viscur.dh.fhir.model.enums.PatientQueueStatus.ON_OBSERVATION]
+     * Пациент отправляется обратно первым в очередь
+     * Кабинет принимает статус "занят" (если пациентов на приеме в кабинет не осталось)
+     */
+    fun cancelEntering(patientId: String)
+
+    /**
+     * Функционал, который нужно сделать после изменения степени тяжести
+     */
+    fun severityUpdated(patientId: String, severity: Severity)
+
+    /**
+     * Кабинет готов принять пациента: смена статуса с CLOSED, BUSY на READY
      * Если кабинет находится в статусе назначенного пациента, ничего не делаем
-     *
-     * TODO pass only officeId?
      */
-    fun officeIsReady(office: Office);
+    fun officeIsReady(officeId: String)
+
+    /**
+     * Пригласить след. пациента из очереди в кабинет
+     */
+    fun enterNextPatient(officeId: String)
 
     /**
      * Смена статуса кабинета с "готов принять" или с "закрыт" на занят
-     *
-     * TODO pass only officeId?
      */
-    fun officeIsBusy(office: Office)
+    fun officeIsBusy(officeId: String)
 
     /**
      * Смена статуса кабинета с "занят" или "готов принять" на "закрыт"
      * Расформировываем очередь
-     *
-     * TODO pass only officeId?
      */
-    fun officeIsClosed(office: Office)
+    fun officeIsClosed(officeId: String)
 
     /**
-     * Пациент покинул очередь
-     *
-     * TODO pass only userId?
+     * Удалить устаревшие [ru.viscur.dh.fhir.model.type.LocationExtensionNextOfficeForPatientInfo]
      */
-    fun userLeftQueue(user: User)
+    fun deleteOldNextOfficeForPatientsInfo()
 
     /**
      * Удалить всю очередь: из базы и из системы
      * и пациентов, и маршрутные листы
-     *
-     * TODO clearQueue?
      */
     fun deleteQueue()
 
@@ -105,4 +151,25 @@ interface QueueManagerService {
      * Удаление истории работы кабинетов и статусов пациентов
      */
     fun deleteHistory()
+
+    /**
+     * Очередь в опр. кабинет
+     */
+    fun queueOfOffice(officeId: String): Bundle
+
+    /**
+     * Все [QueueItem] - все элементы очередей для всех кабинетов
+     */
+    fun queueItems(): List<QueueItem>
+
+    /**
+     * Информация для монитора для отображения очереди/приема в кабинет/зоне
+     */
+    fun locationMonitor(officeId: String): LocationMonitorDto
+
+    /**
+     * Отобразить в логах очередь и провалидировать
+     * todo только на время отладки
+     */
+    fun loqAndValidate(): String
 }

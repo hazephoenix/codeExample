@@ -1,0 +1,109 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###                                             Информация о продолжительности проведения пациента в этапах очереди за последние сутки
+###
+GET {{host}}/report/queueHistoryOfPatient?patientId=d33cc085-ee65-40f1-b856-0d7e47da6fea
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                             Информация о продолжительности проведения услуг пациенту за последние сутки
+###
+GET {{host}}/report/observationHistoryOfPatient?patientId=d33cc085-ee65-40f1-b856-0d7e47da6fea
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              вся очередь на тек момент/Информация об очередях в кабинеты
+###
+GET {{host}}/report/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              очередь на тек момент в опр кабинет/Информация об очереди в кабинет на тек. момент
+###
+GET {{host}}/report/queue?officeId=Office:104
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              очередь на тек момент к врачу (опр. как в кабинет)/Информация об очереди для врача на тек. момент
+###
+GET {{host}}/report/queue?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              Текущая нагрузка на врачей (то же самое что и информация об очередях + кто в кабинете)
+###
+GET {{host}}/report/workload
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              История нагрузки на врачей за период
+###
+GET {{host}}/report/workloadHistory
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "start": "2019-11-01T00:57:04.242+0000",
+  "end": "2019-11-20T00:57:04.242+0000"
+}
+###                                              Маршрутный лист для печати
+###
+GET {{host}}/report/carePlan?patientId=a94b4873-3844-4c23-a077-87deffcddc71
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###                                              Информация об очередях в кабинет за период
+###
+GET {{host}}/report/queueHistory
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "start": "2019-11-01T00:57:04.242+0000",
+  "end": "2019-11-20T00:57:04.242+0000"
+}
+###                                              Информация о продолжительности текущих/активных обращений пациентов
+###
+GET {{host}}/clinicalImpressionDuration
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###                                              Информация о регламентных значений продолжительности обслуживания обращения пациентов
+###
+GET {{host}}/clinicalImpressionDuration/default
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              Задать значение регламентного времени обслуживания обращения пациентов для указанной степени тяжести
+###
+POST {{host}}/clinicalImpressionDuration/duration?severity=RED&duration=1801
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                              Задать значение настройки Автокорректировка регламентного времени обслуживания по степени тяжести
+###
+POST {{host}}/clinicalImpressionDuration/autoRecalc?severity=RED&value=true
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###

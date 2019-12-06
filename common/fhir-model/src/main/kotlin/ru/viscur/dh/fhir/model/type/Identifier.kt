@@ -25,5 +25,5 @@ class Identifier @JsonCreator constructor(
         @JsonProperty("use") val use: IdentifierUse? = IdentifierUse.official,
         @JsonProperty("assigner") val assigner: Reference? = null
 ) {
-    constructor(value: String, type: IdentifierType) : this(value = value, type = CodeableConcept(code = type.toString(), systemId = ValueSetName.IDENTIFIER_TYPES.id))
+    constructor(value: String, type: IdentifierType) : this(value = value, type = CodeableConcept(code = type.toString(), system = ValueSetName.IDENTIFIER_TYPES))
 }

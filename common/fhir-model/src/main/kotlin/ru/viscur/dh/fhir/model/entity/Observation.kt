@@ -7,7 +7,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.type.Annotation
 import ru.viscur.dh.fhir.model.utils.genId
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 01.10.2019 13:56 by SherbakovaMA
@@ -36,21 +36,21 @@ class Observation @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.Observation.id,
-        @JsonProperty("status") val status: ObservationStatus = ObservationStatus.registered,
-        @JsonProperty("issued") val issued: Timestamp,
-        @JsonProperty("code") val code: CodeableConcept,
-        @JsonProperty("basedOn") val basedOn: Reference? = null,
-        @JsonProperty("performer") val performer: List<Reference>,
-        @JsonProperty("subject") val subject: Reference,
+        @JsonProperty("status") var status: ObservationStatus = ObservationStatus.registered,
+        @JsonProperty("issued") val issued: Date,
+        @JsonProperty("code") var code: CodeableConcept,
+        @JsonProperty("basedOn") var basedOn: Reference? = null,
+        @JsonProperty("performer") var performer: List<Reference>,
+        @JsonProperty("subject") var subject: Reference,
         @JsonProperty("specimen") val specimen: Reference? = null,
         @JsonProperty("note") val note: List<Annotation>? = null,
         @JsonProperty("interpretation") val interpretation: List<CodeableConcept>? = null,
-        @JsonProperty("valueQuantity") val valueQuantity: Quantity? = null,
-        @JsonProperty("valueCodeableConcept") val valueCodeableConcept: CodeableConcept? = null,
-        @JsonProperty("valueString") val valueString: String? = null,
-        @JsonProperty("valueBoolean") val valueBoolean: Boolean? = null,
-        @JsonProperty("valueInteger") val valueInteger: Int? = null,
-        @JsonProperty("valueSampledData") val valueSampledData: SampledData? = null
+        @JsonProperty("valueQuantity") var valueQuantity: Quantity? = null,
+        @JsonProperty("valueCodeableConcept") var valueCodeableConcept: CodeableConcept? = null,
+        @JsonProperty("valueString") var valueString: String? = null,
+        @JsonProperty("valueBoolean") var valueBoolean: Boolean? = null,
+        @JsonProperty("valueInteger") var valueInteger: Int? = null,
+        @JsonProperty("valueSampledData") var valueSampledData: SampledData? = null
         //val valueRange:  Range ,//todo подключить если необходимо использование
         //val valueRatio:  Ratio ,
         //val valueTime: <time>,

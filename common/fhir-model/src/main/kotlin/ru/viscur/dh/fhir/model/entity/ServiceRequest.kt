@@ -9,6 +9,7 @@ import ru.viscur.dh.fhir.model.type.Identifier
 import ru.viscur.dh.fhir.model.type.Reference
 import ru.viscur.dh.fhir.model.type.ServiceRequestExtension
 import ru.viscur.dh.fhir.model.utils.genId
+import ru.viscur.dh.fhir.model.valueSets.ValueSetName
 
 /**
  * Created at 07.10.2019 13:57 by SherbakovaMA
@@ -28,11 +29,16 @@ class ServiceRequest @JsonCreator constructor(
         @JsonProperty("id") id: String = genId(),
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.ServiceRequest.id,
-        @JsonProperty("status") val status: ServiceRequestStatus = ServiceRequestStatus.active,
-        @JsonProperty("subject") val subject: Reference,
-        @JsonProperty("performer") val performer: List<Reference>? = null,
-        @JsonProperty("locationReference") val locationReference: List<Reference>? = null,
+        @JsonProperty("status") var status: ServiceRequestStatus = ServiceRequestStatus.active,
+        @JsonProperty("subject") var subject: Reference? = null,
+        @JsonProperty("performer") var performer: List<Reference>? = null,
+        @JsonProperty("locationReference") var locationReference: List<Reference>? = null,
         @JsonProperty("requester") val requester: Reference? = null,
         @JsonProperty("code") val code: CodeableConcept,
-        @JsonProperty("extension") val extension: ServiceRequestExtension
-) : BaseResource(id, identifier, resourceType)
+        @JsonProperty("extension") var extension: ServiceRequestExtension? = null
+) : BaseResource(id, identifier, resourceType) {
+    constructor(code: String) : this(code = CodeableConcept(
+            code = code,
+            system = ValueSetName.OBSERVATION_TYPES
+    ))
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<izpack:installation xmlns:izpack="http://izpack.org/schema/installation"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     version="5.0"
+                     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+    <info>
+        <appname>Paramedic Desktop</appname>
+        <appversion>1.0</appversion>
+        <javaversion>1.11</javaversion>
+    </info>
+
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+    <guiprefs width="640" height="480" resizable="yes"/>
+
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="FinishPanel"/>
+    </panels>
+
+    <packs>
+        <pack name="stuff" required="true">
+            <description>Stuff</description>
+            <file src="tves-driver.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="tves-backend.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="zebra-native.zip" targetdir="${INSTALL_PATH}/stuff/native" unpack="true"/>
+            <file src="openjdk-11_windows-x64.zip" targetdir="${INSTALL_PATH}/stuff" unpack="true"/>
+            <file src="paramedic-device-native-service.exe" targetdir="${INSTALL_PATH}/stuff"/>
+            <file src="SDK_4_15_1_msi.zip" targetdir="${INSTALL_PATH}/stuff/regula" unpack="true"/>
+            <file src="winsw.exe" targetdir="${INSTALL_PATH}"/>
+        </pack>
+        <pack name="app" required="true">
+            <description>Main application</description>
+            <singlefile src="dh-paramedic-device-app.jar" target="${INSTALL_PATH}/app.jar"/>
+        </pack>
+    </packs>
+</izpack:installation>

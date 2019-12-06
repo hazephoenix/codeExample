@@ -3,288 +3,290 @@ create sequence if not exists transaction_id_seq
 
 alter sequence transaction_id_seq owner to ${owner};
 
-drop table if exists "account";
-drop table if exists "account_history";
-drop table if exists "activitydefinition";
-drop table if exists "activitydefinition_history";
-drop table if exists "adverseevent";
-drop table if exists "adverseevent_history";
-drop table if exists "allergyintolerance";
-drop table if exists "allergyintolerance_history";
-drop table if exists "appointment";
-drop table if exists "appointment_history";
-drop table if exists "appointmentresponse";
-drop table if exists "appointmentresponse_history";
-drop table if exists "auditevent";
-drop table if exists "auditevent_history";
-drop table if exists "basic";
-drop table if exists "basic_history";
-drop table if exists "binary";
-drop table if exists "binary_history";
-drop table if exists "biologicallyderivedproduct";
-drop table if exists "biologicallyderivedproduct_history";
-drop table if exists "bodystructure";
-drop table if exists "bodystructure_history";
-drop table if exists "capabilitystatement";
-drop table if exists "capabilitystatement_history";
-drop table if exists "careplan";
-drop table if exists "careplan_history";
-drop table if exists "careteam";
-drop table if exists "careteam_history";
-drop table if exists "chargeitem";
-drop table if exists "chargeitem_history";
-drop table if exists "claim";
-drop table if exists "claim_history";
-drop table if exists "claimresponse";
-drop table if exists "claimresponse_history";
-drop table if exists "clinicalimpression";
-drop table if exists "clinicalimpression_history";
-drop table if exists "codesystem";
-drop table if exists "codesystem_history";
-drop table if exists "communication";
-drop table if exists "communication_history";
-drop table if exists "communicationrequest";
-drop table if exists "communicationrequest_history";
-drop table if exists "compartmentdefinition";
-drop table if exists "compartmentdefinition_history";
-drop table if exists "composition";
-drop table if exists "composition_history";
-drop table if exists "concept";
-drop table if exists "concept_history";
-drop table if exists "conceptmap";
-drop table if exists "conceptmap_history";
-drop table if exists "condition";
-drop table if exists "condition_history";
-drop table if exists "consent";
-drop table if exists "consent_history";
-drop table if exists "contract";
-drop table if exists "contract_history";
-drop table if exists "coverage";
-drop table if exists "coverage_history";
-drop table if exists "detectedissue";
-drop table if exists "detectedissue_history";
-drop table if exists "device";
-drop table if exists "device_history";
-drop table if exists "devicecomponent";
-drop table if exists "devicecomponent_history";
-drop table if exists "devicemetric";
-drop table if exists "devicemetric_history";
-drop table if exists "devicerequest";
-drop table if exists "devicerequest_history";
-drop table if exists "deviceusestatement";
-drop table if exists "deviceusestatement_history";
-drop table if exists "diagnosticreport";
-drop table if exists "diagnosticreport_history";
-drop table if exists "documentmanifest";
-drop table if exists "documentmanifest_history";
-drop table if exists "documentreference";
-drop table if exists "documentreference_history";
-drop table if exists "eligibilityrequest";
-drop table if exists "eligibilityrequest_history";
-drop table if exists "eligibilityresponse";
-drop table if exists "eligibilityresponse_history";
-drop table if exists "encounter";
-drop table if exists "encounter_history";
-drop table if exists "endpoint";
-drop table if exists "endpoint_history";
-drop table if exists "enrollmentrequest";
-drop table if exists "enrollmentrequest_history";
-drop table if exists "enrollmentresponse";
-drop table if exists "enrollmentresponse_history";
-drop table if exists "entrydefinition";
-drop table if exists "entrydefinition_history";
-drop table if exists "episodeofcare";
-drop table if exists "episodeofcare_history";
-drop table if exists "eventdefinition";
-drop table if exists "eventdefinition_history";
-drop table if exists "examplescenario";
-drop table if exists "examplescenario_history";
-drop table if exists "expansionprofile";
-drop table if exists "expansionprofile_history";
-drop table if exists "explanationofbenefit";
-drop table if exists "explanationofbenefit_history";
-drop table if exists "familymemberhistory";
-drop table if exists "familymemberhistory_history";
-drop table if exists "flag";
-drop table if exists "flag_history";
-drop table if exists "goal";
-drop table if exists "goal_history";
-drop table if exists "graphdefinition";
-drop table if exists "graphdefinition_history";
-drop table if exists "group";
-drop table if exists "group_history";
-drop table if exists "guidanceresponse";
-drop table if exists "guidanceresponse_history";
-drop table if exists "healthcareservice";
-drop table if exists "healthcareservice_history";
-drop table if exists "imagingstudy";
-drop table if exists "imagingstudy_history";
-drop table if exists "immunization";
-drop table if exists "immunization_history";
-drop table if exists "immunizationevaluation";
-drop table if exists "immunizationevaluation_history";
-drop table if exists "immunizationrecommendation";
-drop table if exists "immunizationrecommendation_history";
-drop table if exists "implementationguide";
-drop table if exists "implementationguide_history";
-drop table if exists "invoice";
-drop table if exists "invoice_history";
-drop table if exists "iteminstance";
-drop table if exists "iteminstance_history";
-drop table if exists "library";
-drop table if exists "library_history";
-drop table if exists "linkage";
-drop table if exists "linkage_history";
-drop table if exists "list";
-drop table if exists "list_history";
-drop table if exists "location";
-drop table if exists "location_history";
-drop table if exists "measure";
-drop table if exists "measure_history";
-drop table if exists "measurereport";
-drop table if exists "measurereport_history";
-drop table if exists "media";
-drop table if exists "media_history";
-drop table if exists "medication";
-drop table if exists "medication_history";
-drop table if exists "medicationadministration";
-drop table if exists "medicationadministration_history";
-drop table if exists "medicationdispense";
-drop table if exists "medicationdispense_history";
-drop table if exists "medicationrequest";
-drop table if exists "medicationrequest_history";
-drop table if exists "medicationstatement";
-drop table if exists "medicationstatement_history";
-drop table if exists "medicinalproduct";
-drop table if exists "medicinalproduct_history";
-drop table if exists "medicinalproductauthorization";
-drop table if exists "medicinalproductauthorization_history";
-drop table if exists "medicinalproductclinicals";
-drop table if exists "medicinalproductclinicals_history";
-drop table if exists "medicinalproductdevicespec";
-drop table if exists "medicinalproductdevicespec_history";
-drop table if exists "medicinalproductingredient";
-drop table if exists "medicinalproductingredient_history";
-drop table if exists "medicinalproductpackaged";
-drop table if exists "medicinalproductpackaged_history";
-drop table if exists "medicinalproductpharmaceutical";
-drop table if exists "medicinalproductpharmaceutical_history";
-drop table if exists "messagedefinition";
-drop table if exists "messagedefinition_history";
-drop table if exists "messageheader";
-drop table if exists "messageheader_history";
-drop table if exists "metadataresource";
-drop table if exists "metadataresource_history";
-drop table if exists "namingsystem";
-drop table if exists "namingsystem_history";
-drop table if exists "nutritionorder";
-drop table if exists "nutritionorder_history";
-drop table if exists "observation";
-drop table if exists "observation_history";
-drop table if exists "observationdefinition";
-drop table if exists "observationdefinition_history";
-drop table if exists "occupationaldata";
-drop table if exists "occupationaldata_history";
-drop table if exists "operationdefinition";
-drop table if exists "operationdefinition_history";
-drop table if exists "operationoutcome";
-drop table if exists "operationoutcome_history";
-drop table if exists "organization";
-drop table if exists "organization_history";
-drop table if exists "organizationrole";
-drop table if exists "organizationrole_history";
-drop table if exists "parameters";
-drop table if exists "parameters_history";
-drop table if exists "patient";
-drop table if exists "patient_history";
-drop table if exists "paymentnotice";
-drop table if exists "paymentnotice_history";
-drop table if exists "paymentreconciliation";
-drop table if exists "paymentreconciliation_history";
-drop table if exists "person";
-drop table if exists "person_history";
-drop table if exists "plandefinition";
-drop table if exists "plandefinition_history";
-drop table if exists "practitioner";
-drop table if exists "practitioner_history";
-drop table if exists "practitionerrole";
-drop table if exists "practitionerrole_history";
-drop table if exists "procedure";
-drop table if exists "procedure_history";
-drop table if exists "processrequest";
-drop table if exists "processrequest_history";
-drop table if exists "processresponse";
-drop table if exists "processresponse_history";
-drop table if exists "productplan";
-drop table if exists "productplan_history";
-drop table if exists "provenance";
-drop table if exists "provenance_history";
-drop table if exists "questionnaire";
-drop table if exists "questionnaire_history";
-drop table if exists "questionnaireresponse";
-drop table if exists "questionnaireresponse_history";
-drop table if exists "relatedperson";
-drop table if exists "relatedperson_history";
-drop table if exists "requestgroup";
-drop table if exists "requestgroup_history";
-drop table if exists "researchstudy";
-drop table if exists "researchstudy_history";
-drop table if exists "researchsubject";
-drop table if exists "researchsubject_history";
-drop table if exists "riskassessment";
-drop table if exists "riskassessment_history";
-drop table if exists "schedule";
-drop table if exists "schedule_history";
-drop table if exists "sequence";
-drop table if exists "sequence_history";
-drop table if exists "servicerequest";
-drop table if exists "servicerequest_history";
-drop table if exists "slot";
-drop table if exists "slot_history";
-drop table if exists "specimen";
-drop table if exists "specimen_history";
-drop table if exists "specimendefinition";
-drop table if exists "specimendefinition_history";
-drop table if exists "structuredefinition";
-drop table if exists "structuredefinition_history";
-drop table if exists "structuremap";
-drop table if exists "structuremap_history";
-drop table if exists "subscription";
-drop table if exists "subscription_history";
-drop table if exists "substance";
-drop table if exists "substance_history";
-drop table if exists "substancepolymer";
-drop table if exists "substancepolymer_history";
-drop table if exists "substancereferenceinformation";
-drop table if exists "substancereferenceinformation_history";
-drop table if exists "substancespecification";
-drop table if exists "substancespecification_history";
-drop table if exists "supplydelivery";
-drop table if exists "supplydelivery_history";
-drop table if exists "supplyrequest";
-drop table if exists "supplyrequest_history";
-drop table if exists "task";
-drop table if exists "task_history";
-drop table if exists "terminologycapabilities";
-drop table if exists "terminologycapabilities_history";
-drop table if exists "testreport";
-drop table if exists "testreport_history";
-drop table if exists "testscript";
-drop table if exists "testscript_history";
-drop table if exists "transaction";
-drop table if exists "usersession";
-drop table if exists "usersession_history";
-drop table if exists "valueset";
-drop table if exists "valueset_history";
-drop table if exists "verificationresult";
-drop table if exists "verificationresult_history";
-drop table if exists "visionprescription";
-drop table if exists "visionprescription_history";
+drop table if exists "account" cascade;
+drop table if exists "account_history" cascade;
+drop table if exists "activitydefinition" cascade;
+drop table if exists "activitydefinition_history" cascade;
+drop table if exists "adverseevent" cascade;
+drop table if exists "adverseevent_history" cascade;
+drop table if exists "allergyintolerance" cascade;
+drop table if exists "allergyintolerance_history" cascade;
+drop table if exists "appointment" cascade;
+drop table if exists "appointment_history" cascade;
+drop table if exists "appointmentresponse" cascade;
+drop table if exists "appointmentresponse_history" cascade;
+drop table if exists "auditevent" cascade;
+drop table if exists "auditevent_history" cascade;
+drop table if exists "basic" cascade;
+drop table if exists "basic_history" cascade;
+drop table if exists "binary" cascade;
+drop table if exists "binary_history" cascade;
+drop table if exists "biologicallyderivedproduct" cascade;
+drop table if exists "biologicallyderivedproduct_history" cascade;
+drop table if exists "bodystructure" cascade;
+drop table if exists "bodystructure_history" cascade;
+drop table if exists "capabilitystatement" cascade;
+drop table if exists "capabilitystatement_history" cascade;
+drop table if exists "careplan" cascade;
+drop table if exists "careplan_history" cascade;
+drop table if exists "careteam" cascade;
+drop table if exists "careteam_history" cascade;
+drop table if exists "chargeitem" cascade;
+drop table if exists "chargeitem_history" cascade;
+drop table if exists "claim" cascade;
+drop table if exists "claim_history" cascade;
+drop table if exists "claimresponse" cascade;
+drop table if exists "claimresponse_history" cascade;
+drop table if exists "clinicalimpression" cascade;
+drop table if exists "clinicalimpression_history" cascade;
+drop table if exists "codesystem" cascade;
+drop table if exists "codesystem_history" cascade;
+drop table if exists "communication" cascade;
+drop table if exists "communication_history" cascade;
+drop table if exists "communicationrequest" cascade;
+drop table if exists "communicationrequest_history" cascade;
+drop table if exists "compartmentdefinition" cascade;
+drop table if exists "compartmentdefinition_history" cascade;
+drop table if exists "composition" cascade;
+drop table if exists "composition_history" cascade;
+drop table if exists "concept" cascade;
+drop table if exists "concept_history" cascade;
+drop table if exists "conceptmap" cascade;
+drop table if exists "conceptmap_history" cascade;
+drop table if exists "condition" cascade;
+drop table if exists "condition_history" cascade;
+drop table if exists "consent" cascade;
+drop table if exists "consent_history" cascade;
+drop table if exists "contract" cascade;
+drop table if exists "contract_history" cascade;
+drop table if exists "coverage" cascade;
+drop table if exists "coverage_history" cascade;
+drop table if exists "detectedissue" cascade;
+drop table if exists "detectedissue_history" cascade;
+drop table if exists "device" cascade;
+drop table if exists "device_history" cascade;
+drop table if exists "devicecomponent" cascade;
+drop table if exists "devicecomponent_history" cascade;
+drop table if exists "devicemetric" cascade;
+drop table if exists "devicemetric_history" cascade;
+drop table if exists "devicerequest" cascade;
+drop table if exists "devicerequest_history" cascade;
+drop table if exists "deviceusestatement" cascade;
+drop table if exists "deviceusestatement_history" cascade;
+drop table if exists "diagnosticreport" cascade;
+drop table if exists "diagnosticreport_history" cascade;
+drop table if exists "documentmanifest" cascade;
+drop table if exists "documentmanifest_history" cascade;
+drop table if exists "documentreference" cascade;
+drop table if exists "documentreference_history" cascade;
+drop table if exists "eligibilityrequest" cascade;
+drop table if exists "eligibilityrequest_history" cascade;
+drop table if exists "eligibilityresponse" cascade;
+drop table if exists "eligibilityresponse_history" cascade;
+drop table if exists "encounter" cascade;
+drop table if exists "encounter_history" cascade;
+drop table if exists "endpoint" cascade;
+drop table if exists "endpoint_history" cascade;
+drop table if exists "enrollmentrequest" cascade;
+drop table if exists "enrollmentrequest_history" cascade;
+drop table if exists "enrollmentresponse" cascade;
+drop table if exists "enrollmentresponse_history" cascade;
+drop table if exists "entrydefinition" cascade;
+drop table if exists "entrydefinition_history" cascade;
+drop table if exists "episodeofcare" cascade;
+drop table if exists "episodeofcare_history" cascade;
+drop table if exists "eventdefinition" cascade;
+drop table if exists "eventdefinition_history" cascade;
+drop table if exists "examplescenario" cascade;
+drop table if exists "examplescenario_history" cascade;
+drop table if exists "expansionprofile" cascade;
+drop table if exists "expansionprofile_history" cascade;
+drop table if exists "explanationofbenefit" cascade;
+drop table if exists "explanationofbenefit_history" cascade;
+drop table if exists "familymemberhistory" cascade;
+drop table if exists "familymemberhistory_history" cascade;
+drop table if exists "flag" cascade;
+drop table if exists "flag_history" cascade;
+drop table if exists "goal" cascade;
+drop table if exists "goal_history" cascade;
+drop table if exists "graphdefinition" cascade;
+drop table if exists "graphdefinition_history" cascade;
+drop table if exists "group" cascade;
+drop table if exists "group_history" cascade;
+drop table if exists "guidanceresponse" cascade;
+drop table if exists "guidanceresponse_history" cascade;
+drop table if exists "healthcareservice" cascade;
+drop table if exists "healthcareservice_history" cascade;
+drop table if exists "imagingstudy" cascade;
+drop table if exists "imagingstudy_history" cascade;
+drop table if exists "immunization" cascade;
+drop table if exists "immunization_history" cascade;
+drop table if exists "immunizationevaluation" cascade;
+drop table if exists "immunizationevaluation_history" cascade;
+drop table if exists "immunizationrecommendation" cascade;
+drop table if exists "immunizationrecommendation_history" cascade;
+drop table if exists "implementationguide" cascade;
+drop table if exists "implementationguide_history" cascade;
+drop table if exists "invoice" cascade;
+drop table if exists "invoice_history" cascade;
+drop table if exists "iteminstance" cascade;
+drop table if exists "iteminstance_history" cascade;
+drop table if exists "library" cascade;
+drop table if exists "library_history" cascade;
+drop table if exists "linkage" cascade;
+drop table if exists "linkage_history" cascade;
+drop table if exists "listresource" cascade;
+drop table if exists "listresource_history" cascade;
+drop table if exists "location" cascade;
+drop table if exists "location_history" cascade;
+drop table if exists "measure" cascade;
+drop table if exists "measure_history" cascade;
+drop table if exists "measurereport" cascade;
+drop table if exists "measurereport_history" cascade;
+drop table if exists "media" cascade;
+drop table if exists "media_history" cascade;
+drop table if exists "medication" cascade;
+drop table if exists "medication_history" cascade;
+drop table if exists "medicationadministration" cascade;
+drop table if exists "medicationadministration_history" cascade;
+drop table if exists "medicationdispense" cascade;
+drop table if exists "medicationdispense_history" cascade;
+drop table if exists "medicationrequest" cascade;
+drop table if exists "medicationrequest_history" cascade;
+drop table if exists "medicationstatement" cascade;
+drop table if exists "medicationstatement_history" cascade;
+drop table if exists "medicinalproduct" cascade;
+drop table if exists "medicinalproduct_history" cascade;
+drop table if exists "medicinalproductauthorization" cascade;
+drop table if exists "medicinalproductauthorization_history" cascade;
+drop table if exists "medicinalproductclinicals" cascade;
+drop table if exists "medicinalproductclinicals_history" cascade;
+drop table if exists "medicinalproductdevicespec" cascade;
+drop table if exists "medicinalproductdevicespec_history" cascade;
+drop table if exists "medicinalproductingredient" cascade;
+drop table if exists "medicinalproductingredient_history" cascade;
+drop table if exists "medicinalproductpackaged" cascade;
+drop table if exists "medicinalproductpackaged_history" cascade;
+drop table if exists "medicinalproductpharmaceutical" cascade;
+drop table if exists "medicinalproductpharmaceutical_history" cascade;
+drop table if exists "messagedefinition" cascade;
+drop table if exists "messagedefinition_history" cascade;
+drop table if exists "messageheader" cascade;
+drop table if exists "messageheader_history" cascade;
+drop table if exists "metadataresource" cascade;
+drop table if exists "metadataresource_history" cascade;
+drop table if exists "namingsystem" cascade;
+drop table if exists "namingsystem_history" cascade;
+drop table if exists "nutritionorder" cascade;
+drop table if exists "nutritionorder_history" cascade;
+drop table if exists "observation" cascade;
+drop table if exists "observation_history" cascade;
+drop table if exists "observationdefinition" cascade;
+drop table if exists "observationdefinition_history" cascade;
+drop table if exists "occupationaldata" cascade;
+drop table if exists "occupationaldata_history" cascade;
+drop table if exists "operationdefinition" cascade;
+drop table if exists "operationdefinition_history" cascade;
+drop table if exists "operationoutcome" cascade;
+drop table if exists "operationoutcome_history" cascade;
+drop table if exists "organization" cascade;
+drop table if exists "organization_history" cascade;
+drop table if exists "organizationrole" cascade;
+drop table if exists "organizationrole_history" cascade;
+drop table if exists "parameters" cascade;
+drop table if exists "parameters_history" cascade;
+drop table if exists "patient" cascade;
+drop table if exists "patient_history" cascade;
+drop table if exists "paymentnotice" cascade;
+drop table if exists "paymentnotice_history" cascade;
+drop table if exists "paymentreconciliation" cascade;
+drop table if exists "paymentreconciliation_history" cascade;
+drop table if exists "person" cascade;
+drop table if exists "person_history" cascade;
+drop table if exists "plandefinition" cascade;
+drop table if exists "plandefinition_history" cascade;
+drop table if exists "practitioner" cascade;
+drop table if exists "practitioner_history" cascade;
+drop table if exists "practitionerrole" cascade;
+drop table if exists "practitionerrole_history" cascade;
+drop table if exists "procedure" cascade;
+drop table if exists "procedure_history" cascade;
+drop table if exists "processrequest" cascade;
+drop table if exists "processrequest_history" cascade;
+drop table if exists "processresponse" cascade;
+drop table if exists "processresponse_history" cascade;
+drop table if exists "productplan" cascade;
+drop table if exists "productplan_history" cascade;
+drop table if exists "provenance" cascade;
+drop table if exists "provenance_history" cascade;
+drop table if exists "questionnaire" cascade;
+drop table if exists "questionnaire_history" cascade;
+drop table if exists "questionnaireresponse" cascade;
+drop table if exists "questionnaireresponse_history" cascade;
+drop table if exists "relatedperson" cascade;
+drop table if exists "relatedperson_history" cascade;
+drop table if exists "requestgroup" cascade;
+drop table if exists "requestgroup_history" cascade;
+drop table if exists "researchstudy" cascade;
+drop table if exists "researchstudy_history" cascade;
+drop table if exists "researchsubject" cascade;
+drop table if exists "researchsubject_history" cascade;
+drop table if exists "riskassessment" cascade;
+drop table if exists "riskassessment_history" cascade;
+drop table if exists "schedule" cascade;
+drop table if exists "schedule_history" cascade;
+drop table if exists "sequence" cascade;
+drop table if exists "sequence_history" cascade;
+drop table if exists "servicerequest" cascade;
+drop table if exists "servicerequest_history" cascade;
+drop table if exists "slot" cascade;
+drop table if exists "slot_history" cascade;
+drop table if exists "specimen" cascade;
+drop table if exists "specimen_history" cascade;
+drop table if exists "specimendefinition" cascade;
+drop table if exists "specimendefinition_history" cascade;
+drop table if exists "structuredefinition" cascade;
+drop table if exists "structuredefinition_history" cascade;
+drop table if exists "structuremap" cascade;
+drop table if exists "structuremap_history" cascade;
+drop table if exists "subscription" cascade;
+drop table if exists "subscription_history" cascade;
+drop table if exists "substance" cascade;
+drop table if exists "substance_history" cascade;
+drop table if exists "substancepolymer" cascade;
+drop table if exists "substancepolymer_history" cascade;
+drop table if exists "substancereferenceinformation" cascade;
+drop table if exists "substancereferenceinformation_history" cascade;
+drop table if exists "substancespecification" cascade;
+drop table if exists "substancespecification_history" cascade;
+drop table if exists "supplydelivery" cascade;
+drop table if exists "supplydelivery_history" cascade;
+drop table if exists "supplyrequest" cascade;
+drop table if exists "supplyrequest_history" cascade;
+drop table if exists "task" cascade;
+drop table if exists "task_history" cascade;
+drop table if exists "terminologycapabilities" cascade;
+drop table if exists "terminologycapabilities_history" cascade;
+drop table if exists "testreport" cascade;
+drop table if exists "testreport_history" cascade;
+drop table if exists "testscript" cascade;
+drop table if exists "testscript_history" cascade;
+drop table if exists "transaction" cascade;
+drop table if exists "usersession" cascade;
+drop table if exists "usersession_history" cascade;
+drop table if exists "valueset" cascade;
+drop table if exists "valueset_history" cascade;
+drop table if exists "verificationresult" cascade;
+drop table if exists "verificationresult_history" cascade;
+drop table if exists "visionprescription" cascade;
+drop table if exists "visionprescription_history" cascade;
 
 drop type if exists resource_status cascade;
 create type resource_status as enum ('created', 'updated', 'deleted', 'recreated');
 
 alter type resource_status owner to ${owner};
+
+--> Tables
 
 drop type if exists _resource cascade;
 create type _resource as
@@ -3138,33 +3140,33 @@ create table measure_history
 
 alter table measure_history owner to ${owner};
 
-create table list
+create table listresource
 (
 	id text not null
-		constraint list_pkey
+		constraint listresource_pkey
 			primary key,
 	txid bigint not null,
 	ts timestamp with time zone default CURRENT_TIMESTAMP,
-	resource_type text default 'List'::text,
+	resource_type text default 'ListResource'::text,
 	status resource_status not null,
 	resource jsonb not null
 );
 
-alter table list owner to ${owner};
+alter table listresource owner to ${owner};
 
-create table list_history
+create table listresource_history
 (
 	id text not null,
 	txid bigint not null,
 	ts timestamp with time zone default CURRENT_TIMESTAMP,
-	resource_type text default 'List'::text,
+	resource_type text default 'ListResource'::text,
 	status resource_status not null,
 	resource jsonb not null,
-	constraint list_history_pkey
+	constraint listresource_history_pkey
 		primary key (id, txid)
 );
 
-alter table list_history owner to ${owner};
+alter table listresource_history owner to ${owner};
 
 create table encounter
 (
@@ -4174,15 +4176,17 @@ create table concept_history
 
 alter table concept_history owner to ${owner};
 
-create or replace function fhirbase_genid() returns text
+--> Функции
+
+create or replace function resource_genid() returns text
 	language sql
 as $$
 select gen_random_uuid()::text
 $$;
 
-alter function fhirbase_genid() owner to ${owner};
+alter function resource_genid() owner to ${owner};
 
-create or replace function _fhirbase_to_resource(x _resource) returns jsonb
+create or replace function to_resource(x _resource) returns jsonb
 	language sql
 as $$
 select x.resource || jsonb_build_object(
@@ -4190,14 +4194,14 @@ select x.resource || jsonb_build_object(
   'id', x.id,
   'meta', coalesce(x.resource->'meta', '{}'::jsonb) || jsonb_build_object(
     'lastUpdated', x.ts,
-    'versionId', x.txid::text
+    'versionId', x.txid
   )
  );
 $$;
 
-alter function _fhirbase_to_resource(_resource) owner to ${owner};
+alter function to_resource(_resource) owner to ${owner};
 
-create or replace function fhirbase_create(resource jsonb, txid bigint) returns jsonb
+create or replace function resource_create(resource jsonb, txid bigint) returns jsonb
 	language plpgsql
 as $$
 DECLARE
@@ -4207,7 +4211,7 @@ DECLARE
   result jsonb;
 BEGIN
     rt   := resource->>'resourceType';
-    rid  := coalesce(resource->>'id', fhirbase_genid());
+    rid  := coalesce(resource->>'id', resource_genid());
     _sql := format($SQL$
       WITH archived AS (
         INSERT INTO %s (id, txid, ts, status, resource)
@@ -4227,13 +4231,13 @@ BEGIN
          RETURNING *
       )
 
-      select _fhirbase_to_resource(i.*) from inserted i
+      select to_resource(i.*) from inserted i
 
       $SQL$,
       rt || '_history', rt, rt, rt);
 
   EXECUTE _sql
-  USING txid, rid, resource || ('{"id": "' || rid || '"}')::jsonb
+  USING txid, rid, resource || ('{"id": "' || rid || '", "meta": {"versionId": ' || txid ||'}}')::jsonb
   INTO result;
 
   return result;
@@ -4241,77 +4245,68 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_create(jsonb, bigint) owner to ${owner};
+alter function resource_create(jsonb, bigint) owner to ${owner};
 
-create or replace function fhirbase_create(resource jsonb) returns jsonb
+create or replace function resource_create(resource jsonb) returns jsonb
 	language sql
 as $$
-SELECT fhirbase_create(resource, nextval('transaction_id_seq'));
+SELECT resource_create(resource, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_create(jsonb) owner to ${owner};
+alter function resource_create(jsonb) owner to ${owner};
 
-create or replace function fhirbase_update(resource jsonb, txid bigint) returns jsonb
-	language plpgsql
+create or replace function resource_update_by_txid(resource jsonb, txid_to_update bigint, txid bigint) returns jsonb
+    language plpgsql
 as $$
 DECLARE
-  _sql text ;
-  rt text;
-  rid text;
-  result jsonb;
+    _sql text;
+    rt text;
+    rid text;
+    result jsonb;
 BEGIN
     rt   := resource->>'resourceType';
     rid  := resource->> 'id';
 
     CASE WHEN (rid IS NULL) THEN
-      RAISE EXCEPTION 'Resource does not have and id' USING HINT = 'Resource does not have and id';
-    ELSE
-    END CASE;
+        RAISE EXCEPTION 'Resource does not have and id' USING HINT = 'Resource does not have and id';
+        ELSE
+        END CASE;
 
     _sql := format($SQL$
-      WITH archived AS (
-        INSERT INTO %s (id, txid, ts, status, resource)
-        SELECT id, txid, ts, status, resource
-        FROM %s
-        WHERE id = $2
+    with updated as(
+        update %s set
+              txid = $1,
+              ts = current_timestamp,
+              status = 'updated',
+              resource = $3
+        where id = $2 and txid = $4
         RETURNING *
-      ), inserted AS (
-         INSERT INTO %s (id, ts, txid, status, resource)
-         VALUES ($2, current_timestamp, $1, 'created', $3)
-         ON CONFLICT (id)
-         DO UPDATE SET
-          txid = $1,
-          ts = current_timestamp,
-          status = 'updated',
-          resource = $3
-         RETURNING *
-      )
+    )
 
-      select _fhirbase_to_resource(i.*) from inserted i
+    select to_resource(u.*) from updated u
+    $SQL$,
+    rt);
 
-      $SQL$,
-      rt || '_history', rt, rt, rt);
+    EXECUTE _sql
+        USING txid, rid, resource || ('{"id": "' || rid || '", "meta": {"versionId": ' || txid ||'}}')::jsonb, txid_to_update
+        INTO result;
 
-  EXECUTE _sql
-  USING txid, rid, resource || ('{"id": "' || rid || '"}')::jsonb
-  INTO result;
-
-  return result;
-
+    return result;
 END
 $$;
 
-alter function fhirbase_update(jsonb, bigint) owner to ${owner};
 
-create or replace function fhirbase_update(resource jsonb) returns jsonb
-	language sql
+alter function resource_update_by_txid(jsonb, bigint, bigint) owner to ${owner};
+
+create or replace function resource_update_by_txid(resource jsonb, txid_to_update bigint) returns jsonb
+    language sql
 as $$
-SELECT fhirbase_update(resource, nextval('transaction_id_seq'));
+SELECT resource_update_by_txid(resource, txid_to_update, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_update(jsonb) owner to ${owner};
+alter function resource_update_by_txid(jsonb, bigint) owner to ${owner};
 
-create or replace function fhirbase_read(resource_type text, id text) returns jsonb
+create or replace function resource_read(resource_type text, id text) returns jsonb
 	language plpgsql
 as $$
 DECLARE
@@ -4319,7 +4314,7 @@ DECLARE
   result jsonb;
 BEGIN
   _sql := format($SQL$
-    SELECT _fhirbase_to_resource(row(r.*)::_resource) FROM %s r WHERE r.id = $1
+    SELECT to_resource(row(r.*)::_resource) FROM %s r WHERE r.id = $1
   $SQL$,
   resource_type
   );
@@ -4330,9 +4325,9 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_read(text, text) owner to ${owner};
+alter function resource_read(text, text) owner to ${owner};
 
-create or replace function fhirbase_delete(resource_type text, id text, txid bigint) returns jsonb
+create or replace function resource_delete(resource_type text, id text, txid bigint) returns jsonb
 	language plpgsql
 as $$
 DECLARE
@@ -4357,7 +4352,7 @@ BEGIN
       ), dropped AS (
          DELETE FROM %s WHERE id = $2 RETURNING *
       )
-      select _fhirbase_to_resource(i.*) from archived i
+      select to_resource(i.*) from archived i
 
       $SQL$,
       rt || '_history', rt, rt || '_history', rt, rt);
@@ -4371,13 +4366,13 @@ BEGIN
 END
 $$;
 
-alter function fhirbase_delete(text, text, bigint) owner to ${owner};
+alter function resource_delete(text, text, bigint) owner to ${owner};
 
-create or replace function fhirbase_delete(resource_type text, id text) returns jsonb
+create or replace function resource_delete(resource_type text, id text) returns jsonb
 	language sql
 as $$
-SELECT fhirbase_delete(resource_type, id, nextval('transaction_id_seq'));
+SELECT resource_delete(resource_type, id, nextval('transaction_id_seq'));
 $$;
 
-alter function fhirbase_delete(text, text) owner to ${owner};
+alter function resource_delete(text, text) owner to ${owner};
 

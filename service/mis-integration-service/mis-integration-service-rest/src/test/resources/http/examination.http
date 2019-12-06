@@ -1,0 +1,162 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###        все пациенты в ответственности врача
+###
+GET {{host}}/examination/patients?practitionerId=37030497-7d8b-48ec-a5cf-5f3097c813ac
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+GET {{host}}/examination/patients
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+GET {{host}}/examination/cancel?patientId=3c497f2e-beee-43cc-bdb3-da8786c3537b
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###        все назначения пациента
+###
+
+GET {{host}}/examination/serviceRequests?patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+###
+
+POST {{host}}/examination/serviceRequests
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "B01.057.001",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
+      }
+    }
+  ]
+}
+
+###
+
+POST {{host}}/examination
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "B01.057.001",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueString": "На осмотре хирурга (отв. врача) показаний для дообследований не выявлено. Необходима госпитализация.",
+        "basedOn" : {
+          "reference": "ServiceRequest/ignored"
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "status": "final",
+        "issued": "2019-10-23T10:20:37.979+0000",
+        "subject": {
+          "reference": "Patient/ignored"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962"
+          }
+        ],
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "L93",
+                "system": "ValueSet/ICD-10",
+                "display": "Красная волчанка"
+              }
+            ]
+          },
+          {
+            "coding": [
+              {
+                "code": "Claim_result_types:Hospitalization",
+                "system": "ValueSet/Claim_result_types",
+                "display": "Госпитализация"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Encounter",
+        "subject": {
+          "reference": "Patient/ignored"
+        },
+        "hospitalization": {
+          "destination": {
+            "reference": "Location/unknown"
+          }
+        }
+      }
+    }
+  ]
+}
+
+###

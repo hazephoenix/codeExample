@@ -1,129 +1,119 @@
-package ru.digitalhospital.queueManager.controller
+package ru.viscur.dh.queue.rest
 
-/*
 import org.springframework.web.bind.annotation.*
-import ru.digitalhospital.queueManager.dto.RegisterUserBodyDto
-import ru.digitalhospital.queueManager.service.QueueManager
+import ru.viscur.dh.fhir.model.entity.Bundle
+import ru.viscur.dh.fhir.model.entity.ListResource
+import ru.viscur.dh.fhir.model.enums.ResourceType
+import ru.viscur.dh.fhir.model.type.BundleEntry
+import ru.viscur.dh.fhir.model.type.Reference
+import ru.viscur.dh.queue.api.QueueManagerService
 
-*/
 /**
  * Created at 11.09.2019 9:39 by SherbakovaMA
  *
  * Контроллер для очереди
- *//*
-
+ */
 @RestController
-@RequestMapping("queue")
-class QueueController(private val queueManager: QueueManager) {
+@RequestMapping("/queue")
+class QueueController(private val queueManagerService: QueueManagerService) {
 
-    */
-/**
-     * see [QueueManager.registerUser]
-     *//*
+    @GetMapping("recalcNextOffice")
+    fun needRecalcNextOffice() = queueManagerService.needRecalcNextOffice()
 
-    @PostMapping("/registerUser")
-    fun registerUser(@RequestBody registerUserBody: RegisterUserBodyDto) =
-            queueManager.registerUser(registerUserBody.user, registerUserBody.surveys)
+    @PostMapping("recalcNextOffice")
+    fun recalcNextOffice(@RequestParam value: Boolean) {
+        queueManagerService.recalcNextOffice(value)
+    }
 
-    */
-/**
-     * see [QueueManager.surveyStarted]
-     *//*
+    @PostMapping("/office/patientEntered")
+    fun patientEntered(@RequestBody listOfReference: ListResource) =
+            queueManagerService.patientEntered(
+                    listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id(),
+                    listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id()
+            ).let { serviceRequests -> Bundle(entry = serviceRequests.map { BundleEntry(it) }) }
 
-    @PostMapping("/survey/started")
-    fun surveyStarted(
-            @RequestParam userId: Long,
-            @RequestParam officeId: Long
-    ) = queueManager.surveyStarted(queueManager.userById(userId), queueManager.officeById(officeId))
+    @PostMapping("/office/forceSendPatientToObservation")
+    fun forceSendPatientToObservation(@RequestBody listOfReference: ListResource) =
+            queueManagerService.forceSendPatientToObservation(
+                    listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id(),
+                    listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id()
+            )
 
-    */
-/**
-     * see [QueueManager.surveyFinished]
-     *//*
+    @PostMapping("/office/setAsFirst")
+    fun setAsFirst(@RequestBody listOfReference: ListResource) {
+        queueManagerService.setAsFirst(
+                listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id(),
+                listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id()
+        )
+    }
 
-    @PostMapping("/survey/finished")
-    fun surveyFinished(@RequestParam officeId: Long) =
-            queueManager.surveyFinished(queueManager.officeById(officeId))
+    @PostMapping("/office/delayGoingToObservation")
+    fun delayGoingToObservation(@RequestBody patientReference: Reference) {
+        queueManagerService.delayGoingToObservation(patientId = patientReference.id(), onlyIfFirstInQueueIsLongWaiting = false)
+    }
 
-    */
-/**
-     * see [QueueManager.officeIsReady]
-     *//*
+    @PostMapping("/office/patientLeft")
+    fun patientLeft(@RequestBody listOfReference: ListResource) {
+        queueManagerService.patientLeft(
+                listOfReference.entry.first { it.item.type == ResourceType.Patient.id }.item.id(),
+                listOfReference.entry.first { it.item.type == ResourceType.Location.id }.item.id()
+        )
+    }
+
+    @PostMapping("/office/cancelEntering")
+    fun cancelEntering(@RequestBody patientReference: Reference) {
+        queueManagerService.cancelEntering(patientReference.id())
+    }
 
     @PostMapping("/office/ready")
-    fun officeIsReady(@RequestParam officeId: Long) =
-            queueManager.officeIsReady(queueManager.officeById(officeId))
+    fun officeIsReady(@RequestBody officeReference: Reference) {
+        queueManagerService.officeIsReady(officeReference.id())
+    }
 
-    */
-/**
-     * see [QueueManager.officeIsBusy]
-     *//*
+    @PostMapping("/office/nextPatient")
+    fun enterNextPatient(@RequestBody officeReference: Reference) {
+        queueManagerService.enterNextPatient(officeReference.id())
+    }
 
     @PostMapping("/office/busy")
-    fun officeIsBusy(@RequestParam officeId: Long) =
-            queueManager.officeIsBusy(queueManager.officeById(officeId))
-
-    */
-/**
-     * see [QueueManager.officeIsClosed]
-     *//*
+    fun officeIsBusy(@RequestBody officeReference: Reference) {
+        queueManagerService.officeIsBusy(officeReference.id())
+    }
 
     @PostMapping("/office/closed")
-    fun officeIsClosed(@RequestParam officeId: Long) =
-            queueManager.officeIsClosed(queueManager.officeById(officeId))
+    fun officeIsClosed(@RequestBody officeReference: Reference) {
+        queueManagerService.officeIsClosed(officeReference.id())
+    }
 
-    */
-/**
-     * see [QueueManager.addToOfficeQueue]
-     *//*
+    @PostMapping("/patient/addToQueue")
+    fun addToOfficeQueue(@RequestBody patientReference: Reference) {
+        queueManagerService.addToQueue(patientReference.id())
+    }
 
-    @PostMapping("/user/addToQueue")
-    fun addToOfficeQueue(
-            @RequestParam userId: Long
-    ) = queueManager.addToOfficeQueue(queueManager.userById(userId))
-
-    */
-/**
-     * see [QueueManager.deleteFromOfficeQueue]
-     *//*
-
-    @PostMapping("/user/remove")
-    fun removeFromOfficeQueue(
-            @RequestParam userId: Long
-    ) = queueManager.deleteFromOfficeQueue(queueManager.userById(userId))
-
-    */
-/**
-     * see [QueueManager.userLeftQueue]
-     *//*
-
-    @DeleteMapping("/user")
-    fun userLeftQueue(
-            @RequestParam userId: Long
-    ) = queueManager.userLeftQueue(queueManager.userById(userId))
-
-    */
-/**
-     * Просмотр какие обследования еще не пройдены по типу
-     *//*
-
-    @GetMapping("/surveys")
-    fun notVisitedSurveys(@RequestParam surveyTypeId: Long) =
-            queueManager.routeSheets.flatMap { it.surveys }.filter { it.surveyType.id == surveyTypeId && !it.visited}
-
-    */
-/**
-     * see [QueueManager.deleteQueue]
-     *//*
+    @DeleteMapping("/patient")
+    fun patientLeftQueue(@RequestBody patientReference: Reference) {
+        queueManagerService.deleteFromQueue(patientReference.id())
+    }
 
     @DeleteMapping
-    fun deleteQueue() = queueManager.deleteQueue()
-
-    */
-/**
-     * see [QueueManager.deleteHistory]
-     *//*
+    fun deleteQueue() {
+        queueManagerService.deleteQueue()
+    }
 
     @DeleteMapping("/history")
-    fun deleteHistory() = queueManager.deleteHistory()
-}*/
+    fun deleteHistory() {
+        queueManagerService.deleteHistory()
+    }
+
+    @GetMapping
+    fun queueOfOffice(@RequestBody officeReference: Reference) = queueManagerService.queueOfOffice(officeReference.id())
+
+    @GetMapping("/queueItems")
+    fun queueItems() = queueManagerService.queueItems()
+
+    @GetMapping("/locationMonitor")
+    fun locationMonitor(@RequestParam officeId: String) = queueManagerService.locationMonitor(officeId)
+
+    @GetMapping("/info")
+    fun queueInfo() = queueManagerService.loqAndValidate()
+}

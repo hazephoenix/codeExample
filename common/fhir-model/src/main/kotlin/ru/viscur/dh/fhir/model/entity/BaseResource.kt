@@ -2,6 +2,7 @@ package ru.viscur.dh.fhir.model.entity
 
 import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.Identifier
+import ru.viscur.dh.fhir.model.type.ResourceMeta
 import ru.viscur.dh.fhir.model.utils.genId
 
 /**
@@ -9,11 +10,14 @@ import ru.viscur.dh.fhir.model.utils.genId
  *
  * Базовый ресурс
  *
- * @param identifier описание id ресурса
+ * @param id id ресурса
+ * @param identifier идентификаторы ресурса, [Identifier]
  * @param resourceType тип ресурса
+ * @param meta мета-информация о ресурсе (версионность)
  */
 abstract class BaseResource(
-        val id: String? = genId(),
-        val identifier: List<Identifier>? = null,
-        val resourceType: ResourceType.ResourceTypeId
+        var id: String = genId(),
+        var identifier: List<Identifier>? = null,
+        val resourceType: ResourceType.ResourceTypeId,
+        var meta: ResourceMeta = ResourceMeta()
 )

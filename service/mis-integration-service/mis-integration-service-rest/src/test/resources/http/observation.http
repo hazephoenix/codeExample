@@ -1,0 +1,93 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+GET {{host}}/Observation?status=final&patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+###
+
+GET {{host}}/Observation?patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
+Accept: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+###
+
+POST {{host}}/Observation
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "id": "ignored",
+  "resourceType": "Observation",
+  "status": "final",
+  "issued": "1970-01-01T00:57:04.242+0000",
+  "code": {
+    "coding": [
+      {
+        "code": "Heart_rate",
+        "system": "ValueSet/Observation_types"
+      }
+    ]
+  },
+  "performer": [
+    {
+      "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+      "type": "Practitioner"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/ignored",
+    "type": "Patient"
+  },
+  "valueInteger": 110,
+  "basedOn" : {
+    "reference": "ServiceRequest/af6c165c-7989-49a0-a779-344981ad9337"
+  }
+}
+
+###
+
+PUT {{host}}/Observation
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "id": "3a82aa9f-b7fa-43cf-b00b-d9876d5ae74e",
+  "resourceType": "Observation",
+  "status": "final",
+  "issued": "1970-01-01T00:57:04.242+0000",
+  "code": {
+    "coding": [
+      {
+        "code": "Heart_rate",
+        "system": "ValueSet/Observation_types"
+      }
+    ]
+  },
+  "performer": [
+    {
+      "reference": "Practitioner/80a3c463-3d68-4aa6-8020-de2a90c92962",
+      "type": "Practitioner"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/63c404e5-56b5-41d0-8701-d71cb75a4e54",
+    "type": "Patient"
+  },
+  "valueInteger": 111
+}
+
+###
+
+GET {{host}}/Observation/start?serviceRequestId=68532bff-4233-4064-92cd-7213899d1f1d
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###

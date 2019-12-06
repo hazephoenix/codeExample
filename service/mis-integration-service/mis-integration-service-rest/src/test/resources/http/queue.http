@@ -1,0 +1,256 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###                                                                                Пациент зашел в кабинет
+###
+POST {{host}}/queue/office/patientEntered
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:128",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/bfe9a174-5f56-4e91-88f3-c00831776a75",
+        "type": "Patient"
+      }
+    }
+  ]
+}
+###                                                                                Пригласить любого пациента в кабинет
+###
+POST {{host}}/queue/office/forceSendPatientToObservation
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:YellowZoneSection6",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/43df3d85-7d22-4a39-84f3-2bbecfd1eca5",
+        "type": "Patient"
+      }
+    }
+  ]
+}
+###                                                                                Поставить пациента первым в очередь в кабинет
+###
+POST {{host}}/queue/office/setAsFirst
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:150",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/1f647c0c-6783-4285-9cca-ac434a4375af",
+        "type": "Patient"
+      }
+    }
+  ]
+}
+###                                                                                Обследования в кабинете завершено
+###
+POST {{host}}/queue/office/patientLeft
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "mode": "working",
+  "status": "current",
+  "resourceType": "ListResource",
+  "id": "12121",
+  "entry": [
+    {
+      "item": {
+        "reference": "Location/Office:116",
+        "type": "Location"
+      }
+    },
+    {
+      "item": {
+        "reference": "Patient/dfdd7016-ec6e-47fb-ab10-f57d9cb6b2bc",
+        "type": "Patient"
+      }
+    }
+  ]
+}
+###                                                                                Отменить "вход" пациента в кабинет
+###
+POST {{host}}/queue/office/cancelEntering
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/a93b73cf-3165-4702-a69c-06ca74cd7d51",
+  "type": "Patient"
+}
+###                                                                                Кабинет готов принять пациента
+POST {{host}}/queue/office/ready
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:101",
+  "type": "Location"
+}
+###
+POST {{host}}/queue/office/ready
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:202",
+  "type": "Location"
+}
+###
+###                                                                                Кабинет busy
+###
+POST {{host}}/queue/office/busy
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:101",
+  "type": "Location"
+}
+###                                                                                Кабинет closed
+###
+POST {{host}}/queue/office/closed
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:101",
+  "type": "Location"
+}
+###                                                                                Отложить прием ожидаемого пациента в кабинет
+###
+POST {{host}}/queue/office/delayGoingToObservation
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/e0393e1a-1c72-4e92-90f8-e02f39bab21c",
+  "type": "Patient"
+}
+###
+###                                                                                Убрать пациента из очереди
+###
+DELETE {{host}}/queue/patient
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/e0393e1a-1c72-4e92-90f8-e02f39bab21c",
+  "type": "Patient"
+}
+###
+###
+DELETE {{host}}/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                                Поставить пациента в очередь
+###
+POST {{host}}/queue/patient/addToQueue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Patient/f1613d5c-353c-4825-971f-93db5b4f96e4",
+  "type": "Patient"
+}
+###                                                                              Информация об очереди в кабинет
+###
+GET {{host}}/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "reference": "Location/Office:104",
+  "type": "Location"
+}
+###                                                                              Информация для монитора для отображения очереди/приема в кабинет/зоне
+###
+GET {{host}}/queue/locationMonitor?officeId=Office:202
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                              Информация об очереди в целом
+###
+GET {{host}}/queue/info
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                              Информация об очереди в формате QueueItems
+###
+GET {{host}}/queue/queueItems
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###                                                                                Непройденные обследования в очереди
+###
+GET {{host}}/queue/surveys?surveyTypeId=3
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+####                                                                                Удалить очередь
+####
+DELETE {{host}}/queue
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+###                                                                                Удалить историю
+###
+DELETE {{host}}/queue/history
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###

@@ -2,3 +2,7 @@
 .gradle
 build
 *.log
+
+out
+logs
+*.log.*.gz

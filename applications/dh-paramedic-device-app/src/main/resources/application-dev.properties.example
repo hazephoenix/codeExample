@@ -1,0 +1,29 @@
+#Настройки для разработки
+
+# App properties
+spring.profiles.active=dev,triton-monitor
+paramedic.tves.url=http://vagrant-10:1221/tves
+uid=developer-paramedic-device
+api.password=developer-paramedic-device
+paramedic.native-service.url=http://localhost:8850
+paramedic.serial.port.system.name=COM7
+spring.main.web-application-type=NONE
+
+wristband.yellow=50J191806000
+wristband.green=50J191806005
+wristband.red=50J191806008
+
+# Spring properties
+spring.artemis.host=192.168.10.78
+spring.artemis.user=admin
+spring.artemis.password=admin
+server.port=9111
+logging.file.name=paramedic.log
+logging.level.ru.viscur.dh.apps.paramedicdevice.device.WristbandPrinter=DEBUG
+
+
+paramedic.triton.ip=192.168.1.20
+paramedic.triton.mac=02:02:03:04:3f:df
+paramedic.triton.broadcast=192.168.1.255
+
+route.printer.name=RoutePrinter

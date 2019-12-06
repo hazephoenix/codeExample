@@ -1,0 +1,1256 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+GET {{host}}/mis-integration/hello
+Accept: application/json
+
+###
+
+###
+
+POST {{host}}/reception/severity?takeSyndromes=5
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Heart_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 70
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_pressure_upper_level",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 95
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_oxygen_saturation",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 110
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Breathing_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 20
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Pain_intensity",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 4
+      }
+    },
+    { "resource": {
+      "id": "ignored",
+      "resourceType": "QuestionnaireResponse",
+      "status": "completed",
+      "author": {
+        "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+        "type": "Practitioner"
+      },
+      "source": {
+        "reference": "Patient/ignored",
+        "type": "Patient"
+      },
+      "questionnaire": "Questionnaire/Severity_criteria",
+      "item": [
+        {
+          "linkId": "Upper_respiratory_airway",
+          "text": "Результат осмотра верхних дыхательных путей",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Airways_passable",
+                "display": "Дыхательные пути проходимы",
+                "system": "ValueSet/Upper_respiratory_airway"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Consciousness_assessment",
+          "text": "Сознание",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Clear_mind",
+                "display": "Ясное сознание",
+                "system": "ValueSet/Consciousness_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Patient_can_stand",
+          "text": "Опорная функция",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Can_stand",
+                "display": "Может стоять",
+                "system": "ValueSet/Patient_can_stand"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Complaints",
+          "text": "Жалобы пациента",
+          "answer": [
+            {
+              "valueString": "Озноб"
+            },
+            {
+              "valueString": "Слабость"
+            },
+            {
+              "valueString": "Недомогание"
+            }
+          ]
+        }
+      ]
+    }
+    }
+  ],
+  "id": "ignored"
+}
+
+###
+
+POST {{host}}/reception/serviceRequests
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "diagnosis": "K61.4",
+  "complaints": ["Сильная боль в правом подреберье"],
+  "gender": "male"
+}
+
+###
+
+POST {{host}}/reception/diagnostic?take=5
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Heart_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 110
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_pressure_upper_level",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 95
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_oxygen_saturation",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 90
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Breathing_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 27
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Pain_intensity",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 4
+      }
+    },
+    { "resource": {
+      "id": "ignored",
+      "resourceType": "QuestionnaireResponse",
+      "status": "completed",
+      "author": {
+        "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+        "type": "Practitioner"
+      },
+      "source": {
+        "reference": "Patient/ignored",
+        "type": "Patient"
+      },
+      "questionnaire": "Questionnaire/Severity_criteria",
+      "item": [
+        {
+          "linkId": "Upper_respiratory_airway",
+          "text": "Результат осмотра верхних дыхательных путей",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Airways_passable",
+                "display": "Дыхательные пути проходимы",
+                "system": "ValueSet/Upper_respiratory_airway"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Consciousness_assessment",
+          "text": "Сознание",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Clear_mind",
+                "display": "Ясное сознание",
+                "system": "ValueSet/Consciousness_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Patient_can_stand",
+          "text": "Опорная функция",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Can_stand",
+                "display": "Может стоять",
+                "system": "ValueSet/Patient_can_stand"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Complaints",
+          "text": "Жалобы пациента",
+          "answer": [
+            {
+              "valueString": "Озноб"
+            },
+            {
+              "valueString": "Слабость"
+            },
+            {
+              "valueString": "Недомогание"
+            }
+          ]
+        }
+      ]
+    }
+    }
+  ],
+  "id": "ignored"
+}
+
+###
+
+POST {{host}}/reception/patient
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Heart_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 110
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "A06.28.002",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "locationReference": [
+          {
+            "reference": "Location/Office:ignored"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_pressure_upper_level",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 95
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Blood_oxygen_saturation",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 90
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "registered",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Breathing_rate",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 27
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Body_temperature",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueQuantity": {
+          "value": 36.5
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "Observation",
+        "status": "final",
+        "issued": "1970-01-01T00:57:04.242+0000",
+        "code": {
+          "coding": [
+            {
+              "code": "Pain_intensity",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "valueInteger": 2
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "issued": "2019-10-24T12:01:00.00",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "D50.1",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "preliminary"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "issued": "2019-10-24T12:01:00.00",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "A00.1",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "mainSyndrome"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "identifier": [
+          {
+            "value": "7878 77521487",
+            "period": {
+              "start": "1970-01-01T00:20:22.222+0000"
+            },
+            "type": {
+              "coding": [
+                {
+                  "code": "PASSPORT",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official",
+            "assigner": {
+              "display": "ОУФМС по ТО..."
+            }
+          },
+          {
+            "value": "7878 77521487",
+            "period": {
+              "start": "1970-01-01T00:20:22.222+0000",
+              "end": "1970-01-01T00:20:22.222+0000"
+            },
+            "type": {
+              "coding": [
+                {
+                  "code": "DIGITAL_ASSURANCE",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official",
+            "assigner": {
+              "display": "ОУФМС по ТО..."
+            }
+          },
+          {
+            "value": "{{$randomInt}}",
+            "type": {
+              "coding": [
+                {
+                  "code": "ENP",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          },
+          {
+            "value": "7878 77521487111111111",
+            "type": {
+              "coding": [
+                {
+                  "code": "SNILS",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          },
+          {
+            "value": "G-{{$randomInt}}",
+            "type": {
+              "coding": [
+                {
+                  "code": "QUEUE_CODE",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          },
+          {
+            "value": "МЛ-1222",
+            "type": {
+              "coding": [
+                {
+                  "code": "CARE_PLAN_CODE",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          }
+        ],
+        "resourceType": "Patient",
+        "name": [
+          {
+            "use": "official",
+            "text": "Петров Иван Алексеевич",
+            "family": "Петров",
+            "given": [
+              "Иван"
+            ],
+            "suffix": [
+              "Алексеевич"
+            ]
+          }
+        ],
+        "birthDate": "2000-10-11T04:07:05.243+0000",
+        "gender": "female",
+        "extension": {
+          "nationality": "Russian",
+          "birthPlace": {
+            "use": "home",
+            "type": "both",
+            "text": "Россия ТО г. Томск",
+            "city": "Tomsk",
+            "state": "TO",
+            "country": "Russia"
+          }
+        }
+      }
+    },
+    { "resource": {
+      "id": "ignored",
+      "resourceType": "QuestionnaireResponse",
+      "status": "completed",
+      "author": {
+        "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+        "type": "Practitioner"
+      },
+      "source": {
+        "reference": "Patient/ignored",
+        "type": "Patient"
+      },
+      "questionnaire": "Questionnaire/Severity_criteria",
+      "item": [
+        {
+          "linkId": "Upper_respiratory_airway",
+          "text": "Результат осмотра верхних дыхательных путей",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Airways_passable",
+                "display": "Дыхательные пути проходимы",
+                "system": "ValueSet/Upper_respiratory_airway"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Consciousness_assessment",
+          "text": "Сознание",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Clear_mind",
+                "display": "Ясное сознание",
+                "system": "ValueSet/Consciousness_assessment"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Patient_can_stand",
+          "text": "Опорная функция",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "Can_stand",
+                "display": "Может стоять",
+                "system": "ValueSet/Patient_can_stand"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Severity",
+          "text": "Результат сортировки",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "YELLOW",
+                "system": "ValueSet/Severity"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "Complaints",
+          "text": "Жалобы пациента",
+          "answer": [
+            {
+              "valueString": "Озноб"
+            },
+            {
+              "valueString": "Слабость"
+            },
+            {
+              "valueString": "Недомогание"
+            }
+          ]
+        }
+      ]
+    }},
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "QuestionnaireResponse",
+        "status": "completed",
+        "author": {
+          "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+          "type": "Practitioner"
+        },
+        "source": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "questionnaire": "Questionnaire/Common_info",
+        "item": [
+          {
+            "linkId": "Entry_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Personal_encounter",
+                  "system": "ValueSet/Entry_types"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "Transportation_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Sitting",
+                  "system": "ValueSet/Transportation_types"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "ServiceRequest",
+        "status": "active",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "B01.057.001",
+              "display": "Осмотр хирурга",
+              "system": "ValueSet/Observation_types"
+            }
+          ]
+        },
+        "locationReference": []
+      }
+    },
+    {
+      "resource": {
+        "mode": "working",
+        "status": "current",
+        "resourceType": "ListResource",
+        "id": "ignored",
+        "entry": [
+          {
+            "item": {
+              "reference": "Practitioner/Surgeon_Клиновицкий_Игорь_Юрьевич",
+              "type": "Practitioner"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "id": "ignored"
+}
+
+###
+
+POST {{host}}/reception/patientForBandage
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "issued": "2019-10-24T12:01:00.00",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "D50.1",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "preliminary"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "DiagnosticReport",
+        "subject": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+            "type": "Practitioner"
+          }
+        ],
+        "issued": "2019-10-24T12:01:00.00",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "A00.1",
+                "system": "ValueSet/ICD-10"
+              }
+            ]
+          }
+        ],
+        "status": "mainSyndrome"
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "identifier": [
+          {
+            "value": "{{$randomInt}}",
+            "type": {
+              "coding": [
+                {
+                  "code": "ENP",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          },
+          {
+            "value": "З-{{$randomInt}}",
+            "type": {
+              "coding": [
+                {
+                  "code": "QUEUE_CODE",
+                  "system": "ValueSet/Identifier_types"
+                }
+              ]
+            },
+            "use": "official"
+          }
+        ],
+        "resourceType": "Patient",
+        "name": [
+          {
+            "use": "official",
+            "text": "Петров Иван Алексеевич",
+            "family": "Петров",
+            "given": [
+              "Иван"
+            ],
+            "suffix": [
+              "Алексеевич"
+            ]
+          }
+        ],
+        "birthDate": "2000-10-11T04:07:05.243+0000",
+        "gender": "female",
+        "extension": {
+          "nationality": "Russian",
+          "birthPlace": {
+            "use": "home",
+            "type": "both",
+            "text": "Россия ТО г. Томск",
+            "city": "Tomsk",
+            "state": "TO",
+            "country": "Russia"
+          }
+        }
+      }
+    },
+    {
+      "resource": {
+        "id": "ignored",
+        "resourceType": "QuestionnaireResponse",
+        "status": "completed",
+        "author": {
+          "reference": "Practitioner/Paramedic_Сейсенбекова_Алена_Нуржановна",
+          "type": "Practitioner"
+        },
+        "source": {
+          "reference": "Patient/ignored",
+          "type": "Patient"
+        },
+        "questionnaire": "Questionnaire/Common_info",
+        "item": [
+          {
+            "linkId": "Entry_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Personal_encounter",
+                  "system": "ValueSet/Entry_types"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "Transportation_type",
+            "answer": [
+              {
+                "valueCoding": {
+                  "code": "Sitting",
+                  "system": "ValueSet/Transportation_types"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "id": "ignored"
+}
+
+###

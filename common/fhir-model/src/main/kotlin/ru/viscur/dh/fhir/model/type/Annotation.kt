@@ -2,7 +2,7 @@ package ru.viscur.dh.fhir.model.type
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.sql.Timestamp
+import java.util.*
 
 /**
  * Created at 01.10.2019 13:17 by SherbakovaMA
@@ -14,5 +14,5 @@ import java.sql.Timestamp
  */
 class Annotation @JsonCreator constructor(
         @JsonProperty("text") val text: String,
-        @JsonProperty("time") val time: Timestamp? = null
+        @JsonProperty("time") val time: Date? = null
 )

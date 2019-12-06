@@ -1,0 +1,179 @@
+package ru.viscur.dh.apps.paramedicdevice
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.hamcrest.Matchers.*
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.web.client.RestTemplate
+import ru.viscur.dh.apps.paramedicdevice.configuration.AppUID
+import ru.viscur.dh.apps.paramedicdevice.dto.TvesResponse
+import ru.viscur.dh.apps.paramedicdevice.enums.TonometerErrorCode
+import ru.viscur.dh.common.dto.task.Task
+import ru.viscur.dh.common.dto.task.TaskStatus
+import ru.viscur.dh.common.dto.task.TaskType
+import java.util.regex.Pattern
+
+/**
+ * Created at 28.10.2019 14:39 by TimochkinEA
+ */
+@RunWith(SpringRunner::class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@Ignore("Перенести в интеграционные тесты")
+class TaskApiTest {
+
+    @Autowired
+    private lateinit var mvc: MockMvc
+
+    @MockBean
+    private lateinit var restTemplate: RestTemplate
+
+    @Value("\${paramedic.tves.url:http://localhost:1221/tves}")
+    private lateinit var tvesUrl: String
+
+    @Autowired
+    private lateinit var uid: AppUID
+
+    @Before
+    fun beforeClass() {
+        Mockito.`when`(
+                restTemplate.getForEntity("${tvesUrl}/height", TvesResponse::class.java)
+        ).thenReturn(
+                ResponseEntity(
+                        TvesResponse(value = "179", unit = "см.", code = "OK", message = "OK"),
+                        HttpStatus.OK
+                )
+        )
+
+        Mockito.`when`(
+                restTemplate.getForEntity("${tvesUrl}/scale", TvesResponse::class.java)
+        ).thenReturn(
+                ResponseEntity(
+                        TvesResponse(value = "83", unit = "кг.", code = "OK", message = "OK"),
+                        HttpStatus.OK
+                )
+        )
+    }
+
+
+    @Test
+    fun addTaskTest() {
+        mvc.perform(
+                post("/desktop/task/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\": \"Document\"}")
+        )
+                .andExpect(status().isOk)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", matchesRegex(Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))))
+                .andExpect(jsonPath("$.type", `is`(TaskType.Document.name)))
+                .andExpect(jsonPath("$.status", `is`(TaskStatus.InProgress.name)))
+    }
+
+    @Test
+    fun takeHeightTest() {
+        val res = mvc.perform(
+               post("/desktop/task/add")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content("{\"type\": \"Height\"}")
+        )
+                .andExpect(status().isOk)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", matchesRegex(Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))))
+                .andExpect(jsonPath("$.type", `is`(TaskType.Height.name)))
+                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name, TaskStatus.InProgress.name, TaskStatus.Complete.name)))))
+                .andReturn()
+        val mapper = ObjectMapper()
+        val task = mapper.readValue(res.response.contentAsString, Task::class.java)
+        mvc.perform(get("/desktop/task/status/${task.id}"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$", `is`(TaskStatus.Complete.name)))
+
+        mvc.perform(get("/desktop/task/result/${task.id}"))
+                .andExpect(status().isOk)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", `is`(task.id)))
+                .andExpect(jsonPath("$.status", `is`(TaskStatus.Complete.name)))
+                .andExpect(jsonPath("$.type", `is`(TaskType.Height.name)))
+                .andExpect(jsonPath("$.result.value", `is`("179")))
+                .andExpect(jsonPath("$.result.unit", `is`("см.")))
+                .andExpect(jsonPath("$.result.code", `is`("OK")))
+                .andExpect(jsonPath("$.result.message", `is`("OK")))
+    }
+
+    @Test
+    fun takeWeightTest() {
+        val res = mvc.perform(
+                post("/desktop/task/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\": \"Weight\"}")
+        )
+                .andExpect(status().isOk)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", matchesRegex(Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))))
+                .andExpect(jsonPath("$.type", `is`(TaskType.Weight.name)))
+                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name,  TaskStatus.InProgress.name, TaskStatus.Complete.name)))))
+                .andReturn()
+        val mapper = ObjectMapper()
+        val task = mapper.readValue(res.response.contentAsString, Task::class.java)
+        mvc.perform(get("/desktop/task/status/${task.id}"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$", `is`(TaskStatus.Complete.name)))
+
+        mvc.perform(get("/desktop/task/result/${task.id}"))
+                .andExpect(status().isOk)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", `is`(task.id)))
+                .andExpect(jsonPath("$.type", `is`(TaskType.Weight.name)))
+                .andExpect(jsonPath("$.status", `is`(TaskStatus.Complete.name)))
+                .andExpect(jsonPath("$.result.value", `is`("83")))
+                .andExpect(jsonPath("$.result.unit", `is`("кг.")))
+                .andExpect(jsonPath("$.result.code", `is`("OK")))
+                .andExpect(jsonPath("$.result.message", `is`("OK")))
+    }
+
+    @Test
+    fun tonometerTest() {
+        val res = mvc.perform(
+                post("/desktop/task/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\": \"Tonometer\"}")
+        )
+                .andExpect(status().isOk)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", matchesRegex(Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))))
+                .andExpect(jsonPath("$.type", `is`(TaskType.Tonometer.name)))
+                .andExpect(jsonPath("$.status", `is`(`in`(listOf(TaskStatus.Await.name, TaskStatus.InProgress.name, TaskStatus.Complete.name)))))
+                .andReturn()
+        val mapper = ObjectMapper()
+        val task = mapper.readValue(res.response.contentAsString, Task::class.java)
+        var taskStatus = TaskStatus.InProgress
+        while(taskStatus != TaskStatus.Complete && taskStatus != TaskStatus.Error) {
+            mvc.perform(get("/desktop/task/status/${task.id}"))
+                    .andExpect(status().isOk)
+                    .andDo { taskStatus = mapper.readValue(it.response.contentAsString, TaskStatus::class.java) }
+        }
+        if (taskStatus == TaskStatus.Complete) {
+            mvc.perform(get("/desktop/task/result/${task.id}"))
+                    .andExpect(status().isOk)
+                    .andExpect(jsonPath("$.result.tonometerModel", `is`("TM2655")))
+                    .andExpect(jsonPath("$.result.error.code", `is`(TonometerErrorCode.E00.name)))
+        }
+    }
+}

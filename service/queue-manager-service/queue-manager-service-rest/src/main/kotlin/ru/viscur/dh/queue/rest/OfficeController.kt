@@ -5,18 +5,15 @@ package ru.viscur.dh.queue.rest
  *
  * Контроллер для кабинетов
  */
-/*
-@RestController
-@RequestMapping("offices")
-class OfficeController(private val queueManager: QueueManager) {
-
-    */
-/**
-     * Информация о кабинете, его очереди, последнем принятом пациенте
-     *//*
-
-    @GetMapping
-    fun info(
-            @RequestParam officeId: Long
-    ) = queueManager.officeById(officeId)
-}*/
+//@RestController
+//@RequestMapping("offices")
+//class OfficeController(private val queueManager: QueueManager) {
+//
+//    /**
+//     * Информация о кабинете, его очереди, последнем принятом пациенте
+//     */
+//    @GetMapping
+//    fun info(
+//            @RequestParam officeId: Long
+//    ) = queueManager.officeById(officeId)
+//}

@@ -30,3 +30,4 @@
   drop extension if exists pgcrypto;
   create extension pgcrypto;
   ```
+* Миграции накатятся при запуске сервиса

@@ -6,7 +6,6 @@ import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
@@ -15,8 +14,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.*
 import org.springframework.context.annotation.ComponentScan.Filter
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
+import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.orm.jpa.JpaTransactionManager
+import org.springframework.scheduling.TaskScheduler
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import java.util.concurrent.Executor
 import javax.persistence.EntityManagerFactory
 
 const val PERSISTENCE_UNIT_NAME = "datastoragePersistenceUnit"
@@ -25,7 +30,7 @@ private const val PROPERTIES_PREFIX = "ru.viscur.dh.data-storage"
 
 private const val BASE_PACKAGE = "ru.viscur.dh.datastorage.impl"
 private const val REPOSITORY_PACKAGE = "$BASE_PACKAGE.repository"
-private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entities"
+private const val ENTITY_PACKAGE = "$BASE_PACKAGE.entity"
 
 
 @Configuration
@@ -65,13 +70,8 @@ class DataStorageConfig {
             .type(HikariDataSource::class.java)
             .build()!!
 
- /*   @ConditionalOnProperty(
-            prefix = "$PROPERTIES_PREFIX.flyway",
-            name = ["enabled"],
-            havingValue = "true",
-            matchIfMissing = false
-    )*/
     @Bean(name = ["dsFlyway"], initMethod = "migrate")
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     fun flyway() = Flyway(
             FluentConfiguration()
                     .dataSource(dataSource())
@@ -97,4 +97,13 @@ class DataStorageConfig {
     @Bean(name = ["dsTxManager"])
     fun txManager(@Qualifier("dsEntityManagerFactory") dsEntityManagerFactory: EntityManagerFactory) = JpaTransactionManager(dsEntityManagerFactory)
 
+    @Bean
+    fun taskExecutor(): Executor {
+        return SimpleAsyncTaskExecutor()
+    }
+
+    @Bean
+    fun taskScheduler(): TaskScheduler {
+        return ConcurrentTaskScheduler()
+    }
 }

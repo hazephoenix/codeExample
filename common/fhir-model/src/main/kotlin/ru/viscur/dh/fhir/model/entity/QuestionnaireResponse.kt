@@ -26,8 +26,8 @@ class QuestionnaireResponse @JsonCreator constructor(
         @JsonProperty("identifier") identifier: List<Identifier>? = null,
         @JsonProperty("resourceType") resourceType: ResourceType.ResourceTypeId = ResourceType.QuestionnaireResponse.id,
         @JsonProperty("status") val status: QuestionnaireResponseStatus,
-        @JsonProperty("author") val author: Reference,
-        @JsonProperty("source") val source: Reference,
+        @JsonProperty("author") var author: Reference,
+        @JsonProperty("source") var source: Reference,
         @JsonProperty("questionnaire") val questionnaire: String,
-        @JsonProperty("item") val item: List<QuestionnaireResponseItem>
+        @JsonProperty("item") var item: List<QuestionnaireResponseItem>
 ) : BaseResource(id, identifier, resourceType)

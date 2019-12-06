@@ -1,0 +1,78 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###                                                                                icd10
+###
+GET {{host}}/dictionary/ICD-10
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+GET {{host}}/dictionary/ICD-10?parentCode=A00-B99
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+###                                                                                any ValueSet
+### ICD-10, Identifier_types, Severity, Complaints, Practitioner_qualifications, Consent_categories, Observation_types, Upper_respiratory_airway, Breathing_rate, Blood_oxygenation_level, Heart_rate_per_minute, Blood_pressure_upper_limit, Consciousness_assessment, Body_temperature, Pain_intensity_assessment, Patient_can_stand
+###
+GET {{host}}/dictionary/Observation_types
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+GET {{host}}/dictionary/Observation_types?parentCode=X-ray
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+###                                                                                icdToPractitionerQualifications
+GET {{host}}/dictionary/icdToPractitionerQualifications
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                                icdToObservationTypes
+GET {{host}}/dictionary/icdToObservationTypes
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                                respQualificationToObservationTypes
+GET {{host}}/dictionary/respQualificationToObservationTypes
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                                offices
+GET {{host}}/dictionary/offices
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###                                                                                Practitioner
+GET {{host}}/dictionary/practitioners
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###
+###                                                                                Organizations
+GET {{host}}/dictionary/organizations
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+
+###

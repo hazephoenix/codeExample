@@ -1,0 +1,124 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+###
+
+GET {{host}}/practitioner
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+GET {{host}}/practitioner/byId?id=Surgeon_Клиновицкий_Игорь_Юрьевич
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+GET {{host}}/practitioner?withBlocked=true
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST {{host}}/practitioner/blocked?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=false
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST {{host}}/practitioner/onWork?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=true
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST {{host}}/practitioner/onWork?practitionerId=Ms_Аникина_Алена_Анатольевна&value=true&officeId=Office:101
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{}
+###
+
+POST {{host}}/practitioner
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "id": "ignored",
+  "resourceType": "Practitioner",
+  "name": [
+    {
+      "use": "official",
+      "text": "Новый Петр Валерьевич",
+      "family": "Новый",
+      "given": [
+        "Петр"
+      ],
+      "suffix": [
+        "Валерьевич"
+      ]
+    }
+  ],
+  "gender": "male",
+  "qualification": {
+    "code": {
+      "coding": [
+        {
+          "code": "Surgeon_category",
+          "system": "ValueSet/Practitioner_qualifications"
+        }
+      ]
+    }
+  },
+  "extension": {
+    "blocked": false
+  }
+}
+###
+
+PUT {{host}}/practitioner
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
+
+{
+  "id": "Surgeon_Клиновицкий_Игорь_Юрьевич",
+  "resourceType": "Practitioner",
+  "name": [
+    {
+      "use": "official",
+      "text": "Отредактированный Петр Валерьевич",
+      "family": "Отредактированный",
+      "given": [
+        "Петр"
+      ],
+      "suffix": [
+        "Валерьевич"
+      ]
+    }
+  ],
+  "gender": "male",
+  "qualification": {
+    "code": {
+      "coding": [
+        {
+          "code": "Surgeon_category",
+          "system": "ValueSet/Practitioner_qualifications"
+        }
+      ]
+    }
+  },
+  "extension": {
+    "blocked": true
+  }
+}
+###

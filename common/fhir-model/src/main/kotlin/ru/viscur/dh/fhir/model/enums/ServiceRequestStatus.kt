@@ -6,10 +6,20 @@ package ru.viscur.dh.fhir.model.enums
  * Статусы направления на [обследование ServiceRequest] [ru.viscur.dh.fhir.model.entity.ServiceRequest]
  */
 enum class ServiceRequestStatus {
-    draft,
+    /**
+     * Назначено
+     */
     active,
-    suspended,
+    /**
+     * Проведено, ожидает результата (есть привязанный [ru.viscur.dh.fhir.model.entity.Observation], ожидающий результата)
+     */
+    waiting_result,
+    /**
+     * Результат готов (есть привязанный [ru.viscur.dh.fhir.model.entity.Observation], с готовым результатом)
+     */
     completed,
-    entered_in_error,
+    /**
+     * Отменен
+     */
     cancelled
 }

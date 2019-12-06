@@ -1,17 +1,20 @@
 package ru.viscur.dh.datastorage.impl
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
-import ru.viscur.dh.fhir.model.entity.BaseResource
-import ru.viscur.dh.fhir.model.enums.ResourceType
-import javax.persistence.Query
+import com.fasterxml.jackson.databind.*
+import com.fasterxml.jackson.databind.node.*
+import ru.viscur.dh.fhir.model.entity.*
+import ru.viscur.dh.fhir.model.enums.*
+import javax.persistence.*
 
 private val dbResourceObjectMapper = ObjectMapper()
         .apply {
-            // TODO в ответе есть атрибут meta, но в моделе у нас его нет
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
+
+fun <T> T?.toJson(): Any? where T : Any {
+    return dbResourceObjectMapper
+            .writeValueAsString(this)
+}
 
 fun <T> T?.toJsonb(): Any? where T : BaseResource {
     return dbResourceObjectMapper
@@ -32,23 +35,28 @@ fun <T> Any?.toResourceEntity(): T?
 }
 
 fun <T> Query.fetchResource(): T?
-        where T : BaseResource {
-    return try {
-        this.fetchResourceList<T>()
-                .single()
-    } catch (ex: NoSuchElementException) {
-        null
-    }
-}
+        where T : BaseResource =
+        this.fetchResourceList<T>().firstOrNull()
 
 fun <T> Query.fetchResourceList(): List<T>
         where T : BaseResource {
     return this.resultList
             .asSequence()
-            .map { it as Array<*> }
-            .map { it[0] }
+            .map {
+                if(it is Array<*>) {
+                    it[0]
+                } else {//если запрос идет на одно поле resource, то это не Array
+                    it
+                }
+            }
             .filterNotNull()
             .map {
                 it.toResourceEntity<T>()!!
             }.toList()
+}
+
+fun Query.setParameters(params: List<Any>) {
+    params.forEachIndexed { index, param ->
+        this.setParameter(index + 1, param)
+    }
 }

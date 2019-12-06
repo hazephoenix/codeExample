@@ -1,17 +1,18 @@
 package ru.viscur.dh.apps.paramedicdevice.configuration
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.event.ApplicationEventMulticaster
+import org.springframework.context.event.SimpleApplicationEventMulticaster
+import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.jms.annotation.EnableJms
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter
 import org.springframework.jms.support.converter.MessageType
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.client.RestTemplate
-import ru.viscur.dh.apps.paramedicdevice.dto.Reference
-import ru.viscur.dh.apps.paramedicdevice.jackson.ReferenceDeserializer
-import ru.viscur.dh.apps.paramedicdevice.jackson.ReferenceSerializer
+import java.time.Duration
 
 /**
  * Created at 26.09.2019 11:18 by TimochkinEA
@@ -20,6 +21,7 @@ import ru.viscur.dh.apps.paramedicdevice.jackson.ReferenceSerializer
  */
 @Configuration
 @EnableJms
+@EnableScheduling
 class AppConfig {
 
     @Bean
@@ -31,17 +33,18 @@ class AppConfig {
     }
 
     @Bean
-    fun objectMapper(): ObjectMapper {
-        val mapper = ObjectMapper()
-        val module = SimpleModule()
-
-        module.addSerializer(Reference::class.java, ReferenceSerializer())
-        module.addDeserializer(Reference::class.java, ReferenceDeserializer())
-        mapper.registerModule(module)
-        return mapper
+    fun restTemplate(builder: RestTemplateBuilder): RestTemplate {
+        return builder
+                .setConnectTimeout(Duration.ofSeconds(15))
+                .setReadTimeout(Duration.ofSeconds(10))
+                .build()
     }
 
     @Bean
-    fun restTemplate() = RestTemplate()
+    fun applicationEventMulticaster(): ApplicationEventMulticaster {
+        val eventMulticaster = SimpleApplicationEventMulticaster()
+        eventMulticaster.setTaskExecutor(SimpleAsyncTaskExecutor())
+        return eventMulticaster
+    }
 
 }

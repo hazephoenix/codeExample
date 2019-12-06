@@ -9,9 +9,7 @@
     * dh-rfid-location-device-app - приложение управляющее rfid-устройствами (TODO под вопросом)
 * common - общие библиотеки/компоненты 
     * fhir-model  - общая модель данных (в формате FHIR)
-    * spring-boot - самописные вещи для Spring Boot
-        *  flyway-module-configuration - позволяет запускать локальные миграции Flyway на базе данных подсистемы (например сервиса)  
-* service - набор сервисов
+ * service - набор сервисов
     * data-storage-service - сервис хранилища данных
         * data-storage-service-api - API сервиса
         * data-storage-service-impl - реализация сервиса
@@ -26,3 +24,6 @@
         * queue-manager-service-impl - реализация сервиса
         * queue-manager-service-rest - Rest API сервиса
         * queue-manager-service-rest-cli - rest клиент сервиса
+        
+## Базы данных
+ * dh_datastorage - БД сервиса хранилища данных.  [Инструкция по созданию в README модуля](./service/data-storage-service/README.md)
