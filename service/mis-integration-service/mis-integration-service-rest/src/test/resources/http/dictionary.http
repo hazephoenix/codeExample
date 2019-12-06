@@ -8,13 +8,13 @@
 
 ###                                                                                icd10
 ###
-GET http://localhost:8080/dictionary/ICD-10
+GET {{host}}/dictionary/ICD-10
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
-GET http://localhost:8080/dictionary/ICD-10?parentCode=A00-B99
+GET {{host}}/dictionary/ICD-10?parentCode=A00-B99
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -24,44 +24,44 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 ###                                                                                any ValueSet
 ### ICD-10, Identifier_types, Severity, Complaints, Practitioner_qualifications, Consent_categories, Observation_types, Upper_respiratory_airway, Breathing_rate, Blood_oxygenation_level, Heart_rate_per_minute, Blood_pressure_upper_limit, Consciousness_assessment, Body_temperature, Pain_intensity_assessment, Patient_can_stand
 ###
-GET http://localhost:8080/dictionary/Observation_types
+GET {{host}}/dictionary/Observation_types
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
-GET http://localhost:8080/dictionary/Observation_types?parentCode=X-ray
+GET {{host}}/dictionary/Observation_types?parentCode=X-ray
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 ###                                                                                icdToPractitionerQualifications
-GET http://localhost:8080/dictionary/icdToPractitionerQualifications
+GET {{host}}/dictionary/icdToPractitionerQualifications
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                                                                icdToObservationTypes
-GET http://localhost:8080/dictionary/icdToObservationTypes
+GET {{host}}/dictionary/icdToObservationTypes
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                                                                respQualificationToObservationTypes
-GET http://localhost:8080/dictionary/respQualificationToObservationTypes
+GET {{host}}/dictionary/respQualificationToObservationTypes
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                                                                offices
-GET http://localhost:8080/dictionary/offices
+GET {{host}}/dictionary/offices
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###                                                                                Practitioner
-GET http://localhost:8080/dictionary/practitioners
+GET {{host}}/dictionary/practitioners
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -69,7 +69,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 ###                                                                                Organizations
-GET http://localhost:8080/dictionary/organizations
+GET {{host}}/dictionary/organizations
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

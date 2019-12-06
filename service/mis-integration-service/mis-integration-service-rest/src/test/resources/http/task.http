@@ -5,7 +5,7 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
-POST http://localhost:8080/desktop/task/add
+POST {{host}}/desktop/task/add
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -16,13 +16,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-GET http://localhost:8080/desktop/task/status/53a20a3a-6c77-4c36-9b6a-8a73cbc89549
+GET {{host}}/desktop/task/status/53a20a3a-6c77-4c36-9b6a-8a73cbc89549
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-GET http://localhost:8080/desktop/task/result/53a20a3a-6c77-4c36-9b6a-8a73cbc89549
+GET {{host}}/desktop/task/result/53a20a3a-6c77-4c36-9b6a-8a73cbc89549
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

@@ -7,19 +7,19 @@
 
 ###        все пациенты в ответственности врача
 ###
-GET http://localhost:8080/examination/patients?practitionerId=37030497-7d8b-48ec-a5cf-5f3097c813ac
+GET {{host}}/examination/patients?practitionerId=37030497-7d8b-48ec-a5cf-5f3097c813ac
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
-GET http://localhost:8080/examination/patients
+GET {{host}}/examination/patients
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
-GET http://localhost:8080/examination/cancel?patientId=3c497f2e-beee-43cc-bdb3-da8786c3537b
+GET {{host}}/examination/cancel?patientId=3c497f2e-beee-43cc-bdb3-da8786c3537b
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -27,13 +27,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 ###        все назначения пациента
 ###
 
-GET http://localhost:8080/examination/serviceRequests?patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
+GET {{host}}/examination/serviceRequests?patientId=9a6bb3c7-e4aa-4636-8d48-ecf574fe6c8a
 Accept: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/examination/serviceRequests
+POST {{host}}/examination/serviceRequests
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -69,7 +69,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 ###
 
-POST http://localhost:8080/examination
+POST {{host}}/examination
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

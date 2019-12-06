@@ -7,49 +7,49 @@
 
 ###
 
-GET http://localhost:8080/practitioner
+GET {{host}}/practitioner
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-GET http://localhost:8080/practitioner/byId?id=Surgeon_Клиновицкий_Игорь_Юрьевич
+GET {{host}}/practitioner/byId?id=Surgeon_Клиновицкий_Игорь_Юрьевич
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-GET http://localhost:8080/practitioner?withBlocked=true
+GET {{host}}/practitioner?withBlocked=true
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-POST http://localhost:8080/practitioner/blocked?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=false
+POST {{host}}/practitioner/blocked?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=false
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-POST http://localhost:8080/practitioner/onWork?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=true
+POST {{host}}/practitioner/onWork?practitionerId=Surgeon_Клиновицкий_Игорь_Юрьевич&value=true
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-POST http://localhost:8080/practitioner/onWork?practitionerId=Ms_Аникина_Алена_Анатольевна&value=true&officeId=Office:101
+POST {{host}}/practitioner/onWork?practitionerId=Ms_Аникина_Алена_Анатольевна&value=true&officeId=Office:101
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
 {}
 ###
 
-POST http://localhost:8080/practitioner
+POST {{host}}/practitioner
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -86,7 +86,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###
 
-PUT http://localhost:8080/practitioner
+PUT {{host}}/practitioner
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
