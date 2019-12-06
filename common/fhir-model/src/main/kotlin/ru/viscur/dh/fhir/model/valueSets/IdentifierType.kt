@@ -48,7 +48,7 @@ enum class IdentifierType {
      */
     RFID,
     /**
-     * Номер кабиента
+     * Номер кабинета
      */
     OFFICE_NUMBER
 }

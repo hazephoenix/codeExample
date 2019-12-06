@@ -46,13 +46,13 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "entry": [
     {
       "item": {
-        "reference": "Location/Office:120",
+        "reference": "Location/Office:YellowZoneSection6",
         "type": "Location"
       }
     },
     {
       "item": {
-        "reference": "Patient/4ddfe1e6-2afd-4ae2-8e27-0c35907ec976",
+        "reference": "Patient/43df3d85-7d22-4a39-84f3-2bbecfd1eca5",
         "type": "Patient"
       }
     }
@@ -112,7 +112,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 }
 ###                                                                                Отменить "вход" пациента в кабинет
 ###
-POST http://84.201.154.121:8080/queue/office/cancelEntering
+POST {{host}}/queue/office/cancelEntering
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -121,7 +121,7 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
   "type": "Patient"
 }
 ###                                                                                Кабинет готов принять пациента
-POST http://84.201.154.121:8080/queue/office/ready
+POST {{host}}/queue/office/ready
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 
@@ -224,12 +224,6 @@ Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 ###                                                                              Информация об очереди в формате QueueItems
 ###
 GET {{host}}/queue/queueItems
-Content-Type: application/json
-Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
-
-{}
-###
-GET http://84.201.154.121:8080/queue/info
 Content-Type: application/json
 Authorization: Basic dGVzdDp0ZXN0R0doZEpwbGRjenhjbmFzdzg3NDU=
 

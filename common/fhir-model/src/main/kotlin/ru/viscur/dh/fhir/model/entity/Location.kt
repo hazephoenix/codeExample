@@ -7,6 +7,7 @@ import ru.viscur.dh.fhir.model.enums.ResourceType
 import ru.viscur.dh.fhir.model.type.*
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.genId
+import ru.viscur.dh.fhir.model.utils.identifierValueNullable
 import ru.viscur.dh.fhir.model.valueSets.IdentifierType
 
 /**
@@ -40,13 +41,5 @@ class Location @JsonCreator constructor(
     /**
      * Номер кабинета
      */
-    fun officeNumber(): String? {
-        val officeNumberIdentifier =
-                identifier?.filter {
-                    it.type.coding.any { coding ->
-                        coding.code == IdentifierType.OFFICE_NUMBER.name
-                    }
-                }?.firstOrNull()
-        return officeNumberIdentifier?.value;
-    }
+    fun officeNumber(): String? = identifierValueNullable(IdentifierType.OFFICE_NUMBER)
 }

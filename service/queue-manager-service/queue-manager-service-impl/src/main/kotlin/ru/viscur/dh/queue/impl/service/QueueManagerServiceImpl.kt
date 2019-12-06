@@ -18,6 +18,8 @@ import ru.viscur.dh.fhir.model.type.BundleEntry
 import ru.viscur.dh.fhir.model.utils.code
 import ru.viscur.dh.fhir.model.utils.criticalTimeForDelayGoingToObservation
 import ru.viscur.dh.fhir.model.utils.criticalTimeForDeletingNextOfficeForPatientsInfo
+import ru.viscur.dh.fhir.model.valueSets.LocationType
+import ru.viscur.dh.practitioner.call.api.LoudspeakerFacade
 import ru.viscur.dh.queue.api.LocationMonitorInformService
 import ru.viscur.dh.queue.api.OfficeService
 import ru.viscur.dh.queue.api.PatientStatusService
@@ -36,7 +38,8 @@ class QueueManagerServiceImpl(
         private val observationDurationService: ObservationDurationEstimationService,
         private val serviceRequestsExecutionCalculator: ServiceRequestsExecutionCalculator,
         private val configService: ConfigService,
-        private val locationMonitorInformService: LocationMonitorInformService
+        private val locationMonitorInformService: LocationMonitorInformService,
+        private val loudSpeakerFacade: LoudspeakerFacade
 ) : QueueManagerService {
 
     companion object {
@@ -87,6 +90,7 @@ class QueueManagerServiceImpl(
     override fun forceSendPatientToObservation(patientId: String, officeId: String): List<ServiceRequest> {
         setAsFirst(patientId, officeId)
         sendFirstToObservation(officeId)
+        loudCallPatientToZone(patientId, officeId)
         return activeServiceRequestInOffice(patientId, officeId)
     }
 
@@ -419,8 +423,36 @@ class QueueManagerServiceImpl(
         val patientId = officeService.firstPatientIdInQueue(officeId)
         patientId?.run {
             patientStatusService.changeStatus(patientId, PatientQueueStatus.GOING_TO_OBSERVATION, officeId)
+            loudCallPatientToOffice(patientId, officeId)
             changeOfficeStatusNotReadyToProper(officeId)
         }
+    }
+
+    /**
+     * Приглашение/вызов пациента в кабинет через динамики
+     */
+    private fun loudCallPatientToOffice(patientId: String, officeId: String) {
+        if (locationService.isZone(officeId)) {
+            return
+        }
+        val office = locationService.byId(officeId)
+        val queueCode = patientService.queueCode(patientId)
+        val text = "Пациент $queueCode пройдите в кабинет номер ${office.officeNumber()}"
+        loudSpeakerFacade.say(office, text)
+    }
+
+    /**
+     * Приглашение/вызов пациента в зону через динамики
+     */
+    private fun loudCallPatientToZone(patientId: String, officeId: String) {
+        val office = locationService.byId(officeId)
+        //вызов актуален только в желтую зону. в зеленую не вызвают, в красную нельзя оповещать
+        if (office.type() != LocationType.YELLOW_ZONE.id) {
+            return
+        }
+        val queueCode = patientService.queueCode(patientId)
+        val text = "Пациент $queueCode пройдите в смотровую желтой зоны номер ${office.officeNumber()}"
+        loudSpeakerFacade.say(office, text)
     }
 
     /**
