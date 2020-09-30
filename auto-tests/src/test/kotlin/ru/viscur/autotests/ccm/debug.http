@@ -1,0 +1,424 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+POST http://localhost:8080/tonometer/start
+Content-Type: application/json
+
+{}
+
+###
+
+POST http://localhost:8080/api/auth/token
+Content-Type: application/json
+
+{
+  "rfid": "1"
+}
+
+> {%
+client.assert(typeof response.body.token !== 'undefined', "No token returned");
+client.global.set('auth_token', response.body.token);
+ %}
+
+###
+
+POST http://localhost:8080/api/pyrometry/start
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+POST http://localhost:8080/api/pyrometry/stop
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+GET http://localhost:8080/api/pyrometry/temperature
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+POST http://localhost:8080/api/pyrometry/temperature
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+POST http://localhost:8080/api/alcometer/start
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+POST http://localhost:8080/api/alcometer/stop
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+GET http://localhost:8080/api/alcometer/temperature
+Content-Type: application/json
+
+{}
+
+###
+POST http://localhost:8080/api/tonometer/start
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+POST http://localhost:8080/api/tonometer/stop
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+GET http://localhost:8080/api/tonometer/temperature
+Content-Type: application/json
+
+{}
+
+###
+
+POST http://localhost:8080/api/photo/startVideo
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+GET http://localhost:8080/api/tonometer/temperature
+Content-Type: application/json
+
+{}
+
+###
+POST http://192.168.10.93:8080/api/pyrometry/stop
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{}
+
+###
+
+POST http://192.168.10.93:8080/api/auth/token
+Content-Type: application/json
+
+{
+  "rfid": "1"
+}
+
+> {%
+client.assert(typeof response.body.token !== 'undefined', "No token returned");
+client.global.set('auth_token', response.body.token);
+ %}
+
+###
+
+GET http://localhost:8080/api/admin/bluetooth/printer
+Content-Type: application/json
+
+###
+
+GET http://localhost:8080/api/admin/bluetooth/discovery/start
+Content-Type: application/json
+
+###
+
+GET http://localhost:8080/api/admin/bluetooth/discovery/cancel
+Content-Type: application/json
+
+###
+
+GET http://192.168.10.110:8080/api/admin/bluetooth/discovery/start
+Content-Type: application/json
+
+###
+GET http://192.168.10.110:8080/api/admin/bluetooth/discovery/cancel
+Content-Type: application/json
+
+###
+
+GET http://localhost:8080/api/admin/bluetooth/status
+Content-Type: application/json
+
+###
+
+GET http://localhost:8080/api/admin/bluetooth/connected?address=DC0D3083C881
+Content-Type: application/json
+
+###
+
+GET http://localhost:8080/api/currentSurvey/print/ru/3
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE1ODQ0MjE4NzV9.9yFvAuYM5klt1mGGDQSJwv2VhPj7TjWcPN8psSUtzHM
+
+###
+
+POST http://localhost:8080/api/admin/printer/test
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE1ODQ0MjE4NzV9.9yFvAuYM5klt1mGGDQSJwv2VhPj7TjWcPN8psSUtzHM
+
+###
+# Проверка правильности пароля для пользователя (на примере встроенного админа)
+
+GET http://localhost:8080/api/admin/user/check?id=1&pw=ccmpass
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE1ODQ0MjE4NzV9.9yFvAuYM5klt1mGGDQSJwv2VhPj7TjWcPN8psSUtzHM
+
+###
+# Проверка правильности пароля для пользователя (на примере встроенного админа)
+
+GET http://localhost:8080/api/admin/user/first-run
+Content-Type: application/json
+
+###
+# Все пользователи-неадмины
+
+GET http://localhost:8080/api/admin/user/listUsers
+Content-Type: application/json
+
+###
+# Все пользователи-неадмины
+
+GET http://localhost:8080/api/admin/user/listAdmins
+Content-Type: application/json
+
+###
+# Все пользователи-неадмины
+
+POST http://localhost:8080/api/admin/user
+Content-Type: application/json
+
+{
+  "rfid": 1,
+  "password": "",
+  "role": "ADMIN"
+}
+
+###
+# Создание пользователя
+###
+POST http://localhost:8080/api/admin/user
+Content-Type: application/json
+
+{
+  "rfid": 3,
+  "role": "USER",
+  "lastName": "test222",
+  "firstName": "testtt",
+  "middleName": null,
+  "gender": "M",
+  "birthDate": null,
+  "login": "test",
+  "password": "",
+  "createdAt": "2020-03-31T06:16:12.000+0000",
+  "updatedAt": null,
+  "deletedAt": null,
+  "referenceRange": null,
+  "surveys": []
+}
+
+###
+# Редактирование пользователя (указан id)
+###
+POST http://localhost:8080/api/admin/user
+Content-Type: application/json
+
+{
+  "id": 4,
+  "rfid": 3,
+  "role": "USER",
+  "lastName": "test222",
+  "firstName": "testtt",
+  "middleName": null,
+  "gender": "M",
+  "birthDate": null,
+  "login": "test",
+  "password": "",
+  "createdAt": "2020-03-31T06:16:12.000+0000",
+  "updatedAt": null,
+  "deletedAt": null,
+  "referenceRange": null,
+  "surveys": []
+}
+
+###
+# Создание referenceRange для пользователя
+###
+POST http://localhost:8080/api/admin/referenceRange?userId=4
+Content-Type: application/json
+
+{
+  "alcoholMin": 2.1,
+  "alcoholMax": 3.5
+}
+
+###
+# Редактирование referenceRange для пользователя (id задавать не нужно, найдется единств-ая запись)
+###
+POST http://localhost:8080/api/admin/referenceRange?userId=4
+Content-Type: application/json
+
+{
+  "alcoholMin": 2.1,
+  "alcoholMax": 3.8
+}
+
+###
+# Получение referenceRange для пользователя
+###
+GET http://localhost:8080/api/admin/referenceRange/listByUserId?userId=4
+Content-Type: application/json
+
+{}
+
+###
+# Список подключенных флешек
+###
+GET http://localhost:8080/api/media/list
+Content-Type: application/json
+
+###
+# Сохранение списка пользователей на флешку
+###
+GET http://localhost:8080/api/admin/user/exportUsers?mediaId=/dev/sdd1
+Content-Type: application/json
+
+
+###
+# Сохранение списка администраторов на флешку
+###
+GET http://localhost:8080/api/admin/user/exportAdmins?mediaId=/dev/sdd1
+Content-Type: application/json
+
+
+###
+# Сохранение списка обследований на флешку
+###
+GET http://localhost:8080/api/admin/survey/export?mediaId=/dev/sdd1
+Content-Type: application/json
+
+###
+# Смонтировать флешку /dev/sdc1
+###
+POST http://localhost:8080/api/media/mount?mediaId=/dev/sdc1
+Content-Type: application/json
+
+###
+# Размонтировать флешку /dev/sdc1
+###
+POST http://localhost:8080/api/media/unmount?mediaId=/dev/sdc1
+Content-Type: application/json
+
+###
+# Форматировать флешку /dev/sdc1
+###
+POST http://localhost:8080/api/media/format?mediaId=/dev/sdc1
+Content-Type: application/json
+
+###
+# Получить системное время
+###
+GET http://localhost:8080/api/admin/config/time
+Content-Type: application/json
+
+###
+# Получить список временных зон
+###
+GET http://localhost:8080/api/admin/config/timezones
+Content-Type: application/json
+
+###
+# Получить текущую временную зону
+###
+GET http://localhost:8080/api/admin/config/timezones/current
+Content-Type: application/json
+
+###
+POST http://localhost:8080/api/platform/printer
+Content-Type: application/json
+
+{
+  "action": "add",
+  "type": "usb",
+  "devname": "blalb"
+}
+
+###
+GET http://localhost:8080/api/printer/bt/list
+Content-Type: application/json
+
+###
+GET http://localhost:8080/api/printer/bt/list0
+Content-Type: application/json
+
+###
+POST http://localhost:8080/api/printer/bt/connect?address=DC:0D:30:83:D6:20
+Content-Type: application/json
+
+###
+
+PUT http://localhost:8080/api/currentSurvey/save
+Content-Type: application/json
+
+{
+  "id": 1,
+  "user": {
+    "id": 2,
+    "rfid": 2
+  },
+  "photo": "",
+  "beginDate": null,
+  "endDate": null,
+  "duration": null,
+  "result": null,
+  "alcohol": 990000.121,
+  "bodyTemperature": null,
+  "systolic": null,
+  "diastolic": null,
+  "heartRate": null,
+  "complaints": null,
+  "signature": "",
+  "createdAt": "2020-07-13T10:53:44.662+0000",
+  "updatedAt": "2020-07-13T10:53:44.666+0000",
+  "deletedAt": null
+}
+
+###
+###
+# Получение списка обследований
+###
+GET http://localhost:8080/api/admin/survey/list
+Content-Type: application/json
+
+###
+# Получение постраничного списка обследований
+###
+GET http://localhost:8080/api/admin/survey/pageable?page=0&size=10
+Content-Type: application/json
+
+###

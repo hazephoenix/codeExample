@@ -2,6 +2,7 @@ package ru.viscur.autotests.utils
 
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import io.restassured.http.Header
 import io.restassured.specification.RequestSpecification
 import ru.viscur.dh.fhir.model.entity.*
 import ru.viscur.dh.fhir.model.enums.*
@@ -43,19 +44,22 @@ class Helpers {
         /**
          * Квалификации
          */
+        val bearerToken = ""
         const val QUALIFICATION_SURGEON = "Surgeon"
         const val QUALIFICATION_CATEGORY_SURGEON = "Surgeon_category"
+        val header : Header = Header("Authorization", "Bearer $bearerToken")
+
 
         //создать спецификацию запроса RestApi
         fun createRequestSpec(body: Any): RequestSpecification {
-            return RestAssured.given().header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745").body(body)
+            return RestAssured.given().header("Content-type", ContentType.JSON )//.header(header)//basic("test", "testGGhdJpldczxcnasw8745").body(body)
         }
 
         fun createRequestSpecWithoutBody(): RequestSpecification =
                 RestAssured.given().header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
 
         fun createRequestWithQuery(paramsMap: Map <String, Any>): RequestSpecification =
-                RestAssured.given().queryParams(paramsMap).header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
+                RestAssured.given().queryParams(paramsMap).contentType(ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
 
         fun createRequestWithQueryAndBody(body: Any, paramsMap: Map <String, Any>): RequestSpecification =
                 RestAssured.given().queryParams(paramsMap).body(body).header("Content-type", ContentType.JSON).auth().preemptive().basic("test", "testGGhdJpldczxcnasw8745")
